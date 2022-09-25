@@ -8,6 +8,9 @@ export const theme = {
       secondary: '#f0f2f5',
     },
     danger: '#ff4d4f',
+    green: '#6CD72B',
+    skyblue: '#18BEF2',
+    pink: '#EE18F2',
   },
   breakPoints: {
     xs: '400px',

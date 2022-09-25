@@ -1,8 +1,8 @@
 import { Outlet } from 'react-router-dom';
-import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './styles';
-import { MainLayoutProps } from './types';
 import SideMenu from '../SideMenu';
 import Header from '../Header';
+import { MainLayoutProps } from './types';
+import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './styles';
 
 const SIDER_WIDTH = 250;
 

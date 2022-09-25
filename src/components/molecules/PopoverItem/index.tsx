@@ -8,7 +8,7 @@ const PopoverItem = ({ title, message, caption }: PopoverItemProps) => {
     <PopoverItemRoot>
       <Avatar title={title} subtitle={message} />
 
-      <Typography.Text>{caption}</Typography.Text>
+      <Typography.Text className="time-distance">{caption}</Typography.Text>
     </PopoverItemRoot>
   );
 };

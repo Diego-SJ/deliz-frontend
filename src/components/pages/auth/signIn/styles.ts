@@ -21,7 +21,7 @@ export const FormContainer = styled(Card)`
     padding: 0;
     width: 100%;
     min-height: 60vh;
-    min-width: 700px;
+    min-width: 800px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.4);

@@ -8,7 +8,7 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const handleOnFinish = () => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME);
+    navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path);
   };
 
   return (
@@ -32,18 +32,10 @@ const SignIn = () => {
             <Typography.Paragraph type="secondary" className="caption">
               o inicia con tu correo
             </Typography.Paragraph>
-            <Form.Item
-              label="Correo"
-              name="email"
-              rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}
-            >
+            <Form.Item label="Correo" name="email" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
               <Input size="large" placeholder="email@ejemplo.com" />
             </Form.Item>
-            <Form.Item
-              label="Contraseña"
-              name="password"
-              rules={[{ required: true, message: 'Ingresa una contraseña válida' }]}
-            >
+            <Form.Item label="Contraseña" name="password" rules={[{ required: true, message: 'Ingresa una contraseña válida' }]}>
               <Input.Password size="large" placeholder="contraseña" />
             </Form.Item>
             <Button type="link">Recuperar contraseña</Button>
@@ -54,7 +46,7 @@ const SignIn = () => {
             </Form.Item>
             <Typography.Paragraph type="secondary" className="caption">
               ¿No tienes una cuenta?{' '}
-              <Button type="link" href={APP_ROUTES.AUTH.SIGN_UP}>
+              <Button type="link" href={APP_ROUTES.AUTH.SIGN_UP.path}>
                 Registrate
               </Button>
             </Typography.Paragraph>

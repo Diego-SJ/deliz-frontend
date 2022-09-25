@@ -7,7 +7,7 @@ export const NOTIFICATIONS = [
   {
     id: '1',
     title: 'Nuevo cliente',
-    message: '5 clientes nuevos en la última hora',
+    message: '5 clientes nuevos en la última hora wegwegweg qegwegweg weg weg wegweg we',
     date: subDays(new Date(), 3),
     type: 'NEW_CLIENT', //  NEW_CLIENT, NEW_ORDER, EMPTY_STOCK, NEW_SCHEDULE, ORDER_CANCELLED, SCHEDULE_CANCELLED
   },
@@ -21,7 +21,7 @@ export const NOTIFICATIONS = [
   {
     id: '3',
     title: 'Stock vácio',
-    message: '5 clientes nuevos en la última hora',
+    message: '5 clientes nuevos en la última hora wegwegweg qegwegweg weg weg wegweg we',
     date: subMinutes(new Date(), 3),
     type: 'EMPTY_STOCK', //  NEW_CLIENT, NEW_ORDER, EMPTY_STOCK, NEW_SCHEDULE, ORDER_CANCELLED, SCHEDULE_CANCELLED
   },
