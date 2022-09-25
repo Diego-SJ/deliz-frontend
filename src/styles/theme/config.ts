@@ -1,0 +1,20 @@
+export const theme = {
+  colors: {
+    primary: '#1890FF',
+    secondary: '#191945',
+    tertiary: '#A9A9A9',
+    background: {
+      primary: '#FFFFFF',
+      secondary: '#f0f2f5',
+    },
+    danger: '#ff4d4f',
+  },
+  breakPoints: {
+    xs: '400px',
+    sm: '600px',
+    md: '768px',
+    lg: '992px',
+    xlg: '1080px',
+    xxlg: '1200px',
+  },
+};
