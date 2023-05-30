@@ -12,6 +12,7 @@ export const APP_ROUTES = {
     DASHBOARD: {
       HOME: { path: '/app/home', title: 'Inicio' },
       PRODUCTS: { path: '/app/products', title: 'Productos' },
+      PRODUCTS_ID: { path: (_: TemplateStringsArray, id: number) => `/app/products/${id}`, title: 'Productos' },
       CUSTOMERS: { path: '/app/customers', title: 'Clientes' },
       ORDERS: { path: '/app/orders', title: 'Ordenes' },
       REPORTS: { path: '/app/reports', title: 'Reportes' },
