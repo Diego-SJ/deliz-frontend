@@ -7,18 +7,20 @@ export const LayoutRoot = styled(Layout)`
 `;
 
 export const LayoutSider = styled(Sider)`
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  min-height: 100vh;
-  max-height: 100vh;
-  overflow: auto;
-  background: ${({ theme }) => theme.colors.background.primary};
+  &.ant-layout-sider {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: auto;
+    background: ${({ theme }) => theme.colors.background.primary};
+  }
 `;
 
 export const LayoutContainer = styled(Layout)`
   display: flex;
+  width: 100%;
   flex-direction: column;
   background: ${({ theme }) => theme.colors.background.secondary};
 `;

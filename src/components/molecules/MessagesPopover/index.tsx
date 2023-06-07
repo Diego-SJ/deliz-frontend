@@ -10,7 +10,7 @@ const MessagesPopover = () => {
     <Popover
       triggerComponent={
         <Badge count={2}>
-          <MessageOutlined style={{ fontSize: 22, color: theme.colors.tertiary }} />
+          <MessageOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.tertiary }} />
         </Badge>
       }
       placement="bottomRight"

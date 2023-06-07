@@ -14,11 +14,11 @@ const Header = () => {
     <HeaderRoot>
       <Typography.Title level={4}>Dashboard</Typography.Title>
       <HeaderActions>
-        <Space size="middle">
-          <SearchOutlined style={{ fontSize: 22, color: theme.colors.tertiary }} />
+        {/* <Space size="middle">
+          <SearchOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.tertiary }} />
           <MessagesPopover />
           <NotificationsPopover />
-        </Space>
+        </Space> */}
         <Divider type="vertical" />
         <Space size={50}>
           <Avatar avatar={{ src: PROFILE_PIC }} title="Diego Salas" subtitle="Admin" bordered />

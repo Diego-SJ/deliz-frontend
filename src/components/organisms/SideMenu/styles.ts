@@ -18,8 +18,7 @@ export const MenuRoot = styled(Menu)`
       padding: 0 16px !important;
       border-radius: 10px;
       color: ${({ theme }) => theme.colors.tertiary};
-      transition: border-color 0.3s, background 0.3s, box-shadow 0.4s,
-        padding 0.1s cubic-bezier(0.215, 0.61, 0.355, 1) !important;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.4s, padding 0.1s cubic-bezier(0.215, 0.61, 0.355, 1) !important;
 
       .anticon {
         font-size: 20px;
@@ -33,7 +32,7 @@ export const MenuRoot = styled(Menu)`
       &.ant-menu-item-selected {
         background: ${({ theme }) => theme.colors.primary};
         color: ${({ theme }) => theme.colors.background.primary};
-        box-shadow: 0 0 13px 0px #1890ff;
+        box-shadow: 0 0 13px 0px #776afb;
       }
 
       ::after {

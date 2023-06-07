@@ -1,0 +1,186 @@
+import Upload from '@/components/atoms/UploadFile';
+import { CATEGORIES } from '@/constants/categories';
+import { APP_ROUTES } from '@/constants/routes';
+import { STATUS } from '@/constants/status';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { productActions } from '@/redux/reducers/products';
+import { Product } from '@/redux/reducers/products/types';
+import { Breadcrumb, Button, Card, Col, Form, Input, InputNumber, Row, Select, UploadFile, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+
+type Params = {
+  action: 'edit' | 'add';
+};
+
+const UI_TEXTS = {
+  breadcrumb: { edit: 'Editar producto', add: 'Agregar nuevo producto' },
+  saveBtn: { edit: 'Guardar cambios', add: 'Guardar' },
+};
+
+const { TextArea } = Input;
+
+const ProductEditor = () => {
+  const [form] = Form.useForm();
+  const dispatch = useAppDispatch();
+  let { action = 'add' } = useParams<Params>();
+  const [loading, setLoading] = useState(false);
+  const { current_product } = useAppSelector(({ products }) => products);
+  const [productImages, setProductImages] = useState<UploadFile[]>([]);
+
+  useEffect(() => {
+    if (current_product?.image_url) {
+      setProductImages([
+        {
+          uid: 'DEFAULT_IMAGE',
+          name: 'DEFAULT_IMAGE',
+          status: 'done',
+          url: current_product.image_url,
+        },
+      ]);
+    }
+  }, [current_product?.image_url]);
+
+  const saveNewProduct = async (values: Product) => {
+    let img = productImages[0];
+    let image_url = '';
+
+    if (img?.originFileObj) await productActions.saveImage(img?.originFileObj as File);
+    if (typeof image_url === 'string') {
+      await dispatch(productActions.saveProduct({ ...values, image_url }));
+    }
+  };
+
+  const saveEditionProduct = async (values: Product) => {
+    let img = productImages[0];
+    let image_url: string | boolean = '';
+    if (img?.uid !== 'DEFAULT_IMAGE') {
+      image_url = await productActions.replaceImage(img?.originFileObj as File, current_product.image_url as string);
+    }
+    if (typeof image_url === 'string') {
+      await dispatch(productActions.updateProduct(values, image_url));
+    }
+  };
+
+  const onFinish = async (values: Product) => {
+    if (!values.name) return message.warning('Agrega un nombre al producto');
+
+    setLoading(true);
+
+    if (action === 'add') await saveNewProduct(values);
+    else if (action === 'edit') await saveEditionProduct(values);
+
+    setLoading(false);
+    form.resetFields();
+  };
+
+  const onImageChange = (files: UploadFile[]) => {
+    setProductImages(files);
+  };
+
+  return (
+    <div>
+      <Row justify="space-between">
+        <Col span={8}>
+          <Breadcrumb
+            items={[
+              {
+                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>{APP_ROUTES.PRIVATE.DASHBOARD.HOME.title}</Link>,
+                key: 'dashboard',
+              },
+              {
+                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path}>{APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.title}</Link>,
+                key: 'products',
+              },
+              {
+                title: UI_TEXTS.breadcrumb[action],
+              },
+            ]}
+          />
+        </Col>
+      </Row>
+      <Row style={{ marginTop: '20px' }}>
+        <Col span={24}>
+          <Card title={UI_TEXTS.breadcrumb[action]}>
+            <Form
+              form={form}
+              wrapperCol={{ span: 24 }}
+              layout="vertical"
+              onFinish={onFinish}
+              initialValues={{ ...current_product, status: 1 }}
+              validateMessages={{
+                required: '${label} es obligatorio.',
+                types: {
+                  number: '${label} no es un número válido!',
+                },
+                number: {
+                  range: '${label} debe tener un valor minímo de ${min}',
+                },
+              }}
+            >
+              <Row gutter={[20, 5]}>
+                <Col span={12}>
+                  <Form.Item name="image_url" label="Upload">
+                    <Upload onChange={onImageChange} defaultFileList={productImages} />
+                  </Form.Item>
+                  <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
+                    <Input placeholder="E.g: Helado de nuez" />
+                  </Form.Item>
+                  <Form.Item name="description" label="Descripción">
+                    <TextArea rows={4} placeholder="E.g: Helado de nuez" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Row gutter={[20, 5]}>
+                    <Col span={12}>
+                      <Form.Item name="retail_price" label="Precio menudeo" rules={[{ type: 'number', min: 0, required: true }]}>
+                        <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
+                      </Form.Item>
+                      <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                        <Select placeholder="Por default es Activo">
+                          {STATUS.map(item => (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                      <Form.Item name="stock" label="Stock" rules={[{ type: 'number', min: 0, required: true }]}>
+                        <InputNumber style={{ width: '100%' }} placeholder="0" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        name="wholesale_price"
+                        label="Precio mayoreo"
+                        rules={[{ type: 'number', min: 0, required: true }]}
+                      >
+                        <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
+                      </Form.Item>
+                      <Form.Item name="category_id" label="Categoría" rules={[{ required: true }]}>
+                        <Select placeholder="Selecciona una categoría">
+                          {CATEGORIES.map(item => (
+                            <Select.Option key={item.id} value={item.id}>
+                              {item.name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Form.Item>
+                <Button block type="primary" size="large" htmlType="submit" loading={loading}>
+                  {UI_TEXTS.saveBtn[action]}
+                </Button>
+              </Form.Item>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default ProductEditor;

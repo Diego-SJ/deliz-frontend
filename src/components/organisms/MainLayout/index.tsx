@@ -12,7 +12,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
       <LayoutSider width={SIDER_WIDTH}>
         <SideMenu />
       </LayoutSider>
-      <LayoutContainer style={{ marginLeft: SIDER_WIDTH }}>
+      <LayoutContainer>
         <Header />
         <LayoutContent>
           <Outlet />
