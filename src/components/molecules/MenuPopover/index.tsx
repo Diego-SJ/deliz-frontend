@@ -8,22 +8,22 @@ const MenuPopover = () => {
   const theme = useTheme();
   return (
     <Popover
-      triggerComponent={<CaretDownOutlined style={{ fontSize: 22, color: theme.colors.primary, marginTop: 10 }} />}
+      triggerComponent={<CaretDownOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.primary, marginTop: 10 }} />}
       placement="bottomRight"
       trigger="click"
       nopadding
     >
       <PopoverBody>
         <IconItem>
-          <TeamOutlined />
+          <TeamOutlined rev={{}} />
           <Typography.Text>Perfil</Typography.Text>
         </IconItem>
         <IconItem>
-          <SettingOutlined />
+          <SettingOutlined rev={{}} />
           <Typography.Text>Configuración</Typography.Text>
         </IconItem>
         <IconItem className="danger">
-          <LogoutOutlined />
+          <LogoutOutlined rev={{}} />
           <Typography.Text>Cerrar sesión</Typography.Text>
         </IconItem>
       </PopoverBody>

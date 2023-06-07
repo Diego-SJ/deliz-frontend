@@ -8,27 +8,17 @@ const SignUp = () => {
     <Layout>
       <LayoutContent>
         <FormContainer className="form-container">
-          <Form
-            name="basic"
-            initialValues={{ remember: true }}
-            autoComplete="off"
-            layout="vertical"
-            requiredMark={false}
-          >
+          <Form name="basic" initialValues={{ remember: true }} autoComplete="off" layout="vertical" requiredMark={false}>
             <Typography.Title level={2}>Bienvenido a Ecommerce</Typography.Title>
             <Form.Item>
-              <Button size="large" icon={<GoogleOutlined />}>
+              <Button size="large" icon={<GoogleOutlined rev={{}} />}>
                 Registrate con Google
               </Button>
             </Form.Item>
             <Typography.Paragraph type="secondary" className="caption">
               o registrate con tu correo
             </Typography.Paragraph>
-            <Form.Item
-              label="Nombre(s)"
-              name="name"
-              rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}
-            >
+            <Form.Item label="Nombre(s)" name="name" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
               <Input size="large" placeholder="Nombre(s)" />
             </Form.Item>
             <Form.Item
@@ -38,18 +28,10 @@ const SignUp = () => {
             >
               <Input size="large" placeholder="Apellidos" />
             </Form.Item>
-            <Form.Item
-              label="Correo"
-              name="email"
-              rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}
-            >
+            <Form.Item label="Correo" name="email" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
               <Input size="large" placeholder="correo@ejemplo.com" />
             </Form.Item>
-            <Form.Item
-              label="Contraseña"
-              name="password"
-              rules={[{ required: true, message: 'Ingresa una contraseña válida' }]}
-            >
+            <Form.Item label="Contraseña" name="password" rules={[{ required: true, message: 'Ingresa una contraseña válida' }]}>
               <Input.Password size="large" placeholder="Contraseña" />
             </Form.Item>
             <Form.Item style={{ marginTop: 10 }}>
@@ -59,7 +41,7 @@ const SignUp = () => {
             </Form.Item>
             <Typography.Paragraph type="secondary" className="caption">
               ¿Ya tienes una cuenta?{' '}
-              <Button type="link" href={APP_ROUTES.AUTH.SIGN_IN}>
+              <Button type="link" href={APP_ROUTES.AUTH.SIGN_IN.path}>
                 Inicia sesión
               </Button>
             </Typography.Paragraph>

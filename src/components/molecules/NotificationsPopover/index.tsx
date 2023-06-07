@@ -11,7 +11,7 @@ const NotificationsPopover = () => {
   const theme = useTheme();
   return (
     <Popover
-      triggerComponent={<BellOutlined style={{ fontSize: 22, color: theme.colors.tertiary }} />}
+      triggerComponent={<BellOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.tertiary }} />}
       placement="bottomRight"
       trigger="click"
       nopadding
