@@ -11,8 +11,10 @@ import CashierActions from './cashier-actions';
 import CashierHeader from '@/components/organisms/CashierHeader';
 import CashierModal from './cashier-modal';
 import CashierCustomer from './cashier-customer';
-import { useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
+import { productActions } from '@/redux/reducers/products';
+import { customerActions } from '@/redux/reducers/customers';
 
 const { Content } = Layout;
 
@@ -23,13 +25,20 @@ const contentStyle: React.CSSProperties = {
 };
 
 const CashRegister = () => {
+  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const { products } = useAppSelector(({ products }) => products);
+  const { customers } = useAppSelector(({ customers }) => customers);
   const [currentProduct, setCurrentProduct] = useState<Product>();
   const [searchText, setSearchText] = useState<string>('');
   const [categories] = useState(CATEGORIES);
   const [currentCategory, setCurrentCategory] = useState('1');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
+    if (!customers.length) dispatch(customerActions.fetchCustomers(true));
+  }, [products, customers, dispatch]);
 
   useEffect(() => {
     let _products = products?.filter(item => {

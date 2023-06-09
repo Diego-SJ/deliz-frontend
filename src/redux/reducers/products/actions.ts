@@ -91,7 +91,7 @@ const customActions = {
         message.error('No se pudo guardar el producto.', 4);
         return false;
       }
-      dispatch(productActions.fetchProducts({ refetch: true }));
+      await dispatch(productActions.fetchProducts({ refetch: true }));
       message.success('¡Producto agregado con éxito!', 4);
       return true;
     } catch (error) {
@@ -128,6 +128,7 @@ const customActions = {
 
       let productData = { ...oldData, ...newData, image_url: BUCKETS.PRODUCTS.IMAGES`${url_sanitized}` };
       dispatch(productActions.setCurrentProduct(productData));
+      await dispatch(productActions.fetchProducts({ refetch: true }));
       message.success('¡Producto actualizado con éxito!', 4);
       return true;
     } catch (error) {

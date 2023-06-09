@@ -38,7 +38,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
 
   const cleanFields = () => {
     setQuantity(0);
-    setChecked(false);
+    setChecked(true);
   };
 
   const handleOnClose = () => {
@@ -101,7 +101,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
     >
       <ModalBody>
         <Avatar
-          src={currentProduct?.image_url ?? FallbackImage}
+          src={currentProduct?.image_url || FallbackImage}
           size={100}
           style={{ background: 'white', padding: !!currentProduct?.image_url ? 0 : 5 }}
           shape="circle"
