@@ -12,6 +12,7 @@ const products = createSlice({
   name: 'products',
   initialState,
   reducers: {
+    resetSlice: () => initialState,
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },

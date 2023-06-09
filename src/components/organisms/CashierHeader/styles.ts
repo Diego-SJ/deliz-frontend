@@ -23,7 +23,7 @@ export const HeaderActions = styled.div`
 
   .ant-divider {
     height: 54%;
-    margin: 0 25px;
+    margin: 0 15px;
     border-left: 1px solid ${({ theme }) => theme.colors.tertiary};
   }
 

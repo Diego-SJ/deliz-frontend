@@ -10,15 +10,32 @@ import SaleDetail from '@/components/pages/sales/detail';
 import CashRegister from '@/components/pages/cash-register';
 import { APP_ROUTES } from '@/constants/routes';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import SignInAdmin from '@/components/pages/auth/signInAdmin';
+import AdminAuth from './AdminAuth';
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route path={APP_ROUTES.AUTH.MAIN.path}>
         <Route path={APP_ROUTES.AUTH.SIGN_IN.path} element={<SignIn />} />
+        <Route
+          path={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path}
+          element={
+            <AdminAuth>
+              <SignInAdmin />
+            </AdminAuth>
+          }
+        />
         <Route path={APP_ROUTES.AUTH.SIGN_UP.path} element={<SignUp />} />
       </Route>
-      <Route path={APP_ROUTES.PRIVATE.MAIN} element={<MainLayout />}>
+      <Route
+        path={APP_ROUTES.PRIVATE.MAIN}
+        element={
+          <AdminAuth>
+            <MainLayout />
+          </AdminAuth>
+        }
+      >
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} element={<Dashboard />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path} element={<Products />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />

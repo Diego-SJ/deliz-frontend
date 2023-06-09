@@ -4,9 +4,9 @@ import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import { PlusOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Row, Tag } from 'antd';
+import { Avatar, Breadcrumb, Button, Card, Col, Input, Row, Select, Tag } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PopsicleImg from '@/assets/img/png/popsicle.png';
 import { CATEGORIES } from '@/constants/categories';
@@ -16,19 +16,19 @@ type DataType = Product;
 
 const columns: ColumnsType<DataType> = [
   {
+    title: '',
+    dataIndex: 'name',
+    width: 55,
+    render: (_, record) => <Avatar src={record?.image_url ?? PopsicleImg} style={{ backgroundColor: '#eee' }} size="large" />,
+  },
+  {
     title: 'Nombre',
     dataIndex: 'name',
     render: (text, record) => (
-      <Row align="middle" gutter={10}>
-        <Col>
-          <Avatar src={record?.image_url ?? PopsicleImg} style={{ backgroundColor: '#eee' }} size="large" />
-        </Col>
-        <Col>
-          <b>{text}</b>
-          <br />
-          <span>{CATEGORIES.find(item => item.id === record.category_id)?.name ?? '- - -'}</span>
-        </Col>
-      </Row>
+      <div>
+        <p style={{ fontWeight: 'bold' }}>{text}</p>
+        <span>{CATEGORIES.find(item => item.id === record.category_id)?.name ?? '- - -'}</span>
+      </div>
     ),
   },
   {
@@ -60,20 +60,21 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-  },
-  getCheckboxProps: (record: DataType) => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
-};
+// const rowSelection = {
+//   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+//     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+//   },
+//   getCheckboxProps: (record: DataType) => ({
+//     disabled: record.name === 'Disabled User', // Column configuration not to be checked
+//     name: record.name,
+//   }),
+// };
 
 const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { products } = useAppSelector(({ products }) => products);
+  const [options, setOptions] = useState<Product[]>([]);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -84,6 +85,10 @@ const Products = () => {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    setOptions(products);
+  }, [products]);
+
   const onAddNew = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
@@ -92,6 +97,18 @@ const Products = () => {
   const onRowClick = (record: DataType) => {
     dispatch(productActions.setCurrentProduct(record));
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'edit'}`);
+  };
+
+  const getPanelValue = ({ searchText, categoryId }: { searchText?: string; categoryId?: number[] }) => {
+    console.log({ categoryId });
+    let _options = products?.filter(item => {
+      return (
+        (functions.includes(item.name, searchText) || functions.includes(item.description, searchText)) &&
+        (!!categoryId?.length ? categoryId.includes(item.category_id) : true)
+      );
+    });
+    setOptions(_options);
+    console.log(_options);
   };
 
   return (
@@ -108,26 +125,55 @@ const Products = () => {
             ]}
           />
         </Col>
-        <Col span={4}>
-          <Button block type="primary" size="large" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-            Nuevo
-          </Button>
-        </Col>
       </Row>
-      <Row style={{ marginTop: '20px' }}>
+      <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
+          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
+            <Row gutter={10}>
+              <Col span={6}>
+                <Input
+                  placeholder="Buscar producto"
+                  style={{ width: '100%' }}
+                  allowClear
+                  onChange={({ target }) => getPanelValue({ searchText: target.value })}
+                />
+              </Col>
+              <Col span={6}>
+                <Select
+                  placeholder="Categorías"
+                  style={{ width: '100%' }}
+                  mode="multiple"
+                  allowClear
+                  onChange={value => getPanelValue({ categoryId: value })}
+                >
+                  {CATEGORIES.map((item, index) => (
+                    <Select.Option key={index} value={item.id}>
+                      {item.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col span={6} offset={6}>
+                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                  Nuevo
+                </Button>
+              </Col>
+            </Row>
+          </Card>
           <Table
-            rowSelection={{
-              type: 'checkbox',
-              ...rowSelection,
-            }}
+            // rowSelection={{
+            //   type: 'checkbox',
+            //   ...rowSelection,
+            // }}
             onRow={record => {
               return {
                 onClick: () => onRowClick(record), // click row
               };
             }}
+            size="small"
+            scroll={{ y: 'calc(100vh - 320px)' }}
             columns={columns}
-            dataSource={products}
+            dataSource={options}
           />
         </Col>
       </Row>

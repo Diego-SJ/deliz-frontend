@@ -1,25 +1,85 @@
 import {
-  BarChartOutlined,
   HomeOutlined,
   LogoutOutlined,
-  SettingOutlined,
   DollarOutlined,
   ShoppingOutlined,
   TeamOutlined,
-  MessageOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
 import DelizLogo from '@/assets/img/png/Logo Color.png';
+import { Modal } from 'antd';
+import { useAppDispatch } from '@/hooks/useStore';
+import { userActions } from '@/redux/reducers/users';
+
+const ITEM_LIST = [
+  {
+    icon: HomeOutlined,
+    label: 'Dashboard',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
+  },
+  {
+    icon: ShoppingOutlined,
+    label: 'Productos',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+  },
+  {
+    icon: TeamOutlined,
+    label: 'Clientes',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
+  },
+  {
+    icon: DollarOutlined,
+    label: 'Ventas',
+
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+  },
+  // {
+  //   icon: MessageOutlined,
+  //   label: 'Mensajes',
+  //   path:APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+  // },
+  // {
+  //   icon: BarChartOutlined,
+  //   label: 'Reportes',
+  //   path:APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path,
+  // },
+  // {
+  //   icon: SettingOutlined,
+  //   label: 'Configuración',
+  //   path:APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path,
+  // },
+];
 
 const SideMenu = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [currentKey, setCurrentKey] = useState(0);
+  const [modal, contextHolder] = Modal.useModal();
+
+  useEffect(() => {
+    const key = ITEM_LIST?.findIndex(item => {
+      return location.pathname?.includes(item?.path);
+    });
+    setCurrentKey(key || 0);
+  }, [location.pathname]);
 
   const handleLogout = () => {
-    navigate(APP_ROUTES.AUTH.SIGN_IN.path);
+    modal.confirm({
+      title: 'Cerrar sesión',
+      icon: <ExclamationCircleOutlined rev={{}} />,
+      content: 'Tu sesión será finalizada ¿deseas continuar?',
+      okText: 'Continuar',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        await dispatch(userActions.signOut());
+      },
+    });
   };
 
   const handlePathChange = (path: string) => {
@@ -30,52 +90,13 @@ const SideMenu = () => {
     <>
       <Logo src={DelizLogo} title="D'eliz" />
       <MenuRoot
-        defaultSelectedKeys={['1']}
-        items={[
-          {
-            key: 1,
-            icon: React.createElement(HomeOutlined),
-            label: 'Dashboard',
-            onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path),
-          },
-          {
-            key: 2,
-            icon: React.createElement(ShoppingOutlined),
-            label: 'Productos',
-            onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path),
-          },
-          {
-            key: 3,
-            icon: React.createElement(TeamOutlined),
-            label: 'Clientes',
-            onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
-          },
-          {
-            key: 4,
-            icon: React.createElement(DollarOutlined),
-            label: 'Ventas',
-
-            onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
-          },
-          // {
-          //   key: 5,
-          //   icon: React.createElement(MessageOutlined),
-          //   label: 'Mensajes',
-          //   onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
-          // },
-          // {
-          //   key: 6,
-          //   icon: React.createElement(BarChartOutlined),
-          //   label: 'Reportes',
-          //   onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path),
-          // },
-          // {
-          //   key: 7,
-          //   icon: React.createElement(SettingOutlined),
-          //   label: 'Configuración',
-          //   onClick: () => handlePathChange(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path),
-          // },
-        ]}
+        selectedKeys={[`${currentKey}`]}
+        items={ITEM_LIST.map((item, key) => ({
+          key,
+          icon: React.createElement(item.icon),
+          label: item.label,
+          onClick: () => handlePathChange(item.path),
+        }))}
       />
       <MenuRoot
         className="bottom"
@@ -88,6 +109,7 @@ const SideMenu = () => {
           },
         ]}
       />
+      {contextHolder}
     </>
   );
 };

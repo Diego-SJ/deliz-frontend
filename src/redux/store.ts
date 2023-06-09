@@ -5,11 +5,13 @@ import storage from 'redux-persist/lib/storage';
 import productsReducer from './reducers/products';
 import customersReducer from './reducers/customers';
 import salesReducer from './reducers/sales';
+import usersReducer from './reducers/users';
 
 const rootReducer = combineReducers({
   products: productsReducer,
   customers: customersReducer,
   sales: salesReducer,
+  users: usersReducer,
 });
 
 const persistConfig = { key: 'deliz.app', version: 1, storage };

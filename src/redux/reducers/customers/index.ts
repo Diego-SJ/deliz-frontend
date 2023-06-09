@@ -12,6 +12,7 @@ const customers = createSlice({
   name: 'customers',
   initialState,
   reducers: {
+    resetSlice: () => initialState,
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },

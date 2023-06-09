@@ -1,12 +1,12 @@
 import { Card } from 'antd';
-import { Content } from 'antd/lib/layout/layout';
 import styled from 'styled-components';
 
-export const LayoutContent = styled(Content)`
+export const LayoutContent = styled.div`
   min-width: 100vw;
   min-height: 100vh;
   max-width: 100vw;
   max-height: 100vh;
+  padding: 20px;
 
   display: grid;
   place-content: center;
@@ -19,9 +19,6 @@ export const LayoutContent = styled(Content)`
 export const FormContainer = styled(Card)`
   &.form-container {
     padding: 0;
-    width: 100%;
-    min-height: 60vh;
-    min-width: 800px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 0 20px -5px rgba(0, 0, 0, 0.4);
@@ -33,9 +30,7 @@ export const FormContainer = styled(Card)`
       height: 100%;
 
       .ant-form {
-        width: 50%;
-        height: 100%;
-        padding: 50px;
+        padding: 30px;
 
         display: flex;
         flex-direction: column;
@@ -53,6 +48,7 @@ export const FormContainer = styled(Card)`
           &-link {
             width: fit-content;
             padding: 0;
+            color: ${({ theme }) => theme.colors.primary};
           }
         }
 

@@ -22,7 +22,7 @@ const functions = {
   },
   date1: (date: Date | string) => {
     let [_date, time] = new Date(date).toLocaleString()?.split(',');
-    return format(new Date(_date), 'PPP') + ' ' + _date;
+    return format(new Date(_date), 'PPP');
   },
   removeBucketURL: (path: string, bucket: string) => {
     let filename = path.replace(bucket, '');

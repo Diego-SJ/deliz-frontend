@@ -5,6 +5,7 @@ export const APP_ROUTES = {
       title: 'E-commerce',
     },
     SIGN_IN: { path: '/login', title: 'Inicio de sesión' },
+    SIGN_IN_ADMIN: { path: '/admin', title: 'Inicio de sesión' },
     SIGN_UP: { path: '/sign-up', title: 'Registro' },
   },
   PRIVATE: {

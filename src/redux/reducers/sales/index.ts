@@ -11,7 +11,7 @@ const initialState: SalesSlice = {
     status: 5, // pending
     shipping: 0,
     discountMoney: 0,
-    customer_id: 0,
+    customer_id: 5,
   },
   loading: false,
 };
@@ -20,6 +20,7 @@ const sales = createSlice({
   name: 'sales',
   initialState,
   reducers: {
+    resetSlice: () => initialState,
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },

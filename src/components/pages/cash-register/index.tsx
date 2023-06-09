@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Col, Input, Layout, Row, Tooltip, Typography } from 'antd';
+import { Col, Input, Layout, Row, Tooltip, Typography } from 'antd';
 import { theme } from '@/styles/theme/config';
 import { CATEGORIES } from '@/constants/categories';
 import { CardBtn, CustomTabs, ProductsCheckout, ProductsContainer } from './styles';
@@ -27,7 +27,7 @@ const CashRegister = () => {
   const { products } = useAppSelector(({ products }) => products);
   const [currentProduct, setCurrentProduct] = useState<Product>();
   const [searchText, setSearchText] = useState<string>('');
-  const [categories, setCategories] = useState(CATEGORIES);
+  const [categories] = useState(CATEGORIES);
   const [currentCategory, setCurrentCategory] = useState('1');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
 
@@ -62,7 +62,12 @@ const CashRegister = () => {
           <Row gutter={[0, 10]} style={{ minHeight: '100%' }}>
             <Col lg={14} sm={24}>
               <ProductsContainer>
-                <Input.Search size="large" placeholder="Buscar producto" onChange={({ target }) => setSearchText(target.value)} />
+                <Input.Search
+                  allowClear
+                  size="large"
+                  placeholder="Buscar producto"
+                  onChange={({ target }) => setSearchText(target.value)}
+                />
                 <Space />
                 <CustomTabs
                   onChange={onChange}
@@ -114,7 +119,12 @@ const ItemButton = (props: ItemButtonProps) => {
   return (
     <Col lg={4} md={4} sm={6} xs={8}>
       <Tooltip title={props?.title ?? 'Producto sin nombre'}>
-        <CardBtn onClick={props?.onClick} hoverable bodyStyle={{ backgroundImage: `url('${props.imageSrc ?? FallbackImage}')` }}>
+        <CardBtn
+          onClick={props?.onClick}
+          hoverable
+          className={!props?.imageSrc ? 'no-image' : ''}
+          bodyStyle={{ backgroundImage: `url('${props?.imageSrc || FallbackImage}')` }}
+        >
           <Typography.Text>{props?.title ?? 'Producto sin nombre'}</Typography.Text>
         </CardBtn>
       </Tooltip>

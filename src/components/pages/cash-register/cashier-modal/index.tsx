@@ -1,9 +1,8 @@
-import { Avatar, Button, Checkbox, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
+import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useAppDispatch } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
@@ -133,6 +132,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           size="large"
           style={{ width: '100%', textAlign: 'center' }}
           value={quantity}
+          onPressEnter={handleOk}
           onChange={value => onQuantityChange(value || 0)}
         />
       </ModalBody>

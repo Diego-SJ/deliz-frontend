@@ -2,14 +2,12 @@ import Avatar from '@/components/molecules/Avatar';
 import { PROFILE_PIC } from '@/constants/mocks';
 import { Divider, Space, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import NotificationsPopover from '@/components/molecules/NotificationsPopover';
-import MessagesPopover from '@/components/molecules/MessagesPopover';
 import MenuPopover from '@/components/molecules/MenuPopover';
-import { SearchOutlined } from '@ant-design/icons';
-import { useTheme } from 'styled-components';
+import { useAppSelector } from '@/hooks/useStore';
 
 const Header = () => {
-  const theme = useTheme();
+  // const theme = useTheme();
+  const { user_auth } = useAppSelector(({ users }) => users);
   return (
     <HeaderRoot>
       <Typography.Title level={4}>Dashboard</Typography.Title>
@@ -21,7 +19,7 @@ const Header = () => {
         </Space> */}
         <Divider type="vertical" />
         <Space size={50}>
-          <Avatar avatar={{ src: PROFILE_PIC }} title="Diego Salas" subtitle="Admin" bordered />
+          <Avatar avatar={{ src: PROFILE_PIC }} title="Admin" subtitle={user_auth?.user?.email} bordered />
           <MenuPopover />
         </Space>
       </HeaderActions>

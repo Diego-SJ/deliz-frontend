@@ -14,10 +14,10 @@ const customActions = {
         const result = await supabase.from('customers').select('*');
 
         customers =
-          result?.data?.map(item => {
+          result?.data?.map((item, key) => {
             return {
               ...item,
-              key: item.product_id as number,
+              key,
             } as Customer;
           }) ?? [];
         dispatch(customerActions.setCustomers(customers));

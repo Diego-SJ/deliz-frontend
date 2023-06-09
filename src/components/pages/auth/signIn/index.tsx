@@ -3,6 +3,7 @@ import { GoogleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Layout, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FormContainer, FormFigure, FormFigureImg, LayoutContent } from './styles';
+import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const SignIn = () => {
   return (
     <Layout>
       <LayoutContent>
+        <AnimatedBackground />
         <FormContainer className="form-container">
           <Form
             name="basic"

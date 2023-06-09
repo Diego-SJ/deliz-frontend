@@ -2,9 +2,9 @@ import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Drawer, Row } from 'antd';
+import { Avatar, Breadcrumb, Button, Card, Col, Drawer, Input, Row } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PopsicleImg from '@/assets/img/png/popsicle.png';
 import { Customer } from '@/redux/reducers/customers/types';
@@ -15,18 +15,15 @@ type DataType = Customer;
 
 const columns: ColumnsType<DataType> = [
   {
+    title: '',
+    dataIndex: 'name',
+    width: 55,
+    render: () => <Avatar src={PopsicleImg} style={{ backgroundColor: '#eee', padding: '8px' }} size="large" />,
+  },
+  {
     title: 'Nombre',
     dataIndex: 'name',
-    render: text => (
-      <Row align="middle" gutter={10}>
-        <Col>
-          <Avatar src={PopsicleImg} style={{ backgroundColor: '#eee', padding: '5px' }} size="large" />
-        </Col>
-        <Col>
-          <b>{text}</b>
-        </Col>
-      </Row>
-    ),
+    render: text => <b>{text}</b>,
   },
   { title: 'Dirección', dataIndex: 'address' },
   { title: 'Teléfono', dataIndex: 'phone' },
@@ -38,18 +35,19 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-  },
-  getCheckboxProps: (record: DataType) => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
-};
+// const rowSelection = {
+//   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+//     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+//   },
+//   getCheckboxProps: (record: DataType) => ({
+//     disabled: record.name === 'Disabled User', // Column configuration not to be checked
+//     name: record.name,
+//   }),
+// };
 
 const Customers = () => {
   const dispatch = useAppDispatch();
+  const [options, setOptions] = useState<Customer[]>([]);
   const { customers, current_customer } = useAppSelector(({ customers }) => customers);
   const isFirstRender = useRef(true);
 
@@ -61,6 +59,10 @@ const Customers = () => {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    setOptions(customers);
+  }, [customers]);
+
   const onAddNew = () => {
     dispatch(customerActions.setCurrentCustomer({ customer_id: -1 } as Customer));
   };
@@ -71,6 +73,17 @@ const Customers = () => {
 
   const onClose = (success?: boolean) => {
     if (success) dispatch(customerActions.setCurrentCustomer({} as Customer));
+  };
+
+  const getPanelValue = ({ searchText }: { searchText?: string }) => {
+    let _options = customers?.filter(item => {
+      return (
+        functions.includes(item.name, searchText) ||
+        functions.includes(item.phone, searchText) ||
+        functions.includes(item.email, searchText)
+      );
+    });
+    setOptions(_options);
   };
 
   return (
@@ -87,26 +100,40 @@ const Customers = () => {
             ]}
           />
         </Col>
-        <Col span={4}>
-          <Button block type="primary" size="large" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-            Nuevo
-          </Button>
-        </Col>
       </Row>
-      <Row style={{ marginTop: '20px' }}>
+      <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
+          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
+            <Row gutter={10}>
+              <Col span={6}>
+                <Input
+                  placeholder="Buscar cliente"
+                  style={{ width: '100%' }}
+                  allowClear
+                  onChange={({ target }) => getPanelValue({ searchText: target.value })}
+                />
+              </Col>
+              <Col span={6} offset={12}>
+                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                  Nuevo
+                </Button>
+              </Col>
+            </Row>
+          </Card>
           <Table
-            rowSelection={{
-              type: 'checkbox',
-              ...rowSelection,
-            }}
+            // rowSelection={{
+            //   type: 'checkbox',
+            //   ...rowSelection,
+            // }}
             onRow={record => {
               return {
                 onClick: () => onRowClick(record), // click row
               };
             }}
+            size="small"
+            scroll={{ y: 'calc(100vh - 320px)' }}
             columns={columns}
-            dataSource={customers}
+            dataSource={options}
           />
         </Col>
       </Row>

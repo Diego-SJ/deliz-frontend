@@ -25,7 +25,7 @@ const customActions = {
               return {
                 ...item,
                 key: item.product_id as number,
-                image_url: BUCKETS.PRODUCTS.IMAGES`${item.image_url}`,
+                image_url: !!item?.image_url ? BUCKETS.PRODUCTS.IMAGES`${item.image_url}` : '',
               } as Product;
             }) ?? [];
         dispatch(productActions.setProducts(products));

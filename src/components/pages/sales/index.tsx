@@ -39,11 +39,11 @@ const columns: ColumnsType<SaleDetails> = [
   },
 ];
 
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: SaleDetails[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-  },
-};
+// const rowSelection = {
+//   onChange: (selectedRowKeys: React.Key[], selectedRows: SaleDetails[]) => {
+//     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+//   },
+// };
 
 const Sales = () => {
   const dispatch = useAppDispatch();
@@ -91,15 +91,16 @@ const Sales = () => {
       <Row style={{ marginTop: '20px' }}>
         <Col span={24}>
           <Table
-            rowSelection={{
-              type: 'checkbox',
-              ...rowSelection,
-            }}
+            // rowSelection={{
+            //   type: 'checkbox',
+            //   ...rowSelection,
+            // }}
             onRow={record => {
               return {
                 onClick: () => onRowClick(record), // click row
               };
             }}
+            size="small"
             columns={columns}
             dataSource={sales}
           />

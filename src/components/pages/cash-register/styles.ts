@@ -99,7 +99,7 @@ export const CustomTabs = styled(Tabs)`
 export const CardBtn = styled(Card)`
   &.ant-card {
     transition: all 0.2s ease-in-out;
-    background: transparent;
+    background: ${({ theme }) => theme.colors.background.secondary};
     border-color: transparent;
     overflow: hidden;
     width: 100%;
@@ -115,8 +115,9 @@ export const CardBtn = styled(Card)`
       align-items: center;
       background-position: center;
       background-size: cover;
+      background-repeat: no-repeat;
       position: relative;
-      transition: all 1s ease-in-out;
+      transition: all 0.2s ease-in-out;
 
       .ant-typography {
         color: ${({ theme }) => theme.colors.secondary};
@@ -135,11 +136,19 @@ export const CardBtn = styled(Card)`
       }
     }
 
+    &.no-image {
+      .ant-card-body {
+        background-position: center 23%;
+        background-size: 70%;
+        position: relative;
+      }
+    }
+
     &:hover {
       transform: scale(1.02);
 
       .ant-card-body {
-        background-size: 130%;
+        transform: scale(1.6);
 
         .ant-avatar {
           scale: 1.4;
@@ -148,6 +157,13 @@ export const CardBtn = styled(Card)`
         .ant-typography {
           color: ${({ theme }) => theme.colors.primary};
           bottom: -40px;
+        }
+      }
+
+      &.no-image {
+        .ant-card-body {
+          transform: scale(1.2);
+          background-position: center;
         }
       }
     }

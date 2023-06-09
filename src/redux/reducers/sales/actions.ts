@@ -47,7 +47,7 @@ const customActions = {
           .select('*, products (*, categories (*))')
           .eq('sale_id', args?.sale_id);
 
-        let items: SaleItem[] = data?.map(item => ({ ...item, key: item.sale_detail_id } as SaleItem)) || [];
+        let items: SaleItem[] = data?.map((item, key) => ({ ...item, key } as SaleItem)) || [];
 
         dispatch(salesActions.setCurrentSale({ items }));
         dispatch(salesActions.setLoading(false));
