@@ -11,7 +11,7 @@ const initialState: SalesSlice = {
     status: 5, // pending
     shipping: 0,
     discountMoney: 0,
-    customer_id: 5,
+    customer_id: '',
   },
   loading: false,
 };

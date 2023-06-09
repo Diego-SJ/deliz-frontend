@@ -1,5 +1,5 @@
 import { DeleteFilled, PercentageOutlined, PrinterFilled, SaveFilled, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
-import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography } from 'antd';
+import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ActionButton } from './styles';
 import { ModalBody, SalePrices } from '../styles';
@@ -106,6 +106,12 @@ const CashierActions = () => {
     setOpen(true);
   };
 
+  const onPaySale = () => {
+    if (!!!cash_register?.customer_id) return message.info('Selecciona un cliente para poder finalizar la venta');
+    if (!cash_register?.items?.length) return message.info('Agrega items a la lista.');
+    setOpenPaymentModal(true);
+  };
+
   const cancelOrder = () => {
     modal.confirm({
       title: 'Cancelar orden',
@@ -176,7 +182,7 @@ const CashierActions = () => {
           </Tooltip>
         </Col>
       </Row>
-      <Button type="primary" block size="large" onClick={() => setOpenPaymentModal(true)}>
+      <Button type="primary" block size="large" onClick={onPaySale}>
         PAGAR
       </Button>
       {contextHolder}

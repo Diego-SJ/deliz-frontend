@@ -1,7 +1,7 @@
 import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Col, Row, Tag } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef } from 'react';
@@ -103,6 +103,7 @@ const Sales = () => {
             size="small"
             columns={columns}
             dataSource={sales}
+            footer={() => <Button shape="circle" icon={<EditOutlined rev={{}} />} />}
           />
         </Col>
       </Row>

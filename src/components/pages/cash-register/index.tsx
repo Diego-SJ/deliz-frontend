@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Input, Layout, Row, Tooltip, Typography } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Col, Input, InputRef, Layout, Row, Tooltip, Typography } from 'antd';
 import { theme } from '@/styles/theme/config';
 import { CATEGORIES } from '@/constants/categories';
 import { CardBtn, CustomTabs, ProductsCheckout, ProductsContainer } from './styles';
@@ -34,6 +34,7 @@ const CashRegister = () => {
   const [categories] = useState(CATEGORIES);
   const [currentCategory, setCurrentCategory] = useState('1');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+  const searchInput = useRef<InputRef>(null);
 
   useEffect(() => {
     if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
@@ -52,6 +53,10 @@ const CashRegister = () => {
 
   const closeModal = () => {
     setOpen(false);
+    setTimeout(() => {
+      searchInput.current?.focus();
+      searchInput.current?.select();
+    }, 600);
   };
 
   const openModal = (item: Product) => {
@@ -72,6 +77,7 @@ const CashRegister = () => {
             <Col lg={14} sm={24}>
               <ProductsContainer>
                 <Input.Search
+                  ref={searchInput}
                   allowClear
                   size="large"
                   placeholder="Buscar producto"

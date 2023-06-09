@@ -72,7 +72,7 @@ const customActions = {
         const state = getState().sales;
         let newSale: Sale = {
           ...sale,
-          customer_id: state.cash_register.customer_id,
+          customer_id: state.cash_register.customer_id as number,
           discount: state.cash_register.discount,
           discount_type: state.cash_register.discountType,
           shipping: state.cash_register.shipping,
@@ -132,7 +132,7 @@ const customActions = {
         discountType: 'AMOUNT',
         shipping: 0,
         status: 5,
-        customer_id: 0,
+        customer_id: '',
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },

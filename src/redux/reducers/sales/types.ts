@@ -62,7 +62,7 @@ export type CashRegister = {
   discountType?: DiscountType;
   discountMoney?: number;
   status?: number;
-  customer_id?: number;
+  customer_id?: number | string;
 };
 
 // redux cash register item

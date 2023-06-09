@@ -32,8 +32,9 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
 
   const handleOk = async () => {
     setLoading(true);
-    if (!cash_register?.customer_id) {
-      return message.warning('Selecciona un cliente para poder finalizar la venta');
+    if (!!!cash_register?.customer_id) {
+      setLoading(false);
+      return message.info('Selecciona un cliente para poder finalizar la venta');
     }
     const newSale: Sale = { payment_method: form.getFieldValue('payment_method'), status_id: getSaleStatus() };
     const sale = await dispatch(salesActions.createSale(newSale));

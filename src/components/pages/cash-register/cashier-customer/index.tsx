@@ -16,12 +16,13 @@ const CashierCustomer = () => {
   const dispatch = useAppDispatch();
   const [customerList, setCustomerList] = useState<Option[]>([]);
   const { current_customer, customers } = useAppSelector(({ customers }) => customers);
-  const [currentCustomerId, setCurrentCustomerId] = useState<number>();
+  const [currentCustomerId, setCurrentCustomerId] = useState<number | string>();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const { customer_id } = cash_register;
 
   useEffect(() => {
     let _customers = customers.map(item => ({ value: item.customer_id, label: item.name }));
+    _customers.push({ value: '' as any, label: 'Selecciona un cliente' });
     setCustomerList(_customers);
   }, [customers]);
 
@@ -48,7 +49,7 @@ const CashierCustomer = () => {
         showSearch
         style={{ width: '100%' }}
         size="large"
-        value={currentCustomerId}
+        value={currentCustomerId as number}
         placeholder="Buscar cliente"
         suffixIcon={<UserOutlined rev={{}} />}
         optionFilterProp="children"

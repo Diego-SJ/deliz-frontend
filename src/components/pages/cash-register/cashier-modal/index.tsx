@@ -1,5 +1,5 @@
 import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
@@ -20,9 +20,19 @@ type CashierModalProps = {
 
 const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherItem }: CashierModalProps) => {
   const dispatch = useAppDispatch();
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number | string>('');
   const [checked, setChecked] = useState(true);
   const [subtotal, setSubtotal] = useState(0);
+  const quantityInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        quantityInput.current?.focus();
+        quantityInput.current?.select();
+      }, 100);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (action === 'EDIT' && casherItem) {
@@ -83,6 +93,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
       onOk={handleOk}
       maskClosable={false}
       width={350}
+      destroyOnClose
       onCancel={handleOnClose}
       footer={[
         <Row key="actions" gutter={10}>
@@ -92,7 +103,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
             </Button>
           </Col>
           <Col span={12}>
-            <Button block type="primary" onClick={handleOk} disabled={quantity <= 0}>
+            <Button block type="primary" onClick={handleOk} disabled={Number(quantity) <= 0}>
               Guardar
             </Button>
           </Col>
@@ -113,7 +124,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name}
         </Typography.Paragraph>
         <Typography.Title level={4} type="success" style={{ margin: 0 }}>
-          {functions.money(subtotal)} * {quantity} = {functions.money(subtotal * quantity)}
+          {functions.money(subtotal)} * {quantity} = {functions.money(subtotal * Number(quantity))}
         </Typography.Title>
         <Space height="10px" />
         <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
@@ -126,6 +137,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
         </Radio.Group>
         <Space height="10px" />
         <InputNumber
+          ref={quantityInput}
           min={0}
           max={currentProduct?.stock ?? 0}
           placeholder="Cantidad"
@@ -133,7 +145,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           style={{ width: '100%', textAlign: 'center' }}
           value={quantity}
           onPressEnter={handleOk}
-          onChange={value => onQuantityChange(value || 0)}
+          onChange={value => onQuantityChange(value as number)}
         />
       </ModalBody>
     </Modal>

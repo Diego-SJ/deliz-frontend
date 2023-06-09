@@ -7,4 +7,6 @@ export const CATEGORIES = [
   { id: 6, name: 'Sandwich' },
   { id: 7, name: 'Bolis' },
   { id: 8, name: 'Materia prima' },
+  { id: 9, name: 'Paleta mini agua' },
+  { id: 10, name: 'Paleta mini crema' },
 ];
