@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Col, Input, InputRef, Layout, Row, Tooltip, Typography } from 'antd';
+import { Col, Drawer, FloatButton, Input, InputRef, Layout, Row, Tooltip, Typography } from 'antd';
 import { theme } from '@/styles/theme/config';
 import { CATEGORIES } from '@/constants/categories';
 import { CardBtn, CustomTabs, ProductsCheckout, ProductsContainer } from './styles';
@@ -15,6 +15,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { productActions } from '@/redux/reducers/products';
 import { customerActions } from '@/redux/reducers/customers';
+import useMediaQuery from '@/hooks/useMediaQueries';
+import { UnorderedListOutlined } from '@ant-design/icons';
 
 const { Content } = Layout;
 
@@ -34,7 +36,9 @@ const CashRegister = () => {
   const [categories] = useState(CATEGORIES);
   const [currentCategory, setCurrentCategory] = useState('1');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const searchInput = useRef<InputRef>(null);
+  const { isPhablet } = useMediaQuery();
 
   useEffect(() => {
     if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
@@ -109,17 +113,34 @@ const CashRegister = () => {
                 />
               </ProductsContainer>
             </Col>
-            <Col lg={10} sm={0}>
-              <ProductsCheckout>
-                <CashierCustomer />
-                <CashRegisterItemsList />
-                <CashierActions />
-              </ProductsCheckout>
-            </Col>
+            {!isPhablet && (
+              <Col lg={10} sm={0}>
+                <ProductsCheckout>
+                  <CashierCustomer />
+                  <CashRegisterItemsList />
+                  <CashierActions />
+                </ProductsCheckout>
+              </Col>
+            )}
           </Row>
         </Content>
       </Layout>
+      {isPhablet && (
+        <FloatButton
+          style={{ transform: 'scale(1.4)' }}
+          icon={<UnorderedListOutlined rev={{}} />}
+          type="default"
+          onClick={() => setDrawerOpen(true)}
+        />
+      )}
       <CashierModal open={open} currentProduct={currentProduct} onCancel={closeModal} />
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} width="100vw" bodyStyle={{ padding: 0 }}>
+        <ProductsCheckout>
+          <CashierCustomer />
+          <CashRegisterItemsList />
+          <CashierActions />
+        </ProductsCheckout>
+      </Drawer>
     </Layout>
   );
 };

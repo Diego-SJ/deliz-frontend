@@ -81,7 +81,7 @@ const ProductEditor = () => {
   return (
     <div>
       <Row justify="space-between">
-        <Col span={8}>
+        <Col span={24}>
           <Breadcrumb
             items={[
               {
@@ -119,7 +119,7 @@ const ProductEditor = () => {
               }}
             >
               <Row gutter={[20, 5]}>
-                <Col span={12}>
+                <Col lg={{ span: 12 }} xs={{ span: 24 }}>
                   <Form.Item name="image_url" label="Upload">
                     <Upload onChange={onImageChange} defaultFileList={productImages} />
                   </Form.Item>
@@ -130,9 +130,9 @@ const ProductEditor = () => {
                     <TextArea rows={4} placeholder="E.g: Helado de nuez" />
                   </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col lg={{ span: 12 }} xs={{ span: 24 }}>
                   <Row gutter={[20, 5]}>
-                    <Col span={12}>
+                    <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
                       <Form.Item name="retail_price" label="Precio menudeo" rules={[{ type: 'number', min: 0, required: true }]}>
                         <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
                       </Form.Item>
@@ -149,7 +149,7 @@ const ProductEditor = () => {
                         <InputNumber style={{ width: '100%' }} placeholder="0" />
                       </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
                       <Form.Item
                         name="wholesale_price"
                         label="Precio mayoreo"

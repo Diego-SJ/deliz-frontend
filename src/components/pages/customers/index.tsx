@@ -10,6 +10,7 @@ import PopsicleImg from '@/assets/img/png/popsicle.png';
 import { Customer } from '@/redux/reducers/customers/types';
 import { customerActions } from '@/redux/reducers/customers';
 import CustomerEditor from './editor';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type DataType = Customer;
 
@@ -49,6 +50,7 @@ const Customers = () => {
   const dispatch = useAppDispatch();
   const [options, setOptions] = useState<Customer[]>([]);
   const { customers, current_customer } = useAppSelector(({ customers }) => customers);
+  const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -89,7 +91,7 @@ const Customers = () => {
   return (
     <div>
       <Row justify="space-between" align="middle">
-        <Col span={8}>
+        <Col span={24}>
           <Breadcrumb
             items={[
               {
@@ -104,8 +106,8 @@ const Customers = () => {
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
           <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
-            <Row gutter={10}>
-              <Col span={6}>
+            <Row gutter={[10, 10]}>
+              <Col lg={{ span: 6 }} sm={18} xs={24}>
                 <Input
                   placeholder="Buscar cliente"
                   style={{ width: '100%' }}
@@ -113,7 +115,7 @@ const Customers = () => {
                   onChange={({ target }) => getPanelValue({ searchText: target.value })}
                 />
               </Col>
-              <Col span={6} offset={12}>
+              <Col lg={{ span: 6, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
                 <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                   Nuevo
                 </Button>
@@ -131,7 +133,7 @@ const Customers = () => {
               };
             }}
             size="small"
-            scroll={{ y: 'calc(100vh - 320px)' }}
+            scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
             columns={columns}
             dataSource={options}
           />
@@ -139,7 +141,7 @@ const Customers = () => {
       </Row>
       <Drawer
         title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
-        width={420}
+        width={isTablet ? 350 : 420}
         onClose={() => onClose(true)}
         open={!!current_customer.customer_id}
         bodyStyle={{ paddingBottom: 80 }}

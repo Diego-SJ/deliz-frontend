@@ -148,21 +148,17 @@ export const CardBtn = styled(Card)`
       transform: scale(1.02);
 
       .ant-card-body {
-        transform: scale(1.6);
-
         .ant-avatar {
           scale: 1.4;
         }
 
         .ant-typography {
           color: ${({ theme }) => theme.colors.primary};
-          bottom: -40px;
         }
       }
 
       &.no-image {
         .ant-card-body {
-          transform: scale(1.2);
           background-position: center;
         }
       }

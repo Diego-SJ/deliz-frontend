@@ -4,9 +4,11 @@ import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@a
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants/routes';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
+  const { isMobile } = useMediaQuery();
 
   const onNavigate = (path: string) => {
     navigate(path);
@@ -16,9 +18,11 @@ const CashierHeader = () => {
     <HeaderRoot>
       <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
         <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
-        <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
-          Punto de venta
-        </Typography.Title>
+        {!isMobile && (
+          <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
+            Punto de venta
+          </Typography.Title>
+        )}
       </Space>
       <HeaderActions>
         <Space>

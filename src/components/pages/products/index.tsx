@@ -114,7 +114,7 @@ const Products = () => {
   return (
     <div>
       <Row justify="space-between" align="middle">
-        <Col span={8}>
+        <Col span={8} xs={24}>
           <Breadcrumb
             items={[
               {
@@ -129,8 +129,8 @@ const Products = () => {
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
           <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
-            <Row gutter={10}>
-              <Col span={6}>
+            <Row gutter={[10, 10]}>
+              <Col lg={6} xs={24}>
                 <Input
                   placeholder="Buscar producto"
                   style={{ width: '100%' }}
@@ -138,7 +138,7 @@ const Products = () => {
                   onChange={({ target }) => getPanelValue({ searchText: target.value })}
                 />
               </Col>
-              <Col span={6}>
+              <Col lg={6} xs={12}>
                 <Select
                   placeholder="Categorías"
                   style={{ width: '100%' }}
@@ -153,7 +153,7 @@ const Products = () => {
                   ))}
                 </Select>
               </Col>
-              <Col span={6} offset={6}>
+              <Col lg={{ span: 6, offset: 6 }} xs={{ offset: 0, span: 12 }}>
                 <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                   Nuevo
                 </Button>
@@ -171,7 +171,7 @@ const Products = () => {
               };
             }}
             size="small"
-            scroll={{ y: 'calc(100vh - 320px)' }}
+            scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
             columns={columns}
             dataSource={options}
           />

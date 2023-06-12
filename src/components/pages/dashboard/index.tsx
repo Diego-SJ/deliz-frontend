@@ -76,7 +76,7 @@ type CardButtonProps = {
 const CardButton = ({ description, icon, title, onClick, color }: CardButtonProps) => {
   const theme = useTheme();
   return (
-    <Col lg={8}>
+    <Col lg={8} sm={12} xs={24}>
       <Card hoverable onClick={onClick}>
         <Card.Meta
           avatar={<Avatar icon={icon} style={{ background: color || theme.colors.primary }} size={60} />}

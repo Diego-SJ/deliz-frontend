@@ -1,8 +1,8 @@
 import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Row, Tag } from 'antd';
+import { EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, Row, Tag, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -68,10 +68,14 @@ const Sales = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${record.sale_id}`);
   };
 
+  const onRefresh = () => {
+    dispatch(salesActions.fetchSales({ refetch: true }));
+  };
+
   return (
     <>
       <Row justify="space-between" align="middle">
-        <Col span={8}>
+        <Col lg={{ span: 12 }}>
           <Breadcrumb
             items={[
               {
@@ -82,8 +86,8 @@ const Sales = () => {
             ]}
           />
         </Col>
-        <Col span={4}>
-          <Button block type="primary" size="large" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+        <Col lg={{ span: 4 }}>
+          <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
             Nueva
           </Button>
         </Col>
@@ -103,7 +107,16 @@ const Sales = () => {
             size="small"
             columns={columns}
             dataSource={sales}
-            footer={() => <Button shape="circle" icon={<EditOutlined rev={{}} />} />}
+            scroll={{ x: 700 }}
+            footer={() => (
+              <Row>
+                <Col>
+                  <Tooltip title="Recargar">
+                    <Button shape="circle" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh} />
+                  </Tooltip>
+                </Col>
+              </Row>
+            )}
           />
         </Col>
       </Row>

@@ -1,8 +1,8 @@
 import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { theme } from '@/styles/theme/config';
-import { MailOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Card, Col, Typography, Row, Alert, Table, AlertProps } from 'antd';
+import { MailOutlined, PhoneOutlined, EnvironmentOutlined, EditOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Card, Col, Typography, Row, Alert, Table, AlertProps, Button } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
@@ -18,21 +18,24 @@ type DataType = SaleItem;
 
 const columns: ColumnsType<DataType> = [
   {
+    title: '',
+    dataIndex: 'products',
+    width: 50,
+    render: (_, record) => {
+      let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
+      return <Avatar src={imageUrl || PopsicleImg} style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }} size="large" />;
+    },
+  },
+  {
     title: 'Producto',
     dataIndex: 'products',
     render: (_, record) => {
-      let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
       return (
-        <Row align="middle" gutter={10}>
-          <Col>
-            <Avatar src={imageUrl || PopsicleImg} style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }} size="large" />
-          </Col>
-          <Col>
-            <b>{record?.products?.name ?? '- - -'}</b>
-            <br />
-            <span>{record?.products?.categories?.name ?? '- - -'}</span>
-          </Col>
-        </Row>
+        <div>
+          <b>{record?.products?.name ?? '- - -'}</b>
+          <br />
+          <span>{record?.products?.categories?.name ?? '- - -'}</span>
+        </div>
       );
     },
   },
@@ -81,7 +84,7 @@ const SaleDetail = () => {
   return (
     <div>
       <Row justify="space-between">
-        <Col span={8}>
+        <Col span={24}>
           <Breadcrumb
             items={[
               {
@@ -100,7 +103,7 @@ const SaleDetail = () => {
         </Col>
       </Row>
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
-        <Col span={8}>
+        <Col lg={{ span: 8 }} xs={24}>
           <Card>
             <Typography.Title level={2}>{`Total: ${functions.money(amounts?.total)}`}</Typography.Title>
             <Typography.Paragraph>{`Envío: ${functions.money(metadata?.shipping)}`}</Typography.Paragraph>
@@ -112,7 +115,19 @@ const SaleDetail = () => {
               showIcon
             />
           </Card>
-          <Card title="Cliente" style={{ marginTop: 20 }}>
+          <Card
+            title={
+              <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography.Title level={5} style={{ margin: 'auto 0' }}>
+                  Cliente
+                </Typography.Title>
+                <Button icon={<EditOutlined rev={{}} />} type="ghost">
+                  Editar
+                </Button>
+              </Row>
+            }
+            style={{ marginTop: 20 }}
+          >
             <Meta
               avatar={
                 <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1" size={55} style={{ background: '#eee' }} />
@@ -154,8 +169,14 @@ const SaleDetail = () => {
             </Col>
           </Card>
         </Col>
-        <Col span={16}>
-          <Table columns={columns} dataSource={items} size="small" />
+        <Col lg={{ span: 16 }} xs={24}>
+          <Table
+            columns={columns}
+            dataSource={items}
+            size="small"
+            scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
+            pagination={false}
+          />
         </Col>
       </Row>
     </div>

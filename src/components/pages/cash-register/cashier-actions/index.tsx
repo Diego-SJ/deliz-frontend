@@ -11,6 +11,8 @@ import { DiscountType } from '@/redux/reducers/sales/types';
 import { EXTRA_ITEM_BASE } from '@/constants/mocks';
 import functions from '@/utils/functions';
 import PaymentModal from './payment-modal';
+import NumberKeyboard from '@/components/atoms/NumberKeyboard';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type ModalAction = '' | 'APPLY_SHIPPING' | 'APPLY_DISCOUNT' | 'ADD_NEW_ITEM';
 
@@ -45,6 +47,7 @@ const CashierActions = () => {
   const [modal, contextHolder] = Modal.useModal();
   const [subTotal, setSubTotal] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const { isTablet } = useMediaQuery();
 
   useEffect(() => {
     let items = cash_register?.items?.reduce((total, item) => {
@@ -248,18 +251,24 @@ const CashierActions = () => {
                 value={discountAmount}
                 onChange={value => setDiscountAmount(value || 0)}
               />
+              {isTablet && <NumberKeyboard withDot onChange={setDiscountAmount} />}
             </>
           )}
           {modalAction === 'APPLY_SHIPPING' && (
-            <InputNumber
-              min={0}
-              placeholder="0.0"
-              size="large"
-              style={{ width: '100%', textAlign: 'center' }}
-              value={shippingPrice}
-              onChange={value => setShippingPrice(value || 0)}
-            />
+            <>
+              <InputNumber
+                min={0}
+                placeholder="0.0"
+                size="large"
+                style={{ width: '100%', textAlign: 'center' }}
+                value={shippingPrice}
+                readOnly={isTablet}
+                onChange={value => setShippingPrice(value || 0)}
+              />
+              {isTablet && <NumberKeyboard withDot onChange={setShippingPrice} />}
+            </>
           )}
+
           {modalAction === 'ADD_NEW_ITEM' && (
             <>
               <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => setChecked(e.target.value)}>

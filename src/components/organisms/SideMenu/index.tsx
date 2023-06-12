@@ -55,7 +55,11 @@ const ITEM_LIST = [
   // },
 ];
 
-const SideMenu = () => {
+type SideMenuProps = {
+  onClick?: () => void;
+};
+
+const SideMenu = (props: SideMenuProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -84,6 +88,7 @@ const SideMenu = () => {
 
   const handlePathChange = (path: string) => {
     navigate(path);
+    if (props?.onClick) props.onClick();
   };
 
   return (

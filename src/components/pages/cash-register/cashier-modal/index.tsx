@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
+import { Avatar, Button, Card, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
@@ -9,6 +9,9 @@ import { Product } from '@/redux/reducers/products/types';
 import { CATEGORIES } from '@/constants/mocks';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
+import { CardBtn } from '../../../atoms/NumberKeyboard/styles';
+import NumberKeyboard from '@/components/atoms/NumberKeyboard';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type CashierModalProps = {
   open?: boolean;
@@ -24,6 +27,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
   const [checked, setChecked] = useState(true);
   const [subtotal, setSubtotal] = useState(0);
   const quantityInput = useRef<HTMLInputElement>(null);
+  const { isTablet } = useMediaQuery();
 
   useEffect(() => {
     if (open) {
@@ -145,8 +149,11 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           style={{ width: '100%', textAlign: 'center' }}
           value={quantity}
           onPressEnter={handleOk}
+          readOnly={isTablet}
           onChange={value => onQuantityChange(value as number)}
         />
+        <Space height="10px" />
+        {isTablet && <NumberKeyboard onChange={onQuantityChange} />}
       </ModalBody>
     </Modal>
   );
