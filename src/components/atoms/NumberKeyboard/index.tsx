@@ -1,6 +1,6 @@
 import { Button, ButtonProps, Row } from 'antd';
 import { CardBtn } from './styles';
-import { DoubleLeftOutlined, VerticalRightOutlined } from '@ant-design/icons';
+import { DoubleLeftOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
 const buttonProps: ButtonProps = {
