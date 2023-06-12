@@ -1,17 +1,23 @@
-import { Avatar, Button, Divider, Space, Tooltip, Typography } from 'antd';
+import { Avatar, Button, Divider, InputNumber, Modal, Space, Tooltip, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
+import { DollarOutlined, HomeOutlined, InteractionOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants/routes';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import { useState } from 'react';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
   const { isMobile } = useMediaQuery();
+  const [open, setOpen] = useState(false);
 
   const onNavigate = (path: string) => {
     navigate(path);
+  };
+
+  const handleOpen = () => {
+    setOpen(prev => !prev);
   };
 
   return (
@@ -53,6 +59,9 @@ const CashierHeader = () => {
               onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
             />
           </Tooltip>
+          <Tooltip title="Venta aleatoria">
+            <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
+          </Tooltip>
         </Space>
         <Divider type="vertical" />
         <Tooltip title="Ir a inicio">
@@ -65,6 +74,9 @@ const CashierHeader = () => {
           />
         </Tooltip>
       </HeaderActions>
+      <Modal open={open}>
+        <InputNumber />
+      </Modal>
     </HeaderRoot>
   );
 };

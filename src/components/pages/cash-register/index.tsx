@@ -57,10 +57,6 @@ const CashRegister = () => {
 
   const closeModal = () => {
     setOpen(false);
-    setTimeout(() => {
-      searchInput.current?.focus();
-      searchInput.current?.select();
-    }, 600);
   };
 
   const openModal = (item: Product) => {
