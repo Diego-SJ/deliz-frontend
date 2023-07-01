@@ -1,8 +1,42 @@
 import { ContainerRoot } from './styles';
 
-const AnimatedBackground = () => {
+type AnimatedBackgroundProps = {
+  style?: 'default' | 'light';
+};
+
+const AnimatedBackground = ({ style = 'default' }: AnimatedBackgroundProps) => {
   return (
-    <ContainerRoot className="background">
+    <ContainerRoot className={`background ${style}`}>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
       <span></span>
       <span></span>
       <span></span>

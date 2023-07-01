@@ -1,15 +1,17 @@
 import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { DollarOutlined, HomeOutlined, InteractionOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
+import { InstagramOutlined, ShoppingCartOutlined, UserOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants/routes';
-import FallbackImage from '@/assets/img/png/Logo Color.png';
-import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
+import FallbackImage from '@/assets/img/png/Logo Color.png';
 
-const CashierHeader = () => {
+type CashierHeaderProps = {
+  hideLogo?: boolean;
+};
+
+const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
   const navigate = useNavigate();
-  const { isMobile } = useMediaQuery();
   const [open, setOpen] = useState(false);
 
   const onNavigate = (path: string) => {
@@ -20,57 +22,45 @@ const CashierHeader = () => {
     setOpen(prev => !prev);
   };
 
+  const openInstagram = () => window.open('https://www.instagram.com/paleteria_deliz/', '_blank');
+
+  const openWhatsapp = () => window.open('https://api.whatsapp.com/send?phone=527711763694', '_blank');
+
   return (
     <HeaderRoot>
-      <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
-        <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
-        {!isMobile && (
-          <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
-            Punto de venta
-          </Typography.Title>
-        )}
-      </Space>
+      {!hideLogo ? (
+        <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
+          <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
+        </Space>
+      ) : (
+        <span />
+      )}
       <HeaderActions>
         <Space>
-          <Tooltip title="Ventas">
+          <Tooltip title="Instagram">
+            <Button icon={<InstagramOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={openInstagram} />
+          </Tooltip>
+          <Tooltip title="Whatsapp">
+            <Button icon={<WhatsAppOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={openWhatsapp} />
+          </Tooltip>
+          <Tooltip title="Carrito">
             <Button
-              icon={<DollarOutlined rev={{}} />}
+              icon={<ShoppingCartOutlined rev={{}} />}
               type="dashed"
               size="large"
               shape="circle"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
+              // onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
             />
-          </Tooltip>
-          <Tooltip title="Clientes">
-            <Button
-              icon={<TeamOutlined rev={{}} />}
-              type="dashed"
-              size="large"
-              shape="circle"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path)}
-            />
-          </Tooltip>
-          <Tooltip title="Productos">
-            <Button
-              icon={<ShoppingOutlined rev={{}} />}
-              type="dashed"
-              size="large"
-              shape="circle"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
-            />
-          </Tooltip>
-          <Tooltip title="Venta aleatoria">
-            <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
           </Tooltip>
         </Space>
         <Divider type="vertical" />
-        <Tooltip title="Ir a inicio">
+        <Tooltip title="Iniciar sesión">
           <Button
-            icon={<HomeOutlined rev={{}} />}
-            type="dashed"
+            icon={<UserOutlined rev={{}} />}
+            type="primary"
             size="large"
             shape="circle"
-            onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
+            // onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
           />
         </Tooltip>
       </HeaderActions>

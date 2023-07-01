@@ -12,22 +12,24 @@ import { APP_ROUTES } from '@/constants/routes';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import SignInAdmin from '@/components/pages/auth/signInAdmin';
 import AdminAuth from './AdminAuth';
+import Home from '@/components/pages/home';
+import ProductsCatalog from '@/components/pages/products/catalog';
 
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path={APP_ROUTES.AUTH.MAIN.path}>
-        <Route path={APP_ROUTES.AUTH.SIGN_IN.path} element={<SignIn />} />
-        <Route
-          path={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path}
-          element={
-            <AdminAuth>
-              <SignInAdmin />
-            </AdminAuth>
-          }
-        />
-        <Route path={APP_ROUTES.AUTH.SIGN_UP.path} element={<SignUp />} />
-      </Route>
+      <Route path={APP_ROUTES.AUTH.MAIN.path} element={<Home />} />
+      <Route path={APP_ROUTES.PUBLIC.PRODUCTS.path} element={<ProductsCatalog />} />
+      <Route path={APP_ROUTES.AUTH.SIGN_IN.path} element={<SignIn />} />
+      <Route
+        path={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path}
+        element={
+          <AdminAuth>
+            <SignInAdmin />
+          </AdminAuth>
+        }
+      />
+      <Route path={APP_ROUTES.AUTH.SIGN_UP.path} element={<SignUp />} />
       <Route
         path={APP_ROUTES.PRIVATE.MAIN}
         element={

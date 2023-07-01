@@ -1,4 +1,7 @@
 export const APP_ROUTES = {
+  PUBLIC: {
+    PRODUCTS: { path: '/products' },
+  },
   AUTH: {
     MAIN: {
       path: '/',

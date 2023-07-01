@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
-import { PlusOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Card, Col, Input, Row, Select, Tag } from 'antd';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Button, Card, Col, Input, Row, Select, Tag, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -100,7 +100,6 @@ const Products = () => {
   };
 
   const getPanelValue = ({ searchText, categoryId }: { searchText?: string; categoryId?: number[] }) => {
-    console.log({ categoryId });
     let _options = products?.filter(item => {
       return (
         (functions.includes(item.name, searchText) || functions.includes(item.description, searchText)) &&
@@ -108,7 +107,10 @@ const Products = () => {
       );
     });
     setOptions(_options);
-    console.log(_options);
+  };
+
+  const onRefresh = () => {
+    dispatch(productActions.fetchProducts({ refetch: true }));
   };
 
   return (
@@ -171,9 +173,19 @@ const Products = () => {
               };
             }}
             size="small"
-            scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
+            scroll={{ y: 'calc(100vh - 300px)', x: 700 }}
             columns={columns}
+            pagination={false}
             dataSource={options}
+            footer={() => (
+              <Row>
+                <Col>
+                  <Tooltip title="Recargar">
+                    <Button shape="circle" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh} />
+                  </Tooltip>
+                </Col>
+              </Row>
+            )}
           />
         </Col>
       </Row>
