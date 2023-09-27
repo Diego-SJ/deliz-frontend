@@ -13,7 +13,7 @@ import BottomMenu from '@/components/organisms/BottomMenu';
 import { productActions } from '@/redux/reducers/products';
 
 const getPopularProducts = (products: Product[]) => {
-  let topProducts = products.sort((a, b) => a.stock - b.stock);
+  let topProducts = products.sort((a, b) => a?.stock - b?.stock);
 
   return topProducts.slice(0, 10);
 };
