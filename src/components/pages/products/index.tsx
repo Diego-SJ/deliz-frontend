@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PopsicleImg from '@/assets/img/png/popsicle.png';
 import { CATEGORIES } from '@/constants/categories';
-import { STATUS } from '@/constants/status';
+import { STATUS, STATUS_OBJ } from '@/constants/status';
 
 type DataType = Product;
 
@@ -48,13 +48,13 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Fecha creación',
     dataIndex: 'created_at',
-    render: (value: Date | string) => functions.date1(value),
+    render: (value: Date | string) => functions.dateTime(value),
   },
   {
     title: 'Status',
     dataIndex: 'status',
     render: (statusId: number) => {
-      const status = STATUS.find(item => item.id === statusId);
+      const status = STATUS_OBJ[statusId];
       return <Tag color={status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
     },
   },
