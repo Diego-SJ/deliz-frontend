@@ -1,4 +1,4 @@
-import { format, formatDistance } from 'date-fns';
+import { addDays, format, formatDistance, isAfter, isBefore, isEqual, subDays, subHours } from 'date-fns';
 import numeral from 'numeral';
 
 const functions = {
@@ -21,8 +21,34 @@ const functions = {
     return numeral(number).format('$0.0');
   },
   date1: (date: Date | string) => {
-    let [_date, time] = new Date(date).toLocaleString()?.split(',');
+    let [_date] = new Date(date).toLocaleString()?.split(',');
     return format(new Date(_date), 'PPP');
+  },
+  dateTime: (date: Date | string) => {
+    let _date = subHours(new Date(date), 6);
+    return format(new Date(_date), 'PPpp');
+  },
+  betweenDates: (date: Date | string, startDate: Date | string, endDate: Date | string): boolean => {
+    let _date = new Date(date)?.toLocaleString()?.split(',')[0];
+
+    let date1 = format(subDays(new Date(_date), 1), 'P');
+    let date2 = format(addDays(new Date(startDate), 1), 'P');
+    let date3 = format(addDays(new Date(endDate), 1), 'P');
+    return date1 >= date2 && date1 <= date3;
+  },
+  dateAfter: (date: Date | string, startDate: Date | string): boolean => {
+    let _date = new Date(date)?.toLocaleString()?.split(',')[0];
+
+    let date1 = format(subDays(new Date(_date), 1), 'P');
+    let date2 = format(addDays(new Date(startDate), 1), 'P');
+    return date1 >= date2;
+  },
+  dateBefore: (date: Date | string, endDate: Date | string): boolean => {
+    let _date = new Date(date)?.toLocaleString()?.split(',')[0];
+
+    let date1 = format(subDays(new Date(_date), 1), 'P');
+    let date2 = format(addDays(new Date(endDate), 1), 'P');
+    return date1 <= date2;
   },
   removeBucketURL: (path: string, bucket: string) => {
     let filename = path.replace(bucket, '');

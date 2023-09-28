@@ -4,7 +4,7 @@ import CustomerEditor from '../../customers/editor';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 
 type Option = {
@@ -30,12 +30,21 @@ const CashierCustomer = () => {
     setCurrentCustomerId(customer_id);
   }, [customer_id]);
 
+  const onMount = useCallback(() => {
+    dispatch(salesActions.cashRegister.setCustomerId(19));
+  }, [dispatch]);
+
+  useEffect(() => {
+    onMount();
+  }, [onMount]);
+
   const onChange = (customerId: number) => {
     setCurrentCustomerId(customerId);
     dispatch(salesActions.cashRegister.setCustomerId(customerId));
   };
 
   const onAddNew = () => {
+    //dispatch(customerActions.fetchCustomers(true));
     dispatch(customerActions.setCurrentCustomer({ customer_id: -1 } as Customer));
   };
 

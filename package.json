@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
+    "@capacitor/core": "^5.4.1",
     "@reduxjs/toolkit": "^1.9.5",
     "@supabase/supabase-js": "^2.24.0",
     "@types/redux-persist": "^4.3.1",

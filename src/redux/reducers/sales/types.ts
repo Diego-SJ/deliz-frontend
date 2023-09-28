@@ -21,6 +21,9 @@ export type Sale = {
   discount_type?: DiscountType;
   discount?: number;
   shipping?: number;
+  amount_paid?: number;
+  cashback?: number;
+  total?: number;
 };
 
 // sales_detail table in DB
@@ -52,6 +55,9 @@ export type SaleDetails = {
   shipping: number;
   status: { status_id: number; name: string };
   status_id: number;
+  amount_paid?: number;
+  cashback?: number;
+  total?: number;
 };
 
 // redux cash register

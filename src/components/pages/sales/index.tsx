@@ -1,14 +1,14 @@
 import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Row, Tag, Tooltip } from 'antd';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Col, DatePicker, Input, Row, Select, Tag, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS } from '@/constants/status';
+import { STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
-import { SaleDetails } from '@/redux/reducers/sales/types';
+import { Sale, SaleDetails } from '@/redux/reducers/sales/types';
 
 const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -28,14 +28,15 @@ const columns: ColumnsType<SaleDetails> = [
     title: 'Status',
     dataIndex: 'status',
     render: status => {
-      const _status = STATUS.find(item => item.id === status?.status_id);
+      const _status = STATUS_OBJ[status?.status_id || 1];
       return <Tag color={_status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
     },
   },
   {
     title: 'Fecha creación',
     dataIndex: 'created_at',
-    render: (value: Date | string) => functions.date1(value),
+    align: 'left',
+    render: (value: Date | string) => functions.dateTime(value),
   },
 ];
 
@@ -49,6 +50,8 @@ const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { sales } = useAppSelector(({ sales }) => sales);
+  const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
+  const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -58,6 +61,28 @@ const Sales = () => {
       return;
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    setAuxSales(sales);
+  }, [sales]);
+
+  const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
+    if (!status && !startDate && !endDate) {
+      setAuxSales(sales);
+    } else {
+      let salesList = sales?.filter(item => {
+        let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
+        let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
+        let matchStatus = !!status ? item?.status_id === status : true;
+        return matchStatus && matchDate1 && matchDate2;
+      });
+      setAuxSales(salesList);
+    }
+  };
+
+  useEffect(() => {
+    applyFilters(filters);
+  }, [filters]);
 
   const onAddNew = () => {
     navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -86,14 +111,47 @@ const Sales = () => {
             ]}
           />
         </Col>
-        <Col lg={{ span: 4 }}>
-          <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-            Nueva
-          </Button>
-        </Col>
       </Row>
-      <Row style={{ marginTop: '20px' }}>
+      <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
+          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
+            <Row gutter={[10, 10]}>
+              <Col lg={6} xs={12}>
+                <Select
+                  placeholder="Status"
+                  style={{ width: '100%' }}
+                  allowClear
+                  onChange={status => setFilters(p => ({ ...p, status }))}
+                >
+                  <Select.Option key={4} value={4}>
+                    {STATUS_OBJ[4].name}
+                  </Select.Option>
+                  <Select.Option key={5} value={5}>
+                    {STATUS_OBJ[5].name}
+                  </Select.Option>
+                </Select>
+              </Col>
+              <Col lg={6} xs={12}>
+                <DatePicker
+                  placeholder="Inicio"
+                  style={{ width: '100%' }}
+                  onChange={(_, startDate) => setFilters(p => ({ ...p, startDate }))}
+                />
+              </Col>
+              <Col lg={6} xs={12}>
+                <DatePicker
+                  placeholder="Fin"
+                  style={{ width: '100%' }}
+                  onChange={(_, endDate) => setFilters(p => ({ ...p, endDate }))}
+                />
+              </Col>
+              <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
+                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                  Nueva
+                </Button>
+              </Col>
+            </Row>
+          </Card>
           <Table
             // rowSelection={{
             //   type: 'checkbox',
@@ -106,7 +164,7 @@ const Sales = () => {
             }}
             size="small"
             columns={columns}
-            dataSource={sales}
+            dataSource={auxSales}
             scroll={{ x: 700 }}
             footer={() => (
               <Row>

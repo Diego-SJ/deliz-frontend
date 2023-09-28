@@ -5,6 +5,7 @@ import { CashRegister, CashRegisterItem, DiscountType, Sale, SaleDetails, SaleIt
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
+import { productActions } from '../products';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -14,10 +15,10 @@ const customActions = {
       if (!salesList.length || args?.refetch) {
         dispatch(salesActions.setLoading(true));
         const { data, error } = await supabase.from('sales').select(`
-        *,
-        customers ( * ),
-        status ( status_id, name )
-      `);
+          *,
+          customers ( * ),
+          status ( status_id, name )
+        `);
 
         dispatch(salesActions.setLoading(false));
 
@@ -27,6 +28,7 @@ const customActions = {
         }
 
         salesList = data?.map(item => ({ ...item, key: item?.sale_id } as SaleDetails)) || [];
+        salesList = salesList?.sort((a, b) => Number(new Date(b?.created_at)) - Number(new Date(a?.created_at)));
 
         dispatch(salesActions.setSales(salesList as SaleDetails[]));
         return true;
@@ -92,6 +94,16 @@ const customActions = {
         return null;
       }
     },
+  restProductsStock: async (products: SaleItem[]) => {
+    let _products = products?.filter(p => p?.product_id !== 0);
+    for (let p of _products) {
+      const { data, error } = await supabase.rpc('reduce_product_quantity', {
+        p_id: p.product_id,
+        p_quantity: p.quantity,
+      });
+      console.log({ data, error });
+    }
+  },
   saveSaleItems:
     (sale: Sale) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<boolean> => {
@@ -109,14 +121,19 @@ const customActions = {
           } as SaleItem;
         });
 
-        const { error, data } = await supabase.from('sale_detail').upsert(saleItems);
-        console.log(data);
+        const { error } = await supabase.from('sale_detail').upsert(saleItems);
+
+        if (!error) {
+          await salesActions.restProductsStock(saleItems);
+        }
+
         if (error) {
           message.error('No se pudo registrar los productos de la venta');
           return false;
         }
 
         await dispatch(salesActions.fetchSales({ refetch: true }));
+        await dispatch(productActions.fetchProducts({ refetch: true }));
         message.success('¡Venta registrada!', 4);
         return true;
       } catch (error) {
@@ -132,7 +149,7 @@ const customActions = {
         discountType: 'AMOUNT',
         shipping: 0,
         status: 5,
-        customer_id: '',
+        customer_id: 19,
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },

@@ -7,6 +7,15 @@ export const STATUS_DATA = {
   CANCELED: { id: 6, name: 'Cancelado', color: 'volcano' },
 };
 
+export const STATUS_OBJ: { [key: number]: { name: string; color: string } } = {
+  1: { name: 'Activo', color: 'lime' },
+  2: { name: 'Oculto', color: 'gold' },
+  3: { name: 'Eliminado', color: 'volcano' },
+  4: { name: 'Pagada', color: 'green' },
+  5: { name: 'Pendiente', color: 'gold' },
+  6: { name: 'Cancelada', color: 'voclano' },
+};
+
 export const STATUS = [
   { id: 1, name: 'Activo', color: 'lime' },
   { id: 2, name: 'Oculto', color: 'gold' },

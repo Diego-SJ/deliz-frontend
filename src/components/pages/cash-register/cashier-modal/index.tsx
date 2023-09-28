@@ -1,15 +1,14 @@
-import { Avatar, Button, Card, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
+import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
 import { CATEGORIES } from '@/constants/mocks';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import { CardBtn } from '../../../atoms/NumberKeyboard/styles';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 
@@ -23,11 +22,16 @@ type CashierModalProps = {
 
 const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherItem }: CashierModalProps) => {
   const dispatch = useAppDispatch();
-  const [quantity, setQuantity] = useState<number | string>('');
+  const { cash_register } = useAppSelector(({ sales }) => sales);
+  const [quantity, setQuantity] = useState<number | string>(casherItem?.quantity || '');
   const [checked, setChecked] = useState(true);
   const [subtotal, setSubtotal] = useState(0);
+  const [quantityUsed, setQuantityUsed] = useState<number>(0);
   const quantityInput = useRef<HTMLInputElement>(null);
   const { isTablet } = useMediaQuery();
+  const { items = [] } = cash_register;
+  const stock = currentProduct?.stock || 0;
+  const isExtra = casherItem?.product?.product_id === 0;
 
   useEffect(() => {
     if (open) {
@@ -43,12 +47,29 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
       setQuantity(casherItem.quantity);
       setChecked(casherItem.wholesale_price);
     }
-  }, [action, currentProduct]);
+  }, [action, casherItem]);
 
   useEffect(() => {
     let currentPrice = checked ? currentProduct?.wholesale_price || 0 : currentProduct?.retail_price || 0;
     setSubtotal(currentPrice);
   }, [checked, currentProduct]);
+
+  useEffect(() => {
+    let productIsAlreadyInList = items?.filter(p => p?.product?.product_id === currentProduct?.product_id);
+    let totalQuantity = productIsAlreadyInList?.reduce((total, i) => total + i?.quantity, 0);
+    if (action === 'EDIT') {
+      totalQuantity = totalQuantity - (Number(casherItem?.quantity) - Number(quantity));
+    }
+
+    setQuantityUsed(totalQuantity);
+  }, [currentProduct, items, quantity]);
+
+  const disableSaveBtn = () => {
+    const overStock = action === 'EDIT' ? stock - quantityUsed < 0 : stock - quantityUsed < Number(quantity);
+    const emptyValue = Number(quantity) <= 0;
+
+    return (overStock || emptyValue) && casherItem?.product?.product_id !== 0;
+  };
 
   const cleanFields = () => {
     setQuantity(0);
@@ -88,6 +109,9 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
   };
 
   const onQuantityChange = (value: number) => {
+    if ((action === 'EDIT' ? stock - quantityUsed <= 0 : stock - quantityUsed < value) && !isExtra) {
+      message.error('No hay stock suficiente');
+    }
     setQuantity(value);
   };
 
@@ -107,7 +131,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
             </Button>
           </Col>
           <Col span={12}>
-            <Button block type="primary" onClick={handleOk} disabled={Number(quantity) <= 0}>
+            <Button block type="primary" onClick={handleOk} disabled={disableSaveBtn()}>
               Guardar
             </Button>
           </Col>
@@ -124,13 +148,20 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
         <Typography.Title level={3} style={{ marginBottom: 0 }}>
           {currentProduct?.name}
         </Typography.Title>
-        <Typography.Paragraph style={{ marginBottom: 5 }}>
+        <Typography.Paragraph style={{ marginBottom: 5, textAlign: 'center' }}>
           {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name}
+          {!isExtra && (
+            <>
+              <br />
+              En existencia <b>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed})</b>
+            </>
+          )}
         </Typography.Paragraph>
         <Typography.Title level={4} type="success" style={{ margin: 0 }}>
           {functions.money(subtotal)} * {quantity} = {functions.money(subtotal * Number(quantity))}
         </Typography.Title>
         <Space height="10px" />
+
         <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
           <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
             Mayoreo
@@ -143,7 +174,6 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
         <InputNumber
           ref={quantityInput}
           min={0}
-          max={currentProduct?.stock ?? 0}
           placeholder="Cantidad"
           size="large"
           style={{ width: '100%', textAlign: 'center' }}

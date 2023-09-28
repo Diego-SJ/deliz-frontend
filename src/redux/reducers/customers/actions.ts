@@ -14,12 +14,14 @@ const customActions = {
         const result = await supabase.from('customers').select('*');
 
         customers =
-          result?.data?.map((item, key) => {
-            return {
-              ...item,
-              key,
-            } as Customer;
-          }) ?? [];
+          result?.data
+            ?.map((item, key) => {
+              return {
+                ...item,
+                key,
+              } as Customer;
+            })
+            ?.sort((a, b) => a?.name?.localeCompare(b?.name)) ?? [];
         dispatch(customerActions.setCustomers(customers));
       }
 

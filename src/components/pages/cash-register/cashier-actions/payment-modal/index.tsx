@@ -17,7 +17,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
-  const [cashback, setCashback] = useState(0);
+  const [receivedMoney, setReceivedMoney] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleClose = () => {
@@ -25,7 +25,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
   };
 
   const getSaleStatus = () => {
-    let _cashback = total - cashback;
+    let _cashback = total - receivedMoney;
     if (_cashback > 0) return STATUS_DATA.PENDING.id;
     return STATUS_DATA.COMPLETED.id;
   };
@@ -36,8 +36,15 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
       setLoading(false);
       return message.info('Selecciona un cliente para poder finalizar la venta');
     }
-    const newSale: Sale = { payment_method: form.getFieldValue('payment_method'), status_id: getSaleStatus() };
+
+    const newSale: Sale = {
+      payment_method: form.getFieldValue('payment_method'),
+      status_id: getSaleStatus(),
+      amount_paid: receivedMoney || 0,
+      cashback: total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney),
+    };
     const sale = await dispatch(salesActions.createSale(newSale));
+
     if (sale?.sale_id) {
       let success = await dispatch(salesActions.saveSaleItems(sale));
 
@@ -65,8 +72,8 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
             </Button>
           </Col>
           <Col span={12}>
-            <Button block type="primary" onClick={handleOk} size="large" disabled={!cashback} loading={loading}>
-              Guardar
+            <Button block type="primary" onClick={handleOk} size="large" disabled={receivedMoney < 0} loading={loading}>
+              {getSaleStatus() === STATUS_DATA.PENDING.id ? 'Pagar luego' : 'Finalizar'}
             </Button>
           </Col>
         </Row>,
@@ -91,14 +98,16 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
             placeholder="0"
             size="large"
             style={{ width: '100%' }}
-            onChange={value => setCashback(value || 0)}
+            onChange={value => setReceivedMoney(value || 0)}
           />
         </Form.Item>
         <Typography.Title
           level={4}
-          type={total - cashback > 0 ? 'danger' : 'success'}
+          type={total - receivedMoney > 0 ? 'danger' : 'success'}
           style={{ margin: '0px 0 30px', textAlign: 'center' }}
-        >{`${total - cashback > 0 ? 'Por pagar' : 'Cambio'}: ${functions.money(Math.abs(total - cashback))}`}</Typography.Title>
+        >{`${total - receivedMoney > 0 ? 'Por pagar' : 'Cambio'}: ${functions.money(
+          Math.abs(total - receivedMoney),
+        )}`}</Typography.Title>
       </Form>
     </Modal>
   );
