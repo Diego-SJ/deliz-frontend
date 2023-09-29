@@ -1,13 +1,11 @@
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
-import Space from '@/components/atoms/Space';
-import { STATUS_DATA } from '@/constants/status';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Sale } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import { EditOutlined } from '@ant-design/icons';
-import { Button, Col, InputNumber, Modal, Radio, Row, Typography, message } from 'antd';
+import { Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
 import { FC, useRef, useState } from 'react';
 
 type UpdateSaleButton = {
@@ -18,7 +16,7 @@ const { Title, Paragraph } = Typography;
 
 const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
   const dispatch = useAppDispatch();
-  const { cash_register, current_sale } = useAppSelector(({ sales }) => sales);
+  const { current_sale } = useAppSelector(({ sales }) => sales);
 
   const [saleStatus, setSaleStatus] = useState<number>(5); // 4 paid, 5 pending, 6 cancelled
   const [receivedMoney, setReceivedMoney] = useState(0);
@@ -31,10 +29,6 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
 
   const handleOk = async () => {
     setLoading(true);
-    if (!!!cash_register?.customer_id) {
-      setLoading(false);
-      return message.info('Selecciona un cliente para poder finalizar la venta');
-    }
 
     const newSale: Sale = {
       status_id: saleStatus,
