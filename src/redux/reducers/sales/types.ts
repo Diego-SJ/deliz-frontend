@@ -9,6 +9,7 @@ export type SalesSlice = {
 };
 
 export type DiscountType = 'PERCENTAGE' | 'AMOUNT';
+export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';
 
 // sales table in DB
 export type Sale = {
@@ -16,7 +17,7 @@ export type Sale = {
   sale_id?: number;
   customer_id?: number;
   created_at?: Date | string;
-  payment_method?: 'CASH' | 'CARD' | 'TRANSFER';
+  payment_method?: PaymentMethod;
   status_id?: number;
   discount_type?: DiscountType;
   discount?: number;
@@ -24,6 +25,7 @@ export type Sale = {
   amount_paid?: number;
   cashback?: number;
   total?: number;
+  updated_at?: string | Date;
 };
 
 // sales_detail table in DB
@@ -36,6 +38,7 @@ export type SaleItem = {
   quantity?: number;
   wholesale?: boolean;
   products?: Product & { categories: Category };
+  sale_id?: number;
 };
 
 export type CurrentSale = {
@@ -48,17 +51,8 @@ export type SaleDetails = {
   created_at: Date | string;
   customer_id: number;
   customers: Customer;
-  discount: number;
-  discount_type: DiscountType;
-  payment_method: string;
-  sale_id: number;
-  shipping: number;
   status: { status_id: number; name: string };
-  status_id: number;
-  amount_paid?: number;
-  cashback?: number;
-  total?: number;
-};
+} & Sale;
 
 // redux cash register
 export type CashRegister = {

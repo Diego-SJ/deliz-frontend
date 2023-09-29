@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
+import { STATUS_OBJ } from '@/constants/status';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -94,6 +95,33 @@ const customActions = {
         return null;
       }
     },
+  updateSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
+    try {
+      let newItem = { ...item, updated_at: new Date() };
+      delete newItem.key;
+
+      const result = await supabase.from('sales').upsert(newItem).eq('sale_id', newItem.sale_id);
+
+      if (result.error) {
+        message.error('No se pudo actualizar la información.', 4);
+        return false;
+      }
+
+      const { current_sale } = getState()?.sales;
+      let newMetadata = {
+        ...current_sale.metadata,
+        ...(newItem as SaleDetails),
+        status: { status_id: item.status_id as number, name: STATUS_OBJ[item.status_id as number].name },
+      };
+      await dispatch(salesActions.setCurrentSale({ metadata: newMetadata }));
+
+      message.success('¡Venta actualizada!', 4);
+      return true;
+    } catch (error) {
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
   restProductsStock: async (products: SaleItem[]) => {
     let _products = products?.filter(p => p?.product_id !== 0);
     for (let p of _products) {
@@ -140,6 +168,27 @@ const customActions = {
         return false;
       }
     },
+  updateSaleItem: (item: SaleItem) => async (dispatch: AppDispatch) => {
+    try {
+      let newItem = { ...item };
+      delete newItem.products;
+      delete newItem.key;
+
+      const result = await supabase.from('sale_detail').update(newItem).eq('sale_detail_id', newItem.sale_detail_id);
+
+      if (result.error) {
+        message.error('No se pudo actualizar la información.', 4);
+        return false;
+      }
+
+      await dispatch(salesActions.getSaleById({ refetch: true, sale_id: newItem.sale_id }));
+      message.success('¡Producto actualizado con éxito!', 4);
+      return true;
+    } catch (error) {
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
   cashRegister: {
     reset: () => async (dispatch: AppDispatch) => {
       const defaultCashRegisterValues: CashRegister = {

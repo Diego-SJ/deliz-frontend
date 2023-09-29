@@ -1,23 +1,8 @@
 import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { theme } from '@/styles/theme/config';
-import { MailOutlined, PhoneOutlined, EnvironmentOutlined, EditOutlined } from '@ant-design/icons';
-import {
-  Avatar,
-  Breadcrumb,
-  Card,
-  Col,
-  Typography,
-  Row,
-  Alert,
-  Table,
-  AlertProps,
-  Button,
-  Modal,
-  Form,
-  InputNumber,
-  Radio,
-} from 'antd';
+import { MailOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Card, Col, Typography, Row, Alert, Table, AlertProps, Button, Modal, InputNumber } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
@@ -33,6 +18,8 @@ import FallbackImage from '@/assets/img/png/Logo Color.png';
 import Space from '@/components/atoms/Space';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
+import UpdateSaleButton from './update-sale-btn';
+import PrintInvoiceButton from './print-invoice-btn';
 
 type DataType = SaleItem;
 
@@ -78,13 +65,13 @@ const columns: ColumnsType<DataType> = [
 const SaleDetail = () => {
   const dispatch = useAppDispatch();
   const { current_sale } = useAppSelector(({ sales }) => sales);
-  const [amounts, setAmounts] = useState({ total: 0, subtotal: 0, color: 'info', pending: 0, cashback: 0, amount_paid: 0 });
+  const [amounts, setAmounts] = useState({ total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0 });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentItem, setCurrentItem] = useState<SaleItem>();
-  const [quantity, setQuantity] = useState<number | string>(0);
-  const [checked, setChecked] = useState(true);
-  const [form] = Form.useForm();
+  const [newQuantity, setNewQuantity] = useState<number>(0);
+  const [newPrice, setNewPrice] = useState(0);
+  const [currentInput, setCurrentInput] = useState<'price' | 'quantity'>('price');
   const firstRender = useRef(false);
   const { isTablet } = useMediaQuery();
   const { metadata, items = [] } = current_sale;
@@ -93,7 +80,7 @@ const SaleDetail = () => {
   useEffect(() => {
     if (!firstRender.current && metadata) {
       firstRender.current = true;
-      console.log(metadata);
+      console.log({ metadata });
       dispatch(salesActions.getSaleById({ sale_id: metadata.sale_id, refetch: true }));
       return;
     }
@@ -114,28 +101,31 @@ const SaleDetail = () => {
     setAmounts(_amounts);
   }, [items, metadata]);
 
-  const onFinish = (values: any) => {
-    console.log(values);
+  const onRowClick = (record: SaleItem) => {
+    setCurrentItem(record);
+    setNewQuantity(record?.quantity || 0);
+    setNewPrice(record?.price || 0);
+    setOpen(true);
+  };
+
+  const onAmountsChange = (value: number | null) => {
+    if (currentInput === 'price') setNewPrice(value || 0);
+    else if (currentInput === 'quantity') setNewQuantity(value || 0);
   };
 
   const closeModal = () => {
     setOpen(false);
   };
 
-  const updateItem = () => {};
-
-  const onRowClick = (record: SaleItem) => {
-    setCurrentItem(record);
-    setQuantity(record?.quantity || 0);
-    setOpen(true);
+  const updateItem = async () => {
+    setLoading(true);
+    const result = await dispatch(salesActions.updateSaleItem({ ...currentItem, quantity: newQuantity, price: newPrice }));
+    if (result) closeModal();
+    setLoading(false);
   };
 
-  const onQuantityChange = (value: number) => {
-    setQuantity(value);
-  };
-
-  const onCheckChange = (value: boolean) => {
-    setChecked(value);
+  const updateSale = (values: any) => {
+    console.log(values);
   };
 
   return (
@@ -162,34 +152,63 @@ const SaleDetail = () => {
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
         <Col lg={{ span: 8 }} xs={24}>
           <Card>
-            <Typography.Title level={2}>{`Total: ${functions.money(amounts?.total)}`}</Typography.Title>
-            <Typography.Paragraph style={{ margin: 0 }}>{`Envío: ${functions.money(metadata?.shipping)}`}</Typography.Paragraph>
-            <Typography.Paragraph style={{ margin: '0 0 10px' }}>{`Subtotal: ${functions.money(
-              amounts.subtotal,
-            )}`}</Typography.Paragraph>
-            <Typography.Paragraph style={{ margin: 0 }}>{`Pagado: ${functions.money(amounts.amount_paid)}`}</Typography.Paragraph>
-            <Typography.Paragraph style={{ margin: 0 }}>{`Pendiente: ${functions.money(amounts.pending)}`}</Typography.Paragraph>
-            <Typography.Paragraph style={{ margin: '0 0 10px' }}>{`Cambio: ${functions.money(
-              amounts.cashback,
-            )}`}</Typography.Paragraph>
+            <Row gutter={[10, 10]}>
+              <Col span={12}>
+                <Typography.Paragraph style={{ margin: '0' }}>
+                  {`Subtotal: ${functions.money(amounts.subtotal)}`}
+                </Typography.Paragraph>
+                <Typography.Paragraph style={{ margin: '0' }}>{`Envío: ${functions.money(
+                  metadata?.shipping,
+                )}`}</Typography.Paragraph>
+                {amounts.pending > 0 && (
+                  <Typography.Paragraph style={{ margin: 0 }}>{`Pendiente: ${functions.money(
+                    amounts.pending,
+                  )}`}</Typography.Paragraph>
+                )}
+              </Col>
+              <Col span={12} style={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}>
+                <Typography.Paragraph style={{ margin: 0 }}>{`Pagado: ${functions.money(
+                  amounts.amount_paid,
+                )}`}</Typography.Paragraph>
+
+                <Typography.Paragraph style={{ margin: '0 0 10px' }}>
+                  {`Cambio: ${functions.money(amounts.cashback)}`}
+                </Typography.Paragraph>
+              </Col>
+            </Row>
+
+            <Typography.Title level={2} style={{ margin: 0 }}>{`Total: ${functions.money(amounts?.total)}`}</Typography.Title>
+          </Card>
+
+          <Card style={{ marginTop: 20 }}>
             <Alert
               message={metadata?.status.name ?? '- - -'}
               action={metadata?.status_id === STATUS_DATA.COMPLETED.id ? functions.date1(metadata.created_at) : ''}
               type={ALERT_COLORS[metadata?.status_id ?? 6]}
               showIcon
+              style={{ marginBottom: 15 }}
             />
+            <Row gutter={[10, 10]}>
+              <Col span={12}>
+                <UpdateSaleButton amounts={amounts} />
+              </Col>
+              <Col span={12}>
+                <PrintInvoiceButton amounts={amounts} />
+              </Col>
+            </Row>
           </Card>
+
           <Card
-            title={
-              <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography.Title level={5} style={{ margin: 'auto 0' }}>
-                  Cliente
-                </Typography.Title>
-                <Button icon={<EditOutlined rev={{}} />} type="ghost">
-                  Editar
-                </Button>
-              </Row>
-            }
+            // title={
+            //   <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+            //     <Typography.Title level={5} style={{ margin: 'auto 0' }}>
+            //       Cliente
+            //     </Typography.Title>
+            //     {/* <Button icon={<EditOutlined rev={{}} />} type="ghost">
+            //       Editar
+            //     </Button> */}
+            //   </Row>
+            // }
             style={{ marginTop: 20 }}
           >
             <Meta
@@ -261,7 +280,7 @@ const SaleDetail = () => {
             </Col>
             <Col span={12}>
               <Button block type="primary" onClick={updateItem} size="large" loading={loading}>
-                Guardar
+                Actualizar
               </Button>
             </Col>
           </Row>,
@@ -269,7 +288,7 @@ const SaleDetail = () => {
       >
         <ModalBody>
           <Avatar
-            src={currentProduct?.image_url || FallbackImage}
+            src={currentProduct?.image_url ? BUCKETS.PRODUCTS.IMAGES`${currentProduct?.image_url}` : FallbackImage}
             size={100}
             style={{ background: 'white', padding: !!currentProduct?.image_url ? 0 : 5 }}
             shape="circle"
@@ -280,32 +299,44 @@ const SaleDetail = () => {
           <Typography.Paragraph style={{ marginBottom: 5, textAlign: 'center' }}>
             {currentProduct?.categories?.name}
           </Typography.Paragraph>
-          <Typography.Title level={4} type="success" style={{ margin: 0 }}>
-            {functions.money(currentItem?.price)} * {quantity} = {functions.money((currentItem?.price || 0) * Number(quantity))}
+          <Space height="10px" />
+          <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
+            Cantidad
           </Typography.Title>
-          <Space height="10px" />
-
-          <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
-            <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
-              Mayoreo
-            </Radio.Button>
-            <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
-              Menudeo
-            </Radio.Button>
-          </Radio.Group>
-          <Space height="10px" />
           <InputNumber
             min={0}
             placeholder="Cantidad"
             size="large"
             style={{ width: '100%', textAlign: 'center' }}
-            value={quantity}
+            value={newQuantity}
             onPressEnter={updateItem}
             readOnly={isTablet}
-            onChange={value => onQuantityChange(value as number)}
+            onFocus={() => setCurrentInput('quantity')}
+            onChange={onAmountsChange}
+          />
+
+          <Space height="10px" />
+          <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
+            Precio
+          </Typography.Title>
+          <InputNumber
+            min={0}
+            placeholder="Precio"
+            size="large"
+            style={{ width: '100%', textAlign: 'center' }}
+            value={newPrice}
+            readOnly={isTablet}
+            onFocus={() => setCurrentInput('price')}
+            onChange={onAmountsChange}
           />
           <Space height="10px" />
-          {isTablet && <NumberKeyboard onChange={onQuantityChange} />}
+          {isTablet && (
+            <NumberKeyboard
+              value={currentInput === 'price' ? newPrice : newQuantity}
+              withDot={currentInput === 'price'}
+              onChange={onAmountsChange}
+            />
+          )}
         </ModalBody>
       </Modal>
     </div>

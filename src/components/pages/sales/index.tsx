@@ -2,31 +2,40 @@ import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Input, Row, Select, Tag, Tooltip } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
-import { Sale, SaleDetails } from '@/redux/reducers/sales/types';
+import { SaleDetails } from '@/redux/reducers/sales/types';
 
-const PAYMENT_METHOD: { [key: string]: string } = {
+export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
   CARD: 'Tarjeta',
   TRANSFER: 'Transferencia',
 };
 
 const columns: ColumnsType<SaleDetails> = [
-  { title: 'No. Venta', dataIndex: 'sale_id' },
+  { title: '#', dataIndex: 'sale_id', width: 50, align: 'center' },
   {
     title: 'Cliente',
     dataIndex: 'customers',
+    align: 'left',
     render: value => value.name,
   },
-  { title: 'Método de pago', dataIndex: 'payment_method', render: (value = 'CASH') => PAYMENT_METHOD[value] },
+  {
+    title: 'Método de pago',
+    width: 130,
+    align: 'center',
+    dataIndex: 'payment_method',
+    render: (value = 'CASH') => PAYMENT_METHOD[value],
+  },
   {
     title: 'Status',
     dataIndex: 'status',
+    width: 130,
+    align: 'center',
     render: status => {
       const _status = STATUS_OBJ[status?.status_id || 1];
       return <Tag color={_status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
@@ -35,16 +44,18 @@ const columns: ColumnsType<SaleDetails> = [
   {
     title: 'Fecha creación',
     dataIndex: 'created_at',
-    align: 'left',
+    align: 'center',
+    width: 210,
     render: (value: Date | string) => functions.dateTime(value),
   },
+  {
+    title: 'Fecha actualización',
+    dataIndex: 'updated_at',
+    align: 'center',
+    width: 210,
+    render: (value: Date | string) => (value ? functions.dateTime(value) : 'N/A'),
+  },
 ];
-
-// const rowSelection = {
-//   onChange: (selectedRowKeys: React.Key[], selectedRows: SaleDetails[]) => {
-//     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-//   },
-// };
 
 const Sales = () => {
   const dispatch = useAppDispatch();
@@ -90,7 +101,7 @@ const Sales = () => {
 
   const onRowClick = (record: SaleDetails) => {
     dispatch(salesActions.setCurrentSale({ metadata: record }));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${record.sale_id}`);
+    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
   const onRefresh = () => {
@@ -153,10 +164,6 @@ const Sales = () => {
             </Row>
           </Card>
           <Table
-            // rowSelection={{
-            //   type: 'checkbox',
-            //   ...rowSelection,
-            // }}
             onRow={record => {
               return {
                 onClick: () => onRowClick(record), // click row
