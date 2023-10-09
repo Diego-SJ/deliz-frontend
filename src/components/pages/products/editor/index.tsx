@@ -63,6 +63,7 @@ const ProductEditor = () => {
   };
 
   const onFinish = async (values: Product) => {
+    return console.log({ values });
     if (!values.name) return message.warning('Agrega un nombre al producto');
 
     setLoading(true);
@@ -124,20 +125,20 @@ const ProductEditor = () => {
                     <Upload onChange={onImageChange} defaultFileList={productImages} />
                   </Form.Item>
                   <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
-                    <Input placeholder="E.g: Helado de nuez" />
+                    <Input size="large" placeholder="E.g: Helado de nuez" />
                   </Form.Item>
                   <Form.Item name="description" label="Descripción">
-                    <TextArea rows={4} placeholder="E.g: Helado de nuez" />
+                    <TextArea size="large" rows={4} placeholder="E.g: Helado de nuez" />
                   </Form.Item>
                 </Col>
                 <Col lg={{ span: 12 }} xs={{ span: 24 }}>
                   <Row gutter={[20, 5]}>
                     <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
                       <Form.Item name="retail_price" label="Precio menudeo" rules={[{ type: 'number', min: 0, required: true }]}>
-                        <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
+                        <InputNumber size="large" prefix="$" style={{ width: '100%' }} placeholder="0.0" />
                       </Form.Item>
                       <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-                        <Select placeholder="Por default es Activo">
+                        <Select size="large" placeholder="Por default es Activo">
                           {STATUS.map(item => (
                             <Select.Option key={item.id} value={item.id}>
                               {item.name}
@@ -146,7 +147,7 @@ const ProductEditor = () => {
                         </Select>
                       </Form.Item>
                       <Form.Item name="stock" label="Stock" rules={[{ type: 'number', min: 0, required: true }]}>
-                        <InputNumber style={{ width: '100%' }} placeholder="0" />
+                        <InputNumber size="large" style={{ width: '100%' }} placeholder="0" />
                       </Form.Item>
                     </Col>
                     <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
@@ -155,16 +156,18 @@ const ProductEditor = () => {
                         label="Precio mayoreo"
                         rules={[{ type: 'number', min: 0, required: true }]}
                       >
-                        <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
+                        <InputNumber size="large" prefix="$" style={{ width: '100%' }} placeholder="0.0" />
                       </Form.Item>
                       <Form.Item name="category_id" label="Categoría" rules={[{ required: true }]}>
-                        <Select placeholder="Selecciona una categoría">
-                          {CATEGORIES.map(item => (
-                            <Select.Option key={item.id} value={item.id}>
-                              {item.name}
-                            </Select.Option>
-                          ))}
-                        </Select>
+                        <Select
+                          size="large"
+                          placeholder="Selecciona una categoría"
+                          showSearch
+                          style={{ width: '100%' }}
+                          optionFilterProp="children"
+                          filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                          options={CATEGORIES?.map(i => ({ value: i.id, label: i.name }))}
+                        />
                       </Form.Item>
                     </Col>
                   </Row>
