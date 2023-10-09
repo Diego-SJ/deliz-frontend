@@ -2,7 +2,7 @@ import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -111,8 +111,9 @@ const Sales = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
-  const onRefresh = () => {
-    dispatch(salesActions.fetchSales({ refetch: true }));
+  const onRefresh = async () => {
+    const result = await dispatch(salesActions.fetchSales({ refetch: true }));
+    if (result) message.info('Información actualizada');
   };
 
   return (

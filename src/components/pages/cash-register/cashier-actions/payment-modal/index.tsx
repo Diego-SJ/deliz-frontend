@@ -64,6 +64,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
       status_id: getSaleStatus(),
       amount_paid: receivedMoney || 0,
       cashback: total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney),
+      total: total,
     };
     const sale = await dispatch(salesActions.createSale(newSale));
 

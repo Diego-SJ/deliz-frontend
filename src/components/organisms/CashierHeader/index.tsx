@@ -1,6 +1,6 @@
 import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { DollarOutlined, HomeOutlined, InteractionOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
+import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/constants/routes';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
@@ -59,9 +59,9 @@ const CashierHeader = () => {
               onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
             />
           </Tooltip>
-          <Tooltip title="Venta aleatoria">
+          {/* <Tooltip title="Venta aleatoria">
             <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
-          </Tooltip>
+          </Tooltip> */}
         </Space>
         <Divider type="vertical" />
         <Tooltip title="Ir a inicio">

@@ -17,6 +17,7 @@ import { productActions } from '@/redux/reducers/products';
 import { customerActions } from '@/redux/reducers/customers';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { UnorderedListOutlined } from '@ant-design/icons';
+import PopsicleIcon from '@/assets/img/jsx/popsicle';
 
 const { Content } = Layout;
 
@@ -94,14 +95,17 @@ const CashRegister = () => {
                       key: `${category.id}`,
                       children: (
                         <Row gutter={[10, 10]} key={i}>
-                          {currentProducts.map(product => (
-                            <ItemButton
-                              key={product.product_id}
-                              imageSrc={product.image_url}
-                              title={product.name}
-                              onClick={() => openModal(product)}
-                            />
-                          ))}
+                          {currentProducts.map(product => {
+                            console.log({ product });
+                            return (
+                              <ItemButton
+                                key={product.product_id}
+                                imageSrc={product.image_url}
+                                title={product.name}
+                                onClick={() => openModal(product)}
+                              />
+                            );
+                          })}
                         </Row>
                       ),
                     };
@@ -154,7 +158,7 @@ const ItemButton = (props: ItemButtonProps) => {
         <CardBtn
           onClick={props?.onClick}
           hoverable
-          className={!props?.imageSrc ? 'no-image' : ''}
+          className={!!!props?.imageSrc ? 'no-image' : ''}
           bodyStyle={{ backgroundImage: `url('${props?.imageSrc || FallbackImage}')` }}
         >
           <Typography.Text>{props?.title ?? 'Producto sin nombre'}</Typography.Text>

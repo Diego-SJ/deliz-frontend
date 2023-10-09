@@ -261,6 +261,9 @@ const CashierActions = () => {
                 readOnly={isTablet}
                 style={{ width: '100%', textAlign: 'center' }}
                 value={discountAmount}
+                onFocus={target => {
+                  target.currentTarget?.select();
+                }}
                 onChange={value => setDiscountAmount(value || 0)}
               />
               {isTablet && <NumberKeyboard value={discountAmount} withDot onChange={setDiscountAmount} />}
@@ -275,6 +278,9 @@ const CashierActions = () => {
                 style={{ width: '100%', textAlign: 'center' }}
                 value={shippingPrice}
                 readOnly={isTablet}
+                onFocus={target => {
+                  target.currentTarget?.select();
+                }}
                 onChange={value => setShippingPrice(value || 0)}
               />
               {isTablet && <NumberKeyboard value={shippingPrice} withDot onChange={setShippingPrice} />}
