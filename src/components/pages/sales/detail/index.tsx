@@ -6,7 +6,6 @@ import { Avatar, Breadcrumb, Card, Col, Typography, Row, Alert, Table, AlertProp
 import Meta from 'antd/es/card/Meta';
 import { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
-import PopsicleImg from '@/assets/img/png/popsicle.png';
 import functions from '@/utils/functions';
 import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
@@ -20,6 +19,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import UpdateSaleButton from './update-sale-btn';
 import PrintInvoiceButton from './print-invoice-btn';
+import PopsicleIcon from '@/assets/img/jsx/popsicle';
 
 type DataType = SaleItem;
 
@@ -30,7 +30,13 @@ const columns: ColumnsType<DataType> = [
     width: 50,
     render: (_, record) => {
       let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
-      return <Avatar src={imageUrl || PopsicleImg} style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }} size="large" />;
+      return (
+        <Avatar
+          src={imageUrl || <PopsicleIcon style={{ width: 15 }} />}
+          style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }}
+          size="large"
+        />
+      );
     },
   },
   {
@@ -79,8 +85,8 @@ const SaleDetail = () => {
 
   useEffect(() => {
     if (!firstRender.current && metadata) {
+      console.log('RENDER');
       firstRender.current = true;
-      console.log({ metadata });
       dispatch(salesActions.getSaleById({ sale_id: metadata.sale_id, refetch: true }));
       return;
     }
@@ -143,7 +149,7 @@ const SaleDetail = () => {
                 key: 'Ventas',
               },
               {
-                title: `Detalle de la venta`,
+                title: `Detalle de la venta (${current_sale?.metadata?.sale_id || '- - -'})`,
               },
             ]}
           />
@@ -288,9 +294,15 @@ const SaleDetail = () => {
       >
         <ModalBody>
           <Avatar
-            src={currentProduct?.image_url ? BUCKETS.PRODUCTS.IMAGES`${currentProduct?.image_url}` : FallbackImage}
-            size={100}
-            style={{ background: 'white', padding: !!currentProduct?.image_url ? 0 : 5 }}
+            src={
+              currentProduct?.image_url ? (
+                BUCKETS.PRODUCTS.IMAGES`${currentProduct?.image_url}`
+              ) : (
+                <PopsicleIcon style={{ width: isTablet ? 25 : 47 }} />
+              )
+            }
+            size={isTablet ? 60 : 100}
+            style={{ background: '#e2e2e2', padding: 5 }}
             shape="circle"
           />
           <Typography.Title level={3} style={{ marginBottom: 0 }}>
@@ -300,35 +312,47 @@ const SaleDetail = () => {
             {currentProduct?.categories?.name}
           </Typography.Paragraph>
           <Space height="10px" />
-          <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
-            Cantidad
-          </Typography.Title>
-          <InputNumber
-            min={0}
-            placeholder="Cantidad"
-            size="large"
-            style={{ width: '100%', textAlign: 'center' }}
-            value={newQuantity}
-            onPressEnter={updateItem}
-            readOnly={isTablet}
-            onFocus={() => setCurrentInput('quantity')}
-            onChange={onAmountsChange}
-          />
 
-          <Space height="10px" />
-          <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
-            Precio
-          </Typography.Title>
-          <InputNumber
-            min={0}
-            placeholder="Precio"
-            size="large"
-            style={{ width: '100%', textAlign: 'center' }}
-            value={newPrice}
-            readOnly={isTablet}
-            onFocus={() => setCurrentInput('price')}
-            onChange={onAmountsChange}
-          />
+          <Row gutter={[10, 10]}>
+            <Col span={12}>
+              <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
+                Cantidad
+              </Typography.Title>
+              <InputNumber
+                min={0}
+                placeholder="Cantidad"
+                size="large"
+                style={{ width: '100%', textAlign: 'center' }}
+                value={newQuantity}
+                onPressEnter={updateItem}
+                readOnly={isTablet}
+                onFocus={target => {
+                  setCurrentInput('quantity');
+                  target.currentTarget.select();
+                }}
+                onChange={onAmountsChange}
+              />
+            </Col>
+            <Col span={12}>
+              <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
+                Precio
+              </Typography.Title>
+              <InputNumber
+                min={0}
+                placeholder="Precio"
+                size="large"
+                style={{ width: '100%', textAlign: 'center' }}
+                value={newPrice}
+                readOnly={isTablet}
+                onFocus={target => {
+                  setCurrentInput('price');
+                  target.currentTarget.select();
+                }}
+                onChange={onAmountsChange}
+              />
+            </Col>
+          </Row>
+
           <Space height="10px" />
           {isTablet && (
             <NumberKeyboard

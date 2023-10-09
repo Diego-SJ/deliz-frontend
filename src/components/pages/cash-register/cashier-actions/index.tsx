@@ -41,6 +41,7 @@ const CashierActions = () => {
   const [productName, setProductName] = useState('');
   const [modalAction, setModalAction] = useState<ModalAction>('');
   const [discountType, setDiscountType] = useState<DiscountType>('PERCENTAGE');
+  const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
   const [itemExtra, setItemExtra] = useState({ price: 0, quantity: 0 });
   const [total, setTotal] = useState(0);
   const { shipping = 0, discountMoney = 0, discount = 0 } = cash_register;
@@ -125,6 +126,11 @@ const CashierActions = () => {
     });
   };
 
+  const onInputsChange = (value: number) => {
+    if (currentInput === 'quantity') setItemExtra(prev => ({ ...prev, quantity: value || 0 }));
+    else setItemExtra(prev => ({ ...prev, price: value || 0 }));
+  };
+
   return (
     <div className="cashier-actions">
       <SalePrices>
@@ -141,46 +147,50 @@ const CashierActions = () => {
           TOTAL: <span>{functions.money(total)}</span>
         </Typography.Title>
       </SalePrices>
-      <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 5 }} style={{ marginBottom: 20 }}>
-        <Col span={4}>
+      <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }} style={{ marginBottom: 10 }}>
+        <Col span={6}>
           <Tooltip title="Aplicar envío">
             <ActionButton onClick={() => openModal('APPLY_SHIPPING')}>
-              <Button icon={<SendOutlined rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<SendOutlined rev={{}} />} size="small" type="primary" shape="circle" />
+              Envio
             </ActionButton>
           </Tooltip>
         </Col>
-        <Col span={4}>
+        <Col span={6}>
           <Tooltip title="Aplicar descuento">
             <ActionButton onClick={() => openModal('APPLY_DISCOUNT')}>
-              <Button icon={<PercentageOutlined rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<PercentageOutlined rev={{}} />} size="small" type="primary" shape="circle" />
+              Descuento
             </ActionButton>
           </Tooltip>
         </Col>
-        <Col span={4}>
+        <Col span={6}>
           <Tooltip title="Cancelar orden">
             <ActionButton onClick={cancelOrder}>
-              <Button icon={<DeleteFilled rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<DeleteFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              Cancelar
             </ActionButton>
           </Tooltip>
         </Col>
-        <Col span={4}>
+        {/* <Col span={6}>
           <Tooltip title="Imprimir ticket">
             <ActionButton>
-              <Button icon={<PrinterFilled rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<PrinterFilled rev={{}} />} size="small" type="primary" shape="circle" />
             </ActionButton>
           </Tooltip>
         </Col>
-        <Col span={4}>
+        <Col span={6}>
           <Tooltip title="Guardar borrador">
             <ActionButton>
-              <Button icon={<SaveFilled rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<SaveFilled rev={{}} />} size="small" type="primary" shape="circle" />
             </ActionButton>
           </Tooltip>
-        </Col>
-        <Col span={4}>
+        </Col> */}
+        <Col span={6}>
           <Tooltip title="Agregar extra">
             <ActionButton onClick={() => openModal('ADD_NEW_ITEM')}>
-              <Button icon={<PlusCircleFilled rev={{}} />} size="large" type="primary" shape="circle" />
+              <Button icon={<PlusCircleFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              Item extra
             </ActionButton>
           </Tooltip>
         </Col>
@@ -211,7 +221,8 @@ const CashierActions = () => {
                 size="large"
                 disabled={
                   (modalAction === 'APPLY_SHIPPING' && shippingPrice < 0) ||
-                  (modalAction === 'APPLY_DISCOUNT' && (discountAmount < 0 || discountAmount > 100))
+                  (modalAction === 'APPLY_DISCOUNT' && (discountAmount < 0 || discountAmount > 100)) ||
+                  (modalAction === 'ADD_NEW_ITEM' && !productName)
                 }
               >
                 Guardar
@@ -247,11 +258,12 @@ const CashierActions = () => {
                 max={discountType === 'PERCENTAGE' ? 100 : 10000000000}
                 placeholder="0"
                 size="large"
+                readOnly={isTablet}
                 style={{ width: '100%', textAlign: 'center' }}
                 value={discountAmount}
                 onChange={value => setDiscountAmount(value || 0)}
               />
-              {isTablet && <NumberKeyboard withDot onChange={setDiscountAmount} />}
+              {isTablet && <NumberKeyboard value={discountAmount} withDot onChange={setDiscountAmount} />}
             </>
           )}
           {modalAction === 'APPLY_SHIPPING' && (
@@ -265,18 +277,18 @@ const CashierActions = () => {
                 readOnly={isTablet}
                 onChange={value => setShippingPrice(value || 0)}
               />
-              {isTablet && <NumberKeyboard withDot onChange={setShippingPrice} />}
+              {isTablet && <NumberKeyboard value={shippingPrice} withDot onChange={setShippingPrice} />}
             </>
           )}
 
           {modalAction === 'ADD_NEW_ITEM' && (
             <>
               <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => setChecked(e.target.value)}>
-                <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
-                  Mayoreo
-                </Radio.Button>
                 <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
                   Menudeo
+                </Radio.Button>
+                <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
+                  Mayoreo
                 </Radio.Button>
               </Radio.Group>
               <Space height="10px" />
@@ -290,29 +302,54 @@ const CashierActions = () => {
                 onChange={({ target }) => setProductName(target.value)}
               />
               <Space height="10px" />
-              <Typography.Title level={5} style={{ width: '100%' }}>
-                Cantidad
-              </Typography.Title>
-              <InputNumber
-                min={0}
-                placeholder="0"
-                size="large"
-                style={{ width: '100%', textAlign: 'center' }}
-                value={itemExtra.quantity}
-                onChange={value => setItemExtra(prev => ({ ...prev, quantity: value || 0 }))}
-              />
-              <Space height="10px" />
-              <Typography.Title level={5} style={{ width: '100%' }}>
-                Precio
-              </Typography.Title>
-              <InputNumber
-                min={0}
-                placeholder="0.0"
-                size="large"
-                style={{ width: '100%', textAlign: 'center' }}
-                value={itemExtra.price}
-                onChange={value => setItemExtra(prev => ({ ...prev, price: value || 0 }))}
-              />
+              <Row gutter={[10, 10]}>
+                <Col span={12}>
+                  <Typography.Title level={5} style={{ width: '100%' }}>
+                    Cantidad
+                  </Typography.Title>
+                  <InputNumber
+                    min={0}
+                    placeholder="0"
+                    size="large"
+                    type="number"
+                    className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
+                    style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+                    value={itemExtra.quantity}
+                    onFocus={target => {
+                      setCurrentInput('quantity');
+                      target.currentTarget.select();
+                    }}
+                    readOnly={isTablet}
+                    onChange={value => onInputsChange(value || 0)}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Typography.Title level={5} style={{ width: '100%' }}>
+                    Precio
+                  </Typography.Title>
+                  <InputNumber
+                    min={0}
+                    placeholder="0.0"
+                    size="large"
+                    className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
+                    style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+                    onFocus={target => {
+                      setCurrentInput('price');
+                      target.currentTarget?.select();
+                    }}
+                    value={itemExtra.price}
+                    readOnly={isTablet}
+                    onChange={value => onInputsChange(value || 0)}
+                  />
+                </Col>
+              </Row>
+              {isTablet && (
+                <NumberKeyboard
+                  withDot={currentInput === 'price'}
+                  value={currentInput === 'quantity' ? itemExtra.quantity : itemExtra.price}
+                  onChange={value => onInputsChange(value)}
+                />
+              )}
             </>
           )}
         </ModalBody>

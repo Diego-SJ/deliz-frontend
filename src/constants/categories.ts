@@ -79,4 +79,11 @@ export const CATEGORIES = [
       radial: COLORS.violet.light,
     },
   },
+  {
+    id: 11,
+    name: 'Pastes',
+    gradient: {
+      radial: COLORS.orange.light,
+    },
+  },
 ];

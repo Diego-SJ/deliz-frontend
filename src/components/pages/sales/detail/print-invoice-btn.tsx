@@ -7,7 +7,7 @@ import { useAppSelector } from '@/hooks/useStore';
 import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, ProductCell, ProductName } from './styles';
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { format } from 'date-fns';
-import { toJpeg } from 'html-to-image';
+import { toPng } from 'html-to-image';
 
 type PrintInvoiceButtonProps = {
   amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number };
@@ -31,7 +31,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const downloadInvoice = async () => {
     setLoading(true);
     try {
-      const dataUrl = await toJpeg(elementRef?.current, { cacheBust: false });
+      const dataUrl = await toPng(elementRef?.current, { cacheBust: false });
       const link = document.createElement('a');
       link.download = `nota-${metadata?.sale_id}.png`;
       link.href = dataUrl;

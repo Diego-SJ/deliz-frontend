@@ -7,6 +7,7 @@ import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
 import { STATUS_OBJ } from '@/constants/status';
+import { Product } from '../products/types';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -50,7 +51,19 @@ const customActions = {
           .select('*, products (*, categories (*))')
           .eq('sale_id', args?.sale_id);
 
-        let items: SaleItem[] = data?.map((item, key) => ({ ...item, key } as SaleItem)) || [];
+        let items: SaleItem[] =
+          data?.map((item, key) => {
+            let product = { ...item?.products };
+            console.log({ product, item });
+            if (item?.product_id === 0) {
+              product = {
+                ...product,
+                name: item?.metadata?.name,
+                categories: { ...product?.categories, name: 'Item extra' },
+              } as Product;
+            }
+            return { ...item, key, products: product } as SaleItem;
+          }) || [];
 
         dispatch(salesActions.setCurrentSale({ items }));
         dispatch(salesActions.setLoading(false));
@@ -146,6 +159,7 @@ const customActions = {
             product_id: item.product.product_id,
             quantity: item.quantity,
             wholesale: item.wholesale_price,
+            metadata: item?.product?.product_id === 0 ? { name: item?.product?.name } : {},
           } as SaleItem;
         });
 

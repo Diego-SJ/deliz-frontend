@@ -124,6 +124,9 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
         value={receivedMoney}
         style={{ width: '100%', marginBottom: 10 }}
         readOnly={isTablet}
+        onFocus={target => {
+          target.currentTarget.select();
+        }}
         onChange={value => setReceivedMoney(value || 0)}
       />
       <Title level={4} type={total - receivedMoney > 0 ? 'danger' : 'success'} style={{ margin: '0', textAlign: 'center' }}>

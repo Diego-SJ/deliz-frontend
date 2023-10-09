@@ -39,6 +39,7 @@ export type SaleItem = {
   wholesale?: boolean;
   products?: Product & { categories: Category };
   sale_id?: number;
+  metadata?: any;
 };
 
 export type CurrentSale = {
