@@ -16,7 +16,7 @@ const paymentMethod: { [key: string]: string } = {
 };
 
 type PrintInvoiceButtonProps = {
-  amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number };
+  amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number; discount?: string };
 };
 
 const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
@@ -145,6 +145,9 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
                 Envio: {functions.money(metadata?.shipping || 0)}
+              </Typography.Paragraph>
+              <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+                Descuento: {amounts?.discount}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 13, fontWeight: 800, margin: 0 }}>
                 TOTAL: {functions.money(amounts?.total || 0)}

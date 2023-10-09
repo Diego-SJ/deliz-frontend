@@ -28,8 +28,11 @@ const columns: ColumnsType<SaleDetails> = [
     title: 'Monto',
     width: 120,
     align: 'center',
-    dataIndex: 'amount_paid',
-    render: (value = 0) => functions.money(value),
+    dataIndex: 'total',
+    render: (value = 0, record) => {
+      let _total = (record?.amount_paid || 0) - (record?.cashback || 0);
+      return functions.money(value || _total);
+    },
   },
   {
     title: 'Método de pago',

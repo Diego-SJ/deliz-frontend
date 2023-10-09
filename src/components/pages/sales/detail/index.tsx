@@ -42,6 +42,17 @@ type Option = {
   label: string;
 };
 
+export type Amounts = {
+  total: number;
+  subtotal: number;
+  pending: number;
+  cashback: number;
+  amount_paid: number;
+  discount?: string;
+};
+
+const initalAmounts = { total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0, discount: '' };
+
 const columns: ColumnsType<DataType> = [
   {
     title: '',
@@ -92,7 +103,7 @@ const SaleDetail = () => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
   const { customers } = useAppSelector(({ customers }) => customers);
   const [customerList, setCustomerList] = useState<Option[]>([]);
-  const [amounts, setAmounts] = useState({ total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0 });
+  const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentItem, setCurrentItem] = useState<SaleItem>();
@@ -109,7 +120,6 @@ const SaleDetail = () => {
 
   useEffect(() => {
     if (!firstRender.current && metadata) {
-      console.log('RENDER');
       firstRender.current = true;
       dispatch(salesActions.getSaleById({ sale_id: metadata.sale_id, refetch: true }));
       return;
@@ -120,6 +130,16 @@ const SaleDetail = () => {
     let subtotal = items?.reduce((acum, item) => acum + (item?.price || 0) * (item?.quantity || 0), 0);
     let color = STATUS.find(item => item.id === metadata?.status_id)?.color ?? 'info';
     let total = subtotal + (metadata?.shipping || 0);
+    let _discount = '$0';
+    // get discount function
+    if (metadata?.discount_type === 'AMOUNT') {
+      total = total - (metadata?.discount || 0);
+      _discount = `$${metadata?.discount || 0}`;
+    } else if (metadata?.discount_type === 'PERCENTAGE') {
+      total = total - (total * (metadata?.discount || 0)) / 100;
+      _discount = `${metadata?.discount || 0}%`;
+    }
+
     const _amounts = {
       color,
       subtotal,
@@ -127,6 +147,7 @@ const SaleDetail = () => {
       amount_paid: metadata?.amount_paid || 0,
       pending: total - (metadata?.amount_paid || 0),
       total: total,
+      discount: _discount,
     };
     setAmounts(_amounts);
   }, [items, metadata]);
@@ -208,28 +229,30 @@ const SaleDetail = () => {
       </Row>
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
         <Col lg={{ span: 8 }} xs={24}>
+          {/* SALE AMOUNTS */}
           <Card>
             <Row gutter={[10, 10]}>
               <Col span={12}>
                 <Typography.Paragraph style={{ margin: '0' }}>
-                  {`Subtotal: ${functions.money(amounts.subtotal)}`}
+                  {`Productos: ${functions.money(amounts?.subtotal)}`}
                 </Typography.Paragraph>
                 <Typography.Paragraph style={{ margin: '0' }}>{`Envío: ${functions.money(
                   metadata?.shipping,
                 )}`}</Typography.Paragraph>
-                {amounts.pending > 0 && (
+                <Typography.Paragraph style={{ margin: '0' }}>{`Descuento: ${amounts?.discount}`}</Typography.Paragraph>
+                {Number(amounts?.pending) > 0 && (
                   <Typography.Paragraph style={{ margin: 0 }}>{`Pendiente: ${functions.money(
-                    amounts.pending,
+                    amounts?.pending,
                   )}`}</Typography.Paragraph>
                 )}
               </Col>
               <Col span={12} style={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}>
                 <Typography.Paragraph style={{ margin: 0 }}>{`Pagado: ${functions.money(
-                  amounts.amount_paid,
+                  amounts?.amount_paid,
                 )}`}</Typography.Paragraph>
 
                 <Typography.Paragraph style={{ margin: '0 0 10px' }}>
-                  {`Cambio: ${functions.money(amounts.cashback)}`}
+                  {`Cambio: ${functions.money(amounts?.cashback)}`}
                 </Typography.Paragraph>
               </Col>
             </Row>
@@ -237,6 +260,7 @@ const SaleDetail = () => {
             <Typography.Title level={2} style={{ margin: 0 }}>{`Total: ${functions.money(amounts?.total)}`}</Typography.Title>
           </Card>
 
+          {/* SALE DETAILS */}
           <Card style={{ marginTop: 20 }}>
             <Alert
               message={metadata?.status.name ?? '- - -'}

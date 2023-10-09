@@ -7,9 +7,10 @@ import functions from '@/utils/functions';
 import { EditOutlined } from '@ant-design/icons';
 import { Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
 import { FC, useRef, useState } from 'react';
+import { Amounts } from './index';
 
 type UpdateSaleButton = {
-  amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number };
+  amounts: Amounts;
 };
 
 const { Title, Paragraph } = Typography;

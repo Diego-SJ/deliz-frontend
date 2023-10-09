@@ -54,7 +54,6 @@ const customActions = {
         let items: SaleItem[] =
           data?.map((item, key) => {
             let product = { ...item?.products };
-            console.log({ product, item });
             if (item?.product_id === 0) {
               product = {
                 ...product,
