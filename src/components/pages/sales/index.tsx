@@ -25,6 +25,13 @@ const columns: ColumnsType<SaleDetails> = [
     render: value => value.name,
   },
   {
+    title: 'Monto',
+    width: 120,
+    align: 'center',
+    dataIndex: 'amount_paid',
+    render: (value = 0) => functions.money(value),
+  },
+  {
     title: 'Método de pago',
     width: 130,
     align: 'center',
@@ -42,19 +49,19 @@ const columns: ColumnsType<SaleDetails> = [
     },
   },
   {
-    title: 'Fecha creación',
+    title: 'Fecha venta',
     dataIndex: 'created_at',
     align: 'center',
     width: 210,
     render: (value: Date | string) => functions.dateTime(value),
   },
-  {
-    title: 'Fecha actualización',
-    dataIndex: 'updated_at',
-    align: 'center',
-    width: 210,
-    render: (value: Date | string) => (value ? functions.dateTime(value) : 'N/A'),
-  },
+  // {
+  //   title: 'Fecha actualización',
+  //   dataIndex: 'updated_at',
+  //   align: 'center',
+  //   width: 210,
+  //   render: (value: Date | string) => (value ? functions.dateTime(value) : 'N/A'),
+  // },
 ];
 
 const Sales = () => {

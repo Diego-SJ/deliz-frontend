@@ -26,7 +26,11 @@ const functions = {
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
-    return format(new Date(_date), 'PPpp');
+    return format(new Date(_date), 'PPp');
+  },
+  currentDate: () => {
+    let _date = subHours(new Date(), 1);
+    return format(new Date(_date), 'PPp');
   },
   betweenDates: (date: Date | string, startDate: Date | string, endDate: Date | string): boolean => {
     let _date = new Date(date)?.toLocaleString()?.split(',')[0];

@@ -121,6 +121,7 @@ const customActions = {
       }
 
       const { current_sale } = getState()?.sales;
+
       let newMetadata = {
         ...current_sale.metadata,
         ...(newItem as SaleDetails),

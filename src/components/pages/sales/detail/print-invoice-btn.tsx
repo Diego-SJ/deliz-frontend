@@ -1,6 +1,6 @@
 import { FileProtectOutlined, PrinterOutlined } from '@ant-design/icons';
 import { Button, Col, Drawer, Row, Typography } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
 import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
@@ -8,6 +8,12 @@ import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, Pro
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { format } from 'date-fns';
 import { toPng } from 'html-to-image';
+
+const paymentMethod: { [key: string]: string } = {
+  CASH: 'Efectivo',
+  TRANSFER: 'Transferencia',
+  CARD: 'Tarjeta',
+};
 
 type PrintInvoiceButtonProps = {
   amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number };
@@ -19,6 +25,12 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const elementRef = useRef<any>(null);
+  const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    let _totalItems = items?.reduce((total, item) => (item?.quantity || 0) + total, 0);
+    setTotalItems(_totalItems);
+  }, [items]);
 
   const showDrawer = () => {
     setOpen(true);
@@ -67,11 +79,8 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
               span={12}
               style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', flexDirection: 'column' }}
             >
-              <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                Invoice No.: <b>{metadata?.sale_id || '- - -'}</b>
-              </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: '0 0 10px' }}>
-                Fecha: {format(new Date(), 'Pp')}
+                Fecha: {functions.currentDate()}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 800, margin: 0 }}>Cliente:</Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
@@ -125,7 +134,12 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
             pagination={false}
           />
           <Row style={{ padding: '10px', display: 'flex', justifyContent: 'flex-end' }}>
-            <Col style={{ textAlign: 'end' }}>
+            <Col span={12} style={{ textAlign: 'start' }}>
+              <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+                Productos: {totalItems}
+              </Typography.Paragraph>
+            </Col>
+            <Col span={12} style={{ textAlign: 'end' }}>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
                 Subtotal: {functions.money(amounts?.subtotal || 0)}
               </Typography.Paragraph>
@@ -139,7 +153,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
           </Row>
           <FooterReceipt>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-              Forma de pago: {metadata?.payment_method || '- - -'}
+              Forma de pago: {paymentMethod[metadata?.payment_method || ''] || '- - -'}
             </Typography.Paragraph>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
               Estatus de la venta: {metadata?.status?.name || '- - -'}
