@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { CashRegister, CurrentSale, Sale, SaleDetails, SalesSlice } from './types';
+import { CashClosing, CashRegister, ClosingDays, CurrentSale, Sale, SaleDetails, SalesSlice } from './types';
 import customActions from './actions';
 
 const initialState: SalesSlice = {
@@ -12,6 +12,9 @@ const initialState: SalesSlice = {
     shipping: 0,
     discountMoney: 0,
     customer_id: '',
+  },
+  closing_days: {
+    data: [],
   },
   loading: false,
 };
@@ -32,6 +35,9 @@ const sales = createSlice({
     },
     updateCashRegister(state, action: PayloadAction<CashRegister>) {
       state.cash_register = { ...state.cash_register, ...action.payload };
+    },
+    setClosingDays(state, action: PayloadAction<ClosingDays>) {
+      state.closing_days = { ...state.closing_days, ...action.payload };
     },
   },
 });

@@ -14,6 +14,7 @@ import SignInAdmin from '@/components/pages/auth/signInAdmin';
 import AdminAuth from './AdminAuth';
 import Home from '@/components/pages/home';
 import ProductsCatalog from '@/components/pages/products/catalog';
+import CloseSales from '@/components/pages/close-sales';
 
 const AppRouter = () => {
   return (
@@ -44,6 +45,7 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path} element={<Customers />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path} element={<Sales />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path} element={<SaleDetail />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUT.path} element={<CloseSales />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<div>SETTINGS</div>} />
       </Route>

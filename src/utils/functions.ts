@@ -1,4 +1,5 @@
 import { addDays, format, formatDistance, isAfter, isBefore, isEqual, subDays, subHours } from 'date-fns';
+import { es } from 'date-fns/locale';
 import numeral from 'numeral';
 
 const functions = {
@@ -20,17 +21,22 @@ const functions = {
   moneySimple: (number: string | number) => {
     return numeral(number).format('$0.0');
   },
+  date: (date: Date | string) => {
+    let [year, month, day] = (date + '')?.split('-');
+    let _date = `${month}/${day}/${year}`;
+    return format(new Date(_date), 'PP', { locale: es });
+  },
   date1: (date: Date | string) => {
     let [_date] = new Date(date).toLocaleString()?.split(',');
-    return format(new Date(_date), 'PPP');
+    return format(new Date(_date), 'PPP', { locale: es });
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
-    return format(new Date(_date), 'PPp');
+    return format(new Date(_date), 'PPp', { locale: es });
   },
   currentDate: () => {
     let _date = subHours(new Date(), 1);
-    return format(new Date(_date), 'PPp');
+    return format(new Date(_date), 'PPp', { locale: es });
   },
   betweenDates: (date: Date | string, startDate: Date | string, endDate: Date | string): boolean => {
     let _date = new Date(date)?.toLocaleString()?.split(',')[0];

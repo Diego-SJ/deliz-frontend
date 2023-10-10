@@ -134,6 +134,7 @@ const Products = () => {
             <Row gutter={[10, 10]}>
               <Col lg={6} xs={24}>
                 <Input
+                  size="large"
                   placeholder="Buscar producto"
                   style={{ width: '100%' }}
                   allowClear
@@ -142,6 +143,7 @@ const Products = () => {
               </Col>
               <Col lg={6} xs={12}>
                 <Select
+                  size="large"
                   placeholder="Categorías"
                   style={{ width: '100%' }}
                   mode="multiple"
@@ -156,7 +158,7 @@ const Products = () => {
                 </Select>
               </Col>
               <Col lg={{ span: 6, offset: 6 }} xs={{ offset: 0, span: 12 }}>
-                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                   Nuevo
                 </Button>
               </Col>
@@ -181,7 +183,9 @@ const Products = () => {
               <Row>
                 <Col>
                   <Tooltip title="Recargar">
-                    <Button shape="circle" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh} />
+                    <Button size="large" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh}>
+                      Recargar
+                    </Button>
                   </Tooltip>
                 </Col>
               </Row>

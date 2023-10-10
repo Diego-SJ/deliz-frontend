@@ -5,6 +5,7 @@ import {
   ShoppingOutlined,
   TeamOutlined,
   ExclamationCircleOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -38,11 +39,11 @@ const ITEM_LIST = [
 
     path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
   },
-  // {
-  //   icon: MessageOutlined,
-  //   label: 'Mensajes',
-  //   path:APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
-  // },
+  {
+    icon: BarChartOutlined,
+    label: 'Cortes',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.CUT.path,
+  },
   // {
   //   icon: BarChartOutlined,
   //   label: 'Reportes',

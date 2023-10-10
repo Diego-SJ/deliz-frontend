@@ -2,7 +2,7 @@ import { APP_ROUTES } from '@/constants/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message, Typography } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -67,6 +67,8 @@ const columns: ColumnsType<SaleDetails> = [
   // },
 ];
 
+const { Title } = Typography;
+
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -74,6 +76,7 @@ const Sales = () => {
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
+  const [totalSaleAmount, setTotalSaleAmount] = useState(0);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -86,6 +89,14 @@ const Sales = () => {
   useEffect(() => {
     setAuxSales(sales);
   }, [sales]);
+
+  useEffect(() => {
+    let totalAmounts = auxSales?.reduce((acc, item) => {
+      let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
+      return (item?.total || _total) + acc;
+    }, 0);
+    setTotalSaleAmount(totalAmounts);
+  }, [auxSales]);
 
   const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
     if (!status && !startDate && !endDate) {
@@ -155,6 +166,7 @@ const Sales = () => {
               </Col>
               <Col lg={6} xs={12}>
                 <DatePicker
+                  size="large"
                   placeholder="Inicio"
                   style={{ width: '100%' }}
                   onChange={(_, startDate) => setFilters(p => ({ ...p, startDate }))}
@@ -162,13 +174,14 @@ const Sales = () => {
               </Col>
               <Col lg={6} xs={12}>
                 <DatePicker
+                  size="large"
                   placeholder="Fin"
                   style={{ width: '100%' }}
                   onChange={(_, endDate) => setFilters(p => ({ ...p, endDate }))}
                 />
               </Col>
               <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
-                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                <Button size="large" block type="default" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                   Nueva
                 </Button>
               </Col>
@@ -186,10 +199,17 @@ const Sales = () => {
             scroll={{ x: 700 }}
             footer={() => (
               <Row>
-                <Col>
+                <Col span={6}>
                   <Tooltip title="Recargar">
-                    <Button shape="circle" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh} />
+                    <Button size="large" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh}>
+                      Recargar
+                    </Button>
                   </Tooltip>
+                </Col>
+                <Col span={6} offset={12}>
+                  <Title style={{ textAlign: 'end' }} level={4}>
+                    Total ventas: {functions?.money(totalSaleAmount)}
+                  </Title>
                 </Col>
               </Row>
             )}

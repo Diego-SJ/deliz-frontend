@@ -1,13 +1,16 @@
 import { AppDispatch, AppState } from '@/redux/store';
 import { salesActions } from '.';
 import { supabase } from '@/config/supabase';
-import { CashRegister, CashRegisterItem, DiscountType, Sale, SaleDetails, SaleItem } from './types';
+import { CashClosing, CashRegister, CashRegisterItem, DiscountType, Sale, SaleDetails, SaleItem } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
 import { STATUS_OBJ } from '@/constants/status';
 import { Product } from '../products/types';
+import INITIAL_STATE from '@/constants/initial-states';
+import { isToday } from 'date-fns';
+import functions from '@/utils/functions';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -212,7 +215,7 @@ const customActions = {
         discountType: 'AMOUNT',
         shipping: 0,
         status: 5,
-        customer_id: 19,
+        customer_id: INITIAL_STATE.customerId,
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },
@@ -256,6 +259,41 @@ const customActions = {
     setCustomerId: (customer_id: number) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.updateCashRegister({ customer_id }));
     },
+  },
+  closeDay: (comment?: string) => async (dispatch: AppDispatch, getState: AppState) => {
+    let { data, error } = await supabase.rpc('close_today_sales', {
+      comments: comment || 'Cierre del dia',
+    });
+
+    if (error) {
+      message.error('No se pudo finalizar la operación');
+      return false;
+    }
+
+    let newData = [...(getState()?.sales?.closing_days?.data || [])];
+    newData?.unshift(data);
+    dispatch(salesActions.setClosingDays({ data: newData, today_is_done: true }));
+
+    message.success('Información guardada con exito');
+    return true;
+  },
+  fetchClosedDays: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    let salesList: CashClosing[] = getState().sales?.closing_days?.data || [];
+
+    if (!salesList.length || args?.refetch) {
+      let { data, error } = await supabase.from('cash_closing').select('*').order('created_at', { ascending: false });
+
+      if (error) {
+        message.error('No se pudo obtener la lista de registros');
+        return false;
+      }
+
+      salesList = data || [];
+    }
+
+    let todayIsDone = salesList?.some(i => (i?.closing_date ? isToday(new Date(functions.date(i.closing_date))) : false));
+    dispatch(salesActions.setClosingDays({ data: salesList as CashClosing[], today_is_done: todayIsDone }));
+    return true;
   },
 };
 

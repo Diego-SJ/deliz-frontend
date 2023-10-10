@@ -6,6 +6,7 @@ import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import { useCallback, useEffect, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
+import INITIAL_STATE from '@/constants/initial-states';
 
 type Option = {
   value: number | string;
@@ -31,7 +32,7 @@ const CashierCustomer = () => {
   }, [customer_id]);
 
   const onMount = useCallback(() => {
-    dispatch(salesActions.cashRegister.setCustomerId(19));
+    dispatch(salesActions.cashRegister.setCustomerId(INITIAL_STATE.customerId));
   }, [dispatch]);
 
   useEffect(() => {

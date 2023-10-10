@@ -6,10 +6,16 @@ export type SalesSlice = {
   current_sale: CurrentSale;
   cash_register: CashRegister;
   loading: boolean;
+  closing_days: ClosingDays;
 };
 
 export type DiscountType = 'PERCENTAGE' | 'AMOUNT';
 export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';
+
+export type ClosingDays = {
+  data: CashClosing[];
+  today_is_done?: boolean;
+};
 
 // sales table in DB
 export type Sale = {
@@ -73,4 +79,14 @@ export type CashRegisterItem = {
   product: Product;
   quantity: number;
   wholesale_price: boolean;
+};
+
+// cash_closing table in BD
+export type CashClosing = {
+  cash_closing_id?: number;
+  amount?: number;
+  closing_date?: string | Date;
+  created_at?: string | Date;
+  total_sales?: number;
+  description?: string;
 };

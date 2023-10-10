@@ -109,6 +109,7 @@ const Customers = () => {
             <Row gutter={[10, 10]}>
               <Col lg={{ span: 6 }} sm={18} xs={24}>
                 <Input
+                  size="large"
                   placeholder="Buscar cliente"
                   style={{ width: '100%' }}
                   allowClear
@@ -116,7 +117,7 @@ const Customers = () => {
                 />
               </Col>
               <Col lg={{ span: 6, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
-                <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                   Nuevo
                 </Button>
               </Col>

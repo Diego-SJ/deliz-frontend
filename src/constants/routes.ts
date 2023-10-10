@@ -32,6 +32,7 @@ export const APP_ROUTES = {
         hash: (_: TemplateStringsArray, id: number) => `/app/sales/detail/${id}`,
         title: 'Editar producto',
       },
+      CUT: { path: '/app/closing-sales', title: 'Cierre de ventas' },
       REPORTS: { path: '/app/reports', title: 'Reportes' },
       SETTINGS: { path: '/app/settings', title: 'Configuración' },
     },
