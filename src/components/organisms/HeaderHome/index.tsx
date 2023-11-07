@@ -2,7 +2,7 @@ import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Sp
 import { HeaderActions, HeaderRoot } from './styles';
 import { InstagramOutlined, ShoppingCartOutlined, UserOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { useState } from 'react';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
 

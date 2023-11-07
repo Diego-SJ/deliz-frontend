@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { useAppSelector } from '@/hooks/useStore';
 import { Navigate, useLocation } from 'react-router-dom';
 

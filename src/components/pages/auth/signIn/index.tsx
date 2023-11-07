@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { GoogleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Layout, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';

@@ -6,10 +6,11 @@ import {
   TeamOutlined,
   ExclamationCircleOutlined,
   BarChartOutlined,
+  ExceptionOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
 import DelizLogo from '@/assets/img/png/Logo Color.png';
@@ -39,16 +40,17 @@ const ITEM_LIST = [
 
     path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
   },
+
+  // {
+  //   icon: ExceptionOutlined,
+  //   label: 'Deudores',
+  //   path: APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path,
+  // },
   {
     icon: BarChartOutlined,
     label: 'Cortes',
     path: APP_ROUTES.PRIVATE.DASHBOARD.CUT.path,
   },
-  // {
-  //   icon: BarChartOutlined,
-  //   label: 'Reportes',
-  //   path:APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path,
-  // },
   // {
   //   icon: SettingOutlined,
   //   label: 'Configuración',

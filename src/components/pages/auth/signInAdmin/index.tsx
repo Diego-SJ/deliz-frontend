@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { Button, Form, Input, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FormContainer, LayoutContent } from './styles';

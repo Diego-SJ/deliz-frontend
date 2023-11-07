@@ -2,7 +2,7 @@ import { BottomMenuRoot } from './styles';
 import { Button, Tooltip } from 'antd';
 import { BarcodeOutlined, ShoppingCartOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 
 const BottomMenu = () => {
   const navigate = useNavigate();

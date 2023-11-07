@@ -1,6 +1,6 @@
 import Upload from '@/components/atoms/UploadFile';
 import { CATEGORIES } from '@/constants/categories';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { STATUS } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
@@ -63,7 +63,6 @@ const ProductEditor = () => {
   };
 
   const onFinish = async (values: Product) => {
-    return console.log({ values });
     if (!values.name) return message.warning('Agrega un nombre al producto');
 
     setLoading(true);

@@ -33,6 +33,7 @@ export const APP_ROUTES = {
         title: 'Editar producto',
       },
       CUT: { path: '/app/closing-sales', title: 'Cierre de ventas' },
+      DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes' },
       SETTINGS: { path: '/app/settings', title: 'Configuración' },
     },

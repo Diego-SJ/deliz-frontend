@@ -2,7 +2,7 @@ import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Sp
 import { HeaderActions, HeaderRoot } from './styles';
 import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import FallbackImage from '@/assets/img/png/Logo Color.png';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';

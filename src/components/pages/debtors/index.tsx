@@ -69,7 +69,7 @@ const columns: ColumnsType<SaleDetails> = [
 
 const { Title } = Typography;
 
-const Sales = () => {
+const DebtorsClients = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { sales } = useAppSelector(({ sales }) => sales);
@@ -221,4 +221,4 @@ const Sales = () => {
   );
 };
 
-export default Sales;
+export default DebtorsClients;

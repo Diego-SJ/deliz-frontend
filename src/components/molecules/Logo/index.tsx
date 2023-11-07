@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 // import { Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { LogoImg, LogoRoot } from './styles';

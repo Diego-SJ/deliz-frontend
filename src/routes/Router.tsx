@@ -8,13 +8,14 @@ import Customers from '@/components/pages/customers';
 import Sales from '@/components/pages/sales';
 import SaleDetail from '@/components/pages/sales/detail';
 import CashRegister from '@/components/pages/cash-register';
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import SignInAdmin from '@/components/pages/auth/signInAdmin';
 import AdminAuth from './AdminAuth';
 import Home from '@/components/pages/home';
 import ProductsCatalog from '@/components/pages/products/catalog';
 import CloseSales from '@/components/pages/close-sales';
+import DebtorsClients from '@/components/pages/debtors';
 
 const AppRouter = () => {
   return (
@@ -46,6 +47,7 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path} element={<Sales />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path} element={<SaleDetail />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUT.path} element={<CloseSales />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path} element={<DebtorsClients />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<div>SETTINGS</div>} />
       </Route>

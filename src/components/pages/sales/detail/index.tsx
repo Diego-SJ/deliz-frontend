@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/constants/routes';
+import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { theme } from '@/styles/theme/config';
 import { MailOutlined, PhoneOutlined, EnvironmentOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
