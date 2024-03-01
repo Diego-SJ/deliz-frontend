@@ -58,7 +58,7 @@ const Dashboard = () => {
         width={420}
         onClose={onClose}
         open={!!current_customer.customer_id}
-        bodyStyle={{ paddingBottom: 80 }}
+        styles={{ body: { paddingBottom: 80 } }}
       >
         <CustomerEditor />
       </Drawer>

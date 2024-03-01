@@ -6,7 +6,7 @@ import {
   TeamOutlined,
   ExclamationCircleOutlined,
   BarChartOutlined,
-  ExceptionOutlined,
+  BarcodeOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -18,49 +18,91 @@ import { Modal } from 'antd';
 import { useAppDispatch } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 
+type SideMenuProps = {
+  onClick?: () => void;
+};
+
 const ITEM_LIST = [
   {
+    key: 'dashboard',
     icon: HomeOutlined,
     label: 'Dashboard',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
   {
-    icon: ShoppingOutlined,
-    label: 'Productos',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+    key: 'point_of_sale',
+    icon: BarcodeOutlined,
+    label: 'Punto de venta',
+    path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
   },
   {
+    key: 'products',
+    icon: ShoppingOutlined,
+    label: 'Productos',
+    children: [
+      {
+        key: 'products.list',
+        label: 'Productos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+      },
+      {
+        key: 'products.categories',
+        label: 'Categorias',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path,
+      },
+      {
+        key: 'products.size',
+        label: 'Tamaños',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path,
+      },
+      {
+        key: 'products.units',
+        label: 'Unidades de medida',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path,
+      },
+    ],
+  },
+  {
+    key: 'customers',
     icon: TeamOutlined,
     label: 'Clientes',
     path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
   },
   {
+    key: 'sales',
     icon: DollarOutlined,
     label: 'Ventas',
-
-    path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+    children: [
+      {
+        key: 'sales.orders',
+        label: 'Pedidos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+      },
+      {
+        key: 'sales.main',
+        label: 'Ventas',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+      },
+    ],
   },
-
-  // {
-  //   icon: ExceptionOutlined,
-  //   label: 'Deudores',
-  //   path: APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path,
-  // },
   {
+    key: 'transactions',
     icon: BarChartOutlined,
-    label: 'Cortes',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.CUT.path,
+    label: 'Transacciones',
+    children: [
+      {
+        key: 'transactions.cashiers',
+        label: 'Cajas',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+      },
+      {
+        key: 'transactions.operative_expenses',
+        label: 'Gastos operativos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path,
+      },
+    ],
   },
-  // {
-  //   icon: SettingOutlined,
-  //   label: 'Configuración',
-  //   path:APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path,
-  // },
 ];
-
-type SideMenuProps = {
-  onClick?: () => void;
-};
 
 const SideMenu = (props: SideMenuProps) => {
   const location = useLocation();
@@ -70,8 +112,8 @@ const SideMenu = (props: SideMenuProps) => {
   const [modal, contextHolder] = Modal.useModal();
 
   useEffect(() => {
-    const key = ITEM_LIST?.findIndex(item => {
-      return location.pathname?.includes(item?.path);
+    const key = ITEM_LIST.findIndex(item => {
+      return location.pathname.includes(item?.path || '');
     });
     setCurrentKey(key || 0);
   }, [location.pathname]);
@@ -89,8 +131,8 @@ const SideMenu = (props: SideMenuProps) => {
     });
   };
 
-  const handlePathChange = (path: string) => {
-    navigate(path);
+  const handlePathChange = (path?: string) => {
+    if (path) navigate(path);
     if (props?.onClick) props.onClick();
   };
 
@@ -99,15 +141,23 @@ const SideMenu = (props: SideMenuProps) => {
       <Logo src={DelizLogo} title="D'eliz" />
       <MenuRoot
         selectedKeys={[`${currentKey}`]}
+        mode="inline"
         items={ITEM_LIST.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),
           label: item.label,
-          onClick: () => handlePathChange(item.path),
+          onClick: () => handlePathChange(item?.path),
+          children: item?.children?.length
+            ? item.children.map(subItem => ({
+                ...subItem,
+                onClick: () => navigate(subItem.path),
+              }))
+            : null,
         }))}
       />
       <MenuRoot
         className="bottom"
+        mode="inline"
         items={[
           {
             key: 1,

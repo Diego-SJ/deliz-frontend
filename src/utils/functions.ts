@@ -1,4 +1,4 @@
-import { addDays, format, formatDistance, isAfter, isBefore, isEqual, subDays, subHours } from 'date-fns';
+import { addDays, format, formatDistance, isValid, subDays, subHours } from 'date-fns';
 import { es } from 'date-fns/locale';
 import numeral from 'numeral';
 
@@ -28,7 +28,13 @@ const functions = {
   },
   date1: (date: Date | string) => {
     let [_date] = new Date(date).toLocaleString()?.split(',');
+    if (!isValid(new Date(_date))) return _date;
     return format(new Date(_date), 'PPP', { locale: es });
+  },
+  tableDate: (date: Date | string) => {
+    // let [_date] = new Date(date).toLocaleString();
+    if (!!!date) return '- - -';
+    return format(new Date(date), 'PPp', { locale: es });
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
@@ -66,6 +72,11 @@ const functions = {
   },
   includes: (value1 = '', value2 = '') => {
     return value1?.toLowerCase()?.includes(value2?.toLowerCase());
+  },
+  getTagColor: (frase: string) => {
+    const hash = frase.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colores = ['green', 'volcano', 'gold', 'magenta', 'red', 'orange', 'lime', 'cyan', 'blue', 'geekblue', 'purple'];
+    return colores[hash % colores.length];
   },
 };
 

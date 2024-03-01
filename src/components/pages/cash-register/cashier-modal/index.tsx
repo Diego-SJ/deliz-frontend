@@ -56,7 +56,9 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
   useEffect(() => {
     if (!!currentProduct) {
       let currentPrice = checked ? currentProduct?.wholesale_price || 0 : currentProduct?.retail_price || 0;
-      setSubtotal(specialPrice > 0 ? specialPrice : currentPrice);
+      let _subtotal = specialPrice > 0 ? specialPrice : currentPrice;
+      console.log('_subtotal', _subtotal);
+      setSubtotal(_subtotal);
     }
   }, [checked, currentProduct, specialPrice]);
 

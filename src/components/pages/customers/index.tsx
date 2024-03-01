@@ -105,7 +105,7 @@ const Customers = () => {
       </Row>
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
-          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
+          <Card styles={{ body: { padding: '10px' } }} style={{ marginBottom: 10 }}>
             <Row gutter={[10, 10]}>
               <Col lg={{ span: 6 }} sm={18} xs={24}>
                 <Input
@@ -145,7 +145,7 @@ const Customers = () => {
         width={isTablet ? 350 : 420}
         onClose={() => onClose(true)}
         open={!!current_customer.customer_id}
-        bodyStyle={{ paddingBottom: 80 }}
+        styles={{ body: { paddingBottom: 80 } }}
         destroyOnClose
       >
         <CustomerEditor onSuccess={onClose} />

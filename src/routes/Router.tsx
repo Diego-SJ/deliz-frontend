@@ -14,8 +14,12 @@ import SignInAdmin from '@/components/pages/auth/signInAdmin';
 import AdminAuth from './AdminAuth';
 import Home from '@/components/pages/home';
 import ProductsCatalog from '@/components/pages/products/catalog';
-import CloseSales from '@/components/pages/close-sales';
+import TransactionsCashiers from '@/components/pages/transactions/cashiers';
+import OperatingExpenses from '@/components/pages/transactions/operating-expenses';
 import DebtorsClients from '@/components/pages/debtors';
+import ProductCategories from '@/components/pages/products/categories';
+import ProductSizes from '@/components/pages/products/sizes';
+import ProductUnits from '@/components/pages/products/units';
 
 const AppRouter = () => {
   return (
@@ -41,12 +45,24 @@ const AppRouter = () => {
         }
       >
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} element={<Dashboard />} />
+
+        {/* PRODUCTS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path} element={<Products />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path} element={<ProductCategories />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path} element={<ProductSizes />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path} element={<ProductUnits />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
+        {/* PRODUCTS ROUTES - END */}
+
+        {/* TRANSACTIONS ROUTES - START */}
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path} element={<TransactionsCashiers />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path} element={<OperatingExpenses />} />
+        {/* TRANSACTIONS ROUTES - END */}
+
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path} element={<Customers />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path} element={<Sales />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path} element={<SaleDetail />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUT.path} element={<CloseSales />} />
+
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path} element={<DebtorsClients />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<div>SETTINGS</div>} />

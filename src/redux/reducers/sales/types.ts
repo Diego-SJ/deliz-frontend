@@ -1,3 +1,4 @@
+import { Pagination } from '@supabase/supabase-js';
 import { Customer } from '../customers/types';
 import { Category, Product } from '../products/types';
 
@@ -5,6 +6,8 @@ export type SalesSlice = {
   sales: SaleDetails[];
   current_sale: CurrentSale;
   cash_register: CashRegister;
+  operating_expenses?: OperatingExpenses;
+  cashiers?: Cashiers;
   loading: boolean;
   closing_days: ClosingDays;
 };
@@ -32,6 +35,7 @@ export type Sale = {
   cashback?: number;
   total?: number;
   updated_at?: string | Date;
+  cashier_id?: number;
 };
 
 // sales_detail table in DB
@@ -89,4 +93,41 @@ export type CashClosing = {
   created_at?: string | Date;
   total_sales?: number;
   description?: string;
+};
+
+export type OperatingExpense = {
+  key?: number;
+  expense_id?: number;
+  expense_name: string;
+  description?: string;
+  amount: number;
+  created_at?: string | Date;
+  payment_method?: string;
+  months_without_interest?: string;
+};
+
+export type OperatingExpenses = {
+  selected?: OperatingExpense;
+  drawer?: 'new' | 'edit' | null;
+  pagination?: Pagination;
+  data?: OperatingExpense[];
+};
+
+export type Cashier = {
+  key?: number;
+  cashier_id?: number;
+  name: string;
+  initial_amount?: number;
+  final_amount?: number;
+  received_amount?: number;
+  created_at?: string | Date;
+  close_date?: string;
+};
+
+export type Cashiers = {
+  selected?: Cashier;
+  activeCashier?: Cashier;
+  drawer?: 'new' | 'edit' | null;
+  pagination?: Pagination;
+  data?: Cashier[];
 };

@@ -1,6 +1,17 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { CashClosing, CashRegister, ClosingDays, CurrentSale, Sale, SaleDetails, SalesSlice } from './types';
+import {
+  CashRegister,
+  Cashier,
+  Cashiers,
+  ClosingDays,
+  CurrentSale,
+  OperatingExpense,
+  OperatingExpenses,
+  SaleDetails,
+  SalesSlice,
+} from './types';
 import customActions from './actions';
+import { Pagination } from '@supabase/supabase-js';
 
 const initialState: SalesSlice = {
   sales: [],
@@ -13,6 +24,8 @@ const initialState: SalesSlice = {
     discountMoney: 0,
     customer_id: '',
   },
+  operating_expenses: { data: [], drawer: null, pagination: {} as Pagination, selected: {} as OperatingExpense },
+  cashiers: { data: [], drawer: null, pagination: {} as Pagination, selected: {} as Cashier },
   closing_days: {
     data: [],
   },
@@ -38,6 +51,12 @@ const sales = createSlice({
     },
     setClosingDays(state, action: PayloadAction<ClosingDays>) {
       state.closing_days = { ...state.closing_days, ...action.payload };
+    },
+    setExpense(state, action: PayloadAction<OperatingExpenses>) {
+      state.operating_expenses = { ...state.operating_expenses, ...action.payload };
+    },
+    setCashiers(state, action: PayloadAction<Cashiers>) {
+      state.cashiers = { ...state.cashiers, ...action.payload };
     },
   },
 });

@@ -1,7 +1,17 @@
 import { AppDispatch, AppState } from '@/redux/store';
 import { salesActions } from '.';
 import { supabase } from '@/config/supabase';
-import { CashClosing, CashRegister, CashRegisterItem, DiscountType, Sale, SaleDetails, SaleItem } from './types';
+import {
+  CashClosing,
+  CashRegister,
+  CashRegisterItem,
+  Cashier,
+  DiscountType,
+  OperatingExpense,
+  Sale,
+  SaleDetails,
+  SaleItem,
+} from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
@@ -88,12 +98,14 @@ const customActions = {
       try {
         dispatch(salesActions.setLoading(true));
         const state = getState().sales;
+        let activeCashier = await dispatch(salesActions.cashiers.getActiveCashier());
         let newSale: Sale = {
           ...sale,
           customer_id: state.cash_register.customer_id as number,
           discount: state.cash_register.discount,
           discount_type: state.cash_register.discountType,
           shipping: state.cash_register.shipping,
+          cashier_id: activeCashier?.cashier_id,
         };
 
         const { data, error } = await supabase.from('sales').insert(newSale).select();
@@ -294,6 +306,245 @@ const customActions = {
     let todayIsDone = salesList?.some(i => (i?.closing_date ? isToday(new Date(functions.date(i.closing_date))) : false));
     dispatch(salesActions.setClosingDays({ data: salesList as CashClosing[], today_is_done: todayIsDone }));
     return true;
+  },
+  operating_expenses: {
+    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+      try {
+        let operating_expenses = getState()?.sales?.operating_expenses;
+
+        if (!!operating_expenses?.data?.length && !args?.refetch) return true;
+
+        dispatch(salesActions.setLoading(true));
+        let { data: result, error } = await supabase.from('operating_expenses').select('*'); //.range(0, 9);
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo cargar esta información', 4);
+          return false;
+        }
+
+        let data = result?.map(item => ({ ...item, key: item.expense_id as number } as OperatingExpense)) ?? [];
+
+        dispatch(salesActions.setExpense({ data }));
+        return true;
+      } catch (error) {
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    add: (expense: OperatingExpense) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase
+          .from('operating_expenses')
+          .insert([
+            {
+              expense_name: expense.expense_name,
+              description: expense.description,
+              amount: expense.amount,
+              payment_method: expense.payment_method,
+              months_without_interest: expense.months_without_interest ?? 0,
+            },
+          ])
+          .select();
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo guardar el registro.', 4);
+          return false;
+        }
+
+        await dispatch(salesActions.operating_expenses.get({ refetch: true }));
+        message.success('Registro agregado', 4);
+        return true;
+      } catch (error) {
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    delete: (expense_id: number) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase.from('operating_expenses').delete().eq('expense_id', expense_id);
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error(`No se pudo eliminar este elemento: ${error.message}`);
+          return false;
+        }
+
+        dispatch(salesActions.operating_expenses.get({ refetch: true }));
+        message.success('Elemento eliminado');
+      } catch (error) {
+        message.error('No se pudo eliminar este elemento');
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    update: (expense: OperatingExpense) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase
+          .from('operating_expenses')
+          .update({
+            expense_name: expense.expense_name,
+            description: expense.description,
+            amount: expense.amount,
+            payment_method: expense.payment_method,
+            months_without_interest: expense.months_without_interest ?? 0,
+          })
+          .eq('expense_id', expense.expense_id)
+          .select();
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo actualizar el registro.', 4);
+          return false;
+        }
+
+        await dispatch(salesActions.operating_expenses.get({ refetch: true }));
+        message.success('Registro actualizado', 4);
+        return true;
+      } catch (error) {
+        message.error('No se pudo actualizar el registro.', 4);
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    edit: (expense: OperatingExpense) => async (dispatch: AppDispatch) => {
+      dispatch(salesActions.setExpense({ selected: expense, drawer: 'edit' }));
+    },
+  },
+  cashiers: {
+    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+      try {
+        let cashiers = getState()?.sales?.cashiers;
+
+        if (!!cashiers?.data?.length && !args?.refetch) return true;
+
+        dispatch(salesActions.setLoading(true));
+        let { data: result, error } = await supabase.from('cashiers').select('*'); //.range(0, 9);
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo cargar esta información', 4);
+          return false;
+        }
+
+        let data = result?.map(item => ({ ...item, key: item.cashier_id as number } as Cashier)) ?? [];
+
+        dispatch(salesActions.setCashiers({ data }));
+        return true;
+      } catch (error) {
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    add: (cashier: Cashier) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase
+          .from('cashiers')
+          .insert([
+            {
+              name: cashier.name,
+              initial_amount: cashier.initial_amount,
+              final_amount: cashier.final_amount,
+              close_date: null,
+            },
+          ])
+          .select();
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo guardar el registro.', 4);
+          return false;
+        }
+
+        await dispatch(salesActions.cashiers.get({ refetch: true }));
+        message.success('Registro agregado', 4);
+        return true;
+      } catch (error) {
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    delete: (cashier_id: number) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase.from('cashiers').delete().eq('cashier_id', cashier_id);
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error(`No se pudo eliminar este elemento: ${error.message}`);
+          return false;
+        }
+
+        dispatch(salesActions.cashiers.get({ refetch: true }));
+        message.success('Elemento eliminado');
+      } catch (error) {
+        message.error('No se pudo eliminar este elemento');
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    update: (cashier: Cashier) => async (dispatch: AppDispatch) => {
+      try {
+        dispatch(salesActions.setLoading(true));
+        const { error } = await supabase
+          .from('cashiers')
+          .update({ ...cashier, received_amount: cashier.received_amount })
+          .eq('cashier_id', cashier.cashier_id);
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo actualizar el registro.', 4);
+          return false;
+        }
+
+        await dispatch(salesActions.cashiers.get({ refetch: true }));
+        message.success('Registro actualizado', 4);
+        return true;
+      } catch (error) {
+        message.error('No se pudo actualizar el registro.', 4);
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    edit: (cashier: Cashier) => async (dispatch: AppDispatch) => {
+      dispatch(salesActions.setCashiers({ selected: cashier, drawer: 'edit' }));
+    },
+    closeDay: () => async (dispatch: AppDispatch, getState: AppState) => {
+      try {
+        const cashier = getState().sales?.cashiers?.activeCashier;
+        dispatch(salesActions.setLoading(true));
+
+        let { error } = await supabase.rpc('close_cashier', { id: cashier?.cashier_id });
+
+        dispatch(salesActions.setLoading(false));
+
+        if (error) {
+          message.error('No se pudo actualizar el registro.', 4);
+          return false;
+        }
+
+        await dispatch(salesActions.cashiers.get({ refetch: true }));
+        message.success('Caja cerrada', 4);
+        return true;
+      } catch (error) {
+        message.error('No se pudo actualizar el registro.', 4);
+        dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+    getActiveCashier:
+      () =>
+      async (dispatch: AppDispatch, getState: AppState): Promise<Cashier | null> => {
+        await dispatch(salesActions.cashiers.get({ refetch: true }));
+        const data = getState().sales.cashiers?.data || [];
+
+        return data?.filter(item => !!!item?.final_amount && !!!item.close_date)[0] || null;
+      },
   },
 };
 

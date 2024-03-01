@@ -18,7 +18,13 @@ export const APP_ROUTES = {
     },
     DASHBOARD: {
       HOME: { path: '/app/home', title: 'Inicio' },
-      PRODUCTS: { path: '/app/products', title: 'Productos' },
+      PRODUCTS: {
+        path: '/app/products',
+        title: 'Productos',
+        CATEGORIES: { path: '/app/products/categories' },
+        SIZES: { path: '/app/products/sizes' },
+        UNITS: { path: '/app/products/units' },
+      },
       PRODUCT_EDITOR: {
         path: '/app/products/:action',
         hash: (_: TemplateStringsArray, action: 'edit' | 'add') => `/app/products/${action}`,
@@ -32,7 +38,12 @@ export const APP_ROUTES = {
         hash: (_: TemplateStringsArray, id: number) => `/app/sales/detail/${id}`,
         title: 'Editar producto',
       },
-      CUT: { path: '/app/closing-sales', title: 'Cierre de ventas' },
+      TRANSACTIONS: {
+        path: '/app/transactions',
+        title: 'Cierre de ventas',
+        OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
+        CASHIERS: { path: '/app/transactions/cashiers' },
+      },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes' },
       SETTINGS: { path: '/app/settings', title: 'Configuración' },

@@ -8,12 +8,12 @@ export const STATUS_DATA = {
 };
 
 export const STATUS_OBJ: { [key: number]: { name: string; color: string } } = {
-  1: { name: 'Activo', color: '#2db7f5' },
-  2: { name: 'Oculto', color: '#e7bc6c' },
-  3: { name: 'Eliminado', color: '#f50' },
-  4: { name: 'Pagada', color: '#87d068' },
-  5: { name: 'Pendiente', color: '#e7bc6c' },
-  6: { name: 'Cancelada', color: '#f50' },
+  1: { name: 'Activo', color: 'green' },
+  2: { name: 'Oculto', color: 'gold' },
+  3: { name: 'Eliminado', color: 'volcano' },
+  4: { name: 'Pagada', color: 'green' },
+  5: { name: 'Pendiente', color: 'gold' },
+  6: { name: 'Cancelada', color: 'orange' },
 };
 
 export const STATUS = [

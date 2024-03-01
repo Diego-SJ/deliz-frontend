@@ -17,7 +17,6 @@ import { productActions } from '@/redux/reducers/products';
 import { customerActions } from '@/redux/reducers/customers';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { UnorderedListOutlined } from '@ant-design/icons';
-import PopsicleIcon from '@/assets/img/jsx/popsicle';
 
 const { Content } = Layout;
 

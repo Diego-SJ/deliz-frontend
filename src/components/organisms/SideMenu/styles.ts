@@ -2,7 +2,7 @@ import { Menu } from 'antd';
 import styled from 'styled-components';
 
 export const MenuRoot = styled(Menu)`
-  &.ant-menu {
+  /* &.ant-menu {
     padding: 15px 20px 0;
     border-right: none;
 
@@ -39,5 +39,5 @@ export const MenuRoot = styled(Menu)`
         content: unset;
       }
     }
-  }
+  } */
 `;

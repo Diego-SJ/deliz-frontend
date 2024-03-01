@@ -1,13 +1,13 @@
 import Upload from '@/components/atoms/UploadFile';
-import { CATEGORIES } from '@/constants/categories';
 import { APP_ROUTES } from '@/routes/routes';
 import { STATUS } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
-import { Breadcrumb, Button, Card, Col, Form, Input, InputNumber, Row, Select, UploadFile, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { Breadcrumb, Button, Card, Col, Form, Input, InputNumber, Modal, Row, Select, UploadFile, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { DeleteOutlined } from '@ant-design/icons';
 
 type Params = {
   action: 'edit' | 'add';
@@ -25,8 +25,18 @@ const ProductEditor = () => {
   const dispatch = useAppDispatch();
   let { action = 'add' } = useParams<Params>();
   const [loading, setLoading] = useState(false);
-  const { current_product } = useAppSelector(({ products }) => products);
+  const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
   const [productImages, setProductImages] = useState<UploadFile[]>([]);
+  const firstRender = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!categories?.length) {
+      dispatch(productActions.fetchCategories({ refetch: true }));
+    }
+    if (!sizes?.data?.length) {
+      dispatch(productActions.sizes.get({ refetch: true }));
+    }
+  }, [categories, sizes, dispatch]);
 
   useEffect(() => {
     if (current_product?.image_url) {
@@ -43,9 +53,9 @@ const ProductEditor = () => {
 
   const saveNewProduct = async (values: Product) => {
     let img = productImages[0];
-    let image_url = '';
+    let image_url: string | boolean = '';
 
-    if (img?.originFileObj) await productActions.saveImage(img?.originFileObj as File);
+    if (img?.originFileObj) image_url = await productActions.saveImage(img?.originFileObj);
     if (typeof image_url === 'string') {
       await dispatch(productActions.saveProduct({ ...values, image_url }));
     }
@@ -53,9 +63,10 @@ const ProductEditor = () => {
 
   const saveEditionProduct = async (values: Product) => {
     let img = productImages[0];
+    console.log(img);
     let image_url: string | boolean = '';
-    if (img?.uid !== 'DEFAULT_IMAGE') {
-      image_url = await productActions.replaceImage(img?.originFileObj as File, current_product.image_url as string);
+    if (img?.originFileObj?.uid && img?.originFileObj?.uid !== 'DEFAULT_IMAGE') {
+      image_url = await productActions.replaceImage(img?.originFileObj, current_product.image_url as string);
     }
     if (typeof image_url === 'string') {
       await dispatch(productActions.updateProduct(values, image_url));
@@ -75,7 +86,31 @@ const ProductEditor = () => {
   };
 
   const onImageChange = (files: UploadFile[]) => {
+    console.log(files);
+    // if (!files.length) return null;
     setProductImages(files);
+  };
+
+  const confirmDelete = async () => {
+    setLoading(true);
+    await dispatch(productActions.deleteProduct(current_product));
+    setLoading(false);
+  };
+
+  const onDelete = async () => {
+    Modal.confirm({
+      title: 'Eliminar',
+      content: '¿Desea eliminar este elemento?',
+      onOk: confirmDelete,
+      okText: 'Confirmar',
+      cancelText: 'Cancelar',
+      footer: (_, { OkBtn, CancelBtn }) => (
+        <>
+          <CancelBtn />
+          <OkBtn />
+        </>
+      ),
+    });
   };
 
   return (
@@ -101,7 +136,16 @@ const ProductEditor = () => {
       </Row>
       <Row style={{ marginTop: '20px' }}>
         <Col span={24}>
-          <Card title={UI_TEXTS.breadcrumb[action]}>
+          <Card
+            title={UI_TEXTS.breadcrumb[action]}
+            extra={
+              action === 'edit' ? (
+                <Button type="primary" danger icon={<DeleteOutlined rev={{}} />} onClick={onDelete} loading={loading}>
+                  Eliminar
+                </Button>
+              ) : null
+            }
+          >
             <Form
               form={form}
               wrapperCol={{ span: 24 }}
@@ -148,6 +192,13 @@ const ProductEditor = () => {
                       <Form.Item name="stock" label="Stock" rules={[{ type: 'number', min: 0, required: true }]}>
                         <InputNumber size="large" style={{ width: '100%' }} placeholder="0" />
                       </Form.Item>
+                      <Form.Item name="unit_id" label="Unidad" rules={[{ required: true }]}>
+                        <Select
+                          size="large"
+                          placeholder="Grande"
+                          options={units?.data?.map(size => ({ value: size.unit_id, label: size?.short_name }))}
+                        />
+                      </Form.Item>
                     </Col>
                     <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
                       <Form.Item
@@ -165,8 +216,18 @@ const ProductEditor = () => {
                           style={{ width: '100%' }}
                           optionFilterProp="children"
                           filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                          options={CATEGORIES?.map(i => ({ value: i.id, label: i.name }))}
+                          options={categories?.map(i => ({ value: i.category_id, label: i.name }))}
                         />
+                      </Form.Item>
+                      <Form.Item name="size_id" label="Tamaño" rules={[{ required: true }]}>
+                        <Select
+                          size="large"
+                          placeholder="Grande"
+                          options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
+                        />
+                      </Form.Item>
+                      <Form.Item name="code" label="Código" rules={[{ required: true }]}>
+                        <Input size="large" placeholder="PAML01" />
                       </Form.Item>
                     </Col>
                   </Row>

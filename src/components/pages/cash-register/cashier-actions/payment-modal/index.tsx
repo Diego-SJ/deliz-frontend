@@ -1,4 +1,5 @@
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
+import { PAYMENT_METHODS } from '@/constants/payment_methods';
 import { STATUS_DATA } from '@/constants/status';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -108,12 +109,9 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
         style={{ width: '100%', marginBottom: 10 }}
         size="large"
         value={paymentMethod}
+        options={PAYMENT_METHODS}
         onChange={value => setPaymentMethod(value)}
-      >
-        <Select.Option value="CASH">Efectivo</Select.Option>
-        <Select.Option value="CARD">Tarjeta</Select.Option>
-        <Select.Option value="TRANSFER">Transferencia</Select.Option>
-      </Select>
+      />
 
       <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Cantidad recibida</Paragraph>
       <InputNumber
