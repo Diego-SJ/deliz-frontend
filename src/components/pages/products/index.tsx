@@ -8,7 +8,7 @@ import { Avatar, Breadcrumb, Button, Col, Form, Input, Row, Select, Tag } from '
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PopsicleImg from '@/assets/img/png/popsicle.png';
+import PopsicleImg from '@/assets/img/png/popsicle.webp';
 import { CATEGORIES } from '@/constants/categories';
 import { STATUS_OBJ } from '@/constants/status';
 import Table from '@/components/molecules/Table';

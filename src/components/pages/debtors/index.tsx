@@ -74,7 +74,7 @@ const DebtorsClients = () => {
   const navigate = useNavigate();
   const { sales } = useAppSelector(({ sales }) => sales);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
-  const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
+  const [filters, setFilters] = useState<any>({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
   const [totalSaleAmount, setTotalSaleAmount] = useState(0);
 
@@ -155,7 +155,7 @@ const DebtorsClients = () => {
                   placeholder="Status"
                   style={{ width: '100%' }}
                   allowClear
-                  onChange={status => setFilters(p => ({ ...p, status }))}
+                  onChange={status => setFilters((p: any) => ({ ...p, status }))}
                 >
                   <Select.Option key={4} value={4}>
                     {STATUS_OBJ[4].name}
@@ -170,7 +170,7 @@ const DebtorsClients = () => {
                   size="large"
                   placeholder="Inicio"
                   style={{ width: '100%' }}
-                  onChange={(_, startDate) => setFilters(p => ({ ...p, startDate }))}
+                  onChange={(_, startDate) => setFilters((p: any) => ({ ...p, startDate: startDate as string }))}
                 />
               </Col>
               <Col lg={6} xs={12}>
@@ -178,7 +178,7 @@ const DebtorsClients = () => {
                   size="large"
                   placeholder="Fin"
                   style={{ width: '100%' }}
-                  onChange={(_, endDate) => setFilters(p => ({ ...p, endDate }))}
+                  onChange={(_, endDate) => setFilters((p: any) => ({ ...p, endDate: endDate as string }))}
                 />
               </Col>
               <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>

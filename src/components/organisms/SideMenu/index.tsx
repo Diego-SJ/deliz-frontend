@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
-import DelizLogo from '@/assets/img/png/Logo Color.png';
+import DelizLogo from '@/assets/img/png/logo_deliz.webp';
 import { Modal } from 'antd';
 import { useAppDispatch } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';

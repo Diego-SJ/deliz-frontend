@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { CATEGORIES } from '@/constants/categories';
 import { Product } from '@/redux/reducers/products/types';
 import { COLORS } from '@/constants/colors';
-import FallbackImage from '@/assets/img/png/Logo Color.png';
+import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import BottomMenu from '@/components/organisms/BottomMenu';

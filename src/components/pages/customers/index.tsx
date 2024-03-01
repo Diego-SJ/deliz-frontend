@@ -6,7 +6,7 @@ import { Avatar, Breadcrumb, Button, Card, Col, Drawer, Input, Row } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import PopsicleImg from '@/assets/img/png/popsicle.png';
+import PopsicleImg from '@/assets/img/png/popsicle.webp';
 import { Customer } from '@/redux/reducers/customers/types';
 import { customerActions } from '@/redux/reducers/customers';
 import CustomerEditor from './editor';

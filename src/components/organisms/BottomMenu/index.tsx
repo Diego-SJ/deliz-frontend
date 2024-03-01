@@ -20,7 +20,7 @@ const BottomMenu = () => {
           size="large"
           shape="round"
           icon={<HomeOutlined rev={{}} />}
-          type="ghost"
+          type="text"
           onClick={() => onClick(APP_ROUTES.AUTH.MAIN.path)}
         />
       </Tooltip>
@@ -30,15 +30,15 @@ const BottomMenu = () => {
           size="large"
           shape="round"
           icon={<BarcodeOutlined rev={{}} />}
-          type="ghost"
+          type="text"
           onClick={() => onClick(APP_ROUTES.PUBLIC.PRODUCTS.path)}
         />
       </Tooltip>
       <Tooltip title="Carrito">
-        <Button size="large" shape="round" icon={<ShoppingCartOutlined rev={{}} />} type="ghost" />
+        <Button size="large" shape="round" icon={<ShoppingCartOutlined rev={{}} />} type="text" />
       </Tooltip>
       <Tooltip title="Perfil">
-        <Button size="large" shape="round" icon={<UserOutlined rev={{}} />} type="ghost" />
+        <Button size="large" shape="round" icon={<UserOutlined rev={{}} />} type="text" />
       </Tooltip>
     </BottomMenuRoot>
   );

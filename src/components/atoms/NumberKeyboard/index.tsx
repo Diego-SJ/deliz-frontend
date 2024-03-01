@@ -4,7 +4,7 @@ import { DoubleLeftOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 
 const buttonProps: ButtonProps = {
-  type: 'ghost',
+  type: 'text',
   size: 'large',
   block: true,
 };

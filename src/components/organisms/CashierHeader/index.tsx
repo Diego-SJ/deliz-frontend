@@ -3,7 +3,7 @@ import { HeaderActions, HeaderRoot } from './styles';
 import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
-import FallbackImage from '@/assets/img/png/Logo Color.png';
+import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
 

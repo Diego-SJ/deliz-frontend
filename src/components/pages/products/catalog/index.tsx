@@ -4,7 +4,7 @@ import { CategoryContainer, CategoryContent, FloattingMessage, ProductCard, Prod
 import { CATEGORIES } from '@/constants/categories';
 import { Avatar, Button, Col, Input, Row, Typography, message } from 'antd';
 import { useAppSelector } from '@/hooks/useStore';
-import FallbackImage from '@/assets/img/png/Logo Color.png';
+import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 import { useEffect, useState } from 'react';
 import { ShoppingCartOutlined } from '@ant-design/icons';

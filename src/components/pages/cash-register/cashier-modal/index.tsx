@@ -2,7 +2,7 @@ import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Typography, messag
 import { useEffect, useRef, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
-import FallbackImage from '@/assets/img/png/Logo Color.png';
+import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
