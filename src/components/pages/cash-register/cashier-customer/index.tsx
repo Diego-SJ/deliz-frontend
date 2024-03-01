@@ -31,13 +31,13 @@ const CashierCustomer = () => {
     setCurrentCustomerId(customer_id);
   }, [customer_id]);
 
-  const onMount = useCallback(() => {
-    dispatch(salesActions.cashRegister.setCustomerId(INITIAL_STATE.customerId));
-  }, [dispatch]);
+  // const onMount = useCallback(() => {
+  //   dispatch(salesActions.cashRegister.setCustomerId(INITIAL_STATE.customerId));
+  // }, [dispatch]);
 
-  useEffect(() => {
-    onMount();
-  }, [onMount]);
+  // useEffect(() => {
+  //   onMount();
+  // }, [onMount]);
 
   const onChange = (customerId: number) => {
     setCurrentCustomerId(customerId);
@@ -54,7 +54,7 @@ const CashierCustomer = () => {
   };
 
   return (
-    <div className="cashier-search">
+    <div className="cashier-search" style={{ display: 'flex', gap: '10px' }}>
       <Select
         showSearch
         style={{ width: '100%' }}
@@ -73,7 +73,7 @@ const CashierCustomer = () => {
         width={350}
         onClose={onClose}
         open={!!current_customer.customer_id}
-        bodyStyle={{ paddingBottom: 80 }}
+        styles={{ body: { paddingBottom: 80 } }}
       >
         <CustomerEditor onSuccess={onClose} />
       </Drawer>

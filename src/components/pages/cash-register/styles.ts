@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const ProductsContainer = styled(Card)`
   &.ant-card {
     height: 100%;
-    background: ${({ theme }) => theme.colors.primary};
+    background: #e9e9e95c;
     padding: 0;
     border-color: transparent;
 
@@ -176,4 +176,30 @@ export const ModalBody = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+export const CardProduct = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 1rem;
+  width: 100%;
+  background: #fff;
+  aspect-ratio: 1/1;
+  padding: 1rem;
+  transition: all 0.22ms linear;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-product-image {
+    height: 8rem;
+    width: 8rem;
+  }
+
+  .card-product-tags {
+    display: flex;
+  }
 `;

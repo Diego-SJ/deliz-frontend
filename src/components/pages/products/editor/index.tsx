@@ -63,7 +63,6 @@ const ProductEditor = () => {
 
   const saveEditionProduct = async (values: Product) => {
     let img = productImages[0];
-    console.log(img);
     let image_url: string | boolean = '';
     if (img?.originFileObj?.uid && img?.originFileObj?.uid !== 'DEFAULT_IMAGE') {
       image_url = await productActions.replaceImage(img?.originFileObj, current_product.image_url as string);
@@ -86,7 +85,6 @@ const ProductEditor = () => {
   };
 
   const onImageChange = (files: UploadFile[]) => {
-    console.log(files);
     // if (!files.length) return null;
     setProductImages(files);
   };

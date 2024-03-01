@@ -157,7 +157,6 @@ const customActions = {
         p_id: p.product_id,
         p_quantity: p.quantity,
       });
-      console.log({ data, error });
     }
   },
   saveSaleItems:
@@ -269,6 +268,7 @@ const customActions = {
       dispatch(salesActions.updateCashRegister({ discount, discountType, discountMoney }));
     },
     setCustomerId: (customer_id: number) => async (dispatch: AppDispatch) => {
+      console.log(customer_id);
       dispatch(salesActions.updateCashRegister({ customer_id }));
     },
   },

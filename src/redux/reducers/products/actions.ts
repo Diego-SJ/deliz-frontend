@@ -106,7 +106,6 @@ const customActions = {
       dispatch(productActions.setLoading(true));
 
       let url_sanitized = (image_url || product?.image_url || '')?.replace(BUCKETS.PRODUCTS.IMAGES`${''}`, '') || '';
-      console.log(url_sanitized);
 
       const oldData = getState().products.current_product;
       const newData = {
@@ -222,7 +221,6 @@ const customActions = {
     update: (category: Category) => async (dispatch: AppDispatch) => {
       try {
         dispatch(productActions.setLoading(true));
-        console.log(category);
         const { error } = await supabase
           .from('categories')
           .update({ name: category.name, description: category.description, status: category.status })
