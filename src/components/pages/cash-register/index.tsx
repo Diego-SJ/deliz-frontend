@@ -177,7 +177,7 @@ const CashRegister = () => {
         />
       )}
       <CashierModal open={open} currentProduct={currentProduct} onCancel={closeModal} />
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} width="100vw" bodyStyle={{ padding: 0 }}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} width="100vw" styles={{ body: { padding: 0 } }}>
         <ProductsCheckout>
           <CashierCustomer />
           <CashRegisterItemsList />

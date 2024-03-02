@@ -151,7 +151,7 @@ const Products = () => {
             width={isTablet ? 350 : 420}
             onClose={onClose}
             open={!!drawerStatus || !!current_category?.category_id}
-            bodyStyle={{ paddingBottom: 80 }}
+            styles={{ body: { paddingBottom: 80 } }}
             destroyOnClose
           >
             <CategoryEditor onSuccess={onClose} />

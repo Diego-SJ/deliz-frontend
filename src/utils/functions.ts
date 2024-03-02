@@ -41,7 +41,7 @@ const functions = {
     return format(new Date(_date), 'PPp', { locale: es });
   },
   currentDate: () => {
-    let _date = subHours(new Date(), 1);
+    let _date = new Date();
     return format(new Date(_date), 'PPp', { locale: es });
   },
   betweenDates: (date: Date | string, startDate: Date | string, endDate: Date | string): boolean => {

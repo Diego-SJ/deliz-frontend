@@ -149,7 +149,7 @@ const ProductEditor = () => {
               wrapperCol={{ span: 24 }}
               layout="vertical"
               onFinish={onFinish}
-              initialValues={{ ...current_product, status: 1 }}
+              initialValues={{ ...current_product, status: current_product?.status ?? 1 }}
               validateMessages={{
                 required: '${label} es obligatorio.',
                 types: {

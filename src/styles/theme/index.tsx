@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeProvider as AppStyledTheme } from 'styled-components';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App } from 'antd';
 import GlobalStyles from '@/styles/global';
 import { theme } from './config';
 
@@ -12,15 +12,17 @@ const AppThemeProvider = ({ children }: Props) => {
   return (
     <AppStyledTheme theme={theme}>
       <GlobalStyles theme={theme} />
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: theme.colors.primary,
-          },
-        }}
-      >
-        {children}
-      </ConfigProvider>
+      <App>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: theme.colors.primary,
+            },
+          }}
+        >
+          {children}
+        </ConfigProvider>
+      </App>
     </AppStyledTheme>
   );
 };

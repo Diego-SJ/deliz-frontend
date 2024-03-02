@@ -9,6 +9,7 @@ import { Avatar, Card, Col, Drawer, Row } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import CustomerEditor from '../customers/editor';
+import { theme } from '@/styles/theme/config';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +39,7 @@ const Dashboard = () => {
         title="Nuevo producto"
         description="Agregar un producto al catalogo"
         icon={<AppstoreAddOutlined rev={{}} />}
+        color={theme.colors.green}
         onClick={addProduct}
       />
       <CardButton
@@ -49,6 +51,7 @@ const Dashboard = () => {
       <CardButton
         title="Punto de venta"
         description="Accede al punto de venta"
+        color={theme.colors.danger}
         icon={<ShoppingCartOutlined rev={{}} />}
         onClick={newSale}
       />

@@ -1,3 +1,4 @@
+import { STATUS_DATA } from '@/constants/status';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
@@ -33,7 +34,7 @@ const OpenCashier = ({ onSuccess }: Props) => {
 
   useEffect(() => {
     let totalAmounts = sales
-      ?.filter(i => i?.cashier_id === cashiers?.activeCashier?.cashier_id)
+      ?.filter(i => i?.cashier_id === cashiers?.activeCashier?.cashier_id && i?.status_id === STATUS_DATA.COMPLETED.id)
       ?.reduce((acc, item) => {
         let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
         return (item?.total || _total) + acc;

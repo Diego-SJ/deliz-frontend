@@ -40,6 +40,12 @@ const CashRegisterItemsList = () => {
             render: (_, record: DataType) => <span>{record.product.name}</span>,
           },
           {
+            title: 'Cant.',
+            dataIndex: 'quantity',
+            key: '3',
+            align: 'center',
+          },
+          {
             title: '$',
             dataIndex: 'product',
             key: '2',
@@ -49,12 +55,6 @@ const CashRegisterItemsList = () => {
               let price = record.wholesale_price ? product.wholesale_price : product.retail_price;
               return functions.money(price);
             },
-          },
-          {
-            title: 'Cant.',
-            dataIndex: 'quantity',
-            key: '3',
-            align: 'center',
           },
           {
             title: 'Total',

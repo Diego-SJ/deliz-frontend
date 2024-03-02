@@ -1,14 +1,15 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message, Typography } from 'antd';
-import Table, { ColumnsType } from 'antd/es/table';
+import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message, Typography, Avatar } from 'antd';
+import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS_OBJ } from '@/constants/status';
+import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails } from '@/redux/reducers/sales/types';
+import Table from '@/components/molecules/Table';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -72,19 +73,23 @@ const { Title } = Typography;
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { sales } = useAppSelector(({ sales }) => sales);
+  const { sales, cashiers } = useAppSelector(({ sales }) => sales);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
   const [totalSaleAmount, setTotalSaleAmount] = useState(0);
+  const [todaySales, setTodaySales] = useState(0);
+  const activeCashier = cashiers?.activeCashier;
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       dispatch(salesActions.fetchSales());
+
+      if (!activeCashier?.cashier_id) dispatch(salesActions.cashiers.getActiveCashier());
       return;
     }
-  }, [dispatch]);
+  }, [dispatch, activeCashier?.cashier_id]);
 
   useEffect(() => {
     setAuxSales(sales);
@@ -95,8 +100,22 @@ const Sales = () => {
       let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
       return (item?.total || _total) + acc;
     }, 0);
+
     setTotalSaleAmount(totalAmounts);
   }, [auxSales]);
+
+  useEffect(() => {
+    let _todaySales = sales
+      ?.filter(i => {
+        return i?.cashier_id === activeCashier?.cashier_id && i?.status_id === STATUS_DATA.COMPLETED.id;
+      })
+      ?.reduce((acc, item) => {
+        let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
+        return (item?.total || _total) + acc;
+      }, 0);
+
+    setTodaySales(_todaySales);
+  }, [sales, activeCashier]);
 
   const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
     if (!status && !startDate && !endDate) {
@@ -145,49 +164,73 @@ const Sales = () => {
           />
         </Col>
       </Row>
+      <Row style={{ width: '100%', marginTop: 10 }} gutter={[10, 10]}>
+        <Col xs={24} md={12} lg={8}>
+          <Card style={{ width: '100%' }}>
+            <Card.Meta
+              avatar={<Avatar icon={<LineChartOutlined rev={{}} />} style={{ background: '#2db7f5' }} size={60} />}
+              title={functions?.money(totalSaleAmount)}
+              description="Total de ventas"
+            />
+          </Card>
+        </Col>
+        <Col xs={24} md={12} lg={8}>
+          <Card>
+            <Card.Meta
+              avatar={<Avatar icon={<ReconciliationOutlined rev={{}} />} style={{ background: '#a52df5' }} size={60} />}
+              title={sales?.length || 0}
+              description="Ventas totales"
+            />
+          </Card>
+        </Col>
+        <Col xs={24} md={12} lg={8}>
+          <Card>
+            <Card.Meta
+              avatar={<Avatar icon={<DollarOutlined rev={{}} />} style={{ background: '#4beb88' }} size={60} />}
+              title={functions.money(todaySales)}
+              description="Ventas de hoy"
+            />
+          </Card>
+        </Col>
+      </Row>
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
-          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
-            <Row gutter={[10, 10]}>
-              <Col lg={6} xs={12}>
-                <Select
-                  size="large"
-                  placeholder="Status"
-                  style={{ width: '100%' }}
-                  allowClear
-                  onChange={status => setFilters(p => ({ ...p, status }))}
-                >
-                  <Select.Option key={4} value={4}>
-                    {STATUS_OBJ[4].name}
-                  </Select.Option>
-                  <Select.Option key={5} value={5}>
-                    {STATUS_OBJ[5].name}
-                  </Select.Option>
-                </Select>
-              </Col>
-              <Col lg={6} xs={12}>
-                <DatePicker
-                  size="large"
-                  placeholder="Inicio"
-                  style={{ width: '100%' }}
-                  onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
-                />
-              </Col>
-              <Col lg={6} xs={12}>
-                <DatePicker
-                  size="large"
-                  placeholder="Fin"
-                  style={{ width: '100%' }}
-                  onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
-                />
-              </Col>
-              <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
-                <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-                  Nueva
-                </Button>
-              </Col>
-            </Row>
-          </Card>
+          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
+            <Col lg={6} xs={12}>
+              <Select
+                placeholder="Status"
+                style={{ width: '100%' }}
+                allowClear
+                onChange={status => setFilters(p => ({ ...p, status }))}
+              >
+                <Select.Option key={4} value={4}>
+                  {STATUS_OBJ[4].name}
+                </Select.Option>
+                <Select.Option key={5} value={5}>
+                  {STATUS_OBJ[5].name}
+                </Select.Option>
+              </Select>
+            </Col>
+            <Col lg={6} xs={12}>
+              <DatePicker
+                placeholder="Inicio"
+                style={{ width: '100%' }}
+                onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
+              />
+            </Col>
+            <Col lg={6} xs={12}>
+              <DatePicker
+                placeholder="Fin"
+                style={{ width: '100%' }}
+                onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
+              />
+            </Col>
+            <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
+              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                Nueva
+              </Button>
+            </Col>
+          </Row>
           <Table
             onRow={record => {
               return {
@@ -198,22 +241,8 @@ const Sales = () => {
             columns={columns}
             dataSource={auxSales}
             scroll={{ x: 700 }}
-            footer={() => (
-              <Row>
-                <Col span={6}>
-                  <Tooltip title="Recargar">
-                    <Button size="large" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh}>
-                      Recargar
-                    </Button>
-                  </Tooltip>
-                </Col>
-                <Col span={6} offset={12}>
-                  <Title style={{ textAlign: 'end' }} level={4}>
-                    Total ventas: {functions?.money(totalSaleAmount)}
-                  </Title>
-                </Col>
-              </Row>
-            )}
+            onRefresh={onRefresh}
+            totalItems={sales?.length || 0}
           />
         </Col>
       </Row>

@@ -147,7 +147,7 @@ const DebtorsClients = () => {
       </Row>
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
-          <Card bodyStyle={{ padding: '10px' }} style={{ marginBottom: 10 }}>
+          <Card styles={{ body: { padding: '10px' } }} style={{ marginBottom: 10 }}>
             <Row gutter={[10, 10]}>
               <Col lg={6} xs={12}>
                 <Select

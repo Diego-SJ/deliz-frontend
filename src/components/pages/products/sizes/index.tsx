@@ -143,7 +143,7 @@ const ProductSizes = () => {
             width={isTablet ? 350 : 420}
             onClose={onClose}
             open={!!sizes?.drawer}
-            bodyStyle={{ paddingBottom: 80 }}
+            styles={{ body: { paddingBottom: 80 } }}
             destroyOnClose
           >
             <SizeEditor onSuccess={onClose} />

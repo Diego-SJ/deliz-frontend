@@ -23,7 +23,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
           <SideMenu />
         </LayoutSider>
       )}
-      <Drawer placement="left" width={300} open={open} onClose={handleDrawer} bodyStyle={{ padding: 0 }}>
+      <Drawer placement="left" width={300} open={open} onClose={handleDrawer} styles={{ body: { padding: 0 } }}>
         <SideMenu onClick={handleDrawer} />
       </Drawer>
       <LayoutContainer>

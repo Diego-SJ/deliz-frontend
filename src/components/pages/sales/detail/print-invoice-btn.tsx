@@ -66,7 +66,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         placement="right"
         onClose={onClose}
         open={open}
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
         extra={
           <Button onClick={downloadInvoice} icon={<PrinterOutlined rev={{}} />}>
             Imprimir
@@ -74,7 +74,10 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         }
       >
         <DrawerBody ref={elementRef}>
-          <Row style={{ padding: '0 10px 5px' }}>
+          <Typography.Title level={5} style={{ textAlign: 'center', margin: '0 0 10px' }}>
+            NOTA DE VENTA
+          </Typography.Title>
+          <Row style={{ padding: '10px 10px 5px', borderTop: '1px dashed gray' }}>
             <Col
               span={12}
               style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', flexDirection: 'column' }}
