@@ -70,8 +70,24 @@ const functions = {
     let filename = path.replace(bucket, '');
     return filename;
   },
-  includes: (value1 = '', value2 = '') => {
-    return value1?.toLowerCase()?.includes(value2?.toLowerCase());
+  includes: function (value1 = '', value2 = '') {
+    // Normalizar los textos para eliminar acentos
+    const normalizedValue1 = this.normalizeText(value1)?.toLowerCase();
+    const normalizedValue2 = this.normalizeText(value2)?.toLowerCase();
+
+    console.log('normalizedValue1', normalizedValue1);
+    console.log('normalizedValue2', normalizedValue2);
+
+    // Escape de caracteres especiales en value2
+    const escapedValue2 = normalizedValue2?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    console.log('escapedValue2', escapedValue2);
+    // Construir un patrón de expresión regular para buscar value2 en cualquier lugar de value1
+    const pattern = new RegExp(`\\b${escapedValue2?.replace(/ /g, '\\b|\\b')}\\b`, 'i');
+    // Verificar si el patrón coincide con value1
+    return pattern?.test(normalizedValue1);
+  },
+  normalizeText: (text: string) => {
+    return text?.normalize('NFD')?.replace(/[\u0300-\u036f]/g, '');
   },
   getTagColor: (frase: string) => {
     const hash = frase.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

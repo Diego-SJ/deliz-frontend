@@ -84,7 +84,7 @@ export const CustomTabs = styled(Tabs)`
     .ant-tabs-nav-list {
       .ant-tabs-tab {
         .ant-tabs-tab-btn {
-          color: ${({ theme }) => theme.colors.background.primary};
+          color: ${({ theme }) => theme.colors.primary};
         }
       }
       .ant-tabs-tab-active {

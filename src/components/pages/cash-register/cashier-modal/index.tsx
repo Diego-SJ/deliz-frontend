@@ -44,7 +44,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
         setQuantity(casherItem.quantity);
         setChecked(casherItem.wholesale_price);
       } else {
-        setChecked(false);
+        setChecked(true);
       }
       setTimeout(() => {
         quantityInput.current?.focus();

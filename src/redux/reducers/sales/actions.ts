@@ -324,6 +324,7 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.expense_id as number } as OperatingExpense)) ?? [];
+        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(salesActions.setExpense({ data }));
         return true;
@@ -432,6 +433,7 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.cashier_id as number } as Cashier)) ?? [];
+        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(salesActions.setCashiers({ data }));
         return true;

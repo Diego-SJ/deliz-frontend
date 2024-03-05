@@ -17,6 +17,7 @@ import { customerActions } from '@/redux/reducers/customers';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { salesActions } from '@/redux/reducers/sales';
+import { productHelpers } from '@/utils/products';
 
 const { Content } = Layout;
 
@@ -47,14 +48,9 @@ const CashRegister = () => {
   }, [products, customers, dispatch]);
 
   useEffect(() => {
-    let _products = products?.filter(item => {
-      let matchName = functions.includes(item?.name, searchText);
-      let matchCategory = item?.category_id === Number(currentCategory);
-      return matchName && matchCategory;
-    });
-
+    let _products = productHelpers.searchProducts(searchText, products, currentCategory);
     setCurrentProducts(_products);
-  }, [products, searchText, currentCategory]);
+  }, [products, searchText]);
 
   const closeModal = () => {
     setOpen(false);
@@ -101,33 +97,36 @@ const CashRegister = () => {
                   </Radio.Button>
                 </Radio.Group>
                 {!currentClient && <CashierCustomer />}
-
-                <Space />
-                <Row gutter={[10, 10]}>
-                  {products
-                    ?.filter(i => i?.status === 2)
-                    .map(product => {
-                      return (
-                        <ItemProduct
-                          key={product.product_id}
-                          imageSrc={product.image_url}
-                          title={product.name}
-                          category={(product as any)?.categories?.name}
-                          size={(product as any)?.sizes?.name}
-                          onClick={() => openModal(product)}
-                        />
-                      );
-                    })}
-                </Row>
                 <Input.Search
                   ref={searchInput}
                   allowClear
                   size="large"
-                  style={{ marginTop: 30, marginBottom: 10 }}
+                  style={{ marginTop: 10, marginBottom: 0 }}
                   placeholder="Buscar producto"
                   onChange={({ target }) => setSearchText(target.value)}
                 />
+
+                <Space />
+                {!!!searchText && (
+                  <Row gutter={[10, 10]}>
+                    {products
+                      ?.filter(i => i?.status === 2)
+                      .map(product => {
+                        return (
+                          <ItemProduct
+                            key={product.product_id}
+                            imageSrc={product.image_url}
+                            title={product.name}
+                            category={(product as any)?.categories?.name}
+                            size={(product as any)?.sizes?.name}
+                            onClick={() => openModal(product)}
+                          />
+                        );
+                      })}
+                  </Row>
+                )}
                 <CustomTabs
+                  style={{ marginTop: 10 }}
                   onChange={onChange}
                   type="card"
                   size="small"
