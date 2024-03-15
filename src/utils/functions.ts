@@ -1,3 +1,4 @@
+import { Product } from '@/redux/reducers/products/types';
 import { addDays, format, formatDistance, isValid, subDays, subHours } from 'date-fns';
 import { es } from 'date-fns/locale';
 import numeral from 'numeral';
@@ -75,24 +76,25 @@ const functions = {
     const normalizedValue1 = this.normalizeText(value1)?.toLowerCase();
     const normalizedValue2 = this.normalizeText(value2)?.toLowerCase();
 
-    console.log('normalizedValue1', normalizedValue1);
-    console.log('normalizedValue2', normalizedValue2);
-
-    // Escape de caracteres especiales en value2
-    const escapedValue2 = normalizedValue2?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    console.log('escapedValue2', escapedValue2);
     // Construir un patrón de expresión regular para buscar value2 en cualquier lugar de value1
-    const pattern = new RegExp(`\\b${escapedValue2?.replace(/ /g, '\\b|\\b')}\\b`, 'i');
-    // Verificar si el patrón coincide con value1
-    return pattern?.test(normalizedValue1);
+    return normalizedValue1?.includes(normalizedValue2);
   },
   normalizeText: (text: string) => {
-    return text?.normalize('NFD')?.replace(/[\u0300-\u036f]/g, '');
+    let newText = text?.normalize('NFD')?.replace(/[\u0300-\u036f]/g, '');
+    return newText?.replace(/[^\w\s]/gi, '') || '';
   },
   getTagColor: (frase: string) => {
     const hash = frase.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colores = ['green', 'volcano', 'gold', 'magenta', 'red', 'orange', 'lime', 'cyan', 'blue', 'geekblue', 'purple'];
     return colores[hash % colores.length];
+  },
+  getCode: (product: Product) => {
+    let words = product?.description?.split(' ');
+    let code = '';
+    code = words?.map(word => word[0])?.join('') || '';
+    code += product?.size_id;
+    code += product?.category_id;
+    return code?.toUpperCase();
   },
 };
 

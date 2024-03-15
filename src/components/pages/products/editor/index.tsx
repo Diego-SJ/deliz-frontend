@@ -8,6 +8,7 @@ import { Breadcrumb, Button, Card, Col, Form, Input, InputNumber, Modal, Row, Se
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DeleteOutlined } from '@ant-design/icons';
+import functions from '@/utils/functions';
 
 type Params = {
   action: 'edit' | 'add';
@@ -77,8 +78,11 @@ const ProductEditor = () => {
 
     setLoading(true);
 
-    if (action === 'add') await saveNewProduct(values);
-    else if (action === 'edit') await saveEditionProduct(values);
+    let code = functions.getCode(values);
+    let product = { ...values, code };
+
+    if (action === 'add') await saveNewProduct(product);
+    else if (action === 'edit') await saveEditionProduct(product);
 
     setLoading(false);
     form.resetFields();
@@ -224,7 +228,7 @@ const ProductEditor = () => {
                           options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
                         />
                       </Form.Item>
-                      <Form.Item name="code" label="Código" rules={[{ required: true }]}>
+                      <Form.Item name="code" label="Código">
                         <Input size="large" placeholder="PAML01" />
                       </Form.Item>
                     </Col>

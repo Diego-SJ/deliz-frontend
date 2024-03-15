@@ -18,17 +18,19 @@ const customActions = {
 
       if (!products.length || args?.refetch) {
         dispatch(productActions.setLoading(true));
-        const result = await supabase.from('products').select(`*, categories(category_id,name), units(*), sizes(*)`);
+        const result = await supabase
+          .from('products')
+          .select(`*, categories(category_id,name), units(*), sizes(*)`)
+          .not('product_id', 'in', '(0,3)')
+          .order('name', { ascending: true });
         products =
-          result?.data
-            ?.filter(item => item?.product_id !== 0)
-            ?.map(item => {
-              return {
-                ...item,
-                key: item.product_id as number,
-                image_url: !!item?.image_url ? BUCKETS.PRODUCTS.IMAGES`${item.image_url}` : '',
-              } as Product;
-            }) ?? [];
+          result?.data?.map(item => {
+            return {
+              ...item,
+              key: item.product_id as number,
+              image_url: !!item?.image_url ? BUCKETS.PRODUCTS.IMAGES`${item.image_url}` : '',
+            } as Product;
+          }) ?? [];
         dispatch(productActions.setProducts(products));
       }
     } catch (error) {

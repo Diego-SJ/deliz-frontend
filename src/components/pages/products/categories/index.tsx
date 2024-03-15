@@ -6,7 +6,7 @@ import functions from '@/utils/functions';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Button, Col, Drawer, Input, Row, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { STATUS_OBJ } from '@/constants/status';
 import Table from '@/components/molecules/Table';
@@ -84,12 +84,15 @@ const Products = () => {
     setDrawerStatus('edit');
   };
 
-  const getPanelValue = ({ searchText }: { searchText?: string }) => {
-    let _options = categories?.filter(item => {
-      return functions.includes(item.name, searchText) || functions.includes(item.description, searchText);
-    });
-    setOptions(_options);
-  };
+  const getPanelValue = useCallback(
+    ({ searchText }: { searchText?: string }) => {
+      let _options = categories?.filter(item => {
+        return functions.includes(item.name, searchText) || functions.includes(item.description, searchText);
+      });
+      setOptions(_options);
+    },
+    [categories],
+  );
 
   const onRefresh = () => {
     dispatch(productActions.fetchCategories({ refetch: true }));
@@ -124,7 +127,6 @@ const Products = () => {
           <Row gutter={[10, 10]} style={{ marginBottom: 20 }}>
             <Col lg={6} xs={24}>
               <Input
-                size="large"
                 placeholder="Buscar producto"
                 style={{ width: '100%' }}
                 allowClear
@@ -133,7 +135,7 @@ const Products = () => {
               />
             </Col>
             <Col lg={{ span: 6, offset: 12 }} xs={{ offset: 0, span: 24 }}>
-              <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                 Nuevo
               </Button>
             </Col>

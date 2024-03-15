@@ -467,7 +467,7 @@ const customActions = {
         data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(salesActions.setCashiers({ data }));
-        return true;
+        return data;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
         return false;
@@ -573,10 +573,9 @@ const customActions = {
     getActiveCashier:
       () =>
       async (dispatch: AppDispatch, getState: AppState): Promise<Cashier | null> => {
-        await dispatch(salesActions.cashiers.get({ refetch: true }));
-        const data = getState().sales.cashiers?.data || [];
+        const cashiers = await dispatch(salesActions.cashiers.get({ refetch: true }));
 
-        return data?.filter(item => !!!item?.final_amount && !!!item.close_date)[0] || null;
+        return (cashiers as Cashier[])?.filter(item => !!!item?.final_amount && !!!item.close_date)[0] || null;
       },
   },
 };

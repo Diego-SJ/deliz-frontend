@@ -4,7 +4,7 @@ import functions from '@/utils/functions';
 import { PlusOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Button, Card, Col, Drawer, Input, Row } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PopsicleImg from '@/assets/img/png/popsicle.webp';
 import { Customer } from '@/redux/reducers/customers/types';
@@ -78,16 +78,19 @@ const Customers = () => {
     if (success) dispatch(customerActions.setCurrentCustomer({} as Customer));
   };
 
-  const getPanelValue = ({ searchText }: { searchText?: string }) => {
-    let _options = customers?.filter(item => {
-      return (
-        functions.includes(item.name, searchText) ||
-        functions.includes(item.phone, searchText) ||
-        functions.includes(item.email, searchText)
-      );
-    });
-    setOptions(_options);
-  };
+  const getPanelValue = useCallback(
+    ({ searchText }: { searchText?: string }) => {
+      let _options = customers?.filter(item => {
+        return (
+          functions.includes(item.name, searchText) ||
+          functions.includes(item.phone, searchText) ||
+          functions.includes(item.address, searchText)
+        );
+      });
+      setOptions(_options);
+    },
+    [customers],
+  );
 
   const onRefresh = () => {
     dispatch(customerActions.fetchCustomers({ refetch: true }));
@@ -110,24 +113,21 @@ const Customers = () => {
       </Row>
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
-          <Card styles={{ body: { padding: '10px' } }} style={{ marginBottom: 10 }}>
-            <Row gutter={[10, 10]}>
-              <Col lg={{ span: 6 }} sm={18} xs={24}>
-                <Input
-                  size="large"
-                  placeholder="Buscar cliente"
-                  style={{ width: '100%' }}
-                  allowClear
-                  onChange={({ target }) => getPanelValue({ searchText: target.value })}
-                />
-              </Col>
-              <Col lg={{ span: 6, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
-                <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-                  Nuevo
-                </Button>
-              </Col>
-            </Row>
-          </Card>
+          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
+            <Col lg={{ span: 6 }} sm={18} xs={24}>
+              <Input
+                placeholder="Buscar por nombre, telefono o dirección"
+                style={{ width: '100%' }}
+                allowClear
+                onChange={({ target }) => getPanelValue({ searchText: target.value })}
+              />
+            </Col>
+            <Col lg={{ span: 6, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
+              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                Nuevo
+              </Button>
+            </Col>
+          </Row>
           <Table
             // rowSelection={{
             //   type: 'checkbox',

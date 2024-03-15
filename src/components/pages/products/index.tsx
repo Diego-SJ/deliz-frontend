@@ -40,7 +40,13 @@ const columns: ColumnsType<DataType> = [
       <Tag color={functions.getTagColor(record?.categories?.name || 'empty')}>{record?.categories?.name || ''}</Tag>
     ),
   },
-
+  {
+    title: 'Tamaño',
+    dataIndex: 'sizes',
+    render: (value: any) => <Tag color={functions.getTagColor(value?.short_name)}>{value?.short_name || ''}</Tag>,
+    width: 100,
+    align: 'center',
+  },
   {
     title: 'Stock',
     dataIndex: 'stock',
@@ -61,13 +67,7 @@ const columns: ColumnsType<DataType> = [
     width: 100,
     align: 'center',
   },
-  {
-    title: 'Tamaño',
-    dataIndex: 'sizes',
-    render: (value: any) => <Tag>{value?.short_name || ''}</Tag>,
-    width: 100,
-    align: 'center',
-  },
+
   {
     title: 'Unidad',
     dataIndex: 'units',
@@ -135,7 +135,7 @@ const Products = () => {
   const getPanelValue = ({ searchText, categoryId }: { searchText?: string; categoryId?: number[] }) => {
     let _options = products?.filter(item => {
       return (
-        (functions.includes(item.name, searchText) || functions.includes(item.description, searchText)) &&
+        (functions.includes(item?.name, searchText) || functions.includes(item?.description, searchText)) &&
         (!!categoryId?.length ? categoryId.includes(item.category_id) : true)
       );
     });
