@@ -86,6 +86,7 @@ const OperatingExpenses = () => {
   const { isTablet } = useMediaQuery();
   const { operating_expenses } = useAppSelector(({ sales }) => sales);
   const [options, setOptions] = useState<OperatingExpense[]>([]);
+  const [total, setTotal] = useState(0);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -99,6 +100,13 @@ const OperatingExpenses = () => {
   useEffect(() => {
     setOptions(operating_expenses?.data || []);
   }, [operating_expenses?.data]);
+
+  useEffect(() => {
+    let _total = options?.reduce((total, item) => {
+      return item?.amount + total;
+    }, 0);
+    setTotal(_total);
+  }, [options]);
 
   const onAddNew = () => {
     dispatch(salesActions.setExpense({ drawer: 'new' }));
@@ -164,6 +172,7 @@ const OperatingExpenses = () => {
             onRefresh={onRefresh}
             totalItems={operating_expenses?.data?.length}
             dataSource={options}
+            totalAmount={total}
           />
           <Drawer
             title={operating_expenses?.drawer === 'edit' ? 'Editar gasto' : 'Agregar nuevo gasto'}

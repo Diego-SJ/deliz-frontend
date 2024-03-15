@@ -37,7 +37,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
       sale_id: current_sale?.metadata?.sale_id,
       cashback: cashback >= 0 ? 0 : Math.abs(cashback),
     };
-    const success = await dispatch(salesActions.updateSale(newSale));
+    const success = await dispatch(salesActions.upsertSale(newSale));
 
     if (success) {
       setReceivedMoney(0);
@@ -58,6 +58,10 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
   const onAmountChange = (value: number) => {
     setSaleStatus(value >= pending ? 4 : 5);
     setReceivedMoney(value);
+  };
+
+  const onStatusChange = (status: number) => {
+    setSaleStatus(status);
   };
 
   const closeModal = () => {

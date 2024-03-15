@@ -44,7 +44,7 @@ const CashRegister = () => {
 
   useEffect(() => {
     if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
-    if (!customers.length) dispatch(customerActions.fetchCustomers(true));
+    if (!customers.length) dispatch(customerActions.fetchCustomers({ refetch: true }));
   }, [products, customers, dispatch]);
 
   useEffect(() => {

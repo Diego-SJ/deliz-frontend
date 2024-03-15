@@ -44,6 +44,12 @@ export const APP_ROUTES = {
         OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
         CASHIERS: { path: '/app/transactions/cashiers' },
       },
+      ORDERS: {
+        path: '/app/orders',
+        title: 'Pedidos',
+        OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
+        CASHIERS: { path: '/app/transactions/cashiers' },
+      },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes' },
       SETTINGS: { path: '/app/settings', title: 'Configuración' },

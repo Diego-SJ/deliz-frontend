@@ -20,6 +20,7 @@ import DebtorsClients from '@/components/pages/debtors';
 import ProductCategories from '@/components/pages/products/categories';
 import ProductSizes from '@/components/pages/products/sizes';
 import ProductUnits from '@/components/pages/products/units';
+import Orders from '@/components/pages/orders';
 
 const AppRouter = () => {
   return (
@@ -53,6 +54,10 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path} element={<ProductUnits />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
         {/* PRODUCTS ROUTES - END */}
+
+        {/* ORDERS ROUTES - START */}
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path} element={<Orders />} />
+        {/* ORDERS ROUTES - END */}
 
         {/* TRANSACTIONS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path} element={<TransactionsCashiers />} />

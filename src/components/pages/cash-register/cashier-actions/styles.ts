@@ -21,3 +21,16 @@ export const ActionButton = styled.div`
     cursor: pointer;
   }
 `;
+
+export const ContainerItems = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+
+  .total-products {
+    margin-top: 15px;
+    padding-left: 8px;
+    width: 100%;
+    text-align: left;
+    font-weight: 700;
+  }
+`;

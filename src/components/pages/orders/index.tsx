@@ -2,7 +2,21 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message, Typography, Avatar } from 'antd';
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Row,
+  Select,
+  Tag,
+  Tooltip,
+  message,
+  Typography,
+  Avatar,
+  Calendar,
+} from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,6 +24,7 @@ import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
+import dayjs, { Dayjs } from 'dayjs';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -70,12 +85,13 @@ const columns: ColumnsType<SaleDetails> = [
 
 const { Title } = Typography;
 
-const Sales = () => {
+const Orders = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { sales, cashiers } = useAppSelector(({ sales }) => sales);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const isFirstRender = useRef(true);
   const [totalSaleAmount, setTotalSaleAmount] = useState(0);
   const [todaySales, setTodaySales] = useState(0);
@@ -159,90 +175,27 @@ const Sales = () => {
                 title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
                 key: 'dashboard',
               },
-              { title: 'Ventas' },
+              { title: 'Pedidos' },
             ]}
           />
         </Col>
       </Row>
-      <Row style={{ width: '100%', marginTop: 10 }} gutter={[10, 10]}>
-        <Col xs={24} md={12} lg={8}>
-          <Card style={{ width: '100%' }}>
-            <Card.Meta
-              avatar={<Avatar icon={<LineChartOutlined rev={{}} />} style={{ background: '#2db7f5' }} size={60} />}
-              title={functions?.money(totalSaleAmount)}
-              description="Total de ventas"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} md={12} lg={8}>
+      <Row gutter={[10, 10]} style={{ marginTop: '10px' }}>
+        <Col xs={24} lg={12}>
           <Card>
-            <Card.Meta
-              avatar={<Avatar icon={<ReconciliationOutlined rev={{}} />} style={{ background: '#a52df5' }} size={60} />}
-              title={sales?.length || 0}
-              description="Ventas totales"
-            />
+            <Button size="large" type="primary" block style={{ marginBottom: 20 }}>
+              Nuevo pedido
+            </Button>
+            <Typography.Title level={4}>Pedidos del {functions.date1(selectedDate as any)}</Typography.Title>
           </Card>
         </Col>
-        <Col xs={24} md={12} lg={8}>
-          <Card>
-            <Card.Meta
-              avatar={<Avatar icon={<DollarOutlined rev={{}} />} style={{ background: '#4beb88' }} size={60} />}
-              title={functions.money(todaySales)}
-              description="Ventas de hoy"
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row style={{ marginTop: '10px' }}>
-        <Col span={24}>
-          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
-            <Col lg={6} xs={12}>
-              <Select
-                placeholder="Status"
-                style={{ width: '100%' }}
-                allowClear
-                onChange={status => setFilters(p => ({ ...p, status }))}
-              >
-                <Select.Option key={4} value={4}>
-                  {STATUS_OBJ[4].name}
-                </Select.Option>
-                <Select.Option key={5} value={5}>
-                  {STATUS_OBJ[5].name}
-                </Select.Option>
-              </Select>
-            </Col>
-            <Col lg={6} xs={12}>
-              <DatePicker
-                placeholder="Inicio"
-                style={{ width: '100%' }}
-                onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
-              />
-            </Col>
-            <Col lg={6} xs={12}>
-              <DatePicker
-                placeholder="Fin"
-                style={{ width: '100%' }}
-                onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
-              />
-            </Col>
-            <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-                Nueva
-              </Button>
-            </Col>
-          </Row>
-          <Table
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            columns={columns}
-            dataSource={auxSales}
-            scroll={{ x: 700 }}
-            onRefresh={onRefresh}
-            totalItems={sales?.length || 0}
+        <Col xs={24} lg={12}>
+          <Calendar
+            style={{ width: '100%' }}
+            value={selectedDate}
+            onSelect={setSelectedDate}
+            // onPanelChange={onPanelChange}
+            // onSelect={onSelect}
           />
         </Col>
       </Row>
@@ -250,4 +203,4 @@ const Sales = () => {
   );
 };
 
-export default Sales;
+export default Orders;

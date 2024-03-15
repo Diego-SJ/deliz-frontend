@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Button, Card, Col, Drawer, Input, Row } from 'antd';
-import Table, { ColumnsType } from 'antd/es/table';
+import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PopsicleImg from '@/assets/img/png/popsicle.webp';
@@ -11,6 +11,7 @@ import { Customer } from '@/redux/reducers/customers/types';
 import { customerActions } from '@/redux/reducers/customers';
 import CustomerEditor from './editor';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import Table from '@/components/molecules/Table';
 
 type DataType = Customer;
 
@@ -56,7 +57,7 @@ const Customers = () => {
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      dispatch(customerActions.fetchCustomers());
+      dispatch(customerActions.fetchCustomers({ refetch: true }));
       return;
     }
   }, [dispatch]);
@@ -86,6 +87,10 @@ const Customers = () => {
       );
     });
     setOptions(_options);
+  };
+
+  const onRefresh = () => {
+    dispatch(customerActions.fetchCustomers({ refetch: true }));
   };
 
   return (
@@ -137,6 +142,7 @@ const Customers = () => {
             scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
             columns={columns}
             dataSource={options}
+            onRefresh={onRefresh}
           />
         </Col>
       </Row>

@@ -1,5 +1,5 @@
 import { AppDispatch, AppState } from '@/redux/store';
-import { salesActions } from '.';
+import sales, { salesActions } from '.';
 import { supabase } from '@/config/supabase';
 import {
   CashClosing,
@@ -122,7 +122,7 @@ const customActions = {
         return null;
       }
     },
-  updateSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
+  upsertSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       let newItem = { ...item, updated_at: new Date() };
       delete newItem.key;
@@ -142,11 +142,42 @@ const customActions = {
         status: { status_id: item.status_id as number, name: STATUS_OBJ[item.status_id as number].name },
       };
       await dispatch(salesActions.setCurrentSale({ metadata: newMetadata }));
+      await dispatch(salesActions.fetchSales({ refetch: true }));
 
       message.success('¡Venta actualizada!', 4);
       return true;
     } catch (error) {
       dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
+  updateSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
+    try {
+      let newItem = { ...item, updated_at: new Date() };
+
+      const result = await supabase.from('sales').update(newItem).eq('sale_id', item?.sale_id).select();
+
+      console.log(result);
+
+      if (result.error) {
+        message.error('No se pudo actualizar la información.', 4);
+        return false;
+      }
+
+      const { current_sale } = getState()?.sales;
+
+      let newMetadata = {
+        ...current_sale.metadata,
+        ...(newItem as SaleDetails),
+      };
+      await dispatch(salesActions.setCurrentSale({ metadata: newMetadata }));
+      await dispatch(salesActions.fetchSales({ refetch: true }));
+
+      message.success('¡Venta actualizada!', 4);
+      return true;
+    } catch (error) {
+      dispatch(productActions.setLoading(false));
+      console.log(error);
       return false;
     }
   },

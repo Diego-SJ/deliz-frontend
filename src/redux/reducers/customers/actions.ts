@@ -3,14 +3,15 @@ import { customerActions } from '.';
 import { supabase } from '@/config/supabase';
 import { Customer } from './types';
 import { message } from 'antd';
+import { FetchFunction } from '../products/actions';
 
 const customActions = {
-  fetchCustomers: (refetch?: boolean) => async (dispatch: AppDispatch, getState: AppState) => {
+  fetchCustomers: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(customerActions.setLoading(true));
       let customers = getState().customers.customers || [];
 
-      if (!customers.length || refetch) {
+      if (!customers.length || args?.refetch) {
         const result = await supabase.from('customers').select('*');
 
         customers =
@@ -49,7 +50,7 @@ const customActions = {
         message.error('No se pudo guardar la información.', 4);
         return false;
       }
-      await dispatch(customActions.fetchCustomers(true));
+      await dispatch(customActions.fetchCustomers({ refetch: true }));
       message.success('Cliente agregado con éxito!', 4);
       return true;
     } catch (error) {
@@ -78,7 +79,7 @@ const customActions = {
         return false;
       }
 
-      await dispatch(customActions.fetchCustomers(true));
+      await dispatch(customActions.fetchCustomers({ refetch: true }));
       dispatch(customerActions.setCurrentCustomer({ ...oldData, ...newData }));
       message.success('Cliente actualizado con éxito!', 4);
       return true;

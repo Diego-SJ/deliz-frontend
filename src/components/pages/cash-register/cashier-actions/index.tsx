@@ -1,7 +1,7 @@
 import { DeleteFilled, PercentageOutlined, PrinterFilled, SaveFilled, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { ActionButton } from './styles';
+import { ActionButton, ContainerItems } from './styles';
 import { ModalBody, SalePrices } from '../styles';
 import Space from '@/components/atoms/Space';
 import { useTheme } from 'styled-components';
@@ -48,14 +48,18 @@ const CashierActions = () => {
   const [modal, contextHolder] = Modal.useModal();
   const [subTotal, setSubTotal] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
   const { isTablet } = useMediaQuery();
 
   useEffect(() => {
+    let totalItemsInList = 0;
     let items = cash_register?.items?.reduce((total, item) => {
       let productPrice = item.wholesale_price ? item.product.wholesale_price : item.product.retail_price;
       productPrice = productPrice * item.quantity;
+      totalItemsInList += item.quantity;
       return productPrice + total;
     }, 0);
+    setTotalItems(totalItemsInList);
 
     setSubTotal(items || 0);
   }, [cash_register]);
@@ -133,20 +137,26 @@ const CashierActions = () => {
 
   return (
     <div className="cashier-actions">
-      <SalePrices>
-        <Typography.Text type="secondary">
-          Subtotal: <span>{functions.money(subTotal)}</span>
+      <ContainerItems>
+        <Typography.Text type="secondary" className="total-products">
+          Productos: <span>{totalItems || 0}</span>
         </Typography.Text>
-        <Typography.Text type="secondary">
-          Descuento: <span>{`-${functions.money(discountMoney)} ${discountType === 'PERCENTAGE' ? `(${discount}%)` : ''}`}</span>
-        </Typography.Text>
-        <Typography.Text type="secondary">
-          Envio: <span>{functions.money(shipping)}</span>
-        </Typography.Text>
-        <Typography.Title level={3} type="success">
-          TOTAL: <span>{functions.money(total)}</span>
-        </Typography.Title>
-      </SalePrices>
+        <SalePrices>
+          <Typography.Text type="secondary">
+            Subtotal: <span>{functions.money(subTotal)}</span>
+          </Typography.Text>
+          <Typography.Text type="secondary">
+            Descuento:{' '}
+            <span>{`-${functions.money(discountMoney)} ${discountType === 'PERCENTAGE' ? `(${discount}%)` : ''}`}</span>
+          </Typography.Text>
+          <Typography.Text type="secondary">
+            Envio: <span>{functions.money(shipping)}</span>
+          </Typography.Text>
+          <Typography.Title level={3} type="success">
+            TOTAL: <span>{functions.money(total)}</span>
+          </Typography.Title>
+        </SalePrices>
+      </ContainerItems>
       <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }} style={{ marginBottom: 10 }}>
         <Col span={6}>
           <Tooltip title="Aplicar envío">

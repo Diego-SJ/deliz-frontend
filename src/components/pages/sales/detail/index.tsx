@@ -35,6 +35,7 @@ import PrintInvoiceButton from './print-invoice-btn';
 import PopsicleIcon from '@/assets/img/jsx/popsicle';
 import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
+import UpdateCashier from './update-sale-cashier';
 
 type DataType = SaleItem;
 type Option = {
@@ -189,7 +190,7 @@ const SaleDetail = () => {
     if (customerId) {
       setLoading(true);
       const { customers, status, ...sale } = { ...current_sale.metadata };
-      const result = await dispatch(salesActions.updateSale({ ...sale, customer_id: customerId }));
+      const result = await dispatch(salesActions.upsertSale({ ...sale, customer_id: customerId }));
       if (result) closeModal();
       setLoading(false);
     }
@@ -327,6 +328,13 @@ const SaleDetail = () => {
           </Card>
         </Col>
         <Col lg={{ span: 16 }} xs={24}>
+          <Card style={{ marginBottom: 10 }}>
+            <Row>
+              <Col xs={24} sm={24} md={6}>
+                <UpdateCashier />
+              </Col>
+            </Row>
+          </Card>
           <Table
             columns={columns}
             dataSource={items}

@@ -76,7 +76,7 @@ const ITEM_LIST = [
       {
         key: 'sales.orders',
         label: 'Pedidos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+        path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
       },
       {
         key: 'sales.main',

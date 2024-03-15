@@ -13,9 +13,9 @@ import OpenCashier from './open-cashier';
 const columns: ColumnsType<Cashier> = [
   {
     title: '',
-    dataIndex: 'name',
+    dataIndex: 'cashier_id',
     width: 55,
-    render: value => <Avatar size="large">{value.substring(0, 2)}</Avatar>,
+    render: value => <Avatar size="large">{value}</Avatar>,
   },
   {
     title: 'Nombre',
