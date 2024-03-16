@@ -1,6 +1,6 @@
 import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { DollarOutlined, HomeOutlined, ShoppingOutlined, TeamOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, HomeOutlined, ShoppingCartOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import FallbackImage from '@/assets/img/png/logo_deliz.webp';
@@ -34,30 +34,30 @@ const CashierHeader = () => {
         <Space>
           <Tooltip title="Ventas">
             <Button
-              icon={<DollarOutlined rev={{}} />}
+              icon={<ShoppingCartOutlined rev={{}} />}
               type="dashed"
-              size="large"
-              shape="circle"
               onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
-            />
+            >
+              {isMobile ? '' : 'Ventas'}
+            </Button>
           </Tooltip>
           <Tooltip title="Clientes">
             <Button
               icon={<TeamOutlined rev={{}} />}
               type="dashed"
-              size="large"
-              shape="circle"
               onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path)}
-            />
+            >
+              {isMobile ? '' : 'Clientes'}
+            </Button>
           </Tooltip>
           <Tooltip title="Productos">
             <Button
-              icon={<ShoppingOutlined rev={{}} />}
+              icon={<AppstoreOutlined rev={{}} />}
               type="dashed"
-              size="large"
-              shape="circle"
               onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
-            />
+            >
+              {isMobile ? '' : 'Productos'}
+            </Button>
           </Tooltip>
           {/* <Tooltip title="Venta aleatoria">
             <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />

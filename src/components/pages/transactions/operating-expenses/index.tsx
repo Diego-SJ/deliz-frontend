@@ -151,7 +151,6 @@ const OperatingExpenses = () => {
           <Row gutter={[10, 10]} style={{ marginBottom: 20 }}>
             <Col lg={6} xs={24}>
               <Input
-                size="large"
                 placeholder="Buscar elemento"
                 style={{ width: '100%' }}
                 allowClear
@@ -160,7 +159,7 @@ const OperatingExpenses = () => {
               />
             </Col>
             <Col lg={{ span: 6, offset: 12 }} xs={{ offset: 0, span: 24 }}>
-              <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                 Nuevo gasto
               </Button>
             </Col>

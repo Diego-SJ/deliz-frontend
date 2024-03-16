@@ -33,9 +33,19 @@ const functions = {
     return format(new Date(_date), 'PPP', { locale: es });
   },
   tableDate: (date: Date | string) => {
-    // let [_date] = new Date(date).toLocaleString();
     if (!!!date) return '- - -';
-    return format(new Date(date), 'PPp', { locale: es });
+    let _date = new Date(date);
+    let localDate = _date.toLocaleDateString('es-Mx', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZone: 'America/Mexico_City',
+    });
+    return localDate;
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
@@ -54,16 +64,12 @@ const functions = {
     return date1 >= date2 && date1 <= date3;
   },
   dateAfter: (date: Date | string, startDate: Date | string): boolean => {
-    let _date = new Date(date)?.toLocaleString()?.split(',')[0];
-
-    let date1 = format(subDays(new Date(_date), 1), 'P');
+    let date1 = format(new Date(date), 'P');
     let date2 = format(addDays(new Date(startDate), 1), 'P');
     return date1 >= date2;
   },
   dateBefore: (date: Date | string, endDate: Date | string): boolean => {
-    let _date = new Date(date)?.toLocaleString()?.split(',')[0];
-
-    let date1 = format(subDays(new Date(_date), 1), 'P');
+    let date1 = format(new Date(date), 'P');
     let date2 = format(addDays(new Date(endDate), 1), 'P');
     return date1 <= date2;
   },

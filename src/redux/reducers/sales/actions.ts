@@ -92,6 +92,24 @@ const customActions = {
       return false;
     }
   },
+  addItemToSale: (item: SaleItem) => async (dispatch: AppDispatch) => {
+    const { error } = await supabase.from('sale_detail').insert([
+      {
+        product_id: item.product_id,
+        sale_id: item.sale_id,
+        quantity: item.quantity,
+        price: item.price,
+        wholesale: item.wholesale,
+      },
+    ]);
+
+    if (error) {
+      message.error('No se pudo agregar el producto a la venta');
+      return false;
+    }
+
+    await dispatch(salesActions.getSaleById({ refetch: true, sale_id: item.sale_id }));
+  },
   createSale:
     (sale: Sale) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<Sale | null> => {
@@ -242,6 +260,41 @@ const customActions = {
 
       await dispatch(salesActions.getSaleById({ refetch: true, sale_id: newItem.sale_id }));
       message.success('¡Producto actualizado con éxito!', 4);
+      return true;
+    } catch (error) {
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
+  deleteItemById: (id: number) => async (dispatch: AppDispatch, getState: AppState) => {
+    try {
+      const sale = getState().sales.current_sale;
+      const result = await supabase.from('sale_detail').delete().eq('sale_detail_id', id);
+
+      if (result.error) {
+        message.error('No se pudo eliminar el producto de la venta.', 4);
+        return false;
+      }
+
+      await dispatch(salesActions.getSaleById({ refetch: true, sale_id: sale?.metadata?.sale_id }));
+      message.success('¡Producto eliminado con éxito!', 4);
+      return true;
+    } catch (error) {
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
+  deleteSaleById: (id: number) => async (dispatch: AppDispatch, getState: AppState) => {
+    try {
+      const result = await supabase.from('sales').delete().eq('sale_id', id);
+
+      if (result.error) {
+        message.error('No se pudo eliminar la venta.', 4);
+        return false;
+      }
+
+      await dispatch(salesActions.fetchSales({ refetch: true }));
+      message.success('¡Venta eliminada con éxito!', 4);
       return true;
     } catch (error) {
       dispatch(productActions.setLoading(false));

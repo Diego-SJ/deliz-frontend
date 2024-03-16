@@ -7,6 +7,7 @@ import { Customer } from '@/redux/reducers/customers/types';
 import { useCallback, useEffect, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import INITIAL_STATE from '@/constants/initial-states';
+import functions from '@/utils/functions';
 
 type Option = {
   value: number | string;
@@ -61,10 +62,11 @@ const CashierCustomer = () => {
         size="large"
         value={currentCustomerId as number}
         placeholder="Buscar cliente"
+        virtual={false}
         suffixIcon={<UserOutlined rev={{}} />}
         optionFilterProp="children"
         onChange={onChange}
-        filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+        filterOption={(input, option) => functions.includes(option?.label, input.toLowerCase())}
         options={customerList}
       />
       <Button icon={<UserAddOutlined rev={{}} />} shape="circle" size="large" type="primary" onClick={onAddNew} />

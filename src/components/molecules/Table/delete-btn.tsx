@@ -8,9 +8,10 @@ type Props = {
   content?: string;
   deleteFunction?: any;
   editFunction?: any;
+  onEdit?: () => void;
 };
 
-const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFunction }) => {
+const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFunction, onEdit }) => {
   const dispatch = useAppDispatch();
   const [modalStatus, setModalStatus] = useState<'edit' | 'delete' | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -30,7 +31,8 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
   };
 
   const handleEdit = () => {
-    dispatch(editFunction as any);
+    if (onEdit) return onEdit();
+    if (editFunction) dispatch(editFunction as any);
   };
 
   return (
@@ -43,7 +45,7 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
             </Button>
           </Tooltip>
         </Col>
-        {editFunction && (
+        {(editFunction || onEdit) && (
           <Col>
             <Tooltip title="Editar">
               <Button onClick={handleEdit}>

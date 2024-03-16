@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
-import { Sale } from '@/redux/reducers/sales/types';
+import { Cashier, Sale } from '@/redux/reducers/sales/types';
 import { EditOutlined } from '@ant-design/icons';
 import { Button, Col, Modal, Row, Select, Typography } from 'antd';
 import { FC, useState } from 'react';
@@ -11,6 +11,10 @@ type UpdateSaleButton = {
 };
 
 const { Title, Paragraph } = Typography;
+
+const findCashierById = (cashiers?: Cashier[], id?: number) => {
+  return cashiers?.find(i => i?.cashier_id === id)?.name;
+};
 
 const UpdateCashier: FC<UpdateSaleButton> = () => {
   const dispatch = useAppDispatch();
@@ -84,14 +88,18 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
         ]}
       >
         <Title level={4} style={{ margin: 0 }}>
-          {current_sale?.metadata?.cashier_id ? `Caja actual: ${current_sale?.metadata?.cashier_id}` : 'Sin caja'}
+          Caja actual:
+        </Title>
+        <Title level={5} style={{ margin: 0 }}>
+          {current_sale?.metadata?.cashier_id ? `${findCashierById(cashiers?.data, current_sale?.metadata?.cashier_id)}` : ''}
         </Title>
 
-        <Paragraph style={{ margin: '10px 0 5px', fontWeight: 600 }}>Caja:</Paragraph>
+        <Paragraph style={{ margin: '10px 0 5px', fontWeight: 600 }}>Nueva caja:</Paragraph>
         <Select
           size="large"
           style={{ width: '100%' }}
           placeholder="Selecciona una caja"
+          virtual={false}
           options={cashiers?.data?.map(i => ({ label: i?.name, value: i?.cashier_id }))}
           onChange={setCashierId}
         />

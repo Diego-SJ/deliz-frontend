@@ -63,3 +63,12 @@ export const DrawerBody = styled.div`
   background-color: #ffffff;
   padding: 25px 0 20px;
 `;
+
+export const ProductInfo = styled.div`
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin: 10px 0;
+`;

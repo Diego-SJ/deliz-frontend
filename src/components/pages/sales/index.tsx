@@ -1,10 +1,10 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, Tooltip, message, Typography, Avatar } from 'antd';
+import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, SearchOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, message, Typography, Avatar, Input } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
@@ -57,7 +57,7 @@ const columns: ColumnsType<SaleDetails> = [
     dataIndex: 'created_at',
     align: 'center',
     width: 210,
-    render: (value: Date | string) => functions.dateTime(value),
+    render: (value: Date | string) => functions.tableDate(value),
   },
   // {
   //   title: 'Fecha actualización',
@@ -101,6 +101,8 @@ const Sales = () => {
       return (item?.total || _total) + acc;
     }, 0);
 
+    console.log(auxSales);
+
     setTotalSaleAmount(totalAmounts);
   }, [auxSales]);
 
@@ -117,19 +119,36 @@ const Sales = () => {
     setTodaySales(_todaySales);
   }, [sales, activeCashier]);
 
-  const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
-    if (!status && !startDate && !endDate) {
-      setAuxSales(sales);
-    } else {
-      let salesList = sales?.filter(item => {
-        let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
-        let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
-        let matchStatus = !!status ? item?.status_id === status : true;
-        return matchStatus && matchDate1 && matchDate2;
-      });
-      setAuxSales(salesList);
-    }
-  };
+  const applyFilters = useCallback(
+    ({
+      status,
+      endDate,
+      startDate,
+      searchText,
+    }: {
+      status?: number;
+      endDate?: string;
+      startDate?: string;
+      searchText?: string;
+    }) => {
+      if (!status && !startDate && !endDate && !searchText) {
+        setAuxSales(sales);
+      } else {
+        let salesList = sales?.filter(item => {
+          let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
+          let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
+          let matchStatus = !!status ? item?.status_id === status : true;
+          let texts =
+            functions.includes(item?.customers?.name, searchText) ||
+            functions.includes(item?.customers?.address, searchText) ||
+            functions.includes(item?.customers?.phone, searchText);
+          return matchStatus && matchDate1 && matchDate2 && texts;
+        });
+        setAuxSales(salesList);
+      }
+    },
+    [sales],
+  );
 
   useEffect(() => {
     applyFilters(filters);
@@ -196,11 +215,21 @@ const Sales = () => {
       <Row style={{ marginTop: '10px' }}>
         <Col span={24}>
           <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
-            <Col lg={6} xs={12}>
+            <Col lg={6} xs={24}>
+              <Input
+                placeholder="Nombre cliente, dirección"
+                style={{ width: '100%' }}
+                allowClear
+                prefix={<SearchOutlined rev={{}} />}
+                onChange={({ target }) => applyFilters({ searchText: target.value })}
+              />
+            </Col>
+            <Col lg={4} xs={12}>
               <Select
                 placeholder="Status"
                 style={{ width: '100%' }}
                 allowClear
+                virtual={false}
                 onChange={status => setFilters(p => ({ ...p, status }))}
               >
                 <Select.Option key={4} value={4}>
@@ -211,21 +240,21 @@ const Sales = () => {
                 </Select.Option>
               </Select>
             </Col>
-            <Col lg={6} xs={12}>
+            <Col lg={4} xs={12}>
               <DatePicker
                 placeholder="Inicio"
                 style={{ width: '100%' }}
                 onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
               />
             </Col>
-            <Col lg={6} xs={12}>
+            <Col lg={4} xs={12}>
               <DatePicker
                 placeholder="Fin"
                 style={{ width: '100%' }}
                 onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
               />
             </Col>
-            <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
+            <Col lg={6} xs={24}>
               <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
                 Nueva
               </Button>

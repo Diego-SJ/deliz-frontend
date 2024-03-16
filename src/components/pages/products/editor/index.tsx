@@ -183,7 +183,7 @@ const ProductEditor = () => {
                         <InputNumber size="large" prefix="$" style={{ width: '100%' }} placeholder="0.0" />
                       </Form.Item>
                       <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-                        <Select size="large" placeholder="Por default es Activo">
+                        <Select size="large" placeholder="Por default es Activo" virtual={false}>
                           {STATUS.map(item => (
                             <Select.Option key={item.id} value={item.id}>
                               {item.name}
@@ -198,6 +198,7 @@ const ProductEditor = () => {
                         <Select
                           size="large"
                           placeholder="Grande"
+                          virtual={false}
                           options={units?.data?.map(size => ({ value: size.unit_id, label: size?.short_name }))}
                         />
                       </Form.Item>
@@ -217,6 +218,7 @@ const ProductEditor = () => {
                           showSearch
                           style={{ width: '100%' }}
                           optionFilterProp="children"
+                          virtual={false}
                           filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                           options={categories?.map(i => ({ value: i.category_id, label: i.name }))}
                         />
@@ -225,6 +227,7 @@ const ProductEditor = () => {
                         <Select
                           size="large"
                           placeholder="Grande"
+                          virtual={false}
                           options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
                         />
                       </Form.Item>

@@ -36,6 +36,9 @@ import PopsicleIcon from '@/assets/img/jsx/popsicle';
 import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import UpdateCashier from './update-sale-cashier';
+import AddNewItem from './add-new-item-btn';
+import DeleteButton from '@/components/molecules/Table/delete-btn';
+import DeleteSaleButton from './delete-sale-btn';
 
 type DataType = SaleItem;
 type Option = {
@@ -53,51 +56,6 @@ export type Amounts = {
 };
 
 const initalAmounts = { total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0, discount: '' };
-
-const columns: ColumnsType<DataType> = [
-  {
-    title: '',
-    dataIndex: 'products',
-    width: 50,
-    render: (_, record) => {
-      let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
-      return (
-        <Avatar
-          src={imageUrl || <PopsicleIcon style={{ width: 15 }} />}
-          style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }}
-          size="large"
-        />
-      );
-    },
-  },
-  {
-    title: 'Producto',
-    dataIndex: 'products',
-    render: (_, record) => {
-      return (
-        <div>
-          <b>{record?.products?.name ?? '- - -'}</b>
-          <br />
-          <span>{record?.products?.categories?.name ?? '- - -'}</span>
-        </div>
-      );
-    },
-  },
-  {
-    title: 'Cantidad',
-    dataIndex: 'quantity',
-  },
-  {
-    title: 'Precio',
-    dataIndex: 'price',
-    render: (value: number) => functions.money(value),
-  },
-  {
-    title: 'Total',
-    dataIndex: 'retail_price',
-    render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
-  },
-];
 
 const SaleDetail = () => {
   const dispatch = useAppDispatch();
@@ -329,21 +287,77 @@ const SaleDetail = () => {
         </Col>
         <Col lg={{ span: 16 }} xs={24}>
           <Card style={{ marginBottom: 10 }}>
-            <Row>
-              <Col xs={24} sm={24} md={6}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} md={8}>
+                <AddNewItem />
+              </Col>
+              <Col xs={24} md={8}>
                 <UpdateCashier />
+              </Col>
+              <Col xs={24} md={8}>
+                <DeleteSaleButton />
               </Col>
             </Row>
           </Card>
           <Table
-            columns={columns}
+            columns={[
+              {
+                title: '',
+                dataIndex: 'products',
+                width: 50,
+                render: (_, record) => {
+                  let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
+                  return (
+                    <Avatar
+                      src={imageUrl || <PopsicleIcon style={{ width: 15 }} />}
+                      style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }}
+                      size="large"
+                    />
+                  );
+                },
+              },
+              {
+                title: 'Producto',
+                dataIndex: 'products',
+                render: (_, record) => {
+                  return (
+                    <div>
+                      <b>{record?.products?.name ?? '- - -'}</b>
+                      <br />
+                      <span>{record?.products?.categories?.name ?? '- - -'}</span>
+                    </div>
+                  );
+                },
+              },
+              {
+                title: 'Cantidad',
+                dataIndex: 'quantity',
+              },
+              {
+                title: 'Precio',
+                dataIndex: 'price',
+                render: (value: number) => functions.money(value),
+              },
+              {
+                title: 'Total',
+                dataIndex: 'retail_price',
+                render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
+              },
+              {
+                title: 'Acciones',
+                dataIndex: 'sale_detail_id',
+                width: 130,
+                render: (id: number, record) => {
+                  return (
+                    <DeleteButton deleteFunction={salesActions.deleteItemById(id)} editFunction={() => onRowClick(record)} />
+                  );
+                },
+              },
+            ]}
             dataSource={items}
             size="small"
             scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
             pagination={false}
-            onRow={record => ({
-              onClick: () => onRowClick(record),
-            })}
           />
         </Col>
       </Row>
@@ -454,7 +468,8 @@ const SaleDetail = () => {
                 suffixIcon={<UserOutlined rev={{}} />}
                 optionFilterProp="children"
                 onChange={setCustomerId}
-                filterOption={(input, option) => (option?.label ?? '')?.toLowerCase()?.includes(input?.toLowerCase())}
+                virtual={false}
+                filterOption={(input, option) => functions.includes(option?.label, input?.toLowerCase())}
                 options={customerList}
               />
             </>

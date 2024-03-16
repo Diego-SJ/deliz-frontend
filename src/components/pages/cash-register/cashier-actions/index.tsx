@@ -213,7 +213,6 @@ const CashierActions = () => {
       <Modal
         open={open}
         onOk={handleOk}
-        maskClosable={false}
         width={370}
         onCancel={handleOnClose}
         footer={[

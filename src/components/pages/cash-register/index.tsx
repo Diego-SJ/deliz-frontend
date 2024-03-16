@@ -41,10 +41,14 @@ const CashRegister = () => {
   const [currentClient, setCurrentClient] = useState<5 | 19 | null>(null);
   const searchInput = useRef<InputRef>(null);
   const { isPhablet } = useMediaQuery();
+  const firstRender = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
-    if (!customers.length) dispatch(customerActions.fetchCustomers({ refetch: true }));
+    if (!firstRender.current) {
+      firstRender.current = true;
+      dispatch(productActions.fetchProducts({ refetch: true }));
+      dispatch(customerActions.fetchCustomers({ refetch: true }));
+    }
   }, [products, customers, dispatch]);
 
   useEffect(() => {

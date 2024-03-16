@@ -108,6 +108,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
       <Select
         style={{ width: '100%', marginBottom: 10 }}
         size="large"
+        virtual={false}
         value={paymentMethod}
         options={PAYMENT_METHODS}
         onChange={value => setPaymentMethod(value)}
