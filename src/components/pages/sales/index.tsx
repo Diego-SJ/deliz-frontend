@@ -238,6 +238,9 @@ const Sales = () => {
                 <Select.Option key={5} value={5}>
                   {STATUS_OBJ[5].name}
                 </Select.Option>
+                <Select.Option key={7} value={7}>
+                  {STATUS_OBJ[7].name}
+                </Select.Option>
               </Select>
             </Col>
             <Col lg={4} xs={12}>

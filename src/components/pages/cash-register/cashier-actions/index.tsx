@@ -44,7 +44,7 @@ const CashierActions = () => {
   const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
   const [itemExtra, setItemExtra] = useState({ price: 0, quantity: 0 });
   const [total, setTotal] = useState(0);
-  const { shipping = 0, discountMoney = 0, discount = 0 } = cash_register;
+  const { shipping = 0, discountMoney = 0, discount = 0, mode = null } = cash_register;
   const [modal, contextHolder] = Modal.useModal();
   const [subTotal, setSubTotal] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
@@ -206,7 +206,7 @@ const CashierActions = () => {
         </Col>
       </Row>
       <Button type="primary" block size="large" onClick={onPaySale}>
-        PAGAR
+        {mode === 'order' ? 'REGISTRAR PEDIDO' : 'PAGAR'}
       </Button>
       {contextHolder}
 

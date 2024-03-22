@@ -518,8 +518,9 @@ const customActions = {
 
         let data = result?.map(item => ({ ...item, key: item.cashier_id as number } as Cashier)) ?? [];
         data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
+        let activeCashier = (result as Cashier[])?.filter(item => !!item?.is_open)[0] || null;
 
-        dispatch(salesActions.setCashiers({ data }));
+        dispatch(salesActions.setCashiers({ data, activeCashier }));
         return data;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
@@ -537,6 +538,7 @@ const customActions = {
               initial_amount: cashier.initial_amount,
               final_amount: cashier.final_amount,
               close_date: null,
+              is_open: true,
             },
           ])
           .select();
@@ -606,7 +608,6 @@ const customActions = {
         dispatch(salesActions.setLoading(true));
 
         let { error } = await supabase.rpc('close_cashier', { id: cashier?.cashier_id });
-
         dispatch(salesActions.setLoading(false));
 
         if (error) {
@@ -625,10 +626,13 @@ const customActions = {
     },
     getActiveCashier:
       () =>
-      async (dispatch: AppDispatch, getState: AppState): Promise<Cashier | null> => {
+      async (dispatch: AppDispatch): Promise<Cashier | null> => {
         const cashiers = await dispatch(salesActions.cashiers.get({ refetch: true }));
 
-        return (cashiers as Cashier[])?.filter(item => !!!item?.final_amount && !!!item.close_date)[0] || null;
+        let activeCashier = (cashiers as Cashier[])?.filter(item => !!item?.is_open)[0] || null;
+        dispatch(salesActions.setCashiers({ activeCashier }));
+
+        return activeCashier;
       },
   },
 };

@@ -36,7 +36,13 @@ export type Sale = {
   total?: number;
   updated_at?: string | Date;
   cashier_id?: number;
+  order_due_date?: string | Date;
 };
+
+export type SaleMetadata = {
+  customers?: Customer;
+  status?: { status_id: number; name: string };
+} & Sale;
 
 // sales_detail table in DB
 export type SaleItem = {
@@ -74,6 +80,7 @@ export type CashRegister = {
   discountMoney?: number;
   status?: number;
   customer_id?: number | string;
+  mode?: 'sale' | 'order';
 };
 
 // redux cash register item
@@ -122,6 +129,7 @@ export type Cashier = {
   received_amount?: number;
   created_at?: string | Date;
   close_date?: string;
+  is_open?: boolean;
 };
 
 export type Cashiers = {

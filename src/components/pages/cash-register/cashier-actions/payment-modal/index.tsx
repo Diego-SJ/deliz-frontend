@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { PaymentMethod, Sale } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import { Button, Col, InputNumber, Modal, Row, Select, Typography, message } from 'antd';
+import { Button, Col, DatePicker, InputNumber, Modal, Row, Select, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
 type PaymentModalProps = {
@@ -23,6 +23,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [receivedMoney, setReceivedMoney] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [loading, setLoading] = useState(false);
   const { isTablet } = useMediaQuery();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -48,6 +49,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
   };
 
   const getSaleStatus = () => {
+    if (cash_register.mode === 'order') return STATUS_DATA.ORDER.id;
     let _cashback = total - receivedMoney;
     if (_cashback > 0) return STATUS_DATA.PENDING.id;
     return STATUS_DATA.COMPLETED.id;
@@ -60,13 +62,16 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
       return message.info('Selecciona un cliente para poder finalizar la venta');
     }
 
-    const newSale: Sale = {
+    let newSale: Sale = {
       payment_method: paymentMethod,
       status_id: getSaleStatus(),
       amount_paid: receivedMoney || 0,
       cashback: total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney),
       total: total,
     };
+
+    if (deliveryDate) newSale.order_due_date = deliveryDate;
+
     const sale = await dispatch(salesActions.createSale(newSale));
 
     if (sale?.sale_id) {
@@ -84,7 +89,6 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
     <Modal
       open={open}
       onCancel={handleClose}
-      maskClosable={false}
       destroyOnClose
       width={380}
       footer={[
@@ -114,25 +118,42 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
         onChange={value => setPaymentMethod(value)}
       />
 
-      <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Cantidad recibida</Paragraph>
-      <InputNumber
-        ref={inputRef}
-        min={0}
-        placeholder="0"
-        size="large"
-        addonBefore="$"
-        value={receivedMoney}
-        style={{ width: '100%', marginBottom: 10 }}
-        readOnly={isTablet}
-        onFocus={target => {
-          target.currentTarget.select();
-        }}
-        onChange={value => setReceivedMoney(value || 0)}
-      />
-      <Title level={4} type={total - receivedMoney > 0 ? 'danger' : 'success'} style={{ margin: '0', textAlign: 'center' }}>
-        {`${total - receivedMoney > 0 ? 'Por pagar' : 'Cambio'}: ${functions.money(Math.abs(total - receivedMoney))}`}
-      </Title>
-      {isTablet && <NumberKeyboard value={receivedMoney} withDot onChange={value => setReceivedMoney(value || 0)} />}
+      {cash_register?.mode !== 'order' ? (
+        <>
+          <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Cantidad recibida</Paragraph>
+          <InputNumber
+            ref={inputRef}
+            min={0}
+            placeholder="0"
+            size="large"
+            addonBefore="$"
+            value={receivedMoney}
+            style={{ width: '100%', marginBottom: 10 }}
+            readOnly={isTablet}
+            onFocus={target => {
+              target.currentTarget.select();
+            }}
+            onChange={value => setReceivedMoney(value || 0)}
+          />
+
+          <Title level={4} type={total - receivedMoney > 0 ? 'danger' : 'success'} style={{ margin: '0', textAlign: 'center' }}>
+            {`${total - receivedMoney > 0 ? 'Por pagar' : 'Cambio'}: ${functions.money(Math.abs(total - receivedMoney))}`}
+          </Title>
+          {isTablet && <NumberKeyboard value={receivedMoney} withDot onChange={value => setReceivedMoney(value || 0)} />}
+        </>
+      ) : (
+        <>
+          <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Fecha de entrega</Paragraph>
+          <DatePicker
+            style={{ width: '100%', marginBottom: 10 }}
+            size="large"
+            showTime
+            format="YYYY-MM-DD HH:mm"
+            value={deliveryDate}
+            onChange={date => setDeliveryDate(date)}
+          />
+        </>
+      )}
     </Modal>
   );
 };

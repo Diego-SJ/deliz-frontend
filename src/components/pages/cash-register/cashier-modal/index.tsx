@@ -151,7 +151,6 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
     <Modal
       open={open}
       onOk={handleOk}
-      maskClosable={false}
       width={350}
       destroyOnClose
       onCancel={handleOnClose}
@@ -220,9 +219,13 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
           style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
           value={subtotal}
+          onPressEnter={handleOk}
           readOnly={isTablet}
           addonAfter={specialPrice > 0 ? 'especial' : ''}
-          onFocus={() => setCurrentInput('price')}
+          onFocus={({ target }) => {
+            target.select();
+            setCurrentInput('price');
+          }}
           addonBefore={<DollarOutlined rev={{}} />}
           onChange={value => setSpecialPrice(value as number)}
         />
@@ -239,7 +242,10 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           onPressEnter={handleOk}
           readOnly={isTablet}
           addonBefore={<ShoppingCartOutlined rev={{}} />}
-          onFocus={() => setCurrentInput('quantity')}
+          onFocus={({ target }) => {
+            target.select();
+            setCurrentInput('quantity');
+          }}
           onChange={value => onQuantityChange(value as number)}
         />
         <Space height="10px" />

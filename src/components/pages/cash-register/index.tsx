@@ -18,6 +18,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { salesActions } from '@/redux/reducers/sales';
 import { productHelpers } from '@/utils/products';
+import { useParams } from 'react-router-dom';
 
 const { Content } = Layout;
 
@@ -30,6 +31,7 @@ const contentStyle: React.CSSProperties = {
 const CashRegister = () => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+  const params = useParams();
   const { products } = useAppSelector(({ products }) => products);
   const { customers } = useAppSelector(({ customers }) => customers);
   const [currentProduct, setCurrentProduct] = useState<Product>();
@@ -55,6 +57,20 @@ const CashRegister = () => {
     let _products = productHelpers.searchProducts(searchText, products, currentCategory);
     setCurrentProducts(_products);
   }, [products, searchText]);
+
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const mode = query.get('mode');
+    if (mode === 'order') {
+      dispatch(salesActions.updateCashRegister({ mode: 'order' }));
+    } else {
+      dispatch(salesActions.updateCashRegister({ mode: 'sale' }));
+    }
+
+    return () => {
+      dispatch(salesActions.updateCashRegister({ mode: undefined }));
+    };
+  }, [params]);
 
   const closeModal = () => {
     setOpen(false);
@@ -107,6 +123,7 @@ const CashRegister = () => {
                   size="large"
                   style={{ marginTop: 10, marginBottom: 0 }}
                   placeholder="Buscar producto"
+                  onFocus={() => searchInput.current?.select()}
                   onChange={({ target }) => setSearchText(target.value)}
                 />
 

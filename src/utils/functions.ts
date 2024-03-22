@@ -102,6 +102,10 @@ const functions = {
     code += product?.category_id;
     return code?.toUpperCase();
   },
+  datesAreEquals: (date1?: string | Date, date2?: string | Date | any) => {
+    if (!date1 || !date2) return false;
+    return format(new Date(date1), 'PP') === format(new Date(date2), 'PP');
+  },
 };
 
 export default functions;

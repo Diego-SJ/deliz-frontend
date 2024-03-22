@@ -18,13 +18,14 @@ const OpenCashier = ({ onSuccess }: Props) => {
   const { cashiers, loading, sales } = useAppSelector(({ sales }) => sales);
   const [totalSaleAmount, setTotalSaleAmount] = useState(0);
   const { isTablet } = useMediaQuery();
+  const firtRender = useRef(false);
 
   useEffect(() => {
-    if (cashiers?.data?.length) {
-      let activeCashier = cashiers?.data?.filter(i => !!!i?.final_amount)[0];
-      dispatch(salesActions.setCashiers({ activeCashier }));
+    if (!firtRender.current) {
+      firtRender.current = true;
+      dispatch(salesActions.cashiers.get({ refetch: true }));
     }
-  }, [cashiers?.data, dispatch]);
+  }, [firtRender.current, dispatch]);
 
   useEffect(() => {
     if (!!cashiers?.activeCashier?.cashier_id) {
@@ -144,7 +145,7 @@ const OpenCashier = ({ onSuccess }: Props) => {
       >
         <Form form={form} layout="vertical" onFinish={onFinish} initialValues={{ ...cashiers?.selected }}>
           <Form.Item name="initial_amount" label="Saldo inicial">
-            <InputNumber size="large" placeholder="$0.00" style={{ width: '100%' }} readOnly={cashiers?.drawer === 'edit'} />
+            <InputNumber size="large" placeholder="$0.00" style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="name" label="Nombre de la caja">
             <Input size="large" placeholder="Caja 1" />

@@ -1,30 +1,15 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, ReloadOutlined } from '@ant-design/icons';
-import {
-  Breadcrumb,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Row,
-  Select,
-  Tag,
-  Tooltip,
-  message,
-  Typography,
-  Avatar,
-  Calendar,
-} from 'antd';
-import { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef, useState } from 'react';
+import { Breadcrumb, Card, Col, Row, Typography, Calendar, Avatar, List, CalendarProps, Badge, Tag } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
+import { STATUS_DATA } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
-import { SaleDetails } from '@/redux/reducers/sales/types';
-import Table from '@/components/molecules/Table';
+import { SaleDetails, SaleMetadata } from '@/redux/reducers/sales/types';
 import dayjs, { Dayjs } from 'dayjs';
+import { ShoppingCartOutlined } from '@ant-design/icons';
+import { theme } from '@/styles/theme/config';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -32,119 +17,82 @@ export const PAYMENT_METHOD: { [key: string]: string } = {
   TRANSFER: 'Transferencia',
 };
 
-const columns: ColumnsType<SaleDetails> = [
-  { title: '#', dataIndex: 'sale_id', width: 50, align: 'center' },
-  {
-    title: 'Cliente',
-    dataIndex: 'customers',
-    align: 'left',
-    render: value => value?.name,
-  },
-  {
-    title: 'Monto',
-    width: 120,
-    align: 'center',
-    dataIndex: 'total',
-    render: (value = 0, record) => {
-      let _total = (record?.amount_paid || 0) - (record?.cashback || 0);
-      return functions.money(value || _total);
-    },
-  },
-  {
-    title: 'Método de pago',
-    width: 130,
-    align: 'center',
-    dataIndex: 'payment_method',
-    render: (value = 'CASH') => PAYMENT_METHOD[value],
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    width: 130,
-    align: 'center',
-    render: status => {
-      const _status = STATUS_OBJ[status?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
-    },
-  },
-  {
-    title: 'Fecha venta',
-    dataIndex: 'created_at',
-    align: 'center',
-    width: 210,
-    render: (value: Date | string) => functions.dateTime(value),
-  },
-  // {
-  //   title: 'Fecha actualización',
-  //   dataIndex: 'updated_at',
-  //   align: 'center',
-  //   width: 210,
-  //   render: (value: Date | string) => (value ? functions.dateTime(value) : 'N/A'),
-  // },
-];
-
-const { Title } = Typography;
+const dateCellRender = (value: Dayjs, orders: SaleMetadata[]) => {
+  const pendings =
+    orders?.filter(i => i?.status_id === STATUS_DATA.ORDER.id && functions.datesAreEquals(i?.order_due_date, value))?.length || 0;
+  const paymentPending =
+    orders?.filter(i => i?.status_id === STATUS_DATA.PENDING.id && functions.datesAreEquals(i?.created_at, value))?.length || 0;
+  return (
+    <div className="bg-pink-400">
+      {pendings > 0 && (
+        <small>
+          <Badge color="geekblue" /> <strong>{pendings}</strong> {pendings > 1 ? 'pedidos' : 'pedido'}
+        </small>
+      )}
+      {paymentPending > 0 && (
+        <small>
+          <Badge color="gold" /> <strong>{paymentPending}</strong> {paymentPending > 1 ? 'pendientes' : 'pendiente'}
+        </small>
+      )}
+    </div>
+  );
+};
 
 const Orders = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { sales, cashiers } = useAppSelector(({ sales }) => sales);
-  const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
+  const [orders, setOrders] = useState<SaleMetadata[]>([]);
+  const [ordersByDate, setOrdersByDate] = useState<SaleMetadata[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const isFirstRender = useRef(true);
-  const [totalSaleAmount, setTotalSaleAmount] = useState(0);
-  const [todaySales, setTodaySales] = useState(0);
   const activeCashier = cashiers?.activeCashier;
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       dispatch(salesActions.fetchSales());
-
-      if (!activeCashier?.cashier_id) dispatch(salesActions.cashiers.getActiveCashier());
       return;
     }
   }, [dispatch, activeCashier?.cashier_id]);
 
   useEffect(() => {
-    setAuxSales(sales);
+    let _orders: SaleMetadata[] = [];
+
+    sales?.forEach(i => {
+      if ([STATUS_DATA.ORDER.id, STATUS_DATA.PENDING.id].includes(i?.status_id as number)) {
+        _orders.push(i);
+      }
+    });
+    setOrders(_orders);
   }, [sales]);
 
   useEffect(() => {
-    let totalAmounts = auxSales?.reduce((acc, item) => {
-      let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
-      return (item?.total || _total) + acc;
-    }, 0);
+    if (orders?.length) {
+      let _orders: SaleMetadata[] = orders?.filter(i => {
+        return (
+          functions.datesAreEquals(i?.order_due_date, selectedDate) ||
+          (functions.datesAreEquals(i?.created_at, selectedDate) && i?.status_id !== STATUS_DATA.ORDER.id)
+        );
+      });
 
-    setTotalSaleAmount(totalAmounts);
-  }, [auxSales]);
-
-  useEffect(() => {
-    let _todaySales = sales
-      ?.filter(i => {
-        return i?.cashier_id === activeCashier?.cashier_id && i?.status_id === STATUS_DATA.COMPLETED.id;
-      })
-      ?.reduce((acc, item) => {
-        let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
-        return (item?.total || _total) + acc;
-      }, 0);
-
-    setTodaySales(_todaySales);
-  }, [sales, activeCashier]);
+      setOrdersByDate(_orders);
+    }
+  }, [orders, selectedDate]);
 
   const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
-    if (!status && !startDate && !endDate) {
-      setAuxSales(sales);
-    } else {
-      let salesList = sales?.filter(item => {
-        let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
-        let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
-        let matchStatus = !!status ? item?.status_id === status : true;
-        return matchStatus && matchDate1 && matchDate2;
-      });
-      setAuxSales(salesList);
-    }
+    // if (!status && !startDate && !endDate) {
+    //   setAuxSales(sales);
+    // } else {
+    //   let salesList = sales?.filter(item => {
+    //     let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
+    //     let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
+    //     let matchStatus = !!status ? item?.status_id === status : true;
+    //     return matchStatus && matchDate1 && matchDate2;
+    //   });
+    //   setAuxSales(salesList);
+    // }
   };
 
   useEffect(() => {
@@ -152,7 +100,7 @@ const Orders = () => {
   }, [filters]);
 
   const onAddNew = () => {
-    navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
+    navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path + '?mode=order');
   };
 
   const onRowClick = (record: SaleDetails) => {
@@ -160,10 +108,14 @@ const Orders = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
-  const onRefresh = async () => {
-    const result = await dispatch(salesActions.fetchSales({ refetch: true }));
-    if (result) message.info('Información actualizada');
-  };
+  const cellRender: CalendarProps<Dayjs>['cellRender'] = useCallback(
+    (current: any, info: any) => {
+      if (info.type === 'date') return dateCellRender(current, orders);
+      if (info.type === 'month') return null;
+      return info.originNode;
+    },
+    [orders],
+  );
 
   return (
     <>
@@ -181,22 +133,59 @@ const Orders = () => {
         </Col>
       </Row>
       <Row gutter={[10, 10]} style={{ marginTop: '10px' }}>
-        <Col xs={24} lg={12}>
+        <Col xs={24} lg={10}>
+          <Card hoverable onClick={onAddNew} style={{ marginBottom: 10 }}>
+            <Card.Meta
+              avatar={<Avatar icon={<ShoppingCartOutlined rev={{}} />} style={{ background: theme.colors.skyblue }} size={60} />}
+              title="Nuevo pedido"
+              description="Accede al punto de venta para crear un pedido"
+            />
+          </Card>
+          <Typography.Title level={4}>
+            Pedidos del {functions.date1(selectedDate as any)} ({ordersByDate?.length || 0})
+          </Typography.Title>
           <Card>
-            <Button size="large" type="primary" block style={{ marginBottom: 20 }}>
-              Nuevo pedido
-            </Button>
-            <Typography.Title level={4}>Pedidos del {functions.date1(selectedDate as any)}</Typography.Title>
+            <List
+              itemLayout="horizontal"
+              style={{ maxHeight: 430, overflowY: 'auto' }}
+              dataSource={ordersByDate}
+              renderItem={(item, index) => (
+                <List.Item key={item?.sale_id} onClick={() => onRowClick(item as SaleDetails)} style={{ cursor: 'pointer' }}>
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar style={{ background: 'grey' }} src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`} />
+                    }
+                    title={
+                      <span>
+                        {item.customers?.name || '- - -'}{' '}
+                        <Tag color={item?.status_id === 7 ? 'blue-inverse' : 'gold-inverse'}>{item?.status?.name}</Tag>
+                      </span>
+                    }
+                    description={
+                      <div className="flex">
+                        <div>
+                          {item?.order_due_date && (
+                            <p>
+                              <strong>Fecha de entrega:</strong> {functions.date1(item?.order_due_date as string)}
+                            </p>
+                          )}
+                          <p>
+                            <strong>Fecha de creación:</strong> {functions.date1(item?.created_at as string)}
+                          </p>
+                          <p>
+                            <strong>Monto:</strong> {functions.money(item.total)}
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
           </Card>
         </Col>
-        <Col xs={24} lg={12}>
-          <Calendar
-            style={{ width: '100%' }}
-            value={selectedDate}
-            onSelect={setSelectedDate}
-            // onPanelChange={onPanelChange}
-            // onSelect={onSelect}
-          />
+        <Col xs={24} lg={14} style={{ maxHeight: 625, overflowY: 'auto' }}>
+          <Calendar style={{ width: '100%' }} value={selectedDate} onSelect={setSelectedDate} cellRender={cellRender} />
         </Col>
       </Row>
     </>

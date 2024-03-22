@@ -33,6 +33,10 @@ const Dashboard = () => {
     dispatch(customerActions.setCurrentCustomer({} as Customer));
   };
 
+  const newOrder = () => {
+    navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path + '?mode=order');
+  };
+
   return (
     <Row gutter={[10, 10]}>
       <CardButton
@@ -55,6 +59,13 @@ const Dashboard = () => {
         icon={<ShoppingCartOutlined rev={{}} />}
         onClick={newSale}
       />
+      <CardButton
+        title="Nuevo pedido"
+        description="Accede al punto de venta para crear un pedido"
+        color={theme.colors.skyblue}
+        icon={<ShoppingCartOutlined rev={{}} />}
+        onClick={newOrder}
+      />
 
       <Drawer
         title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
@@ -76,7 +87,8 @@ type CardButtonProps = {
   color?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 };
-const CardButton = ({ description, icon, title, onClick, color }: CardButtonProps) => {
+
+export const CardButton = ({ description, icon, title, onClick, color }: CardButtonProps) => {
   const theme = useTheme();
   return (
     <Col lg={8} sm={12} xs={24}>
