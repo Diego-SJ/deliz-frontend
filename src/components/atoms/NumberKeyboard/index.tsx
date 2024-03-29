@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Row } from 'antd';
 import { CardBtn } from './styles';
 import { DoubleLeftOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const buttonProps: ButtonProps = {
   type: 'text',
@@ -19,12 +19,20 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
   const [currentNumber, setCurrentNumber] = useState<string[]>([]);
 
   useEffect(() => {
+    console.log(value);
     setCurrentNumber(`${value || 0}`.split(''));
   }, [value]);
 
-  const handleChange = (value: string[]) => {
-    if (typeof onChange === 'function') onChange(Number(value.join()?.replaceAll(',', '') || 0));
-  };
+  const handleChange = useCallback(
+    (value: string[]) => {
+      if (typeof onChange === 'function') {
+        console.log(value, 'value');
+        console.log('first', Number(value.join()?.replaceAll(',', '') || 0));
+        onChange(Number(value.join()?.replaceAll(',', '') || 0));
+      }
+    },
+    [onChange],
+  );
 
   const onClick = (number: string) => {
     let currentArray = currentNumber;

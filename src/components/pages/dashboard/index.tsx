@@ -15,6 +15,8 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { current_customer } = useAppSelector(({ customers }) => customers);
+  const { user_auth } = useAppSelector(({ users }) => users);
+  const isSales = user_auth?.user?.email === 'sales@deliz.com';
 
   const addProduct = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
@@ -39,26 +41,32 @@ const Dashboard = () => {
 
   return (
     <Row gutter={[10, 10]}>
-      <CardButton
-        title="Nuevo producto"
-        description="Agregar un producto al catalogo"
-        icon={<AppstoreAddOutlined rev={{}} />}
-        color={theme.colors.green}
-        onClick={addProduct}
-      />
+      {!isSales && (
+        <>
+          <CardButton
+            title="Nuevo producto"
+            description="Agregar un producto al catalogo"
+            icon={<AppstoreAddOutlined rev={{}} />}
+            color={theme.colors.green}
+            onClick={addProduct}
+          />
+          <CardButton
+            title="Punto de venta"
+            description="Accede al punto de venta"
+            color={theme.colors.danger}
+            icon={<ShoppingCartOutlined rev={{}} />}
+            onClick={newSale}
+          />
+        </>
+      )}
+
       <CardButton
         title="Nuevo cliente"
         description="Crea un nuevo cliente"
         icon={<UserAddOutlined rev={{}} />}
         onClick={addCustomer}
       />
-      <CardButton
-        title="Punto de venta"
-        description="Accede al punto de venta"
-        color={theme.colors.danger}
-        icon={<ShoppingCartOutlined rev={{}} />}
-        onClick={newSale}
-      />
+
       <CardButton
         title="Nuevo pedido"
         description="Accede al punto de venta para crear un pedido"

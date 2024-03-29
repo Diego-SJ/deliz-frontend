@@ -4,9 +4,12 @@ import styled from 'styled-components';
 export const ProductsContainer = styled(Card)`
   &.ant-card {
     height: 100%;
-    background: #e9e9e95c;
+    background: #e2e2e2;
     padding: 0;
     border-color: transparent;
+    border-radius: 0;
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
 
     .ant-card-body {
       padding: 10px;
@@ -16,7 +19,6 @@ export const ProductsContainer = styled(Card)`
 
 export const ProductsCheckout = styled(Card)`
   &.ant-card {
-    height: 100%;
     background: ${({ theme }) => theme.colors.background.primary};
     padding: 0 10px;
     border-color: transparent;

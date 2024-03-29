@@ -201,7 +201,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           </Col>
         </Row>
         <Space height="10px" />
-
+        {subtotal}
         <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
           <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
             Menudeo

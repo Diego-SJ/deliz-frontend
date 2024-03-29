@@ -6,11 +6,14 @@ import { APP_ROUTES } from '@/routes/routes';
 import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
+import { useAppSelector } from '@/hooks/useStore';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
   const { isMobile } = useMediaQuery();
   const [open, setOpen] = useState(false);
+  const { user_auth } = useAppSelector(({ users }) => users);
+  const isSales = user_auth?.user?.email === 'sales@deliz.com';
 
   const onNavigate = (path: string) => {
     navigate(path);
@@ -32,15 +35,18 @@ const CashierHeader = () => {
       </Space>
       <HeaderActions>
         <Space>
-          <Tooltip title="Ventas">
-            <Button
-              icon={<ShoppingCartOutlined rev={{}} />}
-              type="dashed"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
-            >
-              {isMobile ? '' : 'Ventas'}
-            </Button>
-          </Tooltip>
+          {!isSales && (
+            <Tooltip title="Ventas">
+              <Button
+                icon={<ShoppingCartOutlined rev={{}} />}
+                type="dashed"
+                onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
+              >
+                {isMobile ? '' : 'Ventas'}
+              </Button>
+            </Tooltip>
+          )}
+
           <Tooltip title="Clientes">
             <Button
               icon={<TeamOutlined rev={{}} />}
@@ -50,15 +56,17 @@ const CashierHeader = () => {
               {isMobile ? '' : 'Clientes'}
             </Button>
           </Tooltip>
-          <Tooltip title="Productos">
-            <Button
-              icon={<AppstoreOutlined rev={{}} />}
-              type="dashed"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
-            >
-              {isMobile ? '' : 'Productos'}
-            </Button>
-          </Tooltip>
+          {!isSales && (
+            <Tooltip title="Productos">
+              <Button
+                icon={<AppstoreOutlined rev={{}} />}
+                type="dashed"
+                onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
+              >
+                {isMobile ? '' : 'Productos'}
+              </Button>
+            </Tooltip>
+          )}
           {/* <Tooltip title="Venta aleatoria">
             <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
           </Tooltip> */}

@@ -15,7 +15,7 @@ import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
 import DelizLogo from '@/assets/img/png/logo_deliz.webp';
 import { Modal } from 'antd';
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 
 type SideMenuProps = {
@@ -104,19 +104,60 @@ const ITEM_LIST = [
   },
 ];
 
+const SALES_ACTIONS = [
+  {
+    key: 'dashboard',
+    icon: HomeOutlined,
+    label: 'Dashboard',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
+  },
+  // {
+  //   key: 'point_of_sale',
+  //   icon: BarcodeOutlined,
+  //   label: 'Punto de venta',
+  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
+  // },
+  // {
+  //   key: 'products',
+  //   icon: ShoppingOutlined,
+  //   label: 'Productos',
+  //   path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+  // },
+  {
+    key: 'customers',
+    icon: TeamOutlined,
+    label: 'Clientes',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
+  },
+  {
+    key: 'sales',
+    icon: DollarOutlined,
+    label: 'Pedidos',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
+  },
+];
+
 const SideMenu = (props: SideMenuProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [currentKey, setCurrentKey] = useState(0);
+  const { user_auth } = useAppSelector(({ users }) => users);
   const [modal, contextHolder] = Modal.useModal();
+  const [currentItems, setCurrentItems] = useState<any[]>([]);
+  const isSales = user_auth?.user?.email === 'sales@deliz.com';
 
   useEffect(() => {
-    const key = ITEM_LIST.findIndex(item => {
+    const key = currentItems.findIndex(item => {
       return location.pathname.includes(item?.path || '');
     });
     setCurrentKey(key || 0);
-  }, [location.pathname]);
+  }, [location.pathname, currentItems]);
+
+  useEffect(() => {
+    if (isSales) setCurrentItems(SALES_ACTIONS);
+    else setCurrentItems(ITEM_LIST);
+  }, [isSales]);
 
   const handleLogout = () => {
     modal.confirm({
@@ -142,13 +183,13 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         selectedKeys={[`${currentKey}`]}
         mode="inline"
-        items={ITEM_LIST.map((item, key) => ({
+        items={currentItems.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),
           label: item.label,
           onClick: () => handlePathChange(item?.path),
           children: item?.children?.length
-            ? item.children.map(subItem => ({
+            ? item.children.map((subItem: any) => ({
                 ...subItem,
                 onClick: () => navigate(subItem.path),
               }))

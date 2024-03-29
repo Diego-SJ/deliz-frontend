@@ -29,4 +29,6 @@ export const LayoutContent = styled(Layout)`
   display: flex;
   flex-direction: column;
   padding: 20px;
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
 `;

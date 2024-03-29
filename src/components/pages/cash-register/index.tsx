@@ -176,6 +176,7 @@ const CashRegister = () => {
                 />
               </ProductsContainer>
             </Col>
+
             {!isPhablet && (
               <Col lg={10} sm={0}>
                 <ProductsCheckout>
