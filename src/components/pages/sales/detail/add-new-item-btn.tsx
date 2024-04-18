@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, InputNumber, Modal, Radio, Row, Select, Typography, message } from 'antd';
+import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Select, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Space from '@/components/atoms/Space';
 import FallbackImage from '@/assets/img/png/logo_deliz.webp';
@@ -6,13 +6,14 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
 import { CATEGORIES } from '@/constants/mocks';
-import { CashRegisterItem } from '@/redux/reducers/sales/types';
+import { CashRegisterItem, SaleItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { DollarOutlined, PlusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { ModalBody } from '../../cash-register/styles';
 import { ProductInfo } from './styles';
+import { ta } from 'date-fns/locale';
 
 type CashierModalProps = {
   currentProduct?: Product;
@@ -38,6 +39,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   const [currentProduct, setCurrentProduct] = useState<Product>({} as Product);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [productName, setProductName] = useState('');
   const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
   const quantityInput = useRef<HTMLInputElement>(null);
   const { isTablet } = useMediaQuery();
@@ -96,6 +98,8 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
     setSpecialPrice(0);
     setSubtotal(0);
     setChecked(true);
+    setProductName('');
+    setCurrentProduct({} as Product);
   };
 
   const handleOnClose = () => {
@@ -109,15 +113,17 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
       return;
     }
     setLoading(true);
-    await dispatch(
-      salesActions.addItemToSale({
-        sale_id: current_sale?.metadata?.sale_id,
-        product_id: currentProduct?.product_id,
-        quantity: quantity as number,
-        wholesale: checked,
-        price: subtotal,
-      }),
-    );
+    let newProduct: SaleItem = {
+      sale_id: current_sale?.metadata?.sale_id,
+      product_id: currentProduct?.product_id,
+      quantity: quantity as number,
+      wholesale: checked,
+      price: subtotal,
+    };
+    if (currentProduct?.product_id === 0) {
+      newProduct = { ...newProduct, metadata: { name: productName } };
+    }
+    await dispatch(salesActions.addItemToSale(newProduct));
     setLoading(false);
     handleOnClose();
   };
@@ -171,19 +177,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
         ]}
       >
         <ModalBody style={{ paddingTop: 20 }}>
-          <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Producto</Paragraph>
-          <Select
-            style={{ width: '100%' }}
-            size="large"
-            showSearch
-            virtual={false}
-            placeholder="Selecciona un producto"
-            optionFilterProp="children"
-            value={`${currentProduct?.product_id || ''}`}
-            filterOption={filterOption}
-            options={products?.map(i => ({ value: `${i?.product_id}`, label: i?.name }))}
-            onChange={onProductChange}
-          />
           <ProductInfo>
             <Avatar
               src={currentProduct?.image_url || FallbackImage}
@@ -192,15 +185,17 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               shape="circle"
             />
             <div>
-              <Paragraph style={{ marginBottom: 0 }}>
-                {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name || '- - -'}
-                {!isExtra && (
-                  <>
-                    <br />
-                    <b>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed})</b> disponibles
-                  </>
-                )}
-              </Paragraph>
+              {currentProduct?.product_id !== 0 ? (
+                <Paragraph style={{ marginBottom: 0 }}>
+                  {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name || '- - -'}
+                  {!isExtra && (
+                    <>
+                      <br />
+                      <b>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed})</b> disponibles
+                    </>
+                  )}
+                </Paragraph>
+              ) : null}
               <Title level={5} style={{ margin: 0 }}>
                 {functions.money(subtotal)} * {quantity || 0} ={' '}
                 <Text type="success" style={{ fontSize: 'inherit' }}>
@@ -209,9 +204,35 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               </Title>
             </div>
           </ProductInfo>
+          <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Producto</Paragraph>
+          <Select
+            style={{ width: '100%' }}
+            size="large"
+            showSearch
+            virtual={false}
+            placeholder="Selecciona un producto"
+            optionFilterProp="children"
+            value={`${currentProduct?.product_id ?? ''}`}
+            filterOption={filterOption}
+            options={products?.map(i => ({ value: `${i?.product_id}`, label: i?.name }))}
+            onChange={onProductChange}
+          />
+          {currentProduct?.product_id === 0 && (
+            <>
+              <Space height="10px" />
+              <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Nombre del producto</Paragraph>
+              <Input
+                placeholder="Nombre del artículo"
+                size="large"
+                value={productName}
+                onFocus={({ target }) => target.select()}
+                onChange={({ target }) => setProductName(target.value)}
+              />
+            </>
+          )}
           <Space height="10px" />
 
-          <Radio.Group style={{ width: '100%' }} value={checked} onChange={e => onCheckChange(e.target.value)}>
+          <Radio.Group size="large" style={{ width: '100%' }} value={checked} onChange={e => onCheckChange(e.target.value)}>
             <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
               Menudeo
             </Radio.Button>
@@ -230,7 +251,10 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             value={subtotal}
             readOnly={isTablet}
             addonAfter={specialPrice > 0 ? 'especial' : ''}
-            onFocus={() => setCurrentInput('price')}
+            onFocus={({ target }) => {
+              target.select();
+              setCurrentInput('price');
+            }}
             addonBefore={<DollarOutlined rev={{}} />}
             onChange={value => setSpecialPrice(value as number)}
           />
@@ -247,7 +271,10 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             onPressEnter={handleOk}
             readOnly={isTablet}
             addonBefore={<ShoppingCartOutlined rev={{}} />}
-            onFocus={() => setCurrentInput('quantity')}
+            onFocus={({ target }) => {
+              target.select();
+              setCurrentInput('quantity');
+            }}
             onChange={value => onQuantityChange(value as number)}
           />
           <Space height="10px" />

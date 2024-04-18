@@ -100,6 +100,7 @@ const customActions = {
         quantity: item.quantity,
         price: item.price,
         wholesale: item.wholesale,
+        metadata: item?.metadata || null,
       },
     ]);
 

@@ -23,6 +23,7 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
   const handleOk = async () => {
     setConfirmLoading(true);
     await dispatch(deleteFunction as any);
+    setModalStatus(null);
     setConfirmLoading(false);
   };
 

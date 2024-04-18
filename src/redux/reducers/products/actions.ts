@@ -21,7 +21,7 @@ const customActions = {
         const result = await supabase
           .from('products')
           .select(`*, categories(category_id,name), units(*), sizes(*)`)
-          .not('product_id', 'in', '(0,3)')
+          // .not('product_id', 'in', '(0,3)')
           .order('name', { ascending: true });
         products =
           result?.data?.map(item => {

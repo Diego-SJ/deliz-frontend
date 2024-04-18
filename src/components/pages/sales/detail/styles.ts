@@ -70,5 +70,5 @@ export const ProductInfo = styled.div`
   align-items: center;
   gap: 20px;
   width: 100%;
-  margin: 10px 0;
+  margin: 0 0 10px;
 `;
