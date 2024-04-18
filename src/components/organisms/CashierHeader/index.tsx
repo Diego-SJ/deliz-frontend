@@ -6,13 +6,16 @@ import { APP_ROUTES } from '@/routes/routes';
 import FallbackImage from '@/assets/img/png/logo_deliz.webp';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
-import { useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { salesActions } from '@/redux/reducers/sales';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { isMobile } = useMediaQuery();
   const [open, setOpen] = useState(false);
   const { user_auth } = useAppSelector(({ users }) => users);
+  const { cash_register } = useAppSelector(({ sales }) => sales);
   const isSales = user_auth?.user?.email === 'sales@deliz.com';
 
   const onNavigate = (path: string) => {
@@ -23,16 +26,34 @@ const CashierHeader = () => {
     setOpen(prev => !prev);
   };
 
+  const handleSelect = (zone: number) => {
+    dispatch(salesActions.updateCashRegister({ zone }));
+  };
+
   return (
     <HeaderRoot>
-      <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
-        <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
-        {!isMobile && (
-          <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
-            Punto de venta
-          </Typography.Title>
-        )}
-      </Space>
+      <div>
+        <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
+          <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
+          {!isMobile && (
+            <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
+              Punto de venta
+            </Typography.Title>
+          )}
+        </Space>
+
+        <Select
+          placeholder="Selecciona una zona"
+          // size="large"
+          style={{ width: 200, marginLeft: '3rem' }}
+          value={cash_register?.zone}
+          onChange={handleSelect}
+          options={[
+            { label: 'Zona 1', value: 1 },
+            { label: 'Zona 2', value: 2 },
+          ]}
+        />
+      </div>
       <HeaderActions>
         <Space>
           {!isSales && (

@@ -176,8 +176,6 @@ const customActions = {
 
       const result = await supabase.from('sales').update(newItem).eq('sale_id', item?.sale_id).select();
 
-      console.log(result);
-
       if (result.error) {
         message.error('No se pudo actualizar la información.', 4);
         return false;
@@ -196,7 +194,6 @@ const customActions = {
       return true;
     } catch (error) {
       dispatch(productActions.setLoading(false));
-      console.log(error);
       return false;
     }
   },
@@ -353,7 +350,6 @@ const customActions = {
       dispatch(salesActions.updateCashRegister({ discount, discountType, discountMoney }));
     },
     setCustomerId: (customer_id: number) => async (dispatch: AppDispatch) => {
-      console.log(customer_id);
       dispatch(salesActions.updateCashRegister({ customer_id }));
     },
   },

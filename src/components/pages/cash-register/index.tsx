@@ -93,7 +93,7 @@ const CashRegister = () => {
   };
 
   return (
-    <Layout style={{ height: '100vh' }}>
+    <Layout style={{ height: '100vh', minWidth: '100dvw', maxWidth: '100dvw' }}>
       <CashierHeader />
       <Layout>
         <Content style={contentStyle}>
@@ -209,29 +209,6 @@ const CashRegister = () => {
   );
 };
 
-type ItemButtonProps = {
-  title?: string;
-  imageSrc?: string;
-  onClick?: () => void;
-};
-
-const ItemButton = (props: ItemButtonProps) => {
-  return (
-    <Col lg={4} md={4} sm={6} xs={8}>
-      <Tooltip title={props?.title ?? 'Producto sin nombre'}>
-        <CardBtn
-          onClick={props?.onClick}
-          hoverable
-          className={!!!props?.imageSrc ? 'no-image' : ''}
-          styles={{ body: { backgroundImage: `url('${props?.imageSrc || FallbackImage}')` } }}
-        >
-          <Typography.Text>{props?.title ?? 'Producto sin nombre'}</Typography.Text>
-        </CardBtn>
-      </Tooltip>
-    </Col>
-  );
-};
-
 type ItemProductsProps = {
   title?: string;
   imageSrc?: string;
@@ -248,10 +225,12 @@ const ItemProduct = (props: ItemProductsProps) => {
       <Tooltip title={props?.title ?? 'Producto sin nombre'}>
         <CardProduct onClick={props?.onClick}>
           <img className="card-product-image" src={props?.imageSrc || FallbackImage} alt={props.title} />
-          <Typography.Text style={{ fontWeight: 600, margin: '8px 0' }}>{props?.title ?? 'Producto sin nombre'}</Typography.Text>
+          <Typography.Text className="card-product-name" style={{ fontWeight: 600, margin: '8px 0' }}>
+            {props?.title ?? 'Producto sin nombre'}
+          </Typography.Text>
           <div className="card-product-tags">
-            <Tag color={functions.getTagColor(category)}>{category}</Tag>
             <Tag color={functions.getTagColor(size)}>{size}</Tag>
+            <Tag color={functions.getTagColor(category)}>{category}</Tag>
           </div>
         </CardProduct>
       </Tooltip>

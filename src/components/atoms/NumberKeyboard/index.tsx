@@ -19,15 +19,12 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
   const [currentNumber, setCurrentNumber] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log(value);
     setCurrentNumber(`${value || 0}`.split(''));
   }, [value]);
 
   const handleChange = useCallback(
     (value: string[]) => {
       if (typeof onChange === 'function') {
-        console.log(value, 'value');
-        console.log('first', Number(value.join()?.replaceAll(',', '') || 0));
         onChange(Number(value.join()?.replaceAll(',', '') || 0));
       }
     },

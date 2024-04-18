@@ -81,6 +81,7 @@ export type CashRegister = {
   status?: number;
   customer_id?: number | string;
   mode?: 'sale' | 'order';
+  zone?: number;
 };
 
 // redux cash register item

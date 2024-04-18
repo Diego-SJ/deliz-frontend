@@ -101,8 +101,6 @@ const Sales = () => {
       return (item?.total || _total) + acc;
     }, 0);
 
-    console.log(auxSales);
-
     setTotalSaleAmount(totalAmounts);
   }, [auxSales]);
 

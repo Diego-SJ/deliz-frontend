@@ -12,6 +12,7 @@ import functions from '@/utils/functions';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { DollarOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { ZONES } from '@/constants/zones';
 
 type CashierModalProps = {
   open?: boolean;
@@ -27,14 +28,14 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [quantity, setQuantity] = useState<number | string>(casherItem?.quantity || '');
-  const [checked, setChecked] = useState(true);
+  const [checked, setChecked] = useState<boolean | 1>(true);
   const [subtotal, setSubtotal] = useState(0);
   const [quantityUsed, setQuantityUsed] = useState<number>(0);
   const [specialPrice, setSpecialPrice] = useState(0);
   const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
   const quantityInput = useRef<HTMLInputElement>(null);
   const { isTablet } = useMediaQuery();
-  const { items = [] } = cash_register;
+  const { items = [], zone = 1 } = cash_register;
   const stock = currentProduct?.stock || 0;
   const isExtra = casherItem?.product?.product_id === 0;
 
@@ -55,11 +56,14 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
 
   useEffect(() => {
     if (!!currentProduct) {
-      let currentPrice = checked ? currentProduct?.wholesale_price || 0 : currentProduct?.retail_price || 0;
+      let _zone: number = zone ?? 1;
+      let wholesalePrice =
+        (currentProduct?.wholesale_price || 0) + ZONES[_zone][currentProduct?.category_id][currentProduct?.size_id || 2];
+      let currentPrice = !!checked ? wholesalePrice : currentProduct?.retail_price || 0;
       let _subtotal = specialPrice > 0 ? specialPrice : currentPrice;
       setSubtotal(_subtotal);
     }
-  }, [checked, currentProduct, specialPrice]);
+  }, [checked, currentProduct, specialPrice, zone]);
 
   useEffect(() => {
     let productIsAlreadyInList = items?.filter(p => p?.product?.product_id === currentProduct?.product_id);
@@ -98,12 +102,16 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
 
   const getProductWithSpecialPrice = (product: Product): Product => {
     let _product = { ...product };
-
     if (specialPrice > 0) {
       _product = {
         ..._product,
         wholesale_price: specialPrice,
         retail_price: specialPrice,
+      };
+    } else {
+      _product = {
+        ..._product,
+        wholesale_price: subtotal,
       };
     }
 
@@ -117,7 +125,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           customer_id: 1,
           product: getProductWithSpecialPrice(currentProduct as Product),
           quantity: quantity as number,
-          wholesale_price: checked,
+          wholesale_price: !!checked,
         }),
       );
     } else {
@@ -126,7 +134,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           ...(casherItem as CashRegisterItem),
           product: getProductWithSpecialPrice(casherItem?.product as Product),
           quantity: quantity as number,
-          wholesale_price: checked,
+          wholesale_price: !!checked,
         }),
       );
     }
@@ -201,12 +209,11 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           </Col>
         </Row>
         <Space height="10px" />
-        {subtotal}
         <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
-          <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
+          <Radio.Button value={false} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
             Menudeo
           </Radio.Button>
-          <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
+          <Radio.Button value={true} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
             Mayoreo
           </Radio.Button>
         </Radio.Group>

@@ -10,6 +10,7 @@ export const ProductsContainer = styled(Card)`
     border-radius: 0;
     max-height: calc(100dvh - 64px);
     overflow-y: auto;
+    width: 100%;
 
     .ant-card-body {
       padding: 10px;
@@ -187,9 +188,9 @@ export const CardProduct = styled.div`
   border-radius: 1rem;
   width: 100%;
   background: #fff;
-  aspect-ratio: 1/1;
   padding: 1rem;
   transition: all 0.22ms linear;
+  overflow-x: hidden;
   cursor: pointer;
 
   &:hover {
@@ -203,5 +204,24 @@ export const CardProduct = styled.div`
 
   .card-product-tags {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+  }
+
+  @media screen and (max-width: ${({ theme }) => theme.breakPoints.md}) {
+    aspect-ratio: unset;
+
+    .card-product-image {
+      height: 4.5rem;
+      width: 4.5rem;
+      aspect-ratio: 1/1;
+    }
+
+    .card-product-name {
+      font-size: 0.8rem;
+      line-height: 1;
+    }
   }
 `;

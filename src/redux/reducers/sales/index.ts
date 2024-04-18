@@ -23,6 +23,7 @@ const initialState: SalesSlice = {
     shipping: 0,
     discountMoney: 0,
     customer_id: '',
+    zone: 1,
   },
   operating_expenses: { data: [], drawer: null, pagination: {} as Pagination, selected: {} as OperatingExpense },
   cashiers: { data: [], drawer: null, pagination: {} as Pagination, selected: {} as Cashier },
