@@ -15,8 +15,8 @@ export const LogoRoot = styled.div`
 `;
 
 export const LogoImg = styled.img`
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
   cursor: pointer;
 `;

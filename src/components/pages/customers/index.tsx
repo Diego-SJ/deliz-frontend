@@ -12,6 +12,7 @@ import { customerActions } from '@/redux/reducers/customers';
 import CustomerEditor from './editor';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import Table from '@/components/molecules/Table';
+import { BORING_AVATARS } from '@/constants/avatars';
 
 type DataType = Customer;
 
@@ -20,7 +21,7 @@ const columns: ColumnsType<DataType> = [
     title: '',
     dataIndex: 'name',
     width: 55,
-    render: () => <Avatar src={PopsicleImg} style={{ backgroundColor: '#eee', padding: '8px' }} size="large" />,
+    render: value => <Avatar src={BORING_AVATARS`${value}`} style={{ backgroundColor: '#eee' }} size="large" />,
   },
   {
     title: 'Nombre',

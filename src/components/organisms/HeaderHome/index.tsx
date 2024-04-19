@@ -4,7 +4,7 @@ import { InstagramOutlined, ShoppingCartOutlined, UserOutlined, WhatsAppOutlined
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useState } from 'react';
-import FallbackImage from '@/assets/img/png/logo_deliz.webp';
+import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 
 type CashierHeaderProps = {
   hideLogo?: boolean;

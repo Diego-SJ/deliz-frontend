@@ -3,7 +3,7 @@ import { HeaderActions, HeaderRoot } from './styles';
 import { AppstoreOutlined, HomeOutlined, ShoppingCartOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
-import FallbackImage from '@/assets/img/png/logo_deliz.webp';
+import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -34,7 +34,7 @@ const CashierHeader = () => {
     <HeaderRoot>
       <div>
         <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
-          <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
+          <Avatar size={40} src={FallbackImage} style={{ marginBottom: 5 }} />
           {!isMobile && (
             <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
               Punto de venta
@@ -45,7 +45,7 @@ const CashierHeader = () => {
         <Select
           placeholder="Selecciona una zona"
           // size="large"
-          style={{ width: 200, marginLeft: '3rem' }}
+          style={{ width: isMobile ? 90 : 200, marginLeft: isMobile ? '0.5rem' : '2rem' }}
           value={cash_register?.zone}
           onChange={handleSelect}
           options={[

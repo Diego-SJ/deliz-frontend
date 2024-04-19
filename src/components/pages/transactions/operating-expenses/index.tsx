@@ -38,7 +38,8 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'M. Pago',
     dataIndex: 'payment_method',
-    width: 100,
+    width: 90,
+    align: 'center',
     render: value => {
       return <Tag color={functions.getTagColor(value)}>{value}</Tag>;
     },
@@ -46,7 +47,8 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'MSI',
     dataIndex: 'months_without_interest',
-    width: 100,
+    width: 90,
+    align: 'center',
     render: value => {
       return <span>{value || 0} MSI</span>;
     },
@@ -54,13 +56,13 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Descripción',
     dataIndex: 'description',
-    width: 340,
+    width: 300,
     render: value => <span>{value || '- - -'}</span>,
   },
   {
     title: 'Fecha creación',
     dataIndex: 'created_at',
-    width: 150,
+    width: 220,
     render: created_at => {
       const date = functions.tableDate(created_at);
       return <span>{date}</span>;

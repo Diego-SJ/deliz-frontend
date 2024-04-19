@@ -37,6 +37,9 @@ const ProductEditor = () => {
     if (!sizes?.data?.length) {
       dispatch(productActions.sizes.get({ refetch: true }));
     }
+    if (!units?.data?.length) {
+      dispatch(productActions.units.get({ refetch: true }));
+    }
   }, [categories, sizes, dispatch]);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Select, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Space from '@/components/atoms/Space';
-import FallbackImage from '@/assets/img/png/logo_deliz.webp';
+import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';

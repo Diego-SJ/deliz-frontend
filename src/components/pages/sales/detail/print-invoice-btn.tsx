@@ -1,7 +1,7 @@
 import { FileProtectOutlined, PrinterOutlined } from '@ant-design/icons';
 import { Button, Col, Drawer, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import FallbackImage from '@/assets/img/png/logo_deliz.webp';
+import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
 import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, ProductCell, ProductName } from './styles';

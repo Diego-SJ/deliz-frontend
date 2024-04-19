@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Col, Drawer, FloatButton, Input, InputRef, Layout, Radio, Row, Tag, Tooltip, Typography } from 'antd';
 import { CATEGORIES } from '@/constants/categories';
 import { CardBtn, CardProduct, CustomTabs, ProductsCheckout, ProductsContainer } from './styles';
-import FallbackImage from '@/assets/img/png/logo_deliz.webp';
+import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 import { Product } from '@/redux/reducers/products/types';
 import Space from '@/components/atoms/Space';
 import CashRegisterItemsList from './items-list';
