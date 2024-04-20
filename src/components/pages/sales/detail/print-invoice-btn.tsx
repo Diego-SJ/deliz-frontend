@@ -1,12 +1,11 @@
 import { FileProtectOutlined, PrinterOutlined } from '@ant-design/icons';
 import { Button, Col, Drawer, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import FallbackImage from '@/assets/img/webp/ice-cream.webp';
+import FallbackImage from '@/assets/img/webp/logo-deliz.webp';
 import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
 import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, ProductCell, ProductName } from './styles';
 import { SaleItem } from '@/redux/reducers/sales/types';
-import { format } from 'date-fns';
 import { toPng } from 'html-to-image';
 
 const paymentMethod: { [key: string]: string } = {
@@ -79,11 +78,11 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
           </Typography.Title>
           <Row style={{ padding: '10px 10px 5px', borderTop: '1px dashed gray' }}>
             <Col
-              span={12}
+              span={16}
               style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', flexDirection: 'column' }}
             >
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: '0 0 10px' }}>
-                Fecha: {functions.currentDate()}
+                Fecha: {functions.tableDate(current_sale?.metadata?.created_at || '')}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 800, margin: 0 }}>Cliente:</Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
@@ -93,7 +92,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
                 {metadata?.customers?.phone || '- - -'}
               </Typography.Paragraph>
             </Col>
-            <Col span={12} style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <Col span={8} style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
               <ImageLogo src={FallbackImage} alt="Paleteria deliz" />
             </Col>
           </Row>
@@ -140,6 +139,9 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
             <Col span={12} style={{ textAlign: 'start' }}>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
                 Productos: {totalItems}
+              </Typography.Paragraph>
+              <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+                Cambio: {functions.money(current_sale?.metadata?.cashback || 0)}
               </Typography.Paragraph>
             </Col>
             <Col span={12} style={{ textAlign: 'end' }}>
