@@ -50,6 +50,7 @@ const CashRegister = () => {
       firstRender.current = true;
       dispatch(productActions.fetchProducts({ refetch: true }));
       dispatch(customerActions.fetchCustomers({ refetch: true }));
+      dispatch(salesActions.cashiers.getActiveCashier());
     }
   }, [products, customers, dispatch]);
 

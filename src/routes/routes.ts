@@ -51,7 +51,7 @@ export const APP_ROUTES = {
         CASHIERS: { path: '/app/transactions/cashiers' },
       },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
-      REPORTS: { path: '/app/reports', title: 'Reportes' },
+      REPORTS: { path: '/app/reports', title: 'Reportes', PRODUCTS: { path: '/app/reports/products' } },
       SETTINGS: { path: '/app/settings', title: 'Configuración' },
     },
   },
