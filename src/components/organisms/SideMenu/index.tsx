@@ -7,6 +7,7 @@ import {
   ExclamationCircleOutlined,
   BarChartOutlined,
   BarcodeOutlined,
+  PieChartOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -99,6 +100,18 @@ const ITEM_LIST = [
         key: 'transactions.operative_expenses',
         label: 'Gastos operativos',
         path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path,
+      },
+    ],
+  },
+  {
+    key: 'reports',
+    icon: PieChartOutlined,
+    label: 'Reportes',
+    children: [
+      {
+        key: 'reports.products',
+        label: 'Productos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path,
       },
     ],
   },

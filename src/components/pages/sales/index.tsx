@@ -84,7 +84,7 @@ const Sales = () => {
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      dispatch(salesActions.fetchSales());
+      dispatch(salesActions.fetchSales({ refetch: true }));
 
       if (!activeCashier?.cashier_id) dispatch(salesActions.cashiers.getActiveCashier());
       return;

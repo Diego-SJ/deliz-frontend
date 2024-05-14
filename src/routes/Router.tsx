@@ -21,6 +21,7 @@ import ProductCategories from '@/components/pages/products/categories';
 import ProductSizes from '@/components/pages/products/sizes';
 import ProductUnits from '@/components/pages/products/units';
 import Orders from '@/components/pages/orders';
+import ProductsReport from '@/components/pages/reports/products';
 
 const AppRouter = () => {
   return (
@@ -63,6 +64,10 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path} element={<TransactionsCashiers />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path} element={<OperatingExpenses />} />
         {/* TRANSACTIONS ROUTES - END */}
+
+        {/* REPORTS ROUTES - START */}
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path} element={<ProductsReport />} />
+        {/* REPORTS ROUTES - END */}
 
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path} element={<Customers />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path} element={<Sales />} />
