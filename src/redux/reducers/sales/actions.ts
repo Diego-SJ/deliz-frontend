@@ -93,16 +93,14 @@ const customActions = {
     }
   },
   addItemToSale: (item: SaleItem) => async (dispatch: AppDispatch) => {
-    const { error } = await supabase.from('sale_detail').insert([
-      {
-        product_id: item.product_id,
-        sale_id: item.sale_id,
-        quantity: item.quantity,
-        price: item.price,
-        wholesale: item.wholesale,
-        metadata: item?.metadata || null,
-      },
-    ]);
+    const { error } = await supabase.rpc('add_sale_item', {
+      p_metadata: item.metadata || {},
+      p_price: item?.price,
+      p_product_id: item.product_id,
+      p_quantity: item.quantity,
+      p_sale_id: item.sale_id,
+      p_wholesale: item.wholesale,
+    });
 
     if (error) {
       message.error('No se pudo agregar el producto a la venta');
@@ -249,7 +247,12 @@ const customActions = {
       delete newItem.products;
       delete newItem.key;
 
-      const result = await supabase.from('sale_detail').update(newItem).eq('sale_detail_id', newItem.sale_detail_id);
+      const result = await supabase.rpc('update_product_in_sale', {
+        p_new_price: newItem?.price,
+        p_new_quantity: newItem?.quantity,
+        p_sale_detail_id: newItem?.sale_detail_id,
+        p_sale_id: newItem?.sale_id,
+      });
 
       if (result.error) {
         message.error('No se pudo actualizar la información.', 4);
@@ -267,7 +270,10 @@ const customActions = {
   deleteItemById: (id: number) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       const sale = getState().sales.current_sale;
-      const result = await supabase.from('sale_detail').delete().eq('sale_detail_id', id);
+      const result = await supabase.rpc('remove_product_from_sale', {
+        p_sale_detail_id: id,
+        p_sale_id: sale?.metadata?.sale_id,
+      });
 
       if (result.error) {
         message.error('No se pudo eliminar el producto de la venta.', 4);

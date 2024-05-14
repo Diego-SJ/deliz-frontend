@@ -187,7 +187,7 @@ const SaleDetail = () => {
         </Col>
       </Row>
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
-        <Col lg={{ span: 8 }} xs={24}>
+        <Col xl={{ span: 8 }} xs={24} md={24}>
           {/* SALE AMOUNTS */}
           <Card>
             <Row gutter={[10, 10]}>
@@ -285,7 +285,7 @@ const SaleDetail = () => {
             </Button>
           </Card>
         </Col>
-        <Col lg={{ span: 16 }} xs={24}>
+        <Col xl={{ span: 16 }} xs={24} md={24}>
           <Card style={{ marginBottom: 10 }}>
             <Row gutter={[20, 20]}>
               <Col xs={24} md={8}>
