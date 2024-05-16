@@ -3,11 +3,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { Breadcrumb, Col, Row, message, Avatar } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { salesActions } from '@/redux/reducers/sales';
 import { Cashier } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
+import OpenCashier from '../open-cashier';
+import { cashiersActions } from '@/redux/reducers/cashiers';
 
 const columns: ColumnsType<Cashier> = [
   {
@@ -58,15 +60,26 @@ const columns: ColumnsType<Cashier> = [
   },
 ];
 
-const CloseSales = () => {
+const CurrentCashier = () => {
   const dispatch = useAppDispatch();
   const { cashiers } = useAppSelector(({ sales }) => sales);
   const [dataTable, setDataTable] = useState<Cashier[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
+  const firstRender = useRef(true);
 
   useEffect(() => {
     setDataTable(cashiers?.data || []);
   }, [cashiers?.data]);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+
+      dispatch(cashiersActions.cash_operations.get({ refetch: true }));
+      dispatch(cashiersActions.cash_operations.getSalesByCashier({ refetch: true }));
+      dispatch(cashiersActions.cash_operations.calculateCashierData());
+    }
+  }, [cashiers?.data, dispatch]);
 
   const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
     if (!status && !startDate && !endDate) {
@@ -104,31 +117,14 @@ const CloseSales = () => {
                 title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Transacciones</Link>,
                 key: 'transactions',
               },
-              { title: 'Cajas' },
+              { title: 'Caja actual' },
             ]}
           />
         </Col>
       </Row>
-      <Row style={{ marginTop: 30 }}>
-        <Col span={24}>
-          <Table
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            columns={columns}
-            dataSource={dataTable}
-            rowKey={item => `${item.key}`}
-            scroll={{ x: 700 }}
-            onRefresh={onRefresh}
-            totalItems={cashiers?.data?.length}
-          />
-        </Col>
-      </Row>
+      <OpenCashier />
     </>
   );
 };
 
-export default CloseSales;
+export default CurrentCashier;

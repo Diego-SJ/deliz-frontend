@@ -6,12 +6,14 @@ import productsReducer from './reducers/products';
 import customersReducer from './reducers/customers';
 import salesReducer from './reducers/sales';
 import usersReducer from './reducers/users';
+import cashiersReducer from './reducers/cashiers';
 
 const rootReducer = combineReducers({
   products: productsReducer,
   customers: customersReducer,
   sales: salesReducer,
   users: usersReducer,
+  cashiers: cashiersReducer,
 });
 
 const persistConfig = { key: 'deliz.app', version: 1, storage };

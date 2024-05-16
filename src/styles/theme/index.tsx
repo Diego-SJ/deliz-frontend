@@ -3,6 +3,7 @@ import { ThemeProvider as AppStyledTheme } from 'styled-components';
 import { ConfigProvider, App } from 'antd';
 import GlobalStyles from '@/styles/global';
 import { theme } from './config';
+import '../index.css';
 
 interface Props {
   children: React.ReactNode;

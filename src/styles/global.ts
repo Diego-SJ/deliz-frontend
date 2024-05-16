@@ -1,11 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
-
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-
   // ---------------------------------------------
   // global styles
   // ---------------------------------------------
@@ -40,6 +35,10 @@ export default createGlobalStyle`
   // ---------------------------------------------
   // override ant styles
   // ---------------------------------------------
+
+  button, [type='button'], [type='reset'], [type='submit'] {
+    background-color: ${({ theme }) => theme.colors.primary};
+  }
 
   .app-custom-popover.nopadding {
     .ant-popover-content {

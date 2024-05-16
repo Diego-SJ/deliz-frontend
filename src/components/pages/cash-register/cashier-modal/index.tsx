@@ -227,7 +227,9 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
           value={subtotal}
           onPressEnter={handleOk}
-          readOnly={isTablet}
+          // readOnly={isTablet}
+          inputMode="decimal"
+          type="number"
           addonAfter={specialPrice > 0 ? 'especial' : ''}
           onFocus={({ target }) => {
             target.select();
@@ -243,11 +245,14 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           min={0}
           placeholder="Cantidad"
           size="large"
+          inputMode="decimal"
+          type="number"
           className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
           style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
           value={quantity}
           onPressEnter={handleOk}
-          readOnly={isTablet}
+          // readOnly={isTablet}
+          autoFocus
           addonBefore={<ShoppingCartOutlined rev={{}} />}
           onFocus={({ target }) => {
             target.select();
@@ -256,13 +261,13 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           onChange={value => onQuantityChange(value as number)}
         />
         <Space height="10px" />
-        {isTablet && (
+        {/* {isTablet && (
           <NumberKeyboard
             withDot={currentInput === 'price'}
             value={currentInput === 'quantity' ? Number(quantity) : subtotal}
             onChange={value => onInputsChange(value)}
           />
-        )}
+        )} */}
       </ModalBody>
     </Modal>
   );

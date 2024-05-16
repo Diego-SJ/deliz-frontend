@@ -89,18 +89,23 @@ const ITEM_LIST = [
   {
     key: 'transactions',
     icon: BarChartOutlined,
-    label: 'Transacciones',
+    label: 'Cajas',
     children: [
+      {
+        key: 'transactions.current_cashier',
+        label: 'Caja actual',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+      },
       {
         key: 'transactions.cashiers',
         label: 'Cajas',
         path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
       },
-      {
-        key: 'transactions.operative_expenses',
-        label: 'Gastos operativos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path,
-      },
+      // {
+      //   key: 'transactions.operative_expenses',
+      //   label: 'Gastos operativos',
+      //   path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path,
+      // },
     ],
   },
   {

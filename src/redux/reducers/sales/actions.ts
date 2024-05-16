@@ -1,5 +1,5 @@
 import { AppDispatch, AppState } from '@/redux/store';
-import sales, { salesActions } from '.';
+import { salesActions } from '.';
 import { supabase } from '@/config/supabase';
 import {
   CashClosing,
@@ -537,8 +537,8 @@ const customActions = {
           .from('cashiers')
           .insert([
             {
-              name: cashier.name,
-              initial_amount: cashier.initial_amount,
+              name: cashier?.name || '',
+              initial_amount: cashier.initial_amount || 0,
               final_amount: cashier.final_amount,
               close_date: null,
               is_open: true,
@@ -605,12 +605,15 @@ const customActions = {
     edit: (cashier: Cashier) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.setCashiers({ selected: cashier, drawer: 'edit' }));
     },
-    closeDay: () => async (dispatch: AppDispatch, getState: AppState) => {
+    closeDay: (receivedAmount: number) => async (dispatch: AppDispatch) => {
       try {
-        const cashier = getState().sales?.cashiers?.activeCashier;
         dispatch(salesActions.setLoading(true));
 
-        let { error } = await supabase.rpc('close_cashier', { id: cashier?.cashier_id });
+        let { error } = await supabase.rpc('close_current_cashier', {
+          p_branch_id: '81a16d60-40a5-4dba-a3c1-bc9372240bae',
+          p_cashier_id: 0,
+          p_received_amount: receivedAmount,
+        });
         dispatch(salesActions.setLoading(false));
 
         if (error) {
@@ -619,7 +622,7 @@ const customActions = {
         }
 
         await dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Caja cerrada', 4);
+        message.success('Caja cerrada con exito', 4);
         return true;
       } catch (error) {
         message.error('No se pudo actualizar el registro.', 4);
