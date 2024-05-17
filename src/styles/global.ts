@@ -36,7 +36,7 @@ export default createGlobalStyle`
   // override ant styles
   // ---------------------------------------------
 
-  button, [type='button'], [type='reset'], [type='submit'] {
+  .ant-btn-primary {
     background-color: ${({ theme }) => theme.colors.primary};
   }
 

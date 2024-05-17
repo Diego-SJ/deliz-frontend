@@ -43,6 +43,10 @@ export const APP_ROUTES = {
         title: 'Cierre de ventas',
         OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
         CASHIERS: { path: '/app/transactions/cashiers' },
+        CASHIER_DETAIL: {
+          path: '/app/transactions/cashiers/:cashier_id',
+          hash: (_: TemplateStringsArray, cashier_id: number) => `/app/transactions/cashiers/${cashier_id}`,
+        },
         CURRENT_CASHIER: { path: '/app/transactions/current-cashier' },
       },
       ORDERS: {

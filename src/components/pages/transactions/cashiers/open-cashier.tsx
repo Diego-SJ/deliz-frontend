@@ -36,26 +36,26 @@ type Props = {
   onSuccess?: (args: boolean) => void;
 };
 
-const OPERATION_TYPE_NAME = {
+export const OPERATION_TYPE_NAME = {
   INCOME: 'Ingreso',
   EXPENSE: 'Retiro',
   SALE: 'Venta',
 };
 
-const PAYMENT_METHOD_NAME = {
+export const PAYMENT_METHOD_NAME = {
   CASH: 'en efectivo',
   CC: 'con tarjeta',
   CARD: 'con tarjeta',
   TRANSFER: 'por transferencia',
 };
 
-const getImageType = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
+export const getImageType = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
   if (type === 'INCOME') return IncomeBlueSvg;
   if (type === 'EXPENSE') return ExpenseSvg;
   return SaleCashSvg;
 };
 
-const getColorName = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
+export const getColorName = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
   if (type === 'SALE') return { border: 'border-green-500', bg: 'bg-green-50' };
   if (type === 'EXPENSE') return { border: 'border-slate-500', bg: 'bg-slate-50' };
   return { border: 'border-cyan-500', bg: 'bg-cyan-50' };

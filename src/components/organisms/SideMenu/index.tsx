@@ -18,6 +18,7 @@ import DelizLogo from '@/assets/img/webp/logo-deliz.webp';
 import { Modal } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type SideMenuProps = {
   onClick?: () => void;
@@ -157,6 +158,7 @@ const SALES_ACTIONS = [
 
 const SideMenu = (props: SideMenuProps) => {
   const location = useLocation();
+  const { isTablet, isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [currentKey, setCurrentKey] = useState(0);
@@ -201,6 +203,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         selectedKeys={[`${currentKey}`]}
         mode="inline"
+        inlineCollapsed={isPhablet}
         items={currentItems.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),
@@ -217,6 +220,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         className="bottom"
         mode="inline"
+        inlineCollapsed={isPhablet}
         items={[
           {
             key: 1,

@@ -10,7 +10,7 @@ import { useState } from 'react';
 const SIDER_WIDTH = 250;
 
 const MainLayout: React.FC<MainLayoutProps> = () => {
-  const { isTablet } = useMediaQuery();
+  const { isTablet, isPhablet } = useMediaQuery();
   const [open, setOpen] = useState(false);
 
   const handleDrawer = () => {
@@ -19,7 +19,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
   return (
     <LayoutRoot hasSider={!isTablet}>
       {!isTablet && (
-        <LayoutSider width={SIDER_WIDTH}>
+        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet}>
           <SideMenu />
         </LayoutSider>
       )}

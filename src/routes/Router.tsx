@@ -23,6 +23,7 @@ import ProductUnits from '@/components/pages/products/units';
 import Orders from '@/components/pages/orders';
 import ProductsReport from '@/components/pages/reports/products';
 import CurrentCashier from '@/components/pages/transactions/cashiers/current-cashier';
+import CashierDetail from '@/components/pages/transactions/cashiers/detail';
 
 const AppRouter = () => {
   return (
@@ -63,6 +64,7 @@ const AppRouter = () => {
 
         {/* TRANSACTIONS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path} element={<TransactionsCashiers />} />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIER_DETAIL.path} element={<CashierDetail />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path} element={<CurrentCashier />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path} element={<OperatingExpenses />} />
         {/* TRANSACTIONS ROUTES - END */}

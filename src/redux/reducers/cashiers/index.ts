@@ -1,6 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import customActions from './actions';
-import { CashOperation, CashOperations, CashiersSlice } from './types';
+import { CashOperation, CashOperations, CashierDetail, CashiersSlice } from './types';
+import { Cashier } from '../sales/types';
+import { set } from 'date-fns';
 
 const initialState: CashiersSlice = {
   cash_operations: {
@@ -12,6 +14,10 @@ const initialState: CashiersSlice = {
     expenses_amount: 0,
     total_amount: 0,
     selected: {} as CashOperation,
+    operations: [],
+  },
+  cashier_detail: {
+    data: {} as Cashier,
     operations: [],
   },
   error: null,
@@ -28,6 +34,9 @@ const cashiers = createSlice({
     },
     setCashOperations(state, action: PayloadAction<CashOperations>) {
       state.cash_operations = { ...state.cash_operations, ...action.payload };
+    },
+    setCashierDetail(state, action: PayloadAction<CashierDetail>) {
+      state.cashier_detail = { ...state.cashier_detail, ...action.payload };
     },
   },
 });

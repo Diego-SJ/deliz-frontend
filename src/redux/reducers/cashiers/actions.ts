@@ -5,7 +5,8 @@ import { FetchFunction } from '../products/actions';
 import { cashiersActions } from '.';
 import { CashOperation, OperationItem } from './types';
 import { salesActions } from '../sales';
-import { Sale, SaleDetails } from '../sales/types';
+import { Cashier, Sale, SaleDetails } from '../sales/types';
+import { cashierHelpers } from '@/utils/cashiers';
 
 const customActions = {
   cash_operations: {
@@ -15,6 +16,7 @@ const customActions = {
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
 
         if (!!cash_operations?.data?.length && !args?.refetch) return true;
+        if (!activeCashier?.cashier_id) return true;
 
         dispatch(cashiersActions.setLoading(true));
         let { data: result, error } = await supabase
@@ -44,6 +46,8 @@ const customActions = {
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
 
         if (!!sales_by_cashier?.length && !args?.refetch) return true;
+
+        if (!activeCashier?.cashier_id) return false;
 
         dispatch(cashiersActions.setLoading(true));
         let { data: result, error } = await supabase
@@ -87,37 +91,6 @@ const customActions = {
           ?.filter(item => item?.operation_type === 'EXPENSE')
           ?.reduce((acc, item) => acc + item?.amount, 0);
         let total_amount = (activeCashier?.initial_amount || 0) + sales_amount + incomes_amount - expenses_amount;
-        let operations: OperationItem[] = data?.map(
-          item =>
-            ({
-              key: item.cash_operation_id,
-              name: item.name,
-              amount: item.amount,
-              operation_type: item.operation_type,
-              payment_method: item.payment_method,
-              created_at: item.created_at,
-              cashier_id: item.cashier_id,
-              user_id: item.user_id,
-            } as OperationItem),
-        );
-
-        let sales: OperationItem[] = sales_by_cashier?.map(
-          (item: SaleDetails) =>
-            ({
-              key: item.sale_id?.toString(),
-              name: item.customers?.name || 'Venta',
-              amount: item.total || 0,
-              operation_type: 'SALE',
-              payment_method: item.payment_method,
-              created_at: item.created_at,
-              cashier_id: item.cashier_id as number,
-              user_id: '',
-            } as OperationItem),
-        );
-
-        operations = [...operations, ...sales].sort(
-          (a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')),
-        );
 
         let amounts = {
           initial_amount: activeCashier?.initial_amount,
@@ -125,7 +98,7 @@ const customActions = {
           incomes_amount,
           expenses_amount,
           total_amount,
-          operations,
+          operations: cashierHelpers.calculateAmounts(data, sales_by_cashier),
         };
 
         dispatch(cashiersActions.setCashOperations(amounts));
@@ -183,6 +156,49 @@ const customActions = {
       } catch (error) {
         message.error('No se pudo eliminar este elemento');
         dispatch(salesActions.setLoading(false));
+        return false;
+      }
+    },
+  },
+  cashier_detail: {
+    set: (cashier: Cashier) => async (dispatch: AppDispatch) => {
+      dispatch(cashiersActions.setCashierDetail({ data: cashier }));
+    },
+    getCashierOperationsById: (cashier_id: number) => async (dispatch: AppDispatch, getState: AppState) => {
+      try {
+        if (!cashier_id) return false;
+
+        dispatch(cashiersActions.setLoading(true));
+        let { data: operations, error: operationsError } = await supabase
+          .from('cash_operations')
+          .select('*')
+          .eq('cashier_id', cashier_id);
+
+        let { data: sales, error: salesOperation } = await supabase
+          .from('sales')
+          .select(
+            `
+        *,
+        customers ( name ),
+        status ( status_id, name )
+      `,
+          )
+          .eq('cashier_id', cashier_id)
+          .eq('status_id', 4);
+
+        dispatch(cashiersActions.setLoading(false));
+
+        if (operationsError || salesOperation) {
+          message.error('No se pudo cargar esta información', 4);
+          return false;
+        }
+
+        let data = cashierHelpers.calculateAmounts(operations as CashOperation[], sales as SaleDetails[]);
+
+        dispatch(cashiersActions.setCashierDetail({ operations: data }));
+        return true;
+      } catch (error) {
+        dispatch(cashiersActions.setLoading(false));
         return false;
       }
     },

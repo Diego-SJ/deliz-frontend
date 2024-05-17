@@ -1,9 +1,15 @@
-import { PaymentMethod, SaleDetails } from '../sales/types';
+import { Cashier, PaymentMethod, SaleDetails } from '../sales/types';
 
 export type CashiersSlice = {
   cash_operations: CashOperations;
+  cashier_detail: CashierDetail;
   loading: boolean;
   error?: string | null;
+};
+
+export type CashierDetail = {
+  data?: Cashier;
+  operations?: OperationItem[];
 };
 
 export type CashOperations = {

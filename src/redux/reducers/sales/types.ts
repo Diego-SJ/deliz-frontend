@@ -131,6 +131,10 @@ export type Cashier = {
   created_at?: string | Date;
   close_date?: string;
   is_open?: boolean;
+  branch_id?: string;
+  sales_amount?: number;
+  incomes_amount?: number;
+  expenses_amount?: number;
 };
 
 export type Cashiers = {

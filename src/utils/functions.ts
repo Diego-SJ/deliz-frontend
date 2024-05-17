@@ -23,9 +23,9 @@ const functions = {
     return numeral(number).format('$0.0');
   },
   date: (date: Date | string) => {
-    let [year, month, day] = (date + '')?.split('-');
-    let _date = `${month}/${day}/${year}`;
-    return format(new Date(_date), 'PP', { locale: es });
+    // let [year, month, day] = (date + '')?.split('-');
+    // let _date = `${month}/${day}/${year}`;
+    return format(new Date(date), 'PP', { locale: es });
   },
   date1: (date: Date | string) => {
     let [_date] = new Date(date).toLocaleString()?.split(',');
@@ -51,6 +51,11 @@ const functions = {
     let _date = subHours(new Date(date), 6);
     return format(new Date(_date), 'PPp', { locale: es });
   },
+  fullDateTime: (date: Date | string) => {
+    let _date = subHours(new Date(date), 6);
+    return format(new Date(_date), 'PPPPpppp', { locale: es });
+  },
+
   currentDate: () => {
     let _date = new Date();
     return format(new Date(_date), 'PPp', { locale: es });

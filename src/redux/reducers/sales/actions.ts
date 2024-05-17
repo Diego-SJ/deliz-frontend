@@ -533,7 +533,7 @@ const customActions = {
     add: (cashier: Cashier) => async (dispatch: AppDispatch) => {
       try {
         dispatch(salesActions.setLoading(true));
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('cashiers')
           .insert([
             {
@@ -542,6 +542,7 @@ const customActions = {
               final_amount: cashier.final_amount,
               close_date: null,
               is_open: true,
+              branch_id: '81a16d60-40a5-4dba-a3c1-bc9372240bae',
             },
           ])
           .select();
@@ -552,6 +553,7 @@ const customActions = {
           return false;
         }
 
+        dispatch(salesActions.setCashiers({ activeCashier: data[0] as Cashier }));
         await dispatch(salesActions.cashiers.get({ refetch: true }));
         message.success('Registro agregado', 4);
         return true;
