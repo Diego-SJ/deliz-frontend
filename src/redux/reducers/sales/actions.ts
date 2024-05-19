@@ -635,9 +635,18 @@ const customActions = {
     getActiveCashier:
       () =>
       async (dispatch: AppDispatch): Promise<Cashier | null> => {
-        const cashiers = await dispatch(salesActions.cashiers.get({ refetch: true }));
+        let { data: cashiers, error } = await supabase
+          .from('cashiers')
+          .select('*')
+          .eq('is_open', true)
+          .eq('branch_id', '81a16d60-40a5-4dba-a3c1-bc9372240bae');
 
-        let activeCashier = (cashiers as Cashier[])?.filter(item => !!item?.is_open)[0] || null;
+        if (error) {
+          message.error('No se pudo obtener la caja actual', 4);
+          return null;
+        }
+
+        let activeCashier = cashiers ? (cashiers[0] as Cashier) : ({} as Cashier);
         dispatch(salesActions.setCashiers({ activeCashier }));
 
         return activeCashier;

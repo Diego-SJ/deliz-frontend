@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import OpenCashier from '../open-cashier';
 import { cashiersActions } from '@/redux/reducers/cashiers';
+import { salesActions } from '@/redux/reducers/sales';
 
 const CurrentCashier = () => {
   const dispatch = useAppDispatch();
@@ -15,6 +16,7 @@ const CurrentCashier = () => {
     if (firstRender.current) {
       firstRender.current = false;
 
+      dispatch(salesActions.cashiers.getActiveCashier());
       dispatch(cashiersActions.cash_operations.get({ refetch: true }));
       dispatch(cashiersActions.cash_operations.getSalesByCashier({ refetch: true }));
       dispatch(cashiersActions.cash_operations.calculateCashierData());
