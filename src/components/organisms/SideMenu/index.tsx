@@ -8,6 +8,7 @@ import {
   BarChartOutlined,
   BarcodeOutlined,
   PieChartOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -102,24 +103,13 @@ const ITEM_LIST = [
         label: 'Cajas',
         path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
       },
-      // {
-      //   key: 'transactions.operative_expenses',
-      //   label: 'Gastos operativos',
-      //   path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path,
-      // },
     ],
   },
   {
-    key: 'reports',
-    icon: PieChartOutlined,
-    label: 'Reportes',
-    children: [
-      {
-        key: 'reports.products',
-        label: 'Productos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path,
-      },
-    ],
+    key: 'settings',
+    icon: SettingOutlined,
+    label: 'Configuración',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path,
   },
 ];
 
@@ -136,12 +126,7 @@ const SALES_ACTIONS = [
   //   label: 'Punto de venta',
   //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
   // },
-  // {
-  //   key: 'products',
-  //   icon: ShoppingOutlined,
-  //   label: 'Productos',
-  //   path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
-  // },
+
   {
     key: 'customers',
     icon: TeamOutlined,
@@ -203,7 +188,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         selectedKeys={[`${currentKey}`]}
         mode="inline"
-        inlineCollapsed={isPhablet}
+        inlineCollapsed={isPhablet && !isTablet}
         items={currentItems.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),

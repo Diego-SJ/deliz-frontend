@@ -1,6 +1,6 @@
 import { DeleteFilled, PercentageOutlined, PrinterFilled, SaveFilled, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActionButton, ContainerItems } from './styles';
 import { ModalBody, SalePrices } from '../styles';
 import Space from '@/components/atoms/Space';
@@ -135,6 +135,15 @@ const CashierActions = () => {
     else setItemExtra(prev => ({ ...prev, price: value || 0 }));
   };
 
+  const disabledButton = () => {
+    if (modalAction === 'APPLY_SHIPPING') return shippingPrice < 0;
+    if (modalAction === 'APPLY_DISCOUNT') {
+      if (discountType === 'AMOUNT') return discountAmount < 0;
+      else if (discountType === 'PERCENTAGE') return discountAmount < 0 || discountAmount > 100;
+    }
+    return !productName;
+  };
+
   return (
     <div className="cashier-actions">
       <ContainerItems>
@@ -223,17 +232,7 @@ const CashierActions = () => {
               </Button>
             </Col>
             <Col span={12}>
-              <Button
-                block
-                type="primary"
-                onClick={handleOk}
-                size="large"
-                disabled={
-                  (modalAction === 'APPLY_SHIPPING' && shippingPrice < 0) ||
-                  (modalAction === 'APPLY_DISCOUNT' && (discountAmount < 0 || discountAmount > 100)) ||
-                  (modalAction === 'ADD_NEW_ITEM' && !productName)
-                }
-              >
+              <Button block type="primary" onClick={handleOk} size="large" disabled={disabledButton()}>
                 Guardar
               </Button>
             </Col>
@@ -264,16 +263,19 @@ const CashierActions = () => {
               <Space height="10px" />
               <InputNumber
                 min={0}
-                max={discountType === 'PERCENTAGE' ? 100 : 10000000000}
+                max={discountType === 'PERCENTAGE' ? 100 : undefined}
                 placeholder="0"
                 size="large"
                 readOnly={isTablet}
+                type="number"
+                inputMode="decimal"
                 style={{ width: '100%', textAlign: 'center' }}
                 value={discountAmount}
                 onFocus={target => {
                   target.currentTarget?.select();
                 }}
                 onChange={value => setDiscountAmount(value || 0)}
+                onPressEnter={handleOk}
               />
               {isTablet && <NumberKeyboard value={discountAmount} withDot onChange={setDiscountAmount} />}
             </>
@@ -284,12 +286,15 @@ const CashierActions = () => {
                 min={0}
                 placeholder="0.0"
                 size="large"
+                type="number"
+                inputMode="decimal"
                 style={{ width: '100%', textAlign: 'center' }}
                 value={shippingPrice}
                 readOnly={isTablet}
                 onFocus={target => {
                   target.currentTarget?.select();
                 }}
+                onPressEnter={handleOk}
                 onChange={value => setShippingPrice(value || 0)}
               />
               {isTablet && <NumberKeyboard value={shippingPrice} withDot onChange={setShippingPrice} />}

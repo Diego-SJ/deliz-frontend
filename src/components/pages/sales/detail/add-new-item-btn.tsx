@@ -214,7 +214,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             optionFilterProp="children"
             value={`${currentProduct?.product_id ?? ''}`}
             filterOption={filterOption}
-            options={products?.map(i => ({ value: `${i?.product_id}`, label: i?.name }))}
+            options={products?.map(i => ({ value: `${i?.product_id}`, label: `${i?.name} - ${i?.categories?.name}` }))}
             onChange={onProductChange}
           />
           {currentProduct?.product_id === 0 && (
