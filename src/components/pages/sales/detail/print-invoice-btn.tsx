@@ -1,4 +1,4 @@
-import { FileProtectOutlined, PrinterOutlined } from '@ant-design/icons';
+import { FileProtectOutlined, PrinterOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { Button, Col, Drawer, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import FallbackImage from '@/assets/img/webp/logo-deliz.webp';
@@ -6,7 +6,8 @@ import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
 import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, ProductCell, ProductName } from './styles';
 import { SaleItem } from '@/redux/reducers/sales/types';
-import { toPng } from 'html-to-image';
+import { toPng, toBlob } from 'html-to-image';
+import useWhatsappApi from '@/hooks/useWhatsappAPI';
 
 const paymentMethod: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -20,6 +21,7 @@ type PrintInvoiceButtonProps = {
 
 const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
+  const { sendMessage, loading: messageLoading } = useWhatsappApi();
   const { metadata, items = [] } = current_sale;
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,15 +44,24 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const downloadInvoice = async () => {
     setLoading(true);
     try {
-      const dataUrl = await toPng(elementRef?.current, { cacheBust: false });
+      const dataUrl = await toPng(elementRef?.current, { cacheBust: false, quality: 0.5 });
       const link = document.createElement('a');
-      link.download = `nota-${metadata?.sale_id}.png`;
+      link.id = 'download-link';
+      link.download = `Nota: ${metadata?.customers?.name} - ${metadata?.sale_id}.jpeg`;
       link.href = dataUrl;
       link.click();
+      link.remove();
       setLoading(false);
     } catch (error) {
       setLoading(false);
     }
+  };
+
+  const sendNoteByWhatsapp = async () => {
+    const file = await toBlob(elementRef?.current, { cacheBust: false, quality: 0.5 });
+    const text = `Hola ${current_sale?.metadata?.customers?.name}, aquí tienes tu nota de venta. Gracias por tu compra.`;
+    const number = current_sale?.metadata?.customers?.phone || '';
+    sendMessage(number, text, new File([file as Blob], file?.name || 'nota.png', { type: 'image/png' }));
   };
 
   return (
@@ -66,12 +77,15 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         onClose={onClose}
         open={open}
         styles={{ body: { padding: 0 } }}
-        extra={
+      >
+        <div className="flex gap-4 px-6 justify-center pt-4">
           <Button onClick={downloadInvoice} icon={<PrinterOutlined rev={{}} />}>
             Imprimir
           </Button>
-        }
-      >
+          <Button onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined rev={{}} />} loading={messageLoading}>
+            Enviar via Whatsapp
+          </Button>
+        </div>
         <DrawerBody ref={elementRef}>
           <Typography.Title level={5} style={{ textAlign: 'center', margin: '0 0 10px' }}>
             NOTA DE VENTA

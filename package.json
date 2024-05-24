@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.24.0",
     "@types/redux-persist": "^4.3.1",
     "antd": "^5.14.2",
+    "axios": "^1.7.2",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.10",
     "html-to-image": "^1.11.11",
