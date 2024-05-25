@@ -1,6 +1,6 @@
-import { DeleteFilled, PercentageOutlined, PrinterFilled, SaveFilled, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
+import { DeleteFilled, PercentageOutlined, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
 import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography, message } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActionButton, ContainerItems } from './styles';
 import { ModalBody, SalePrices } from '../styles';
 import Space from '@/components/atoms/Space';
@@ -30,14 +30,18 @@ const MODAL_ICON = {
   ADD_NEW_ITEM: <PlusCircleFilled rev={{}} />,
 };
 
-const CashierActions = () => {
+type CashierActionsProps = {
+  onClose?: () => void;
+};
+
+const CashierActions = ({ onClose }: CashierActionsProps) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [open, setOpen] = useState(false);
   const [shippingPrice, setShippingPrice] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
-  const [checked, setChecked] = useState(true);
+  // const [checked, setChecked] = useState(true);
   const [productName, setProductName] = useState('');
   const [modalAction, setModalAction] = useState<ModalAction>('');
   const [discountType, setDiscountType] = useState<DiscountType>('PERCENTAGE');
@@ -54,8 +58,7 @@ const CashierActions = () => {
   useEffect(() => {
     let totalItemsInList = 0;
     let items = cash_register?.items?.reduce((total, item) => {
-      let productPrice = item.wholesale_price ? item.product.wholesale_price : item.product.retail_price;
-      productPrice = productPrice * item.quantity;
+      let productPrice = item.product?.wholesale_price * item?.quantity;
       totalItemsInList += item.quantity;
       return productPrice + total;
     }, 0);
@@ -79,7 +82,7 @@ const CashierActions = () => {
     setDiscountAmount(0);
     setItemExtra({ price: 0, quantity: 0 });
     setProductName('');
-    setChecked(false);
+    // setChecked(false);
   };
 
   const handleOnClose = () => {
@@ -102,7 +105,7 @@ const CashierActions = () => {
             wholesale_price: itemExtra.price,
           },
           quantity: itemExtra.quantity,
-          wholesale_price: checked,
+          wholesale_price: true,
         }),
       );
     }
@@ -145,25 +148,27 @@ const CashierActions = () => {
   };
 
   return (
-    <div className="cashier-actions">
+    <div className="cashier-actions md:border-t md:border-dashed md:border-gray-400">
       <ContainerItems>
-        <Typography.Text type="secondary" className="total-products">
-          Productos: <span>{totalItems || 0}</span>
-        </Typography.Text>
+        <p className="text-base text-gray-500 w-full text-start pt-[10px]">
+          Productos <span className="min-w-[100px]">{totalItems || 0}</span>
+        </p>
         <SalePrices>
-          <Typography.Text type="secondary">
-            Subtotal: <span>{functions.money(subTotal)}</span>
-          </Typography.Text>
-          <Typography.Text type="secondary">
-            Descuento:{' '}
-            <span>{`-${functions.money(discountMoney)} ${discountType === 'PERCENTAGE' ? `(${discount}%)` : ''}`}</span>
-          </Typography.Text>
-          <Typography.Text type="secondary">
-            Envio: <span>{functions.money(shipping)}</span>
-          </Typography.Text>
-          <Typography.Title level={3} type="success">
-            TOTAL: <span>{functions.money(total)}</span>
-          </Typography.Title>
+          <p className="text-base text-gray-500 w-full text-end ">
+            Subtotal <span className="min-w-[100px] inline-flex justify-end">{functions.money(subTotal)}</span>
+          </p>
+          <p className="text-base text-gray-500 w-full text-end ">
+            Descuento
+            <span className="min-w-[100px] inline-flex justify-end">{`-${functions.money(discountMoney)} ${
+              discountType === 'PERCENTAGE' ? `(${discount}%)` : ''
+            }`}</span>
+          </p>
+          <p className="text-base text-gray-500 w-full text-end ">
+            Envio <span className="min-w-[100px] inline-flex justify-end">{functions.money(shipping)}</span>
+          </p>
+          <p className="text-lg text-gray-800 w-full text-end font-semibold">
+            TOTAL <span className="min-w-[100px] inline-flex justify-end">{functions.money(total)}</span>
+          </p>
         </SalePrices>
       </ContainerItems>
       <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }} style={{ marginBottom: 10 }}>
@@ -209,14 +214,21 @@ const CashierActions = () => {
           <Tooltip title="Agregar extra">
             <ActionButton onClick={() => openModal('ADD_NEW_ITEM')}>
               <Button icon={<PlusCircleFilled rev={{}} />} size="small" type="primary" shape="circle" />
-              Item extra
+              Extra
             </ActionButton>
           </Tooltip>
         </Col>
       </Row>
-      <Button type="primary" block size="large" onClick={onPaySale}>
-        {mode === 'order' ? 'REGISTRAR PEDIDO' : 'PAGAR'}
-      </Button>
+      <div className="flex gap-4">
+        {isTablet && (
+          <Button type="default" block size="large" onClick={onClose}>
+            Cerrar
+          </Button>
+        )}
+        <Button type="primary" block size="large" onClick={onPaySale}>
+          {mode === 'order' ? 'REGISTRAR PEDIDO' : 'PAGAR'}
+        </Button>
+      </div>
       {contextHolder}
 
       <Modal
@@ -303,14 +315,14 @@ const CashierActions = () => {
 
           {modalAction === 'ADD_NEW_ITEM' && (
             <>
-              <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => setChecked(e.target.value)}>
+              {/* <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => setChecked(e.target.value)}>
                 <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
                   Menudeo
                 </Radio.Button>
                 <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
                   Mayoreo
                 </Radio.Button>
-              </Radio.Group>
+              </Radio.Group> */}
               <Space height="10px" />
               <Typography.Title level={5} style={{ width: '100%' }}>
                 Nombre del artíulo

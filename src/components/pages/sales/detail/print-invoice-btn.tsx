@@ -1,5 +1,5 @@
 import { FileProtectOutlined, PrinterOutlined, WhatsAppOutlined } from '@ant-design/icons';
-import { Button, Col, Drawer, Row, Typography } from 'antd';
+import { Button, Col, Drawer, Row, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import FallbackImage from '@/assets/img/webp/logo-deliz.webp';
 import functions from '@/utils/functions';
@@ -8,6 +8,7 @@ import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, Pro
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { toPng, toBlob } from 'html-to-image';
 import useWhatsappApi from '@/hooks/useWhatsappAPI';
+import { cashierHelpers } from '@/utils/cashiers';
 
 const paymentMethod: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -58,10 +59,15 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   };
 
   const sendNoteByWhatsapp = async () => {
+    if (!cashierHelpers.isValidPhone(metadata?.customers?.phone || '')) {
+      message.error('El número de Whatsapp no es válido');
+      return;
+    }
+
     const file = await toBlob(elementRef?.current, { cacheBust: false, quality: 0.5 });
     const text = `Hola ${current_sale?.metadata?.customers?.name}, aquí tienes tu nota de venta. Gracias por tu compra.`;
     const number = current_sale?.metadata?.customers?.phone || '';
-    sendMessage(number, text, new File([file as Blob], file?.name || 'nota.png', { type: 'image/png' }));
+    sendMessage(number, text, new File([file as Blob], 'nota.png', { type: 'image/png' }));
   };
 
   return (

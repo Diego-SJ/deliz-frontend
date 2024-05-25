@@ -1,4 +1,6 @@
+import { ZONES } from '@/constants/zones';
 import { CashOperation, OperationItem } from '@/redux/reducers/cashiers/types';
+import { Product } from '@/redux/reducers/products/types';
 import { SaleDetails } from '@/redux/reducers/sales/types';
 
 export const cashierHelpers = {
@@ -34,5 +36,16 @@ export const cashierHelpers = {
     return [...operationsList, ...salesList].sort(
       (a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')),
     );
+  },
+  getWhosalePrice: (product?: Product, zone?: number) => {
+    if (!product) return 0;
+    let _zone = zone || 1;
+    return (product?.wholesale_price || 0) + ZONES[_zone][product?.category_id][product?.size_id || 2];
+  },
+  isValidPhone: (phone: string) => {
+    if (!phone || phone?.length !== 10) return false;
+    let phoneClean = phone?.replace(/[\s-]/g, '')?.trim();
+    let regex = /^[0-9]{10}$/;
+    return regex.test(phoneClean);
   },
 };

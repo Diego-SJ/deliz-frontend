@@ -64,6 +64,11 @@ const customActions = {
           .select('*, products (*, categories (*))')
           .eq('sale_id', args?.sale_id);
 
+        const { data: metadata } = await supabase
+          .from('sales')
+          .select('*, customers (*), status (status_id, name)')
+          .eq('sale_id', args?.sale_id);
+
         let items: SaleItem[] =
           data?.map((item, key) => {
             let product = { ...item?.products };
@@ -77,7 +82,7 @@ const customActions = {
             return { ...item, key, products: product } as SaleItem;
           }) || [];
 
-        dispatch(salesActions.setCurrentSale({ items }));
+        dispatch(salesActions.setCurrentSale({ items, metadata: metadata?.length ? (metadata[0] as SaleDetails) : undefined }));
         dispatch(salesActions.setLoading(false));
 
         if (error) {
@@ -132,7 +137,7 @@ const customActions = {
           message.error('No se pudo registrar la venta');
           return null;
         }
-        message.success('Venta creada.', 4);
+        message.success('Registrando venta', 2);
         return data[0] as Sale;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
@@ -208,7 +213,7 @@ const customActions = {
     (sale: Sale) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<boolean> => {
       try {
-        message.info('Registrando productos', 4);
+        message.info('Registrando productos...', 2);
         const state = getState().sales.cash_register.items || [];
 
         let saleItems: SaleItem[] = state.map(item => {
@@ -235,7 +240,6 @@ const customActions = {
 
         await dispatch(salesActions.fetchSales({ refetch: true }));
         await dispatch(productActions.fetchProducts({ refetch: true }));
-        message.success('¡Venta registrada!', 4);
         return true;
       } catch (error) {
         return false;

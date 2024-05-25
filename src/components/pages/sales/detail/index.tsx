@@ -19,7 +19,7 @@ import {
 } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import { ColumnsType } from 'antd/es/table';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
 import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
@@ -59,7 +59,8 @@ const initalAmounts = { total: 0, subtotal: 0, pending: 0, cashback: 0, amount_p
 
 const SaleDetail = () => {
   const dispatch = useAppDispatch();
-  const { current_sale } = useAppSelector(({ sales }) => sales);
+  const { sale_id } = useParams();
+  const { current_sale, loading: isLoading } = useAppSelector(({ sales }) => sales);
   const { customers } = useAppSelector(({ customers }) => customers);
   const [customerList, setCustomerList] = useState<Option[]>([]);
   const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
@@ -78,12 +79,12 @@ const SaleDetail = () => {
   const currentProduct = currentItem?.products;
 
   useEffect(() => {
-    if (!firstRender.current && metadata) {
+    if (!firstRender.current && !!sale_id) {
       firstRender.current = true;
-      dispatch(salesActions.getSaleById({ sale_id: metadata.sale_id, refetch: true }));
+      dispatch(salesActions.getSaleById({ sale_id: Number(sale_id), refetch: true }));
       return;
     }
-  }, [metadata]);
+  }, [sale_id]);
 
   useEffect(() => {
     let subtotal = items?.reduce((acum, item) => acum + (item?.price || 0) * (item?.quantity || 0), 0);
@@ -189,7 +190,7 @@ const SaleDetail = () => {
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
         <Col xl={{ span: 8 }} xs={24} md={24}>
           {/* SALE AMOUNTS */}
-          <Card>
+          <Card loading={isLoading}>
             <Row gutter={[10, 10]}>
               <Col span={12}>
                 <Typography.Paragraph style={{ margin: '0' }}>
@@ -220,7 +221,7 @@ const SaleDetail = () => {
           </Card>
 
           {/* SALE DETAILS */}
-          <Card style={{ marginTop: 20 }}>
+          <Card style={{ marginTop: 20 }} loading={isLoading}>
             <Alert
               message={metadata?.status.name ?? '- - -'}
               action={metadata?.status_id === STATUS_DATA.COMPLETED.id ? functions.dateTime(metadata.created_at) : ''}
@@ -239,7 +240,7 @@ const SaleDetail = () => {
           </Card>
 
           {/* CUSTOMER CARD DETAILS */}
-          <Card style={{ marginTop: 20 }}>
+          <Card loading={isLoading} style={{ marginTop: 20 }}>
             <Meta
               avatar={
                 <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1" size={55} style={{ background: '#eee' }} />
@@ -286,7 +287,7 @@ const SaleDetail = () => {
           </Card>
         </Col>
         <Col xl={{ span: 16 }} xs={24} md={24}>
-          <Card style={{ marginBottom: 10 }}>
+          <Card style={{ marginBottom: 10 }} loading={isLoading}>
             <Row gutter={[20, 20]}>
               <Col xs={24} md={8}>
                 <AddNewItem />
@@ -300,6 +301,7 @@ const SaleDetail = () => {
             </Row>
           </Card>
           <Table
+            loading={isLoading}
             columns={[
               {
                 title: '',

@@ -9,10 +9,10 @@ export const CardBtn = styled(Col)`
       height: 60px;
       font-size: 20px;
       font-weight: 600;
+    }
 
-      &.expand {
-        transform: scale(1.3);
-      }
+    &.dot {
+      opacity: 0;
     }
   }
 `;

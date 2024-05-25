@@ -6,13 +6,14 @@ import FallbackImage from '@/assets/img/webp/ice-cream.webp';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
-import { CATEGORIES } from '@/constants/mocks';
+
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { DollarOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { ZONES } from '@/constants/zones';
+
+import { cashierHelpers } from '@/utils/cashiers';
 
 type CashierModalProps = {
   open?: boolean;
@@ -27,8 +28,8 @@ const { Title, Paragraph, Text } = Typography;
 const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherItem }: CashierModalProps) => {
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
-  const [quantity, setQuantity] = useState<number | string>(casherItem?.quantity || '');
-  const [checked, setChecked] = useState<boolean | 1>(true);
+  const [quantity, setQuantity] = useState<number | string>(casherItem?.quantity || '0');
+  const [wholesaleActive, setWholesaleActive] = useState<boolean | 1>(true);
   const [subtotal, setSubtotal] = useState(0);
   const [quantityUsed, setQuantityUsed] = useState<number>(0);
   const [specialPrice, setSpecialPrice] = useState(0);
@@ -43,9 +44,14 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
     if (open) {
       if (action === 'EDIT' && casherItem) {
         setQuantity(casherItem.quantity);
-        setChecked(casherItem.wholesale_price);
+        setWholesaleActive(casherItem.wholesale_price);
+
+        let price = casherItem.wholesale_price ? casherItem.product.wholesale_price : casherItem.product.retail_price;
+        setSpecialPrice(price);
       } else {
-        setChecked(true);
+        setWholesaleActive(true);
+        let wholesalePrice = cashierHelpers.getWhosalePrice(currentProduct, zone);
+        setSpecialPrice(wholesalePrice);
       }
       setTimeout(() => {
         quantityInput.current?.focus();
@@ -55,15 +61,14 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
   }, [open, action, casherItem]);
 
   useEffect(() => {
-    if (!!currentProduct) {
-      let _zone: number = zone ?? 1;
-      let wholesalePrice =
-        (currentProduct?.wholesale_price || 0) + ZONES[_zone][currentProduct?.category_id][currentProduct?.size_id || 2];
-      let currentPrice = !!checked ? wholesalePrice : currentProduct?.retail_price || 0;
-      let _subtotal = specialPrice > 0 ? specialPrice : currentPrice;
+    if (!!currentProduct?.created_at) {
+      let wholesalePrice = cashierHelpers.getWhosalePrice(currentProduct, zone);
+      let currentPrice = !!wholesaleActive ? wholesalePrice : currentProduct?.retail_price || 0;
+      let _subtotal = specialPrice === currentPrice ? currentPrice : specialPrice;
+
       setSubtotal(_subtotal);
     }
-  }, [checked, currentProduct, specialPrice, zone]);
+  }, [wholesaleActive, currentProduct, specialPrice, zone]);
 
   useEffect(() => {
     let productIsAlreadyInList = items?.filter(p => p?.product?.product_id === currentProduct?.product_id);
@@ -92,7 +97,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
     setQuantity(0);
     setSpecialPrice(0);
     setSubtotal(0);
-    setChecked(true);
+    setWholesaleActive(true);
   };
 
   const handleOnClose = () => {
@@ -125,7 +130,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           customer_id: 1,
           product: getProductWithSpecialPrice(currentProduct as Product),
           quantity: quantity as number,
-          wholesale_price: !!checked,
+          wholesale_price: !!wholesaleActive,
         }),
       );
     } else {
@@ -134,7 +139,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
           ...(casherItem as CashRegisterItem),
           product: getProductWithSpecialPrice(casherItem?.product as Product),
           quantity: quantity as number,
-          wholesale_price: !!checked,
+          wholesale_price: !!wholesaleActive,
         }),
       );
     }
@@ -142,8 +147,16 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
     if (onCancel) onCancel();
   };
 
-  const onCheckChange = (value: boolean) => {
-    setChecked(value);
+  const onCheckChange = (isWholeSale: boolean) => {
+    console.log({ currentProduct });
+    setWholesaleActive(isWholeSale);
+    if (!isWholeSale) {
+      setSpecialPrice(currentProduct?.retail_price || 0);
+    } else {
+      let wholesalePrice = cashierHelpers.getWhosalePrice(currentProduct, zone);
+      setSpecialPrice(wholesalePrice);
+    }
+    quantityInput.current?.focus();
   };
 
   const onQuantityChange = (value: number) => {
@@ -178,96 +191,104 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
       ]}
     >
       <ModalBody>
-        <Row style={{ width: '100%' }}>
-          <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar
-              src={currentProduct?.image_url || FallbackImage}
-              size={80}
-              style={{ background: '#faefff', padding: 5 }}
-              shape="circle"
-            />
-          </Col>
-          <Col span={16}>
-            <Title level={4} style={{ marginBottom: 0 }}>
+        <div className="w-full flex gap-4 items-center">
+          <Avatar
+            src={currentProduct?.image_url || FallbackImage}
+            size={60}
+            style={{ background: '#faefff', padding: 5 }}
+            shape="circle"
+          />
+          <div className="">
+            <Title level={5} style={{ marginBottom: 0 }}>
               {currentProduct?.name}
             </Title>
             <Paragraph style={{ marginBottom: 0 }}>
-              {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name}
-              {!isExtra && (
-                <>
-                  <br />
-                  <b>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed})</b> disponibles
-                </>
-              )}
+              {currentProduct?.categories?.name || 'Item extra'} -{' '}
+              {isExtra ? '∞ stock' : <>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed}) stock</>}
             </Paragraph>
-            <Title level={5} style={{ margin: 0 }}>
-              {functions.money(subtotal)} * {quantity} ={' '}
+            <Title level={4} style={{ margin: 0 }}>
+              {quantity} x {functions.moneySimple(subtotal)} ={' '}
               <Text type="success" style={{ fontSize: 'inherit' }}>
-                {functions.money(subtotal * Number(quantity))}
+                {functions.moneySimple(subtotal * Number(quantity))}
               </Text>
             </Title>
-          </Col>
-        </Row>
+          </div>
+        </div>
+        {action === 'ADD' && (
+          <>
+            <Space height="10px" />
+            <Radio.Group
+              style={{ width: '100%' }}
+              size="large"
+              value={wholesaleActive}
+              onChange={e => onCheckChange(e.target.value)}
+            >
+              <Radio.Button value={false} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
+                Menudeo
+              </Radio.Button>
+              <Radio.Button value={true} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
+                Mayoreo
+              </Radio.Button>
+            </Radio.Group>
+          </>
+        )}
         <Space height="10px" />
-        <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => onCheckChange(e.target.value)}>
-          <Radio.Button value={false} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
-            Menudeo
-          </Radio.Button>
-          <Radio.Button value={true} style={{ width: '50%', textAlign: 'center', fontSize: '1rem' }}>
-            Mayoreo
-          </Radio.Button>
-        </Radio.Group>
+        <div className="flex gap-4">
+          <div className="">
+            <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Cantidad</Paragraph>
+            <InputNumber
+              ref={quantityInput}
+              min={0}
+              placeholder="Cantidad"
+              size="large"
+              inputMode="decimal"
+              type="number"
+              className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
+              style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+              value={quantity}
+              onPressEnter={handleOk}
+              readOnly={isTablet}
+              autoFocus
+              addonBefore={<ShoppingCartOutlined rev={{}} />}
+              onFocus={({ target }) => {
+                target.select();
+                setCurrentInput('quantity');
+              }}
+              onChange={value => onQuantityChange(value as number)}
+            />
+          </div>
+          <div>
+            <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Precio</Paragraph>
+            <InputNumber
+              min={0}
+              placeholder="Precio"
+              size="large"
+              className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
+              style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+              value={subtotal}
+              onPressEnter={handleOk}
+              readOnly={isTablet}
+              inputMode="decimal"
+              type="number"
+              onFocus={({ target }) => {
+                target.select();
+                setCurrentInput('price');
+                setSpecialPrice(subtotal);
+              }}
+              addonBefore={<DollarOutlined rev={{}} />}
+              onChange={value => setSpecialPrice(value as number)}
+            />
+          </div>
+        </div>
+
         <Space height="10px" />
-        <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Precio</Paragraph>
-        <InputNumber
-          min={0}
-          placeholder="Precio"
-          size="large"
-          className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
-          style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
-          value={subtotal}
-          onPressEnter={handleOk}
-          // readOnly={isTablet}
-          inputMode="decimal"
-          type="number"
-          addonAfter={specialPrice > 0 ? 'especial' : ''}
-          onFocus={({ target }) => {
-            target.select();
-            setCurrentInput('price');
-          }}
-          addonBefore={<DollarOutlined rev={{}} />}
-          onChange={value => setSpecialPrice(value as number)}
-        />
-        <Space height="10px" />
-        <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Cantidad</Paragraph>
-        <InputNumber
-          ref={quantityInput}
-          min={0}
-          placeholder="Cantidad"
-          size="large"
-          inputMode="decimal"
-          type="number"
-          className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
-          style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
-          value={quantity}
-          onPressEnter={handleOk}
-          // readOnly={isTablet}
-          autoFocus
-          addonBefore={<ShoppingCartOutlined rev={{}} />}
-          onFocus={({ target }) => {
-            target.select();
-            setCurrentInput('quantity');
-          }}
-          onChange={value => onQuantityChange(value as number)}
-        />
-        <Space height="10px" />
-        {/* {isTablet && (
+        {isTablet && (
           <NumberKeyboard
             withDot={currentInput === 'price'}
             value={currentInput === 'quantity' ? Number(quantity) : subtotal}
             onChange={value => onInputsChange(value)}
           />
-        )} */}
+        )}
       </ModalBody>
     </Modal>
   );

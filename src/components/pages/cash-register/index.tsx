@@ -79,7 +79,7 @@ const CashRegister = () => {
 
   const openModal = (item: Product) => {
     setCurrentProduct(item);
-    setOpen(true);
+    if (item?.product_id) setOpen(true);
   };
 
   const onChange = (key: string) => {
@@ -192,19 +192,27 @@ const CashRegister = () => {
       </Layout>
       {isPhablet && (
         <FloatButton
-          style={{ transform: 'scale(1.4)' }}
+          style={{ transform: 'scale(1.8)' }}
           icon={<UnorderedListOutlined rev={{}} />}
           type="default"
           onClick={() => setDrawerOpen(true)}
         />
       )}
       <CashierModal open={open} currentProduct={currentProduct} onCancel={closeModal} />
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} width="100vw" styles={{ body: { padding: 0 } }}>
-        <ProductsCheckout>
-          <CashierCustomer />
+      <Drawer
+        title={<CashierCustomer />}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        width="100dvw"
+        height="100dvh"
+        styles={{ body: { padding: 0 } }}
+      >
+        <div className="relative w-[100dvw] overflow-x-hidden h-[calc(100dvh-73px)] ">
           <CashRegisterItemsList />
-          <CashierActions />
-        </ProductsCheckout>
+          <div className="p-4 bottom-0 w-full h-[269px] border-t border-dashed border-slate-400 md:border-none">
+            <CashierActions onClose={() => setDrawerOpen(false)} />
+          </div>
+        </div>
       </Drawer>
     </Layout>
   );
@@ -223,18 +231,16 @@ const ItemProduct = (props: ItemProductsProps) => {
   let size = props?.size || '- - -';
   return (
     <Col lg={6} md={6} xs={8}>
-      <Tooltip title={props?.title ?? 'Producto sin nombre'}>
-        <CardProduct onClick={props?.onClick}>
-          <img className="card-product-image" src={props?.imageSrc || FallbackImage} alt={props.title} />
-          <Typography.Text className="card-product-name" style={{ fontWeight: 600, margin: '8px 0' }}>
-            {props?.title ?? 'Producto sin nombre'}
-          </Typography.Text>
-          <div className="card-product-tags">
-            <Tag color={functions.getTagColor(size)}>{size}</Tag>
-            <Tag color={functions.getTagColor(category)}>{category}</Tag>
-          </div>
-        </CardProduct>
-      </Tooltip>
+      <CardProduct onClick={props?.onClick}>
+        <img className="card-product-image" src={props?.imageSrc || FallbackImage} alt={props.title} />
+        <Typography.Text className="card-product-name" style={{ fontWeight: 600, margin: '8px 0' }}>
+          {props?.title ?? 'Producto sin nombre'}
+        </Typography.Text>
+        <div className="card-product-tags">
+          <Tag color={functions.getTagColor(size)}>{size}</Tag>
+          <Tag color={functions.getTagColor(category)}>{category}</Tag>
+        </div>
+      </CardProduct>
     </Col>
   );
 };

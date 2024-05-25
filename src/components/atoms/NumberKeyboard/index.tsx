@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 const buttonProps: ButtonProps = {
   type: 'text',
-  size: 'large',
+  size: 'small',
   block: true,
 };
 
@@ -25,7 +25,8 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
   const handleChange = useCallback(
     (value: string[]) => {
       if (typeof onChange === 'function') {
-        onChange(Number(value.join()?.replaceAll(',', '') || 0));
+        let _number = value.join()?.replaceAll(',', '');
+        onChange(Number(_number));
       }
     },
     [onChange],
@@ -41,6 +42,9 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
   const onDelete = () => {
     let currentArray = currentNumber;
     currentArray.pop();
+    if (!currentArray.length) {
+      currentArray = ['0'];
+    }
     setCurrentNumber(currentArray);
     handleChange(currentArray);
   };
@@ -92,20 +96,19 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
           9
         </Button>
       </CardBtn>
-      {withDot && (
-        <CardBtn span={8}>
-          <Button {...buttonProps} onClick={() => onClick('.')}>
-            .
-          </Button>
-        </CardBtn>
-      )}
-      <CardBtn span={8} offset={withDot ? 0 : 8}>
+
+      <CardBtn span={8} className={!withDot ? 'dot' : ''}>
+        <Button {...buttonProps} onClick={() => onClick('.')} disabled={!withDot}>
+          .
+        </Button>
+      </CardBtn>
+      <CardBtn span={8}>
         <Button {...buttonProps} onClick={() => onClick('0')}>
           0
         </Button>
       </CardBtn>
       <CardBtn span={8}>
-        <Button {...buttonProps} block onClick={onDelete} className="expand" icon={<DoubleLeftOutlined rev={{}} />} />
+        <Button {...buttonProps} onClick={onDelete} icon={<DoubleLeftOutlined rev={{}} />} />
       </CardBtn>
     </Row>
   );
