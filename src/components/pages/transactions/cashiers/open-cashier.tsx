@@ -80,11 +80,11 @@ const OpenCashier = ({ onSuccess }: Props) => {
     }
   }, [firtRender.current, dispatch]);
 
-  useEffect(() => {
-    if (!!cashiers?.activeCashier?.cashier_id) {
-      dispatch(salesActions.fetchSales({ refetch: true }));
-    }
-  }, [dispatch, cashiers?.activeCashier]);
+  // useEffect(() => {
+  //   if (!!cashiers?.activeCashier?.cashier_id) {
+  //     dispatch(salesActions.cashiers.getSalesByCashierAndBranchId(cashiers?.activeCashier?.cashier_id));
+  //   }
+  // }, [dispatch, cashiers?.activeCashier]);
 
   const onClose = () => {
     form.resetFields();

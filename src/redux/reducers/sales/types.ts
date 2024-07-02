@@ -143,4 +143,5 @@ export type Cashiers = {
   drawer?: 'new' | 'edit' | null;
   pagination?: Pagination;
   data?: Cashier[];
+  salesByCashier?: Sale[];
 };

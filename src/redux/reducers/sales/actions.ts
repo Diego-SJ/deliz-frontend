@@ -655,6 +655,17 @@ const customActions = {
 
         return activeCashier;
       },
+    getSalesByCashierAndBranchId: (args: { cashier_id: number }) => async (dispatch: AppDispatch) => {
+      let { data, error } = await supabase.from('sales').select('*').eq('cashier_id', args.cashier_id).eq('branch_id', '');
+
+      if (error) {
+        message.error('No se pudo obtener la lista de ventas', 4);
+        return null;
+      }
+
+      dispatch(salesActions.setCashiers({ salesByCashier: data as Sale[] }));
+      return true;
+    },
   },
 };
 

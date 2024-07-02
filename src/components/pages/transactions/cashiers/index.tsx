@@ -4,7 +4,7 @@ import functions from '@/utils/functions';
 import { Breadcrumb, Col, Row, message, Avatar, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useNavigation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { salesActions } from '@/redux/reducers/sales';
 import { Cashier } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
