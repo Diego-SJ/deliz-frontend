@@ -2,7 +2,7 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, message, Typography, Avatar, Input } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, message, Avatar, Input } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +14,8 @@ import Table from '@/components/molecules/Table';
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
   CARD: 'Tarjeta',
+  CC: 'Tarjeta crédito',
+  DC: 'Tarjeta débito',
   TRANSFER: 'Transferencia',
 };
 
@@ -26,13 +28,30 @@ const columns: ColumnsType<SaleDetails> = [
     render: value => value?.name,
   },
   {
-    title: 'Monto',
+    title: 'Total',
     width: 120,
     align: 'center',
     dataIndex: 'total',
-    render: (value = 0, record) => {
-      let _total = (record?.amount_paid || 0) - (record?.cashback || 0);
-      return functions.money(value || _total);
+    render: (value = 0) => {
+      return functions.money(value || 0);
+    },
+  },
+  {
+    title: 'Recibido',
+    width: 120,
+    align: 'center',
+    dataIndex: 'amount_paid',
+    render: (value = 0) => {
+      return functions.money(value || 0);
+    },
+  },
+  {
+    title: 'Cambio',
+    width: 120,
+    align: 'center',
+    dataIndex: 'cashback',
+    render: (value = 0) => {
+      return functions.money(value || 0);
     },
   },
   {
@@ -68,8 +87,6 @@ const columns: ColumnsType<SaleDetails> = [
   // },
 ];
 
-const { Title } = Typography;
-
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -85,8 +102,6 @@ const Sales = () => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       dispatch(salesActions.fetchSales({ refetch: true }));
-
-      if (!activeCashier?.cashier_id) dispatch(salesActions.cashiers.getActiveCashier());
       return;
     }
   }, [dispatch, activeCashier?.cashier_id]);
@@ -185,7 +200,7 @@ const Sales = () => {
         <Col xs={24} md={12} lg={8}>
           <Card style={{ width: '100%' }}>
             <Card.Meta
-              avatar={<Avatar icon={<LineChartOutlined rev={{}} />} style={{ background: '#2db7f5' }} size={60} />}
+              avatar={<Avatar icon={<LineChartOutlined />} style={{ background: '#2db7f5' }} size={60} />}
               title={functions?.money(totalSaleAmount)}
               description="Total de ventas"
             />
@@ -194,7 +209,7 @@ const Sales = () => {
         <Col xs={24} md={12} lg={8}>
           <Card>
             <Card.Meta
-              avatar={<Avatar icon={<ReconciliationOutlined rev={{}} />} style={{ background: '#a52df5' }} size={60} />}
+              avatar={<Avatar icon={<ReconciliationOutlined />} style={{ background: '#a52df5' }} size={60} />}
               title={sales?.length || 0}
               description="Ventas totales"
             />
@@ -203,7 +218,7 @@ const Sales = () => {
         <Col xs={24} md={12} lg={8}>
           <Card>
             <Card.Meta
-              avatar={<Avatar icon={<DollarOutlined rev={{}} />} style={{ background: '#4beb88' }} size={60} />}
+              avatar={<Avatar icon={<DollarOutlined />} style={{ background: '#4beb88' }} size={60} />}
               title={functions.money(todaySales)}
               description="Ventas de hoy"
             />
@@ -218,7 +233,7 @@ const Sales = () => {
                 placeholder="Nombre cliente, dirección"
                 style={{ width: '100%' }}
                 allowClear
-                prefix={<SearchOutlined rev={{}} />}
+                prefix={<SearchOutlined />}
                 onChange={({ target }) => applyFilters({ searchText: target.value })}
               />
             </Col>
@@ -256,7 +271,7 @@ const Sales = () => {
               />
             </Col>
             <Col lg={6} xs={24}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+              <Button block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
                 Nueva
               </Button>
             </Col>

@@ -40,51 +40,48 @@ const Dashboard = () => {
   };
 
   return (
-    <Row gutter={[10, 10]}>
-      {!isSales && (
-        <>
-          <CardButton
-            title="Nuevo producto"
-            description="Agregar un producto al catalogo"
-            icon={<AppstoreAddOutlined rev={{}} />}
-            color={theme.colors.green}
-            onClick={addProduct}
-          />
-          <CardButton
-            title="Punto de venta"
-            description="Accede al punto de venta"
-            color={theme.colors.danger}
-            icon={<ShoppingCartOutlined rev={{}} />}
-            onClick={newSale}
-          />
-        </>
-      )}
+    <div className="p-3">
+      <Row gutter={[10, 10]}>
+        {!isSales && (
+          <>
+            <CardButton
+              title="Nuevo producto"
+              description="Agregar un producto al catalogo"
+              icon={<AppstoreAddOutlined />}
+              color={theme.colors.green}
+              onClick={addProduct}
+            />
+            <CardButton
+              title="Punto de venta"
+              description="Accede al punto de venta"
+              color={theme.colors.danger}
+              icon={<ShoppingCartOutlined />}
+              onClick={newSale}
+            />
+          </>
+        )}
 
-      <CardButton
-        title="Nuevo cliente"
-        description="Crea un nuevo cliente"
-        icon={<UserAddOutlined rev={{}} />}
-        onClick={addCustomer}
-      />
+        <CardButton title="Nuevo cliente" description="Crea un nuevo cliente" icon={<UserAddOutlined />} onClick={addCustomer} />
 
-      <CardButton
-        title="Nuevo pedido"
-        description="Accede al punto de venta para crear un pedido"
-        color={theme.colors.skyblue}
-        icon={<ShoppingCartOutlined rev={{}} />}
-        onClick={newOrder}
-      />
+        <CardButton
+          title="Nuevo pedido"
+          description="Accede al punto de venta para crear un pedido"
+          color={theme.colors.skyblue}
+          icon={<ShoppingCartOutlined />}
+          onClick={newOrder}
+        />
 
-      <Drawer
-        title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
-        width={420}
-        onClose={onClose}
-        open={!!current_customer.customer_id}
-        styles={{ body: { paddingBottom: 80 } }}
-      >
-        <CustomerEditor />
-      </Drawer>
-    </Row>
+        <Drawer
+          title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
+          width={420}
+          onClose={onClose}
+          open={!!current_customer.customer_id}
+          styles={{ body: { paddingBottom: 80 } }}
+        >
+          <CustomerEditor />
+        </Drawer>
+      </Row>
+    </div>
   );
 };
 

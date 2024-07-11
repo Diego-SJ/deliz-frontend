@@ -21,6 +21,7 @@ import { Product } from '../products/types';
 import INITIAL_STATE from '@/constants/initial-states';
 import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
+import { cashiersActions } from '../cashiers';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -557,9 +558,10 @@ const customActions = {
           return false;
         }
 
-        dispatch(salesActions.setCashiers({ activeCashier: data[0] as Cashier }));
-        await dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Registro agregado', 4);
+        await dispatch(salesActions.setCashiers({ activeCashier: data[0] as Cashier }));
+        await dispatch(cashiersActions.cash_operations.calculateCashierData());
+
+        message.success('Caja abierta', 4);
         return true;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
@@ -643,29 +645,19 @@ const customActions = {
           .from('cashiers')
           .select('*')
           .eq('is_open', true)
-          .eq('branch_id', '81a16d60-40a5-4dba-a3c1-bc9372240bae');
+          .eq('branch_id', '81a16d60-40a5-4dba-a3c1-bc9372240bae')
+          .single();
 
         if (error) {
           message.error('No se pudo obtener la caja actual', 4);
           return null;
         }
 
-        let activeCashier = cashiers ? (cashiers[0] as Cashier) : ({} as Cashier);
+        let activeCashier = cashiers || ({} as Cashier);
         dispatch(salesActions.setCashiers({ activeCashier }));
 
         return activeCashier;
       },
-    getSalesByCashierAndBranchId: (args: { cashier_id: number }) => async (dispatch: AppDispatch) => {
-      let { data, error } = await supabase.from('sales').select('*').eq('cashier_id', args.cashier_id).eq('branch_id', '');
-
-      if (error) {
-        message.error('No se pudo obtener la lista de ventas', 4);
-        return null;
-      }
-
-      dispatch(salesActions.setCashiers({ salesByCashier: data as Sale[] }));
-      return true;
-    },
   },
 };
 

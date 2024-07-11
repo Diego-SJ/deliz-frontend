@@ -7,13 +7,17 @@ import customersReducer from './reducers/customers';
 import salesReducer from './reducers/sales';
 import usersReducer from './reducers/users';
 import cashiersReducer from './reducers/cashiers';
+import branchesReducer from './reducers/branches';
+import appReducer from './reducers/app';
 
 const rootReducer = combineReducers({
+  app: appReducer,
   products: productsReducer,
   customers: customersReducer,
   sales: salesReducer,
   users: usersReducer,
   cashiers: cashiersReducer,
+  branches: branchesReducer,
 });
 
 const persistConfig = { key: 'deliz.app', version: 1, storage };

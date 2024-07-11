@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   '@ant-design/icons':
-    specifier: ^5.1.4
+    specifier: ^5.3.7
     version: 5.3.7(react-dom@18.3.1)(react@18.3.1)
   '@capacitor/core':
     specifier: ^5.4.1
@@ -18,7 +18,7 @@ dependencies:
     specifier: ^2.44.2
     version: 2.44.2
   antd:
-    specifier: ^5.14.2
+    specifier: ^5.19.0
     version: 5.19.0(date-fns@2.30.0)(react-dom@18.3.1)(react@18.3.1)
   axios:
     specifier: ^1.7.2
@@ -1120,7 +1120,7 @@ packages:
       rc-motion: 2.9.2(react-dom@18.3.1)(react@18.3.1)
       rc-notification: 5.6.0(react-dom@18.3.1)(react@18.3.1)
       rc-pagination: 4.2.0(react-dom@18.3.1)(react@18.3.1)
-      rc-picker: 4.6.6(date-fns@2.30.0)(dayjs@1.11.11)(react-dom@18.3.1)(react@18.3.1)
+      rc-picker: 4.6.7(date-fns@2.30.0)(dayjs@1.11.11)(react-dom@18.3.1)(react@18.3.1)
       rc-progress: 4.0.0(react-dom@18.3.1)(react@18.3.1)
       rc-rate: 2.13.0(react-dom@18.3.1)(react@18.3.1)
       rc-resize-observer: 1.4.0(react-dom@18.3.1)(react@18.3.1)
@@ -2748,8 +2748,8 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
     dev: false
 
-  /rc-picker@4.6.6(date-fns@2.30.0)(dayjs@1.11.11)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-sEWARCNlodubP7/IM6nXHDDIuKZ3gYd5CpS2cYcNORa2telX3nAfllqnGSGjGEFvdtyW+IqGAVatLOmFT0lKYg==}
+  /rc-picker@4.6.7(date-fns@2.30.0)(dayjs@1.11.11)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-ZntxLH863jdNPZq2i6e2+1iXpRfYKHjNfUGgoObA1YExuWAnTCHpZzOkBuS43GnVcnp2MPDp78pH9OZJFd2hLw==}
     engines: {node: '>=8.x'}
     peerDependencies:
       date-fns: '>= 2.x'

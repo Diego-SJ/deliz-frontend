@@ -3,26 +3,26 @@ import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { cashiersActions } from '.';
-import { CashOperation, OperationItem } from './types';
+import { CashOperation } from './types';
 import { salesActions } from '../sales';
-import { Cashier, Sale, SaleDetails } from '../sales/types';
+import { Cashier, SaleDetails } from '../sales/types';
 import { cashierHelpers } from '@/utils/cashiers';
 
 const customActions = {
   cash_operations: {
-    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    get: () => async (dispatch: AppDispatch, getState: AppState) => {
       try {
-        let cash_operations = getState()?.cashiers?.cash_operations;
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-
-        if (!!cash_operations?.data?.length && !args?.refetch) return true;
         if (!activeCashier?.cashier_id) return true;
 
         dispatch(cashiersActions.setLoading(true));
+
         let { data: result, error } = await supabase
           .from('cash_operations')
           .select('*')
-          .eq('cashier_id', activeCashier?.cashier_id); //.range(0, 9);
+          .eq('cashier_id', activeCashier?.cashier_id)
+          .order('created_at', { ascending: false });
+
         dispatch(cashiersActions.setLoading(false));
 
         if (error) {
@@ -31,7 +31,6 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.cash_operation_id as string } as CashOperation)) ?? [];
-        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(cashiersActions.setCashOperations({ data }));
         return true;
@@ -40,27 +39,19 @@ const customActions = {
         return false;
       }
     },
-    getSalesByCashier: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    getSalesByCashier: (_?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
-        let sales_by_cashier = getState()?.cashiers?.cash_operations?.sales_by_cashier;
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-
-        if (!!sales_by_cashier?.length && !args?.refetch) return true;
-
         if (!activeCashier?.cashier_id) return false;
 
         dispatch(cashiersActions.setLoading(true));
+
         let { data: result, error } = await supabase
           .from('sales')
-          .select(
-            `
-        *,
-        customers ( name ),
-        status ( status_id, name )
-      `,
-          )
+          .select(`*, customers ( name ), status ( status_id, name )`)
           .eq('cashier_id', activeCashier?.cashier_id)
-          .eq('status_id', 4); //.range(0, 9);
+          .order('created_at', { ascending: false });
+
         dispatch(cashiersActions.setLoading(false));
 
         if (error) {
@@ -69,7 +60,6 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.sale_id as number } as SaleDetails)) ?? [];
-        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(cashiersActions.setCashOperations({ sales_by_cashier: data }));
         return true;
@@ -78,12 +68,19 @@ const customActions = {
         return false;
       }
     },
-    calculateCashierData: () => async (dispatch: AppDispatch, getState: AppState) => {
+    calculateCashierData: (args?: { cashier?: Cashier }) => async (dispatch: AppDispatch, getState: AppState) => {
+      if (!args?.cashier?.cashier_id) await dispatch(salesActions.cashiers.getActiveCashier());
+      await dispatch(cashiersActions.cash_operations.get());
+      await dispatch(cashiersActions.cash_operations.getSalesByCashier());
+
       try {
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
         let { data = [], sales_by_cashier = [] } = getState()?.cashiers?.cash_operations;
 
-        let sales_amount = sales_by_cashier?.reduce((acc, item) => acc + (item?.total || 0), 0);
+        let sales_amount = sales_by_cashier?.reduce((acc, item) => {
+          let _total = (item?.amount_paid || 0) < (item?.total || 0) ? item?.amount_paid : item?.total;
+          return acc + (_total || 0);
+        }, 0);
         let incomes_amount = data
           ?.filter(item => item?.operation_type === 'INCOME')
           ?.reduce((acc, item) => acc + item?.amount, 0);
@@ -131,7 +128,7 @@ const customActions = {
           return false;
         }
 
-        await dispatch(cashiersActions.cash_operations.get({ refetch: true }));
+        await dispatch(cashiersActions.cash_operations.get());
         await dispatch(cashiersActions.cash_operations.calculateCashierData());
         message.success('Registro agregado', 4);
         return true;
@@ -151,7 +148,7 @@ const customActions = {
           return false;
         }
 
-        dispatch(cashiersActions.cash_operations.get({ refetch: true }));
+        dispatch(cashiersActions.cash_operations.get());
         message.success('Elemento eliminado');
       } catch (error) {
         message.error('No se pudo eliminar este elemento');

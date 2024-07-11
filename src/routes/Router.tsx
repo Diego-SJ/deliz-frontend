@@ -1,4 +1,4 @@
-import MainLayout from '@/components/organisms/MainLayout';
+import MainLayout, { PaddingLayout } from '@/components/organisms/MainLayout';
 import SignIn from '@/components/pages/auth/signIn';
 import SignUp from '@/components/pages/auth/signup';
 import Dashboard from '@/components/pages/dashboard';
@@ -24,8 +24,19 @@ import Orders from '@/components/pages/orders';
 import ProductsReport from '@/components/pages/reports/products';
 import CurrentCashier from '@/components/pages/transactions/cashiers/current-cashier';
 import CashierDetail from '@/components/pages/transactions/cashiers/detail';
+import SettingsPage from '@/components/pages/settings';
+import BranchesPage from '@/components/pages/settings/branches';
+import AddBranchForm from '@/components/pages/settings/branches/add-branch-form';
+import SettingsMenu from '@/components/pages/settings/menu';
+import useMediaQuery from '@/hooks/useMediaQueries';
+import GeneralSettingsPage from '@/components/pages/settings/general';
+import PricesListPage from '@/components/pages/settings/prices-list';
+import CategoriesPage from '@/components/pages/products/categories';
+import ProductSizesPage from '@/components/pages/products/sizes';
+import ProductUnitsPage from '@/components/pages/products/units';
 
 const AppRouter = () => {
+  const { isTablet } = useMediaQuery();
   return (
     <Routes>
       <Route path={APP_ROUTES.AUTH.MAIN.path} element={<Home />} />
@@ -51,35 +62,149 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} element={<Dashboard />} />
 
         {/* PRODUCTS ROUTES - START */}
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path} element={<Products />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path} element={<ProductCategories />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path} element={<ProductSizes />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path} element={<ProductUnits />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path}
+          element={
+            <PaddingLayout>
+              <Products />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path}
+          element={
+            <PaddingLayout>
+              <ProductCategories />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path}
+          element={
+            <PaddingLayout>
+              <ProductSizes />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path}
+          element={
+            <PaddingLayout>
+              <ProductUnits />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path}
+          element={
+            <PaddingLayout>
+              <ProductEditor />
+            </PaddingLayout>
+          }
+        />
         {/* PRODUCTS ROUTES - END */}
 
         {/* ORDERS ROUTES - START */}
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path} element={<Orders />} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path}
+          element={
+            <PaddingLayout>
+              <Orders />
+            </PaddingLayout>
+          }
+        />
         {/* ORDERS ROUTES - END */}
 
         {/* TRANSACTIONS ROUTES - START */}
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path} element={<TransactionsCashiers />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIER_DETAIL.path} element={<CashierDetail />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path} element={<CurrentCashier />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path} element={<OperatingExpenses />} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path}
+          element={
+            <PaddingLayout>
+              <TransactionsCashiers />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIER_DETAIL.path}
+          element={
+            <PaddingLayout>
+              <CashierDetail />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path}
+          element={
+            <PaddingLayout>
+              <CurrentCashier />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.OPERATING_EXPENSES.path}
+          element={
+            <PaddingLayout>
+              <OperatingExpenses />
+            </PaddingLayout>
+          }
+        />
         {/* TRANSACTIONS ROUTES - END */}
 
         {/* REPORTS ROUTES - START */}
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path} element={<ProductsReport />} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path}
+          element={
+            <PaddingLayout>
+              <ProductsReport />
+            </PaddingLayout>
+          }
+        />
         {/* REPORTS ROUTES - END */}
 
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path} element={<Customers />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path} element={<Sales />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path} element={<SaleDetail />} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path}
+          element={
+            <PaddingLayout>
+              <Customers />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path}
+          element={
+            <PaddingLayout>
+              <Sales />
+            </PaddingLayout>
+          }
+        />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path}
+          element={
+            <PaddingLayout>
+              <SaleDetail />
+            </PaddingLayout>
+          }
+        />
+
+        {/* SETTINGS ROUTES - START */}
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsPage />}>
+          {isTablet && <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsMenu />} />}
+          {!isTablet && <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<GeneralSettingsPage />} />}
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path} element={<GeneralSettingsPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.path} element={<BranchesPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.ADD.path} element={<AddBranchForm />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.EDIT.path} element={<AddBranchForm />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path} element={<PricesListPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CATEGORIES.path} element={<CategoriesPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path} element={<ProductSizesPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path} element={<ProductUnitsPage />} />
+
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path} element={<div>USERS</div>} />
+        </Route>
+        {/* SETTINGS ROUTES - END */}
 
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path} element={<DebtorsClients />} />
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<div>SETTINGS</div>} />
       </Route>
       <Route path={APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path} element={<CashRegister />} />
       <Route path="*" element={<Navigate to={APP_ROUTES.AUTH.SIGN_IN.path} replace />} />

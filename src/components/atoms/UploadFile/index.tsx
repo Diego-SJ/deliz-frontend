@@ -51,7 +51,7 @@ const Upload: React.FC<UploadPropsType> = props => {
 
   const uploadButton = (
     <div>
-      <PlusOutlined rev={{}} />
+      <PlusOutlined />
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );

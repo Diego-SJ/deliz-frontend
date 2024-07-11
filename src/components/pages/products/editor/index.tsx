@@ -145,7 +145,7 @@ const ProductEditor = () => {
             title={UI_TEXTS.breadcrumb[action]}
             extra={
               action === 'edit' ? (
-                <Button type="primary" danger icon={<DeleteOutlined rev={{}} />} onClick={onDelete} loading={loading}>
+                <Button type="primary" danger icon={<DeleteOutlined />} onClick={onDelete} loading={loading}>
                   Eliminar
                 </Button>
               ) : null

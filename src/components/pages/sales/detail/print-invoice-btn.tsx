@@ -72,7 +72,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
 
   return (
     <>
-      <Button type="default" icon={<FileProtectOutlined rev={{}} />} block size="large" onClick={showDrawer} loading={loading}>
+      <Button type="default" icon={<FileProtectOutlined />} block size="large" onClick={showDrawer} loading={loading}>
         Ver nota
       </Button>
 
@@ -85,10 +85,10 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex gap-4 px-6 justify-center pt-4">
-          <Button onClick={downloadInvoice} icon={<PrinterOutlined rev={{}} />}>
+          <Button onClick={downloadInvoice} icon={<PrinterOutlined />}>
             Imprimir
           </Button>
-          <Button onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined rev={{}} />} loading={messageLoading}>
+          <Button onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined />} loading={messageLoading}>
             Enviar via Whatsapp
           </Button>
         </div>

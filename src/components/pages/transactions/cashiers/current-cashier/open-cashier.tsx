@@ -29,8 +29,9 @@ import {
   Typography,
   message,
 } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { cashiersActions } from '@/redux/reducers/cashiers';
+import CardRoot from '@/components/atoms/Card';
 
 type Props = {
   onSuccess?: (args: boolean) => void;
@@ -45,6 +46,7 @@ export const OPERATION_TYPE_NAME = {
 export const PAYMENT_METHOD_NAME = {
   CASH: 'en efectivo',
   CC: 'con tarjeta',
+  DC: 'con tarjeta',
   CARD: 'con tarjeta',
   TRANSFER: 'por transferencia',
 };
@@ -66,25 +68,11 @@ const OpenCashier = ({ onSuccess }: Props) => {
   const [addOperationForm] = Form.useForm();
   const [closeDayForm] = Form.useForm();
   const dispatch = useAppDispatch();
-  const { cashiers, loading, sales } = useAppSelector(({ sales }) => sales);
+  const { cashiers, loading } = useAppSelector(({ sales }) => sales);
   const { cash_operations } = useAppSelector(({ cashiers }) => cashiers);
   const [openCloseCashier, setOpenCloseCashier] = useState(false);
   const [operationType, setOperationType] = useState<'INCOME' | 'EXPENSE' | null>(null);
   const { isTablet } = useMediaQuery();
-  const firtRender = useRef(false);
-
-  useEffect(() => {
-    if (!firtRender.current) {
-      firtRender.current = true;
-      dispatch(salesActions.cashiers.get({ refetch: true }));
-    }
-  }, [firtRender.current, dispatch]);
-
-  // useEffect(() => {
-  //   if (!!cashiers?.activeCashier?.cashier_id) {
-  //     dispatch(salesActions.cashiers.getSalesByCashierAndBranchId(cashiers?.activeCashier?.cashier_id));
-  //   }
-  // }, [dispatch, cashiers?.activeCashier]);
 
   const onClose = () => {
     form.resetFields();
@@ -92,22 +80,13 @@ const OpenCashier = ({ onSuccess }: Props) => {
   };
 
   const onFinish = async (values: Cashier) => {
-    let success = false;
-    success = await dispatch(salesActions.cashiers.add(values));
-    // if (cashiers?.drawer === 'new') success = await dispatch(salesActions.cashiers.add(values));
-    // else if (cashiers?.drawer === 'edit') {
-    //   success = await dispatch(salesActions.cashiers.update({ ...values, cashier_id: cashiers?.selected?.cashier_id }));
-    // }
+    let success = await dispatch(salesActions.cashiers.add(values));
 
     if (success) {
       form.resetFields();
       onClose();
       if (onSuccess) onSuccess(success);
     }
-  };
-
-  const addNewCashier = () => {
-    dispatch(salesActions.setCashiers({ drawer: 'new' }));
   };
 
   const closeCashier = () => {
@@ -199,7 +178,7 @@ const OpenCashier = ({ onSuccess }: Props) => {
   return (
     <Row gutter={[20, 20]}>
       <Col xs={24}>
-        <Card>
+        <CardRoot>
           <Row gutter={[20, 20]}>
             <Col xs={24} md={14}>
               <Card.Meta
@@ -226,12 +205,12 @@ const OpenCashier = ({ onSuccess }: Props) => {
               </Col>
             )}
           </Row>
-        </Card>
+        </CardRoot>
         {!!cashiers?.activeCashier && (
           <>
             <Row style={{ width: '100%', marginTop: 10 }} gutter={[10, 10]}>
               <Col xs={24} md={24} lg={10}>
-                <Card className="w-full" styles={{ body: { padding: 0, display: 'flex', flexDirection: 'column' } }}>
+                <CardRoot className="w-full" styles={{ body: { padding: 0, display: 'flex', flexDirection: 'column' } }}>
                   <Typography.Title level={5} className="m-0 py-3 px-4" style={{ marginBottom: 0 }}>
                     Administración del dinero
                   </Typography.Title>
@@ -290,10 +269,10 @@ const OpenCashier = ({ onSuccess }: Props) => {
                       {functions.money(cash_operations?.total_amount || 0)}
                     </Typography.Text>
                   </div>
-                </Card>
+                </CardRoot>
               </Col>
               <Col xs={24} md={24} lg={14}>
-                <Card className="max-h-[30rem] overflow-auto" styles={{ body: { padding: 0 } }}>
+                <CardRoot className="max-h-[30rem] overflow-auto" styles={{ body: { padding: 0 } }}>
                   <List
                     itemLayout="horizontal"
                     dataSource={cash_operations?.operations || []}
@@ -310,16 +289,34 @@ const OpenCashier = ({ onSuccess }: Props) => {
                               <div className="flex flex-col">
                                 <Typography.Text className="text-base font-normal">
                                   {OPERATION_TYPE_NAME[item.operation_type] || '- - -'}{' '}
-                                  {PAYMENT_METHOD_NAME[item.payment_method] || '- - -'}
+                                  {PAYMENT_METHOD_NAME[item.payment_method] || item.payment_method || '- - -'}
                                 </Typography.Text>
-                                <Typography.Text className="text-sm text-gray-400 font-light">
+                                <Typography.Text className="text-sm text-slate-400 font-light">
                                   {item.name || '- - -'}
                                 </Typography.Text>
                               </div>
                             </div>
                             <div className="flex flex-col items-end min-w-[35%]">
-                              <Typography.Text className="text-base font-medium">{functions.money(item.amount)}</Typography.Text>
-                              <Typography.Text className="text-sm text-gray-400">
+                              <Typography.Text className="text-base font-medium mb-1">
+                                {item.operation_type === 'SALE' ? (
+                                  <>
+                                    {item.amount < (item.total || 0) ? (
+                                      <>
+                                        {functions.money(item.amount)}
+                                        <span className="text-sm text-slate-500 font-light">
+                                          {' '}
+                                          / {functions.money(item.total)}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      functions.money(item.amount)
+                                    )}
+                                  </>
+                                ) : (
+                                  functions.money(item.amount)
+                                )}
+                              </Typography.Text>
+                              <Typography.Text className="text-xs text-slate-400 font-light">
                                 {functions.tableDate(item.created_at)}
                               </Typography.Text>
                             </div>
@@ -328,7 +325,7 @@ const OpenCashier = ({ onSuccess }: Props) => {
                       );
                     }}
                   />
-                </Card>
+                </CardRoot>
               </Col>
             </Row>
           </>

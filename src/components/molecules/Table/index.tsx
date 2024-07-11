@@ -17,7 +17,7 @@ const Table: React.FC<Props> = ({ onRefresh, totalItems, ...props }) => {
       <Row gutter={[20, 20]} style={{ position: 'absolute', bottom: props?.dataSource?.length ? '15px' : '-30px' }}>
         <Col>
           <Tooltip title="Recargar">
-            <Button size="small" type="text" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh}>
+            <Button size="small" type="text" icon={<ReloadOutlined />} onClick={onRefresh}>
               Recargar
             </Button>
           </Tooltip>

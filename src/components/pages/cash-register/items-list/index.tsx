@@ -56,8 +56,8 @@ const CashRegisterItemsList = () => {
                 </div>
               </div>
               <div className="w-full flex justify-center items-center gap-3">
-                <Button shape="default" size="large" icon={<EditOutlined rev={{}} />} onClick={() => openModal(record)} />
-                <Button shape="default" size="large" icon={<DeleteOutlined rev={{}} />} onClick={() => onRemove(record)} />
+                <Button shape="default" size="large" icon={<EditOutlined />} onClick={() => openModal(record)} />
+                <Button shape="default" size="large" icon={<DeleteOutlined />} onClick={() => onRemove(record)} />
               </div>
             </li>
           );

@@ -11,6 +11,7 @@ export const cashierHelpers = {
           key: item.cash_operation_id,
           name: item.name,
           amount: item.amount,
+          total: 0,
           operation_type: item.operation_type,
           payment_method: item.payment_method,
           created_at: item.created_at,
@@ -24,7 +25,8 @@ export const cashierHelpers = {
         ({
           key: item.sale_id?.toString(),
           name: item.customers?.name || 'Venta',
-          amount: item.total || 0,
+          amount: (item.amount_paid || 0) < (item.total || 0) ? item.amount_paid : item.total,
+          total: item.total,
           operation_type: 'SALE',
           payment_method: item.payment_method,
           created_at: item.created_at,
@@ -40,7 +42,7 @@ export const cashierHelpers = {
   getWhosalePrice: (product?: Product, zone?: number) => {
     if (!product) return 0;
     let _zone = zone || 1;
-    return (product?.wholesale_price || 0) + ZONES[_zone][product?.category_id][product?.size_id || 2];
+    return (product?.wholesale_price || 0) + ZONES[_zone][product?.category_id || 1][product?.size_id || 2];
   },
   isValidPhone: (phone: string) => {
     if (!phone || phone?.length !== 10) return false;

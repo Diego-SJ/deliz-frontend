@@ -12,18 +12,12 @@ import { cashiersActions } from '@/redux/reducers/cashiers';
 
 const columns: ColumnsType<Cashier> = [
   {
-    title: '',
-    dataIndex: 'cashier_id',
-    width: 55,
-    render: value => <Avatar size="large">{value}</Avatar>,
-  },
-  {
     title: 'Nombre',
     width: 200,
     dataIndex: 'name',
   },
   {
-    title: 'Monto inicial',
+    title: 'Monto de apertura',
     width: 120,
     align: 'center',
     dataIndex: 'initial_amount',
@@ -32,14 +26,14 @@ const columns: ColumnsType<Cashier> = [
     },
   },
   {
-    title: 'Monto recibido',
+    title: 'Monto al cierre',
     dataIndex: 'received_amount',
     align: 'center',
     width: 120,
     render: (value = 0) => functions.money(value),
   },
   {
-    title: 'Monto esperado',
+    title: 'Monto esperado al cierre',
     dataIndex: 'final_amount',
     align: 'center',
     width: 150,
@@ -70,12 +64,14 @@ const columns: ColumnsType<Cashier> = [
     title: 'Fecha de apertura',
     dataIndex: 'created_at',
     align: 'center',
+    width: 240,
     render: (value = '') => functions.tableDate(value),
   },
   {
     title: 'Fecha de cierre',
     dataIndex: 'close_date',
     align: 'center',
+    width: 240,
     render: (value = '') => functions.tableDate(value),
   },
 ];

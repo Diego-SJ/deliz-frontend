@@ -251,7 +251,7 @@ const SaleDetail = () => {
 
             <Col style={{ marginTop: 5 }}>
               <Row align="middle">
-                <PhoneOutlined rev={{}} style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <PhoneOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -261,7 +261,7 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
               <Row align="middle">
-                <MailOutlined rev={{}} style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <MailOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -271,7 +271,7 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
               <Row align="middle">
-                <EnvironmentOutlined rev={{}} style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <EnvironmentOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -281,7 +281,7 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
             </Col>
-            <Button type="default" icon={<EditOutlined rev={{}} />} block size="large" onClick={handleModal}>
+            <Button type="default" icon={<EditOutlined />} block size="large" onClick={handleModal}>
               Editar
             </Button>
           </Card>
@@ -467,7 +467,7 @@ const SaleDetail = () => {
                 size="large"
                 value={customerId}
                 placeholder="Buscar cliente"
-                suffixIcon={<UserOutlined rev={{}} />}
+                suffixIcon={<UserOutlined />}
                 optionFilterProp="children"
                 onChange={setCustomerId}
                 virtual={false}

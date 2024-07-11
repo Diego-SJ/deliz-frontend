@@ -193,7 +193,7 @@ const CashRegister = () => {
       {isPhablet && (
         <FloatButton
           style={{ transform: 'scale(1.8)' }}
-          icon={<UnorderedListOutlined rev={{}} />}
+          icon={<UnorderedListOutlined />}
           type="default"
           onClick={() => setDrawerOpen(true)}
         />

@@ -53,7 +53,7 @@ const functions = {
   },
   fullDateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
-    return format(new Date(_date), 'PPPPpppp', { locale: es });
+    return format(new Date(_date), 'PPPPpp', { locale: es });
   },
 
   currentDate: () => {

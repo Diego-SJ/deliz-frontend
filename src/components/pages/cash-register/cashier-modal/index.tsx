@@ -249,7 +249,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
               onPressEnter={handleOk}
               readOnly={isTablet}
               autoFocus
-              addonBefore={<ShoppingCartOutlined rev={{}} />}
+              addonBefore={<ShoppingCartOutlined />}
               onFocus={({ target }) => {
                 target.select();
                 setCurrentInput('quantity');
@@ -275,7 +275,7 @@ const CashierModal = ({ open, currentProduct, action = 'ADD', onCancel, casherIt
                 setCurrentInput('price');
                 setSpecialPrice(subtotal);
               }}
-              addonBefore={<DollarOutlined rev={{}} />}
+              addonBefore={<DollarOutlined />}
               onChange={value => setSpecialPrice(value as number)}
             />
           </div>

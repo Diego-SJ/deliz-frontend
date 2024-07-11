@@ -57,7 +57,30 @@ export const APP_ROUTES = {
       },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes', PRODUCTS: { path: '/app/reports/products' } },
-      SETTINGS: { path: '/app/settings', title: 'Configuración' },
+      SETTINGS: {
+        path: '/app/settings',
+        title: 'Configuración',
+        USERS: { path: '/app/settings/users' },
+        GENERAL: { path: '/app/settings/general' },
+        BRANCHES: {
+          path: '/app/settings/branches',
+          ADD: {
+            path: '/app/settings/branches/add',
+          },
+          EDIT: {
+            path: '/app/settings/branches/edit/:branch_id',
+            hash: (_: TemplateStringsArray, branch_id: string) => `/app/settings/branches/edit/${branch_id}`,
+          },
+        },
+        PRICES_LIST: { path: '/app/settings/prices-list' },
+        CATEGORIES: { path: '/app/settings/categories' },
+        SIZES: {
+          path: '/app/settings/sizes',
+        },
+        UNITS: {
+          path: '/app/settings/units',
+        },
+      },
     },
   },
 };

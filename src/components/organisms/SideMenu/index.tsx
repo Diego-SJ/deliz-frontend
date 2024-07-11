@@ -7,15 +7,14 @@ import {
   ExclamationCircleOutlined,
   BarChartOutlined,
   BarcodeOutlined,
-  PieChartOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
-import DelizLogo from '@/assets/img/webp/logo-deliz.webp';
+import DelizLogo from '@/assets/img/webp/deliz-logo-bn.webp';
 import { Modal } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
@@ -42,28 +41,7 @@ const ITEM_LIST = [
     key: 'products',
     icon: ShoppingOutlined,
     label: 'Productos',
-    children: [
-      {
-        key: 'products.list',
-        label: 'Productos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
-      },
-      {
-        key: 'products.categories',
-        label: 'Categorias',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path,
-      },
-      {
-        key: 'products.size',
-        label: 'Tamaños',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path,
-      },
-      {
-        key: 'products.units',
-        label: 'Unidades de medida',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path,
-      },
-    ],
+    path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
   },
   {
     key: 'customers',
@@ -109,7 +87,7 @@ const ITEM_LIST = [
     key: 'settings',
     icon: SettingOutlined,
     label: 'Configuración',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path,
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path,
   },
 ];
 
@@ -120,13 +98,6 @@ const SALES_ACTIONS = [
     label: 'Dashboard',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
-  // {
-  //   key: 'point_of_sale',
-  //   icon: BarcodeOutlined,
-  //   label: 'Punto de venta',
-  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
-  // },
-
   {
     key: 'customers',
     icon: TeamOutlined,
@@ -142,22 +113,14 @@ const SALES_ACTIONS = [
 ];
 
 const SideMenu = (props: SideMenuProps) => {
-  const location = useLocation();
   const { isTablet, isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [currentKey, setCurrentKey] = useState(0);
   const { user_auth } = useAppSelector(({ users }) => users);
+  const { business } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
   const [currentItems, setCurrentItems] = useState<any[]>([]);
   const isSales = user_auth?.user?.email === 'sales@deliz.com';
-
-  useEffect(() => {
-    const key = currentItems.findIndex(item => {
-      return location.pathname.includes(item?.path || '');
-    });
-    setCurrentKey(key || 0);
-  }, [location.pathname, currentItems]);
 
   useEffect(() => {
     if (isSales) setCurrentItems(SALES_ACTIONS);
@@ -167,7 +130,7 @@ const SideMenu = (props: SideMenuProps) => {
   const handleLogout = () => {
     modal.confirm({
       title: 'Cerrar sesión',
-      icon: <ExclamationCircleOutlined rev={{}} />,
+      icon: <ExclamationCircleOutlined />,
       content: 'Tu sesión será finalizada ¿deseas continuar?',
       okText: 'Continuar',
       cancelText: 'Cancelar',
@@ -184,9 +147,9 @@ const SideMenu = (props: SideMenuProps) => {
 
   return (
     <>
-      <Logo src={DelizLogo} title="D'eliz" />
+      <Logo src={!!business?.logo_url ? business.logo_url : DelizLogo} title="D'eliz" />
       <MenuRoot
-        selectedKeys={[`${currentKey}`]}
+        theme={'dark' as any}
         mode="inline"
         inlineCollapsed={isPhablet && !isTablet}
         items={currentItems.map((item, key) => ({
@@ -201,10 +164,13 @@ const SideMenu = (props: SideMenuProps) => {
               }))
             : null,
         }))}
+        style={{ borderInlineEnd: 'none' }}
       />
       <MenuRoot
         className="bottom"
         mode="inline"
+        theme={'dark' as any}
+        style={{ borderInlineEnd: 'none' }}
         inlineCollapsed={isPhablet}
         items={[
           {

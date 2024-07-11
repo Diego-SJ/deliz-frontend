@@ -25,9 +25,9 @@ const MODAL_TITLE = {
 
 const MODAL_ICON = {
   '': '',
-  APPLY_SHIPPING: <SendOutlined rev={{}} />,
-  APPLY_DISCOUNT: <PercentageOutlined rev={{}} />,
-  ADD_NEW_ITEM: <PlusCircleFilled rev={{}} />,
+  APPLY_SHIPPING: <SendOutlined />,
+  APPLY_DISCOUNT: <PercentageOutlined />,
+  ADD_NEW_ITEM: <PlusCircleFilled />,
 };
 
 type CashierActionsProps = {
@@ -175,7 +175,7 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
         <Col span={6}>
           <Tooltip title="Aplicar envío">
             <ActionButton onClick={() => openModal('APPLY_SHIPPING')}>
-              <Button icon={<SendOutlined rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<SendOutlined />} size="small" type="primary" shape="circle" />
               Envio
             </ActionButton>
           </Tooltip>
@@ -183,7 +183,7 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
         <Col span={6}>
           <Tooltip title="Aplicar descuento">
             <ActionButton onClick={() => openModal('APPLY_DISCOUNT')}>
-              <Button icon={<PercentageOutlined rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<PercentageOutlined />} size="small" type="primary" shape="circle" />
               Descuento
             </ActionButton>
           </Tooltip>
@@ -191,7 +191,7 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
         <Col span={6}>
           <Tooltip title="Cancelar orden">
             <ActionButton onClick={cancelOrder}>
-              <Button icon={<DeleteFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<DeleteFilled />} size="small" type="primary" shape="circle" />
               Cancelar
             </ActionButton>
           </Tooltip>
@@ -199,21 +199,21 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
         {/* <Col span={6}>
           <Tooltip title="Imprimir ticket">
             <ActionButton>
-              <Button icon={<PrinterFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<PrinterFilled  />} size="small" type="primary" shape="circle" />
             </ActionButton>
           </Tooltip>
         </Col>
         <Col span={6}>
           <Tooltip title="Guardar borrador">
             <ActionButton>
-              <Button icon={<SaveFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<SaveFilled  />} size="small" type="primary" shape="circle" />
             </ActionButton>
           </Tooltip>
         </Col> */}
         <Col span={6}>
           <Tooltip title="Agregar extra">
             <ActionButton onClick={() => openModal('ADD_NEW_ITEM')}>
-              <Button icon={<PlusCircleFilled rev={{}} />} size="small" type="primary" shape="circle" />
+              <Button icon={<PlusCircleFilled />} size="small" type="primary" shape="circle" />
               Extra
             </ActionButton>
           </Tooltip>

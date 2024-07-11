@@ -20,13 +20,13 @@ const Header = ({ onClick }: HeaderProps) => {
   return (
     <HeaderRoot>
       {isTablet ? (
-        <Button onClick={onClick} size="large" type="dashed" icon={<MenuOutlined rev={{}} />}></Button>
+        <Button onClick={onClick} size="large" type="dashed" icon={<MenuOutlined />}></Button>
       ) : (
         <Typography.Title level={4}>Dashboard</Typography.Title>
       )}
       <HeaderActions>
         {/* <Space size="middle">
-          <SearchOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.tertiary }} />
+          <SearchOutlined  style={{ fontSize: 22, color: theme.colors.tertiary }} />
           <MessagesPopover />
           <NotificationsPopover />
         </Space> */}

@@ -28,6 +28,7 @@ export type OperationItem = {
   key: string;
   name: string;
   amount: number;
+  total?: number;
   operation_type: 'EXPENSE' | 'INCOME' | 'SALE';
   payment_method: PaymentMethod;
   created_at: string;

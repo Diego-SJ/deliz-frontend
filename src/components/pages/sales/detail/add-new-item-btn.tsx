@@ -152,7 +152,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
 
   return (
     <>
-      <Button type="default" icon={<PlusOutlined rev={{}} />} block size="large" onClick={openModal}>
+      <Button type="default" icon={<PlusOutlined />} block size="large" onClick={openModal}>
         Agregar item
       </Button>
       <Modal
@@ -255,7 +255,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               target.select();
               setCurrentInput('price');
             }}
-            addonBefore={<DollarOutlined rev={{}} />}
+            addonBefore={<DollarOutlined />}
             onChange={value => setSpecialPrice(value as number)}
           />
           <Space height="10px" />
@@ -270,7 +270,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             value={quantity}
             onPressEnter={handleOk}
             readOnly={isTablet}
-            addonBefore={<ShoppingCartOutlined rev={{}} />}
+            addonBefore={<ShoppingCartOutlined />}
             onFocus={({ target }) => {
               target.select();
               setCurrentInput('quantity');

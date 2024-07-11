@@ -14,7 +14,7 @@ const MenuPopover = () => {
   const handleLogout = () => {
     modal.confirm({
       title: 'Cerrar sesión',
-      icon: <ExclamationCircleOutlined rev={{}} />,
+      icon: <ExclamationCircleOutlined />,
       content: 'Tu sesión será finalizada ¿deseas continuar?',
       okText: 'Continuar',
       cancelText: 'Cancelar',
@@ -26,22 +26,22 @@ const MenuPopover = () => {
 
   return (
     <Popover
-      triggerComponent={<CaretDownOutlined rev={{}} style={{ fontSize: 22, color: theme.colors.primary, marginTop: 10 }} />}
+      triggerComponent={<CaretDownOutlined style={{ fontSize: 22, color: theme.colors.primary, marginTop: 10 }} />}
       placement="bottomRight"
       trigger="click"
       nopadding
     >
       <PopoverBody>
         <IconItem>
-          <TeamOutlined rev={{}} />
+          <TeamOutlined />
           <Typography.Text>Perfil</Typography.Text>
         </IconItem>
         <IconItem>
-          <SettingOutlined rev={{}} />
+          <SettingOutlined />
           <Typography.Text>Configuración</Typography.Text>
         </IconItem>
         <IconItem className="danger" onClick={handleLogout}>
-          <LogoutOutlined rev={{}} />
+          <LogoutOutlined />
           <Typography.Text>Cerrar sesión</Typography.Text>
         </IconItem>
       </PopoverBody>

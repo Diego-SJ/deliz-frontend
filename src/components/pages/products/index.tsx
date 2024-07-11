@@ -147,7 +147,7 @@ const Products = () => {
   };
 
   return (
-    <div>
+    <>
       <Row justify="space-between" align="middle">
         <Col span={8} xs={24}>
           <Breadcrumb
@@ -169,7 +169,7 @@ const Products = () => {
                 placeholder="Buscar producto"
                 style={{ width: '100%' }}
                 allowClear
-                prefix={<SearchOutlined rev={{}} />}
+                prefix={<SearchOutlined />}
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
@@ -187,7 +187,7 @@ const Products = () => {
               </Form.Item>
             </Col>
             <Col lg={{ span: 6, offset: 6 }} xs={{ offset: 0, span: 12 }}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+              <Button block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
                 Nuevo
               </Button>
             </Col>
@@ -207,7 +207,7 @@ const Products = () => {
           />
         </Col>
       </Row>
-    </div>
+    </>
   );
 };
 

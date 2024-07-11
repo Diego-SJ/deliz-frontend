@@ -18,7 +18,9 @@ const AppThemeProvider = ({ children }: Props) => {
           theme={{
             token: {
               colorPrimary: theme.colors.primary,
+              colorLink: theme.colors.secondary,
             },
+            components: {},
           }}
         >
           {children}

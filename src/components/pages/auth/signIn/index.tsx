@@ -27,7 +27,7 @@ const SignIn = () => {
           >
             <Typography.Title level={2}>Bienvenido a Ecommerce</Typography.Title>
             <Form.Item>
-              <Button size="large" icon={<GoogleOutlined rev={{}} />}>
+              <Button size="large" icon={<GoogleOutlined />}>
                 Inicia con Google
               </Button>
             </Form.Item>

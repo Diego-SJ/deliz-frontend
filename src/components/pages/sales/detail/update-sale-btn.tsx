@@ -71,7 +71,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
 
   return (
     <>
-      <Button type="default" icon={<EditOutlined rev={{}} />} block size="large" onClick={openModal}>
+      <Button type="default" icon={<EditOutlined />} block size="large" onClick={openModal}>
         Editar
       </Button>
 

@@ -136,7 +136,7 @@ const Orders = () => {
         <Col xs={24} lg={10}>
           <Card hoverable onClick={onAddNew} style={{ marginBottom: 10 }}>
             <Card.Meta
-              avatar={<Avatar icon={<ShoppingCartOutlined rev={{}} />} style={{ background: theme.colors.skyblue }} size={60} />}
+              avatar={<Avatar icon={<ShoppingCartOutlined />} style={{ background: theme.colors.skyblue }} size={60} />}
               title="Nuevo pedido"
               description="Accede al punto de venta para crear un pedido"
             />

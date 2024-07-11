@@ -1,0 +1,134 @@
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { App, Button, Card, Form, Input, List, Modal, Tag, Typography } from 'antd';
+
+import BreadcrumbSettings from '../menu/breadcrumb';
+import { useState } from 'react';
+
+const PricesListPage = () => {
+  const [form] = Form.useForm();
+  const { message, modal } = App.useApp();
+  const [open, setOpen] = useState(false);
+
+  const openModal = () => {
+    setOpen(true);
+  };
+
+  const closeModal = () => {
+    form.resetFields();
+    setOpen(false);
+  };
+
+  const onEdit = (data: { price_id: string; name: string }) => {
+    form.setFieldValue('name', data.name);
+    form.setFieldValue('price_id', data.price_id);
+    openModal();
+  };
+
+  const onDelete = (price_id: string) => {
+    modal.confirm({
+      title: '¿Estás seguro de eliminar este precio?',
+      content: 'Una vez eliminado, no podrás recuperarlo',
+      okText: 'Eliminar',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        message.success('Precio eliminado correctamente');
+      },
+    });
+  };
+
+  return (
+    <div className="p-4 max-w-[730px] w-full mx-auto">
+      <BreadcrumbSettings items={[{ label: 'Lista de precios' }]} />
+
+      <div className="flex flex-col mb-2 w-full">
+        <Typography.Title level={4}>Lista de precios</Typography.Title>
+
+        <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
+          <Typography.Text className="text-gray-500">
+            Configura las listas de precios que deseas ofrecerle a tus clientes
+          </Typography.Text>
+
+          <Button icon={<PlusCircleOutlined />} onClick={openModal}>
+            Agregar nuevo
+          </Button>
+        </div>
+      </div>
+
+      <Card style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Precios" className="shadow-md rounded-xl">
+        <List
+          itemLayout="horizontal"
+          footer={
+            <div className="px-2">
+              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
+                Agregar nuevo
+              </Button>
+            </div>
+          }
+          className="px-0"
+          dataSource={[{ name: 'Publico', price_id: 'fwefwefwefwefew' }]}
+          renderItem={item => (
+            <List.Item
+              styles={{ actions: { paddingRight: 15, margin: 0 } }}
+              classNames={{ actions: 'flex' }}
+              className="flex"
+              actions={[
+                <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
+                  Editar
+                </Button>,
+                <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.price_id)}>
+                  Eliminar
+                </Button>,
+              ]}
+            >
+              <div className="pl-4 md:pl-6 flex gap-2">
+                <Typography.Text>{item.name}</Typography.Text>
+                <Tag>default</Tag>
+              </div>
+            </List.Item>
+          )}
+        />
+      </Card>
+
+      <Modal
+        open={open}
+        onClose={closeModal}
+        title={form.getFieldValue('price_id') ? 'Editar precio' : 'Nuevo precio'}
+        onCancel={closeModal}
+        onOk={async () => {
+          await form
+            .validateFields()
+            .then(values => {
+              console.log(values);
+
+              form.resetFields();
+              closeModal();
+              message.success('Precio guardado correctamente');
+            })
+            .catch(() => {
+              message.error('Por favor, completa los campos requeridos');
+            });
+        }}
+        width={340}
+        okText="Guardar"
+        cancelText="Cancelar"
+      >
+        <Typography.Text type="secondary">
+          {form.getFieldValue('price_id')
+            ? 'Al editar el tipo de precio, se actualizará en todos los productos que lo tengan asignado'
+            : 'Una vez creado el tipo de precio, podrás asignarlo a tus productos'}
+        </Typography.Text>
+        <Form form={form} layout="vertical" className="mt-4">
+          <Form.Item name="price_id" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Nombre" name="name" rules={[{ required: true, message: 'Este campo es requerido' }]}>
+            <Input placeholder="Nombre del precio" />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default PricesListPage;

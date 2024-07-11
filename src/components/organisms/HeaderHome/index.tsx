@@ -38,14 +38,14 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
       <HeaderActions>
         <Space>
           <Tooltip title="Instagram">
-            <Button icon={<InstagramOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={openInstagram} />
+            <Button icon={<InstagramOutlined />} type="dashed" size="large" shape="circle" onClick={openInstagram} />
           </Tooltip>
           <Tooltip title="Whatsapp">
-            <Button icon={<WhatsAppOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={openWhatsapp} />
+            <Button icon={<WhatsAppOutlined />} type="dashed" size="large" shape="circle" onClick={openWhatsapp} />
           </Tooltip>
           <Tooltip title="Carrito">
             <Button
-              icon={<ShoppingCartOutlined rev={{}} />}
+              icon={<ShoppingCartOutlined />}
               type="dashed"
               size="large"
               shape="circle"
@@ -56,7 +56,7 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
         <Divider type="vertical" />
         <Tooltip title="Iniciar sesión">
           <Button
-            icon={<UserOutlined rev={{}} />}
+            icon={<UserOutlined />}
             type="primary"
             size="large"
             shape="circle"

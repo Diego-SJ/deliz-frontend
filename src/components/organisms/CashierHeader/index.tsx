@@ -59,7 +59,7 @@ const CashierHeader = () => {
           {!isSales && (
             <Tooltip title="Ventas">
               <Button
-                icon={<ShoppingCartOutlined rev={{}} />}
+                icon={<ShoppingCartOutlined />}
                 type="dashed"
                 onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
               >
@@ -69,18 +69,14 @@ const CashierHeader = () => {
           )}
 
           <Tooltip title="Clientes">
-            <Button
-              icon={<TeamOutlined rev={{}} />}
-              type="dashed"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path)}
-            >
+            <Button icon={<TeamOutlined />} type="dashed" onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path)}>
               {isMobile ? '' : 'Clientes'}
             </Button>
           </Tooltip>
           {!isSales && (
             <Tooltip title="Productos">
               <Button
-                icon={<AppstoreOutlined rev={{}} />}
+                icon={<AppstoreOutlined />}
                 type="dashed"
                 onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
               >
@@ -89,13 +85,13 @@ const CashierHeader = () => {
             </Tooltip>
           )}
           {/* <Tooltip title="Venta aleatoria">
-            <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
+            <Button icon={<InteractionOutlined  />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
           </Tooltip> */}
         </Space>
         <Divider type="vertical" />
         <Tooltip title="Ir a inicio">
           <Button
-            icon={<HomeOutlined rev={{}} />}
+            icon={<HomeOutlined />}
             type="dashed"
             size="large"
             shape="circle"

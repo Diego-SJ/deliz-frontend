@@ -62,7 +62,7 @@ const CashierCustomer = () => {
         value={currentCustomerId as number}
         placeholder="Buscar cliente"
         virtual={false}
-        suffixIcon={<UserOutlined rev={{}} />}
+        suffixIcon={<UserOutlined />}
         optionFilterProp="children"
         onChange={onChange}
         filterOption={(input, option) => functions.includes(option?.label, input.toLowerCase())}
@@ -75,7 +75,7 @@ const CashierCustomer = () => {
           );
         }}
       />
-      <Button icon={<UserAddOutlined rev={{}} />} shape="circle" size="large" type="primary" onClick={onAddNew} />
+      <Button icon={<UserAddOutlined />} shape="circle" size="large" type="primary" onClick={onAddNew} />
       <Drawer
         title="Agregar nuevo cliente"
         width={350}

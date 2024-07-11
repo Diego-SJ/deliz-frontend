@@ -1,0 +1,13 @@
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload-list.ant-upload-list-picture-circle
+  .ant-upload-list-item-container {
+  width: 180px !important;
+  height: 180px !important;
+  background: rgba(128, 128, 128, 0.206);
+  border-radius: 100%;
+}
+
+.ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+  width: 180px !important;
+  height: 180px !important;
+}

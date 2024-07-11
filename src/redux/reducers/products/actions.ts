@@ -2,7 +2,6 @@ import { AppDispatch, AppState } from '@/redux/store';
 import { productActions } from './';
 import { supabase } from '@/config/supabase';
 import { Category, Product, Size, Unit } from './types';
-import { v4 as uuid } from 'uuid';
 import { message } from 'antd';
 import { BUCKETS } from '@/constants/buckets';
 import { RcFile } from 'antd/es/upload';

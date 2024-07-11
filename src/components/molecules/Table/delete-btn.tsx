@@ -42,7 +42,7 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
         <Col>
           <Tooltip title="Eliminar">
             <Button onClick={() => showModal('delete')}>
-              <DeleteOutlined rev={{}} />
+              <DeleteOutlined />
             </Button>
           </Tooltip>
         </Col>
@@ -50,7 +50,7 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
           <Col>
             <Tooltip title="Editar">
               <Button onClick={handleEdit}>
-                <EditOutlined rev={{}} />
+                <EditOutlined />
               </Button>
             </Tooltip>
           </Col>
