@@ -2,7 +2,9 @@ import { STATUS } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Category } from '@/redux/reducers/products/types';
+import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Select } from 'antd';
+import { useState } from 'react';
 
 const UI_TEXTS = {
   saveBtn: { edit: 'Guardar cambios', add: 'Guardar' },
@@ -58,6 +60,32 @@ const CategoryEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
         </Button>
       </Form.Item>
     </Form>
+  );
+};
+
+export const QuickCategoryCreationForm = ({ onSuccess }: { onSuccess?: (category_id: number) => void }) => {
+  const [categoryName, setCategoryName] = useState('');
+  const dispatch = useAppDispatch();
+
+  const onClick = async () => {
+    const category_id = await dispatch(productActions.categories.add({ name: categoryName, description: categoryName }));
+    setCategoryName('');
+    if (onSuccess) onSuccess(category_id);
+  };
+
+  return (
+    <div className="flex gap-4 py-1 px-2">
+      <Input
+        className="w-full"
+        placeholder="Nueva categoría"
+        onKeyDown={e => e.stopPropagation()}
+        value={categoryName}
+        onChange={e => setCategoryName(e.target.value)}
+      />
+      <Button className="w-fit" icon={<PlusCircleOutlined />} onClick={onClick}>
+        Agregar
+      </Button>
+    </div>
   );
 };
 

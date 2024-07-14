@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useTransition } from 'react';
 import { CloseCircleOutlined, FileImageOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Button, Image, Upload } from 'antd';
+import { Image, Upload } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { App } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -77,17 +77,6 @@ const LogoManagement: React.FC = () => {
         message.success('Logo cambiado correctamente');
       },
     });
-  };
-
-  const cancelOperation = () => {
-    setFileList([
-      {
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
-    ]);
   };
 
   const uploadButton = (

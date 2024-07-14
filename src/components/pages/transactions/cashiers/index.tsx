@@ -9,6 +9,7 @@ import { salesActions } from '@/redux/reducers/sales';
 import { Cashier } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
 import { cashiersActions } from '@/redux/reducers/cashiers';
+import CardRoot from '@/components/atoms/Card';
 
 const columns: ColumnsType<Cashier> = [
   {
@@ -115,7 +116,7 @@ const CloseSales = () => {
   };
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle" style={{ marginBottom: 10 }}>
         <Col lg={{ span: 12 }}>
           <Breadcrumb
@@ -131,23 +132,25 @@ const CloseSales = () => {
       </Row>
       <Row style={{ marginTop: 30 }}>
         <Col span={24}>
-          <Table
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            columns={columns}
-            dataSource={dataTable}
-            rowKey={item => `${item.key}`}
-            scroll={{ x: 700 }}
-            onRefresh={onRefresh}
-            totalItems={cashiers?.data?.length}
-          />
+          <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+            <Table
+              onRow={record => {
+                return {
+                  onClick: () => onRowClick(record), // click row
+                };
+              }}
+              size="small"
+              columns={columns}
+              dataSource={dataTable}
+              rowKey={item => `${item.key}`}
+              scroll={{ x: 700 }}
+              onRefresh={onRefresh}
+              totalItems={cashiers?.data?.length}
+            />
+          </CardRoot>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

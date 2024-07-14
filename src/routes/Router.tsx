@@ -94,14 +94,7 @@ const AppRouter = () => {
             </PaddingLayout>
           }
         />
-        <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path}
-          element={
-            <PaddingLayout>
-              <ProductEditor />
-            </PaddingLayout>
-          }
-        />
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
         {/* PRODUCTS ROUTES - END */}
 
         {/* ORDERS ROUTES - START */}
@@ -207,7 +200,7 @@ const AppRouter = () => {
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
       </Route>
       <Route path={APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path} element={<CashRegister />} />
-      <Route path="*" element={<Navigate to={APP_ROUTES.AUTH.SIGN_IN.path} replace />} />
+      <Route path="*" element={<Navigate to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} replace />} />
     </Routes>
   );
 };

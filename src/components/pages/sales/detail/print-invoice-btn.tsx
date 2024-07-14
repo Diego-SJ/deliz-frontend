@@ -72,7 +72,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
 
   return (
     <>
-      <Button type="default" icon={<FileProtectOutlined />} block size="large" onClick={showDrawer} loading={loading}>
+      <Button type="default" icon={<FileProtectOutlined />} block onClick={showDrawer} loading={loading}>
         Ver nota
       </Button>
 

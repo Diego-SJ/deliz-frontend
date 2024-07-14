@@ -2,12 +2,24 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import { App, Button, Card, Form, Input, List, Modal, Tag, Typography } from 'antd';
 
 import BreadcrumbSettings from '../menu/breadcrumb';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { branchesActions } from '@/redux/reducers/branches';
 
 const PricesListPage = () => {
+  const mounted = useRef(false);
+  const dispatch = useAppDispatch();
+  const { prices_list } = useAppSelector(state => state.branches);
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      dispatch(branchesActions.getPrices());
+    }
+  }, [mounted]);
 
   const openModal = () => {
     setOpen(true);
@@ -24,14 +36,15 @@ const PricesListPage = () => {
     openModal();
   };
 
-  const onDelete = (price_id: string) => {
+  const onDelete = async (price_id: string) => {
     modal.confirm({
       title: '¿Estás seguro de eliminar este precio?',
       content: 'Una vez eliminado, no podrás recuperarlo',
       okText: 'Eliminar',
       cancelText: 'Cancelar',
+      okType: 'danger',
       onOk: async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await dispatch(branchesActions.deletePrice(price_id));
         message.success('Precio eliminado correctamente');
       },
     });
@@ -66,7 +79,7 @@ const PricesListPage = () => {
             </div>
           }
           className="px-0"
-          dataSource={[{ name: 'Publico', price_id: 'fwefwefwefwefew' }]}
+          dataSource={prices_list}
           renderItem={item => (
             <List.Item
               styles={{ actions: { paddingRight: 15, margin: 0 } }}
@@ -76,14 +89,20 @@ const PricesListPage = () => {
                 <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
                   Editar
                 </Button>,
-                <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.price_id)}>
-                  Eliminar
-                </Button>,
+                item.is_default ? null : (
+                  <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.price_id)}>
+                    Eliminar
+                  </Button>
+                ),
               ]}
             >
               <div className="pl-4 md:pl-6 flex gap-2">
                 <Typography.Text>{item.name}</Typography.Text>
-                <Tag>default</Tag>
+                {item.is_default && (
+                  <Tag bordered={false} color="green">
+                    Predeterminado
+                  </Tag>
+                )}
               </div>
             </List.Item>
           )}
@@ -98,8 +117,8 @@ const PricesListPage = () => {
         onOk={async () => {
           await form
             .validateFields()
-            .then(values => {
-              console.log(values);
+            .then(async values => {
+              await dispatch(branchesActions.upsertPrice(values));
 
               form.resetFields();
               closeModal();

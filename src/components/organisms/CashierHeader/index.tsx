@@ -16,7 +16,7 @@ const CashierHeader = () => {
   const [open, setOpen] = useState(false);
   const { user_auth } = useAppSelector(({ users }) => users);
   const { cash_register } = useAppSelector(({ sales }) => sales);
-  const isSales = user_auth?.user?.email === 'sales@deliz.com';
+  const isSales = user_auth?.profile?.role === 'SALES';
 
   const onNavigate = (path: string) => {
     navigate(path);

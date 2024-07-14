@@ -1,12 +1,10 @@
 import Avatar from '@/components/molecules/Avatar';
-import { PROFILE_PIC } from '@/constants/mocks';
 import { Button, Divider, Space, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
 import MenuPopover from '@/components/molecules/MenuPopover';
 import { useAppSelector } from '@/hooks/useStore';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { MenuOutlined } from '@ant-design/icons';
-import { BORING_AVATARS } from '@/constants/avatars';
 
 type HeaderProps = {
   onClick?: () => void;
@@ -32,12 +30,7 @@ const Header = ({ onClick }: HeaderProps) => {
         </Space> */}
         <Divider type="vertical" />
         <Space size={isTablet ? 0 : 50}>
-          <Avatar
-            avatar={{ src: BORING_AVATARS`${user_auth.user?.email || 'admin'}` }}
-            title={isTablet ? '' : 'Admin'}
-            subtitle={isTablet ? '' : user_auth?.user?.email}
-            bordered
-          />
+          <Avatar title={isTablet ? '' : 'Admin'} subtitle={isTablet ? '' : user_auth?.profile?.email} bordered />
           <MenuPopover />
         </Space>
       </HeaderActions>

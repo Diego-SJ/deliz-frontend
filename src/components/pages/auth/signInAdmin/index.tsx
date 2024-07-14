@@ -5,14 +5,13 @@ import { FormContainer, LayoutContent } from './styles';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 import { useState } from 'react';
 import { supabase } from '@/config/supabase';
-import { useDispatch } from 'react-redux';
 import { userActions } from '@/redux/reducers/users';
-import { UserAuth } from '@/redux/reducers/users/types';
+import { useAppDispatch } from '@/hooks/useStore';
 
 const SignInAdmin = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
 
   const handleOnFinish = async (values: any) => {
@@ -26,9 +25,11 @@ const SignInAdmin = () => {
     if (error) return message.error(error?.message ?? 'No se pudo iniciar sesión.');
 
     if (data) {
-      message.success('¡Bienvenido!');
-      await dispatch(userActions.setUserAuth(data as UserAuth));
-      navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
+      const profileSuccess = await dispatch(userActions.loginSuccess(data.user.id));
+      if (profileSuccess) {
+        message.success('¡Bienvenido!');
+        navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
+      }
     }
   };
 

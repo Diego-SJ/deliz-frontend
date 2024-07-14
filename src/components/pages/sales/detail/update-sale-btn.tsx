@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Sale } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import { EditOutlined } from '@ant-design/icons';
+import { DollarOutlined } from '@ant-design/icons';
 import { Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
 import { FC, useRef, useState } from 'react';
 import { Amounts } from './index';
@@ -71,8 +71,8 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
 
   return (
     <>
-      <Button type="default" icon={<EditOutlined />} block size="large" onClick={openModal}>
-        Editar
+      <Button type="primary" icon={<DollarOutlined />} block onClick={openModal}>
+        Registrar Cobro
       </Button>
 
       <Modal
@@ -84,12 +84,12 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
         footer={[
           <Row key="actions" gutter={10} style={{ marginTop: 30 }}>
             <Col span={12}>
-              <Button key="back" size="large" block onClick={closeModal} loading={loading}>
+              <Button key="back" block onClick={closeModal} loading={loading}>
                 Cancelar
               </Button>
             </Col>
             <Col span={12}>
-              <Button block type="primary" onClick={handleOk} size="large" disabled={receivedMoney < 0} loading={loading}>
+              <Button block type="primary" onClick={handleOk} disabled={receivedMoney < 0} loading={loading}>
                 Actualizar
               </Button>
             </Col>
@@ -107,7 +107,6 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
         <Paragraph style={{ margin: '10px 0 5px', fontWeight: 600 }}>Estatus:</Paragraph>
         <Radio.Group
           style={{ width: '100%', marginBottom: 10 }}
-          size="large"
           buttonStyle="solid"
           value={saleStatus}
           onChange={({ target }) => setSaleStatus(target.value)}
@@ -126,7 +125,6 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
         <InputNumber
           ref={priceRef}
           min={0}
-          size="large"
           placeholder="0"
           addonBefore="$"
           value={receivedMoney}

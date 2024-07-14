@@ -35,7 +35,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
       </Drawer>
       <LayoutContainer>
         <Header onClick={handleDrawer} />
-        <LayoutContent>
+        <LayoutContent className="relative">
           <Outlet />
         </LayoutContent>
       </LayoutContainer>
@@ -44,7 +44,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
 };
 
 export const PaddingLayout = ({ children }: { children?: ReactNode }) => {
-  return <div className="p-4">{children}</div>;
+  return <div className="p-4 relative">{children}</div>;
 };
 
 export default MainLayout;

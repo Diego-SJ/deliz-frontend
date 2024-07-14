@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
+import { DeleteOutlined } from '@ant-design/icons';
 
 type Props = {
   title?: string;
@@ -44,7 +45,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
 
   return (
     <>
-      <Button danger type="primary" block size="large" onClick={onClick}>
+      <Button danger type="primary" block onClick={onClick} icon={<DeleteOutlined />}>
         Eliminar venta
       </Button>
       <Modal
@@ -53,6 +54,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        okType="danger"
         okText={confirmLoading ? 'Guardando...' : 'Confirmar'}
         cancelText="Cancelar"
         width={350}

@@ -1,0 +1,13 @@
+.ant-upload-wrapper .ant-upload-list .ant-upload-list-item-container {
+  width: 310px !important;
+  height: 310px !important;
+  min-height: 310px;
+  background: rgba(128, 128, 128, 0.206);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ant-upload-wrapper .ant-upload.ant-upload-select {
+  width: 310px !important;
+  height: 310px !important;
+}

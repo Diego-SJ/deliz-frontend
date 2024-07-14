@@ -26,8 +26,9 @@ export const APP_ROUTES = {
         UNITS: { path: '/app/products/units' },
       },
       PRODUCT_EDITOR: {
-        path: '/app/products/:action',
-        hash: (_: TemplateStringsArray, action: 'edit' | 'add') => `/app/products/${action}`,
+        path: '/app/products/:action/:product_id',
+        hash: (_: TemplateStringsArray, action: 'edit' | 'add', product_id?: number) =>
+          `/app/products/${action}/${product_id || 'new'}`,
         title: 'Editar producto',
       },
       PRODUCTS_ID: { path: (_: TemplateStringsArray, id: number) => `/app/products/${id}`, title: 'Productos' },

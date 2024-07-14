@@ -3,7 +3,10 @@ import { UserAuth, UsersSlice } from './types';
 import customActions from './actions';
 
 const initialState: UsersSlice = {
-  user_auth: { user: null, session: null } as UserAuth,
+  user_auth: {
+    profile: null,
+    authenticated: false,
+  },
   loading: false,
 };
 
@@ -15,8 +18,8 @@ const users = createSlice({
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    setUserAuth(state, action: PayloadAction<UserAuth>) {
-      state.user_auth = action.payload;
+    setUserAuth(state, action: PayloadAction<Partial<UserAuth>>) {
+      state.user_auth = { ...state.user_auth, ...action.payload };
     },
   },
 });

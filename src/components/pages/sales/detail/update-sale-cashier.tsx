@@ -55,7 +55,7 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
 
   return (
     <>
-      <Button type="default" icon={<EditOutlined />} block size="large" onClick={openModal}>
+      <Button type="default" icon={<EditOutlined />} block onClick={openModal}>
         Editar Caja
       </Button>
 
@@ -68,7 +68,7 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
         footer={[
           <Row key="actions" gutter={10} style={{ marginTop: 30 }}>
             <Col span={12}>
-              <Button key="back" size="large" block onClick={closeModal} loading={loading}>
+              <Button key="back" block onClick={closeModal} loading={loading}>
                 Cancelar
               </Button>
             </Col>
@@ -77,7 +77,6 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
                 block
                 type="primary"
                 onClick={handleOk}
-                size="large"
                 disabled={current_sale?.metadata?.cashier_id === cashierId}
                 loading={loading}
               >
@@ -96,7 +95,6 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
 
         <Paragraph style={{ margin: '10px 0 5px', fontWeight: 600 }}>Nueva caja:</Paragraph>
         <Select
-          size="large"
           style={{ width: '100%' }}
           placeholder="Selecciona una caja"
           virtual={false}

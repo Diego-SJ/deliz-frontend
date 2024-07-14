@@ -19,7 +19,7 @@ const app = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    resetAppSlice: () => initialState,
+    resetSlice: () => initialState,
     setBusiness: (state, action: PayloadAction<Partial<Business>>) => {
       state.business = { ...state.business, ...action.payload };
     },

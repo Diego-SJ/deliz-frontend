@@ -36,10 +36,6 @@ export default createGlobalStyle`
   // override ant styles
   // ---------------------------------------------
 
-  .ant-btn-primary {
-    background-color: ${({ theme }) => theme.colors.primary};
-  }
-
   .app-custom-popover.nopadding {
     .ant-popover-content {
       .ant-popover-inner {
@@ -48,5 +44,9 @@ export default createGlobalStyle`
         }
       }
     }
+  }
+
+  .ant-tag {
+    border-radius: 15px;
   }
 `;

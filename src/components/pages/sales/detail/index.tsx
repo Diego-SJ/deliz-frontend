@@ -1,7 +1,14 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { theme } from '@/styles/theme/config';
-import { MailOutlined, PhoneOutlined, EnvironmentOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  MailOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
+  EditOutlined,
+  UserOutlined,
+  FileImageOutlined,
+} from '@ant-design/icons';
 import {
   Avatar,
   Breadcrumb,
@@ -39,6 +46,7 @@ import UpdateCashier from './update-sale-cashier';
 import AddNewItem from './add-new-item-btn';
 import DeleteButton from '@/components/molecules/Table/delete-btn';
 import DeleteSaleButton from './delete-sale-btn';
+import CardRoot from '@/components/atoms/Card';
 
 type DataType = SaleItem;
 type Option = {
@@ -167,7 +175,7 @@ const SaleDetail = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between">
         <Col span={24}>
           <Breadcrumb
@@ -190,38 +198,43 @@ const SaleDetail = () => {
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
         <Col xl={{ span: 8 }} xs={24} md={24}>
           {/* SALE AMOUNTS */}
-          <Card loading={isLoading}>
+          <CardRoot loading={isLoading} title="Resumen">
             <Row gutter={[10, 10]}>
               <Col span={12}>
-                <Typography.Paragraph style={{ margin: '0' }}>
-                  {`Productos: ${functions.money(amounts?.subtotal)}`}
-                </Typography.Paragraph>
-                <Typography.Paragraph style={{ margin: '0' }}>{`Envío: ${functions.money(
+                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Productos: ${functions.money(
+                  amounts?.subtotal,
+                )}`}</Typography.Paragraph>
+                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Envío: ${functions.money(
                   metadata?.shipping,
                 )}`}</Typography.Paragraph>
-                <Typography.Paragraph style={{ margin: '0' }}>{`Descuento: ${amounts?.discount}`}</Typography.Paragraph>
+                <Typography.Paragraph
+                  type="secondary"
+                  style={{ margin: 0 }}
+                >{`Descuento: ${amounts?.discount}`}</Typography.Paragraph>
                 {Number(amounts?.pending) > 0 && (
-                  <Typography.Paragraph style={{ margin: 0 }}>{`Pendiente: ${functions.money(
+                  <Typography.Paragraph className="text-amber-600" style={{ margin: 0 }}>{`Pendiente: ${functions.money(
                     amounts?.pending,
                   )}`}</Typography.Paragraph>
                 )}
               </Col>
               <Col span={12} style={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}>
-                <Typography.Paragraph style={{ margin: 0 }}>{`Pagado: ${functions.money(
+                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Pagado: ${functions.money(
                   amounts?.amount_paid,
                 )}`}</Typography.Paragraph>
 
-                <Typography.Paragraph style={{ margin: '0 0 10px' }}>
+                <Typography.Paragraph type="secondary" style={{ margin: '0 0 10px' }}>
                   {`Cambio: ${functions.money(amounts?.cashback)}`}
                 </Typography.Paragraph>
               </Col>
             </Row>
 
-            <Typography.Title level={2} style={{ margin: 0 }}>{`Total: ${functions.money(amounts?.total)}`}</Typography.Title>
-          </Card>
+            <Typography.Title level={3} style={{ margin: 0, marginTop: 10 }}>{`Total: ${functions.money(
+              amounts?.total,
+            )}`}</Typography.Title>
+          </CardRoot>
 
-          {/* SALE DETAILS */}
-          <Card style={{ marginTop: 20 }} loading={isLoading}>
+          {/* SALE STATUS */}
+          <CardRoot style={{ marginTop: 20 }} loading={isLoading} title="Estatus">
             <Alert
               message={metadata?.status.name ?? '- - -'}
               action={metadata?.status_id === STATUS_DATA.COMPLETED.id ? functions.dateTime(metadata.created_at) : ''}
@@ -230,17 +243,14 @@ const SaleDetail = () => {
               style={{ marginBottom: 15 }}
             />
             <Row gutter={[10, 10]}>
-              <Col span={12}>
+              <Col span={24}>
                 <UpdateSaleButton amounts={amounts} />
               </Col>
-              <Col span={12}>
-                <PrintInvoiceButton amounts={amounts} />
-              </Col>
             </Row>
-          </Card>
+          </CardRoot>
 
           {/* CUSTOMER CARD DETAILS */}
-          <Card loading={isLoading} style={{ marginTop: 20 }}>
+          <CardRoot loading={isLoading} style={{ marginTop: 20 }} title="Cliente">
             <Meta
               avatar={
                 <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1" size={55} style={{ background: '#eee' }} />
@@ -251,7 +261,7 @@ const SaleDetail = () => {
 
             <Col style={{ marginTop: 5 }}>
               <Row align="middle">
-                <PhoneOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <PhoneOutlined className="text-base mr-3 text-primary" />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -261,7 +271,7 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
               <Row align="middle">
-                <MailOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <MailOutlined className="text-base mr-3 text-primary" />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -271,7 +281,7 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
               <Row align="middle">
-                <EnvironmentOutlined style={{ fontSize: 20, color: theme.colors.primary, marginRight: 10 }} />
+                <EnvironmentOutlined className="text-base mr-3 text-primary" />
                 <Typography.Paragraph
                   style={{ margin: '10px 0' }}
                   type="secondary"
@@ -281,86 +291,91 @@ const SaleDetail = () => {
                 </Typography.Paragraph>
               </Row>
             </Col>
-            <Button type="default" icon={<EditOutlined />} block size="large" onClick={handleModal}>
-              Editar
+            <Button type="default" icon={<EditOutlined />} block onClick={handleModal}>
+              Cambiar cliente
             </Button>
-          </Card>
+          </CardRoot>
         </Col>
         <Col xl={{ span: 16 }} xs={24} md={24}>
-          <Card style={{ marginBottom: 10 }} loading={isLoading}>
+          <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
             <Row gutter={[20, 20]}>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={6}>
+                <PrintInvoiceButton amounts={amounts} />
+              </Col>
+              <Col xs={24} md={6}>
                 <AddNewItem />
               </Col>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={6}>
                 <UpdateCashier />
               </Col>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={6}>
                 <DeleteSaleButton />
               </Col>
             </Row>
-          </Card>
-          <Table
-            loading={isLoading}
-            columns={[
-              {
-                title: '',
-                dataIndex: 'products',
-                width: 50,
-                render: (_, record) => {
-                  let imageUrl = record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
-                  return (
-                    <Avatar
-                      src={imageUrl || <PopsicleIcon style={{ width: 15 }} />}
-                      style={{ backgroundColor: '#eee', padding: imageUrl ? 0 : 5 }}
-                      size="large"
-                    />
-                  );
+          </CardRoot>
+          <CardRoot styles={{ body: { padding: '0 0 2px 0', overflow: 'hidden' } }}>
+            <Table
+              loading={isLoading}
+              columns={[
+                {
+                  title: 'Producto',
+                  dataIndex: 'products',
+                  render: (_, record) => {
+                    let imageUrl = !!record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
+                    return (
+                      <div className="flex gap-4 items-center">
+                        <Avatar
+                          src={imageUrl}
+                          icon={<FileImageOutlined className="text-primary" />}
+                          className="bg-primary/10 p-1"
+                        />
+                        <div>
+                          <b>{record?.products?.name ?? '- - -'}</b>
+                          <br />
+                          <span>{record?.products?.categories?.name ?? '- - -'}</span>
+                        </div>
+                      </div>
+                    );
+                  },
                 },
-              },
-              {
-                title: 'Producto',
-                dataIndex: 'products',
-                render: (_, record) => {
-                  return (
-                    <div>
-                      <b>{record?.products?.name ?? '- - -'}</b>
-                      <br />
-                      <span>{record?.products?.categories?.name ?? '- - -'}</span>
-                    </div>
-                  );
+                {
+                  title: 'Cantidad',
+                  dataIndex: 'quantity',
+                  width: 100,
+                  align: 'center',
                 },
-              },
-              {
-                title: 'Cantidad',
-                dataIndex: 'quantity',
-              },
-              {
-                title: 'Precio',
-                dataIndex: 'price',
-                render: (value: number) => functions.money(value),
-              },
-              {
-                title: 'Total',
-                dataIndex: 'retail_price',
-                render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
-              },
-              {
-                title: 'Acciones',
-                dataIndex: 'sale_detail_id',
-                width: 130,
-                render: (id: number, record) => {
-                  return (
-                    <DeleteButton deleteFunction={salesActions.deleteItemById(id)} editFunction={() => onRowClick(record)} />
-                  );
+                {
+                  title: 'Precio',
+                  dataIndex: 'price',
+                  width: 100,
+                  align: 'center',
+                  render: (value: number) => functions.money(value),
                 },
-              },
-            ]}
-            dataSource={items}
-            size="small"
-            scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
-            pagination={false}
-          />
+                {
+                  title: 'Total',
+                  dataIndex: 'retail_price',
+                  width: 100,
+                  align: 'center',
+                  render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
+                },
+                {
+                  title: 'Acciones',
+                  dataIndex: 'sale_detail_id',
+                  width: 150,
+                  align: 'center',
+                  render: (id: number, record) => {
+                    return (
+                      <DeleteButton deleteFunction={salesActions.deleteItemById(id)} editFunction={() => onRowClick(record)} />
+                    );
+                  },
+                },
+              ]}
+              dataSource={items}
+              size="small"
+              scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
+              pagination={false}
+            />
+          </CardRoot>
         </Col>
       </Row>
       <Modal
@@ -372,12 +387,12 @@ const SaleDetail = () => {
         footer={[
           <Row key="actions" gutter={10}>
             <Col span={12}>
-              <Button key="back" size="large" block onClick={closeModal} loading={loading}>
+              <Button key="back" block onClick={closeModal} loading={loading}>
                 Cancelar
               </Button>
             </Col>
             <Col span={12}>
-              <Button block type="primary" onClick={onModalSave} size="large" loading={loading}>
+              <Button block type="primary" onClick={onModalSave} loading={loading}>
                 Actualizar
               </Button>
             </Col>
@@ -415,7 +430,6 @@ const SaleDetail = () => {
                   <InputNumber
                     min={0}
                     placeholder="Cantidad"
-                    size="large"
                     style={{ width: '100%', textAlign: 'center' }}
                     value={newQuantity}
                     onPressEnter={updateItem}
@@ -434,7 +448,6 @@ const SaleDetail = () => {
                   <InputNumber
                     min={0}
                     placeholder="Precio"
-                    size="large"
                     style={{ width: '100%', textAlign: 'center' }}
                     value={newPrice}
                     readOnly={isTablet}
@@ -464,7 +477,6 @@ const SaleDetail = () => {
               <Select
                 showSearch
                 style={{ width: '100%' }}
-                size="large"
                 value={customerId}
                 placeholder="Buscar cliente"
                 suffixIcon={<UserOutlined />}

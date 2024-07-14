@@ -20,7 +20,14 @@ const AppThemeProvider = ({ children }: Props) => {
               colorPrimary: theme.colors.primary,
               colorLink: theme.colors.secondary,
             },
-            components: {},
+            components: {
+              Tag: {
+                borderRadius: 5,
+              },
+              Table: {
+                colorText: 'rgba(0, 0, 0, 0.45)',
+              },
+            },
           }}
         >
           {children}

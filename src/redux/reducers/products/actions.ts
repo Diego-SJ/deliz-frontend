@@ -27,7 +27,6 @@ const customActions = {
             return {
               ...item,
               key: item.product_id as number,
-              image_url: !!item?.image_url ? BUCKETS.PRODUCTS.IMAGES`${item.image_url}` : '',
             } as Product;
           }) ?? [];
         dispatch(productActions.setProducts(products));
@@ -38,55 +37,61 @@ const customActions = {
       return false;
     }
   },
-  saveImage: async (image: RcFile): Promise<string | boolean> => {
-    const filename = `${image.uid}_${image.name}`;
+  saveImage: async (image: RcFile): Promise<string | null> => {
+    const filename = image.uid;
     const { data, error } = await supabase.storage.from('deliz').upload(`products/images/${filename}`, image, {
-      upsert: false,
+      upsert: true,
     });
 
-    if (data?.path && !error) {
+    if (data?.fullPath && !error) {
       message.success('¡Imagen guardada!', 4);
-      return data.path as string;
+      return BUCKETS.PRODUCTS.IMAGES`${data?.fullPath}`;
     }
 
     message.error('No se pudo guardar la imagen.', 4);
-    return false;
+    return null;
   },
-  replaceImage: async (image: RcFile, image_path?: string): Promise<string | boolean> => {
-    let filename = image_path?.replace(BUCKETS.PRODUCTS.IMAGES_PATH`${''}`, '');
-    const { data, error } = await supabase.storage.from('deliz').update(`products/images/${filename}`, image, {
-      upsert: true,
-    });
-    let imageUrl: string | boolean = data?.path as string;
-
+  deleteImage: (uid: string) => async (dispatch: AppDispatch, getState: AppState) => {
+    const product = getState().products.current_product;
+    const { error } = await supabase.storage.from('deliz').remove([`products/images/${uid}`]);
     if (error) {
-      imageUrl = await productActions.saveImage(image);
+      message.error('Error al eliminar la imagen');
+      return;
     }
 
-    if (!!imageUrl) {
-      return imageUrl as string;
-    }
+    const result = await supabase
+      .from('products')
+      .update({ image_url: null })
+      .eq('product_id', product.product_id)
+      .select()
+      .single();
 
-    message.error('No se pudo actualizar la imagen.', 4);
-    return false;
+    dispatch(productActions.setCurrentProduct({ ...product, ...result.data }));
+    message.info('Imagen eliminada');
   },
-  saveProduct: (product: Product) => async (dispatch: AppDispatch) => {
+  // replaceImage: async (image: RcFile, image_path?: string): Promise<string | boolean> => {
+  //   let filename = image_path?.replace(BUCKETS.PRODUCTS.IMAGES_PATH, '');
+  //   const { data, error } = await supabase.storage.from('deliz').update(`products/images/${filename}`, image, {
+  //     upsert: true,
+  //   });
+  //   let imageUrl: string | boolean = BUCKETS.PRODUCTS.IMAGES`${data?.fullPath || ''}` as string;
+
+  //   if (error) {
+  //     imageUrl = await productActions.saveImage(image);
+  //   }
+
+  //   if (!!imageUrl) {
+  //     return imageUrl as string;
+  //   }
+
+  //   message.error('No se pudo actualizar la imagen.', 4);
+  //   return false;
+  // },
+  saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch) => {
     try {
       dispatch(productActions.setLoading(true));
 
-      const result = await supabase.from('products').insert({
-        category_id: product.category_id,
-        name: product.name,
-        retail_price: product.retail_price,
-        wholesale_price: product.wholesale_price,
-        status: product.status,
-        stock: product.stock,
-        description: product.description,
-        image_url: product?.image_url,
-        size_id: product?.size_id,
-        unit_id: product?.unit_id,
-        code: product?.code,
-      } as Product);
+      const result = await supabase.from('products').insert(product);
 
       dispatch(productActions.setLoading(false));
 
@@ -94,7 +99,7 @@ const customActions = {
         message.error('No se pudo guardar el producto.', 4);
         return false;
       }
-      await dispatch(productActions.fetchProducts({ refetch: true }));
+      //await dispatch(productActions.fetchProducts({ refetch: true }));
       message.success('¡Producto agregado con éxito!', 4);
       return true;
     } catch (error) {
@@ -102,39 +107,17 @@ const customActions = {
       return false;
     }
   },
-  updateProduct: (product: Product, image_url?: string | null) => async (dispatch: AppDispatch, getState: AppState) => {
+  updateProduct: (product: Partial<Product>) => async (dispatch: AppDispatch) => {
     try {
       dispatch(productActions.setLoading(true));
-
-      let url_sanitized = (image_url || product?.image_url || '')?.replace(BUCKETS.PRODUCTS.IMAGES`${''}`, '') || '';
-
-      const oldData = getState().products.current_product;
-      const newData = {
-        category_id: product.category_id,
-        name: product.name,
-        retail_price: product.retail_price,
-        wholesale_price: product.wholesale_price,
-        status: product.status,
-        stock: product.stock,
-        description: product.description,
-        image_url: url_sanitized,
-        size_id: product?.size_id,
-        unit_id: product?.unit_id,
-        code: product?.code,
-      } as Product;
-
-      const result = await supabase.from('products').update(newData).eq('product_id', oldData.product_id);
-
+      const result = await supabase.from('products').update(product).eq('product_id', product.product_id).select().single();
       dispatch(productActions.setLoading(false));
 
       if (result.error) {
         message.error('No se pudo actualizar la información.', 4);
         return false;
       }
-
-      let productData = { ...oldData, ...newData, image_url: BUCKETS.PRODUCTS.IMAGES`${url_sanitized}` };
-      dispatch(productActions.setCurrentProduct(productData));
-      await dispatch(productActions.fetchProducts({ refetch: true }));
+      dispatch(productActions.setCurrentProduct(result.data));
       message.success('¡Producto actualizado con éxito!', 4);
       return true;
     } catch (error) {
@@ -200,10 +183,11 @@ const customActions = {
       try {
         dispatch(productActions.setLoading(true));
 
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('categories')
           .insert([{ name: category.name, description: category.description, status: category.status }])
-          .select();
+          .select()
+          .single();
 
         dispatch(productActions.setLoading(false));
 
@@ -213,7 +197,7 @@ const customActions = {
         }
         await dispatch(productActions.fetchCategories({ refetch: true }));
         message.success('Categoría agregada', 4);
-        return true;
+        return data.category_id;
       } catch (error) {
         dispatch(productActions.setLoading(false));
         return false;

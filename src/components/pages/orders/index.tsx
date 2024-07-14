@@ -10,6 +10,7 @@ import { SaleDetails, SaleMetadata } from '@/redux/reducers/sales/types';
 import dayjs, { Dayjs } from 'dayjs';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { theme } from '@/styles/theme/config';
+import CardRoot from '@/components/atoms/Card';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -118,7 +119,7 @@ const Orders = () => {
   );
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle">
         <Col lg={{ span: 12 }}>
           <Breadcrumb
@@ -132,19 +133,25 @@ const Orders = () => {
           />
         </Col>
       </Row>
-      <Row gutter={[10, 10]} style={{ marginTop: '10px' }}>
+      <Row gutter={[20, 20]} style={{ marginTop: '10px' }}>
         <Col xs={24} lg={10}>
-          <Card hoverable onClick={onAddNew} style={{ marginBottom: 10 }}>
+          <CardRoot onClick={onAddNew} className="mb-6 border hover:border-primary cursor-pointer">
             <Card.Meta
-              avatar={<Avatar icon={<ShoppingCartOutlined />} style={{ background: theme.colors.skyblue }} size={60} />}
+              avatar={
+                <Avatar
+                  icon={<ShoppingCartOutlined className="text-blue-600" />}
+                  className="bg-blue-600/10 shadow-md shadow-primary/40"
+                  size={60}
+                />
+              }
               title="Nuevo pedido"
               description="Accede al punto de venta para crear un pedido"
             />
-          </Card>
+          </CardRoot>
           <Typography.Title level={4}>
             Pedidos del {functions.date1(selectedDate as any)} ({ordersByDate?.length || 0})
           </Typography.Title>
-          <Card>
+          <CardRoot>
             <List
               itemLayout="horizontal"
               style={{ maxHeight: 430, overflowY: 'auto' }}
@@ -182,13 +189,20 @@ const Orders = () => {
                 </List.Item>
               )}
             />
-          </Card>
+          </CardRoot>
         </Col>
-        <Col xs={24} lg={14} style={{ maxHeight: 625, overflowY: 'auto' }}>
-          <Calendar style={{ width: '100%' }} value={selectedDate} onSelect={setSelectedDate} cellRender={cellRender} />
+        <Col xs={24} lg={14}>
+          <CardRoot styles={{ body: { padding: 10 } }} style={{ overflow: 'hidden' }}>
+            <Calendar
+              className="w-full max-h-[calc(100vh-200px)]"
+              value={selectedDate}
+              onSelect={setSelectedDate}
+              cellRender={cellRender}
+            />
+          </CardRoot>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

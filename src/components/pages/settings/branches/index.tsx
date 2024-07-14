@@ -1,11 +1,21 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { PlusCircleOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Col, Result, Row, Typography } from 'antd';
+import { BuildOutlined, PlusCircleOutlined, ShopOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, List, Result, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbSettings from '../menu/breadcrumb';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useEffect } from 'react';
+import { branchesActions } from '@/redux/reducers/branches';
+import CardRoot from '@/components/atoms/Card';
 
 const BranchesPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { branches } = useAppSelector(state => state.branches);
+
+  useEffect(() => {
+    dispatch(branchesActions.getBranches());
+  }, [dispatch]);
 
   const onAddBranch = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.ADD.path);
@@ -30,32 +40,38 @@ const BranchesPage = () => {
         </div>
       </div>
 
-      <Card style={{ width: '100%' }} title="Lista de sucursales" className="shadow-md rounded-xl">
-        {[].length ? (
-          <Row gutter={[20, 20]}>
-            <Col lg={12} xs={24}>
-              <Card
-                className="hover:shadow-md cursor-pointer hover:border-primary/50"
-                color="primary"
-                onClick={() => onEditBranch('qfefwefwejjgifjgwiejfiwe')}
+      <CardRoot style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Sucursales">
+        {!!branches?.length ? (
+          <List
+            itemLayout="horizontal"
+            footer={
+              <div className="px-2">
+                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddBranch}>
+                  Agregar nuevo
+                </Button>
+              </div>
+            }
+            className="px-0"
+            dataSource={branches}
+            renderItem={item => (
+              <List.Item
+                onClick={() => onEditBranch(item.branch_id)}
+                styles={{ actions: { paddingRight: 15, margin: 0 } }}
+                classNames={{ actions: 'flex' }}
+                className="flex cursor-pointer hover:bg-gray-50"
               >
-                <Card.Meta
-                  title="Sucursal 1"
-                  description="Descripción de la sucursal 1"
-                  avatar={<Avatar children="S1" className="bg-primary/5  border border-primary text-primary" />}
-                />
-              </Card>
-            </Col>
-            <Col lg={12} xs={24}>
-              <Card className="hover:shadow-md cursor-pointer hover:border-primary/50" color="primary">
-                <Card.Meta
-                  title="Sucursal 1"
-                  description="Descripción de la sucursal 1"
-                  avatar={<Avatar children="S1" className="bg-primary/5  border border-primary text-primary" />}
-                />
-              </Card>
-            </Col>
-          </Row>
+                <div className="px-4 md:pl-6 flex gap-4 justify-between w-full items-center">
+                  <div className="flex gap-4 items-center">
+                    <Avatar size={40} icon={<ShopOutlined className="text-primary" />} className="bg-primary/10" />
+                    <Typography.Text>{item.name}</Typography.Text>
+                  </div>
+                  <Tag bordered={false} color={item.main_branch ? 'green' : ''}>
+                    {item.main_branch ? 'Predeterminada' : 'Sucursal'}
+                  </Tag>
+                </div>
+              </List.Item>
+            )}
+          />
         ) : (
           <>
             <Result
@@ -71,7 +87,7 @@ const BranchesPage = () => {
             />
           </>
         )}
-      </Card>
+      </CardRoot>
     </div>
   );
 };

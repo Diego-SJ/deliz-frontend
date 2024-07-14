@@ -1,52 +1,37 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { PlusOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Card, Col, Drawer, Input, Row } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Button, Col, Drawer, Input, Row } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import PopsicleImg from '@/assets/img/png/popsicle.webp';
 import { Customer } from '@/redux/reducers/customers/types';
 import { customerActions } from '@/redux/reducers/customers';
 import CustomerEditor from './editor';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import Table from '@/components/molecules/Table';
-import { BORING_AVATARS } from '@/constants/avatars';
+import CardRoot from '@/components/atoms/Card';
 
 type DataType = Customer;
 
 const columns: ColumnsType<DataType> = [
   {
-    title: '',
-    dataIndex: 'name',
-    width: 55,
-    render: value => <Avatar src={BORING_AVATARS`${value}`} style={{ backgroundColor: '#eee' }} size="large" />,
-  },
-  {
     title: 'Nombre',
     dataIndex: 'name',
-    render: text => <b>{text}</b>,
+    render: text => {
+      return (
+        <div className="flex items-center gap-4 pl-4">
+          <Avatar className="bg-primary/10 text-primary font-semibold">{text.charAt(0)}</Avatar>
+          <p className="m-0 ">{text}</p>
+        </div>
+      );
+    },
   },
   { title: 'Dirección', dataIndex: 'address' },
   { title: 'Teléfono', dataIndex: 'phone' },
   { title: 'Correo', dataIndex: 'email' },
-  {
-    title: 'Fecha creación',
-    dataIndex: 'created_at',
-    render: (value: Date | string) => functions.date1(value),
-  },
 ];
-
-// const rowSelection = {
-//   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-//     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-//   },
-//   getCheckboxProps: (record: DataType) => ({
-//     disabled: record.name === 'Disabled User', // Column configuration not to be checked
-//     name: record.name,
-//   }),
-// };
 
 const Customers = () => {
   const dispatch = useAppDispatch();
@@ -98,7 +83,7 @@ const Customers = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle">
         <Col span={24}>
           <Breadcrumb
@@ -112,9 +97,9 @@ const Customers = () => {
           />
         </Col>
       </Row>
-      <Row style={{ marginTop: '10px' }}>
+      <Row>
         <Col span={24}>
-          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
+          <Row gutter={[10, 10]} className="mt-3 mb-6">
             <Col lg={{ span: 6 }} sm={18} xs={24}>
               <Input
                 placeholder="Buscar por nombre, telefono o dirección"
@@ -123,28 +108,26 @@ const Customers = () => {
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
-            <Col lg={{ span: 6, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
-              <Button block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
+            <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
+              <Button block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
                 Nuevo
               </Button>
             </Col>
           </Row>
-          <Table
-            // rowSelection={{
-            //   type: 'checkbox',
-            //   ...rowSelection,
-            // }}
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
-            columns={columns}
-            dataSource={options}
-            onRefresh={onRefresh}
-          />
+          <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+            <Table
+              onRow={record => {
+                return {
+                  onClick: () => onRowClick(record), // click row
+                };
+              }}
+              size="small"
+              scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
+              columns={columns}
+              dataSource={options}
+              onRefresh={onRefresh}
+            />
+          </CardRoot>
         </Col>
       </Row>
       <Drawer

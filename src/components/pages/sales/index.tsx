@@ -1,7 +1,7 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, SearchOutlined } from '@ant-design/icons';
+import { DollarOutlined, LineChartOutlined, PlusCircleOutlined, ReconciliationOutlined, SearchOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, message, Avatar, Input } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
+import CardRoot from '@/components/atoms/Card';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -182,8 +183,8 @@ const Sales = () => {
   };
 
   return (
-    <>
-      <Row justify="space-between" align="middle">
+    <div className="max-w-[1200px] mx-auto">
+      <Row justify="space-between" align="middle" className="mb-3">
         <Col lg={{ span: 12 }}>
           <Breadcrumb
             items={[
@@ -196,38 +197,56 @@ const Sales = () => {
           />
         </Col>
       </Row>
-      <Row style={{ width: '100%', marginTop: 10 }} gutter={[10, 10]}>
+      <Row gutter={[20, 20]} className="mb-6">
         <Col xs={24} md={12} lg={8}>
-          <Card style={{ width: '100%' }}>
+          <CardRoot>
             <Card.Meta
-              avatar={<Avatar icon={<LineChartOutlined />} style={{ background: '#2db7f5' }} size={60} />}
+              avatar={
+                <Avatar
+                  icon={<LineChartOutlined className="text-green-600" />}
+                  className="bg-green-600/10 shadow-md shadow-green-600/40"
+                  size={60}
+                />
+              }
               title={functions?.money(totalSaleAmount)}
               description="Total de ventas"
             />
-          </Card>
+          </CardRoot>
         </Col>
         <Col xs={24} md={12} lg={8}>
-          <Card>
+          <CardRoot>
             <Card.Meta
-              avatar={<Avatar icon={<ReconciliationOutlined />} style={{ background: '#a52df5' }} size={60} />}
+              avatar={
+                <Avatar
+                  icon={<ReconciliationOutlined className="text-indigo-600" />}
+                  className="bg-indigo-600/10 shadow-md shadow-indigo-600/40"
+                  size={60}
+                />
+              }
               title={sales?.length || 0}
               description="Ventas totales"
             />
-          </Card>
+          </CardRoot>
         </Col>
         <Col xs={24} md={12} lg={8}>
-          <Card>
+          <CardRoot>
             <Card.Meta
-              avatar={<Avatar icon={<DollarOutlined />} style={{ background: '#4beb88' }} size={60} />}
+              avatar={
+                <Avatar
+                  icon={<DollarOutlined className="text-blue-600" />}
+                  className="bg-blue-600/10 shadow-md shadow-blue-600/40"
+                  size={60}
+                />
+              }
               title={functions.money(todaySales)}
               description="Ventas de hoy"
             />
-          </Card>
+          </CardRoot>
         </Col>
       </Row>
-      <Row style={{ marginTop: '10px' }}>
+      <Row>
         <Col span={24}>
-          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
+          <Row gutter={[20, 20]} className="mb-6">
             <Col lg={6} xs={24}>
               <Input
                 placeholder="Nombre cliente, dirección"
@@ -270,28 +289,30 @@ const Sales = () => {
                 onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
               />
             </Col>
-            <Col lg={6} xs={24}>
-              <Button block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
+            <Col lg={{ offset: 1, span: 5 }} xs={24}>
+              <Button block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
                 Nueva
               </Button>
             </Col>
           </Row>
-          <Table
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            columns={columns}
-            dataSource={auxSales}
-            scroll={{ x: 700 }}
-            onRefresh={onRefresh}
-            totalItems={sales?.length || 0}
-          />
+          <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+            <Table
+              onRow={record => {
+                return {
+                  onClick: () => onRowClick(record), // click row
+                };
+              }}
+              size="small"
+              columns={columns}
+              dataSource={auxSales}
+              scroll={{ x: 700, y: 'calc(100vh - 300px)' }}
+              onRefresh={onRefresh}
+              totalItems={sales?.length || 0}
+            />
+          </CardRoot>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

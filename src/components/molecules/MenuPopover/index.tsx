@@ -32,10 +32,10 @@ const MenuPopover = () => {
       nopadding
     >
       <PopoverBody>
-        <IconItem>
+        {/* <IconItem>
           <TeamOutlined />
-          <Typography.Text>Perfil</Typography.Text>
-        </IconItem>
+          <Typography.Text>Cuenta</Typography.Text>
+        </IconItem> */}
         <IconItem>
           <SettingOutlined />
           <Typography.Text>Configuración</Typography.Text>

@@ -20,13 +20,13 @@ const CurrentCashier = () => {
   }, [cashiers?.data, dispatch]);
 
   return (
-    <>
+    <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle" style={{ marginBottom: 10 }}>
         <Col lg={{ span: 12 }}>
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Transacciones</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Cajas</Link>,
                 key: 'transactions',
               },
               { title: 'Caja actual' },
@@ -35,7 +35,7 @@ const CurrentCashier = () => {
         </Col>
       </Row>
       <OpenCashier />
-    </>
+    </div>
   );
 };
 

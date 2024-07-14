@@ -1,18 +1,47 @@
+import { useAppDispatch } from '@/hooks/useStore';
+import { branchesActions } from '@/redux/reducers/branches';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, Modal, Typography } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const AddBranchForm = () => {
+  const mounted = useRef(false);
   const [form] = Form.useForm();
-  const navigate = useNavigate();
   const { branch_id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [isMainBranch, setIsMainBranch] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(false);
 
-  const confirmDeleteBranch = () => {};
+  const fetchDetails = async () => {
+    setLoading(true);
+    const data = await dispatch(branchesActions.getBranchById(branch_id!));
+    form.setFieldsValue(data);
+    setIsMainBranch(!!data.main_branch);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!!branch_id && !mounted.current) {
+      mounted.current = true;
+      fetchDetails();
+    }
+  }, [branch_id, mounted]);
+
+  const confirmDeleteBranch = async () => {
+    await dispatch(branchesActions.deleteBranch(branch_id!));
+    navigate(-1);
+  };
 
   const onSubmit = async () => {
-    form.validateFields().then(values => {
-      console.log(values);
+    setLoadingSave(true);
+    await form.validateFields().then(async values => {
+      await dispatch(branchesActions.upsertBranch(values));
+      navigate(-1);
     });
+    setLoadingSave(false);
   };
 
   return (
@@ -30,21 +59,24 @@ const AddBranchForm = () => {
             required: '${label} es obligatorio.',
           }}
         >
-          <Card title="Sucursal" className="shadow-md rounded-xl">
+          <Form.Item name="branch_id" hidden>
+            <Input />
+          </Form.Item>
+          <Card title="Sucursal" className="shadow-md rounded-xl" loading={loading}>
             <Form.Item className="mb-0 w-full" name="name" label="Nombre" rules={[{ required: true }]}>
               <Input placeholder="Nombre de la sucursal" />
             </Form.Item>
           </Card>
 
-          <Card title="Dirección" className="shadow-md rounded-xl">
+          <Card title="Dirección" className="shadow-md rounded-xl" loading={loading}>
             <Form.Item className="w-full" name="street" label="Dirección">
               <Input placeholder="Dirección de la sucursal" />
             </Form.Item>
             <div className="flex md:gap-8 flex-col md:flex-row">
-              <Form.Item className="w-full" name="ext_num" label="No. Exterior">
+              <Form.Item className="w-full" name="ext_number" label="No. Exterior">
                 <Input placeholder="No. Exterior" className="w-full" />
               </Form.Item>
-              <Form.Item className="w-full" name="int_num" label="No. Interior">
+              <Form.Item className="w-full" name="int_number" label="No. Interior">
                 <Input placeholder="No. Interior" className="w-full" />
               </Form.Item>
             </div>
@@ -61,7 +93,7 @@ const AddBranchForm = () => {
             </Form.Item>
           </Card>
 
-          <Card title="Contacto" className="shadow-md rounded-xl">
+          <Card title="Contacto" className="shadow-md rounded-xl" loading={loading}>
             <div className="flex md:gap-8 flex-col md:flex-row">
               <Form.Item className="mb-0 w-full" name="phone" label="Teléfono">
                 <Input placeholder="Teléfono de la sucursal" className="w-full" />
@@ -73,22 +105,23 @@ const AddBranchForm = () => {
           </Card>
         </Form>
 
-        {branch_id && (
-          <Card title="Eliminar sucursal" className="my-2 shadow-md rounded-xl">
-            <div className="flex gap-8 justify-between items-center">
+        {branch_id && !isMainBranch && (
+          <Card title="Eliminar sucursal" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
+            <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
               <Typography.Text type="danger">
                 Una vez eliminada la sucursal, no se podrá recuperar la información.
               </Typography.Text>
               <Button
                 ghost
                 danger
-                className="min-w-40"
+                className="w-full md:max-w-40"
                 onClick={() => {
                   Modal.confirm({
                     title: 'Eliminar sucursal',
                     type: 'error',
                     okText: 'Eliminar',
                     onOk: confirmDeleteBranch,
+                    okType: 'danger',
                     cancelText: 'Cancelar',
                     content: '¿Estás seguro de que deseas eliminar esta sucursal?',
                     footer: (_, { OkBtn, CancelBtn }) => (
@@ -111,11 +144,11 @@ const AddBranchForm = () => {
         classNames={{ body: 'w-full flex items-center' }}
         styles={{ body: { padding: '0px', height: '80px' } }}
       >
-        <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full">
-          <Button className="w-full md:w-40" onClick={() => navigate(-1)}>
+        <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
+          <Button className="w-full md:w-40" onClick={() => navigate(-1)} loading={loadingSave}>
             Cancelar
           </Button>
-          <Button type="primary" className="w-full md:w-40" onClick={onSubmit}>
+          <Button type="primary" className="w-full md:w-40" onClick={onSubmit} loading={loadingSave}>
             Guardar
           </Button>
         </div>

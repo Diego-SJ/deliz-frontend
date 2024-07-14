@@ -26,17 +26,18 @@ type SideMenuProps = {
 
 const ITEM_LIST = [
   {
-    key: 'dashboard',
-    icon: HomeOutlined,
-    label: 'Dashboard',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
-  },
-  {
     key: 'point_of_sale',
     icon: BarcodeOutlined,
     label: 'Punto de venta',
     path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
   },
+  {
+    key: 'dashboard',
+    icon: HomeOutlined,
+    label: 'Dashboard',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
+  },
+
   {
     key: 'products',
     icon: ShoppingOutlined,
@@ -67,7 +68,7 @@ const ITEM_LIST = [
     ],
   },
   {
-    key: 'transactions',
+    key: 'cashiers',
     icon: BarChartOutlined,
     label: 'Cajas',
     children: [
@@ -78,7 +79,7 @@ const ITEM_LIST = [
       },
       {
         key: 'transactions.cashiers',
-        label: 'Cajas',
+        label: 'Historial de cajas',
         path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
       },
     ],
@@ -120,7 +121,7 @@ const SideMenu = (props: SideMenuProps) => {
   const { business } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
   const [currentItems, setCurrentItems] = useState<any[]>([]);
-  const isSales = user_auth?.user?.email === 'sales@deliz.com';
+  const isSales = user_auth?.profile?.role === 'SALES';
 
   useEffect(() => {
     if (isSales) setCurrentItems(SALES_ACTIONS);
@@ -151,6 +152,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         theme={'dark' as any}
         mode="inline"
+        className="my-10"
         inlineCollapsed={isPhablet && !isTablet}
         items={currentItems.map((item, key) => ({
           key,

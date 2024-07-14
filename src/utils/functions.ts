@@ -34,18 +34,7 @@ const functions = {
   },
   tableDate: (date: Date | string) => {
     if (!!!date) return '- - -';
-    let _date = new Date(date);
-    let localDate = _date.toLocaleDateString('es-Mx', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-      timeZone: 'America/Mexico_City',
-    });
-    return localDate;
+    return format(new Date(date), 'PPp', { locale: es });
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
