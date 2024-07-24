@@ -34,6 +34,7 @@ import PricesListPage from '@/components/pages/settings/prices-list';
 import CategoriesPage from '@/components/pages/products/categories';
 import ProductSizesPage from '@/components/pages/products/sizes';
 import ProductUnitsPage from '@/components/pages/products/units';
+import CashRegistersPage from '@/components/pages/settings/cash-registers';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -191,7 +192,7 @@ const AppRouter = () => {
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CATEGORIES.path} element={<CategoriesPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path} element={<ProductSizesPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path} element={<ProductUnitsPage />} />
-
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CASH_REGISTERS.path} element={<CashRegistersPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path} element={<div>USERS</div>} />
         </Route>
         {/* SETTINGS ROUTES - END */}

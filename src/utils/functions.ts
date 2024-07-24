@@ -84,8 +84,9 @@ const functions = {
     return newText?.replace(/[^\w\s]/gi, '') || '';
   },
   getTagColor: (frase: string) => {
+    if (frase === 'empty') return 'default';
     const hash = frase.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colores = ['green', 'volcano', 'gold', 'magenta', 'red', 'orange', 'lime', 'cyan', 'blue', 'geekblue', 'purple'];
+    const colores = ['green', 'volcano', 'gold', 'magenta', 'red', 'orange', 'cyan', 'blue', 'geekblue', 'purple'];
     return colores[hash % colores.length];
   },
   getCode: (product: Product) => {
@@ -99,6 +100,34 @@ const functions = {
   datesAreEquals: (date1?: string | Date, date2?: string | Date | any) => {
     if (!date1 || !date2) return false;
     return format(new Date(date1), 'PP') === format(new Date(date2), 'PP');
+  },
+
+  findNearestDenominations: function findNearestDenominations(amount: number): [number, number] {
+    const denominations = [5, 10, 20, 50, 100, 200, 500, 1000];
+    // Ordenar las denominaciones en orden ascendente (ya debería estar ordenado)
+    const sortedDenominations = denominations.sort((a, b) => a - b);
+
+    let lower = sortedDenominations[0];
+    let upper = sortedDenominations[sortedDenominations.length - 1];
+
+    // Encuentra la denominación más cercana inferior y superior
+    for (let i = 0; i < sortedDenominations.length; i++) {
+      if (sortedDenominations[i] >= amount) {
+        upper = sortedDenominations[i];
+        if (i > 0) {
+          lower = sortedDenominations[i - 1];
+        }
+        break;
+      }
+    }
+
+    // Ajustar lower y upper si el amount es mayor que la denominación más alta
+    if (amount > sortedDenominations[sortedDenominations.length - 1]) {
+      lower = sortedDenominations[sortedDenominations.length - 1];
+      upper = sortedDenominations[sortedDenominations.length - 1] * 2;
+    }
+
+    return [lower, upper];
   },
 };
 

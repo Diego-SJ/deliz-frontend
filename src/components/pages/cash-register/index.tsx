@@ -1,48 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Col, Drawer, FloatButton, Input, InputRef, Layout, Radio, Row, Tag, Tooltip, Typography } from 'antd';
-import { CATEGORIES } from '@/constants/categories';
-import { CardBtn, CardProduct, CustomTabs, ProductsCheckout, ProductsContainer } from './styles';
-import FallbackImage from '@/assets/img/webp/ice-cream.webp';
-import { Product } from '@/redux/reducers/products/types';
-import Space from '@/components/atoms/Space';
-import CashRegisterItemsList from './items-list';
+import { useEffect, useRef, useState } from 'react';
+import { Col, Drawer, FloatButton, Layout, Row } from 'antd';
+import { ProductsCheckout } from './styles';
+import CashRegisterItemsList from './cart-items-list';
 import CashierActions from './cashier-actions';
 import CashierHeader from '@/components/organisms/CashierHeader';
-import CashierModal from './cashier-modal';
 import CashierCustomer from './cashier-customer';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import functions from '@/utils/functions';
 import { productActions } from '@/redux/reducers/products';
 import { customerActions } from '@/redux/reducers/customers';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { salesActions } from '@/redux/reducers/sales';
-import { productHelpers } from '@/utils/products';
 import { useParams } from 'react-router-dom';
+import ChangePrice from './change-price';
+import SearchProducts from './search-products';
 
 const { Content } = Layout;
 
-const contentStyle: React.CSSProperties = {
-  textAlign: 'center',
-  height: '100%',
-  backgroundColor: '#e9e9e95c',
-};
-
 const CashRegister = () => {
   const dispatch = useAppDispatch();
-  const [open, setOpen] = useState(false);
+
   const params = useParams();
   const { products } = useAppSelector(({ products }) => products);
   const { customers } = useAppSelector(({ customers }) => customers);
-  const [currentProduct, setCurrentProduct] = useState<Product>();
-  const [searchText, setSearchText] = useState<string>('');
-  const [categories] = useState(CATEGORIES);
-  const [currentCategory, setCurrentCategory] = useState('1');
-  const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [currentClient, setCurrentClient] = useState<5 | 19 | null>(null);
-  const searchInput = useRef<InputRef>(null);
-  const { isPhablet } = useMediaQuery();
+  const { isTablet } = useMediaQuery();
   const firstRender = useRef<boolean>(false);
 
   useEffect(() => {
@@ -53,11 +35,6 @@ const CashRegister = () => {
       dispatch(salesActions.cashiers.getActiveCashier());
     }
   }, [products, customers, dispatch]);
-
-  useEffect(() => {
-    let _products = productHelpers.searchProducts(searchText, products, currentCategory);
-    setCurrentProducts(_products);
-  }, [products, searchText]);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -73,175 +50,34 @@ const CashRegister = () => {
     };
   }, [params]);
 
-  const closeModal = () => {
-    setOpen(false);
-  };
-
-  const openModal = (item: Product) => {
-    setCurrentProduct(item);
-    if (item?.product_id) setOpen(true);
-  };
-
-  const onChange = (key: string) => {
-    setCurrentCategory(key);
-  };
-
-  const onCustomerChange = (customerId: any) => {
-    setCurrentClient(customerId);
-    if (customerId) {
-      dispatch(salesActions.cashRegister.setCustomerId(customerId));
-    }
-  };
-
   return (
-    <Layout style={{ height: '100vh', minWidth: '100dvw', maxWidth: '100dvw' }}>
+    <Layout style={{ minHeight: '100dvh', maxHeight: '100dvh', minWidth: '100dvw', maxWidth: '100dvw' }}>
       <CashierHeader />
-      <Layout>
-        <Content style={contentStyle}>
+      <Layout className="bg-slate-100">
+        <Content>
           <Row gutter={[0, 10]} style={{ minHeight: '100%' }}>
-            <Col lg={14} sm={24}>
-              <ProductsContainer>
-                <Radio.Group
-                  value={currentClient}
-                  size="large"
-                  style={{ width: '100%', marginBottom: 10 }}
-                  onChange={event => onCustomerChange(event.target.value)}
-                >
-                  <Radio.Button value={5} style={{ width: '33.33%' }}>
-                    MENUDEO
-                  </Radio.Button>
-                  <Radio.Button value={19} style={{ width: '33.33%' }}>
-                    MAYOREO
-                  </Radio.Button>
-                  <Radio.Button value={null} style={{ width: '33.33%' }}>
-                    OTRO
-                  </Radio.Button>
-                </Radio.Group>
-                {!currentClient && <CashierCustomer />}
-                <Input.Search
-                  ref={searchInput}
-                  allowClear
-                  size="large"
-                  style={{ marginTop: 10, marginBottom: 0 }}
-                  placeholder="Buscar producto"
-                  onFocus={() => searchInput.current?.select()}
-                  onChange={({ target }) => setSearchText(target.value)}
-                />
-
-                <Space />
-                {!!!searchText && (
-                  <Row gutter={[10, 10]}>
-                    {products
-                      ?.filter(i => i?.status === 2)
-                      .map(product => {
-                        return (
-                          <ItemProduct
-                            key={product.product_id}
-                            imageSrc={product.image_url}
-                            title={product.name}
-                            category={(product as any)?.categories?.name}
-                            size={(product as any)?.sizes?.name}
-                            onClick={() => openModal(product)}
-                          />
-                        );
-                      })}
-                  </Row>
-                )}
-                <CustomTabs
-                  style={{ marginTop: 10 }}
-                  onChange={onChange}
-                  type="card"
-                  size="small"
-                  items={categories.map((category, i) => {
-                    return {
-                      label: category.name,
-                      key: `${category.id}`,
-                      children: (
-                        <Row gutter={[10, 10]} key={i}>
-                          {currentProducts.map(product => {
-                            return (
-                              <ItemProduct
-                                key={product.product_id}
-                                imageSrc={product.image_url}
-                                title={product.name}
-                                category={(product as any)?.categories?.name}
-                                size={(product as any)?.sizes?.name}
-                                onClick={() => openModal(product)}
-                              />
-                            );
-                          })}
-                        </Row>
-                      ),
-                    };
-                  })}
-                />
-              </ProductsContainer>
+            <Col lg={12} xl={14} sm={24} md={12} xs={24}>
+              <div className="flex gap-4 px-3 my-3">
+                <CashierCustomer />
+                <ChangePrice />
+              </div>
+              <SearchProducts />
             </Col>
 
-            {!isPhablet && (
-              <Col lg={10} sm={0}>
-                <ProductsCheckout>
-                  <CashierCustomer />
-                  <CashRegisterItemsList />
-                  <CashierActions />
-                </ProductsCheckout>
-              </Col>
-            )}
+            <Col lg={12} xl={10} sm={0} md={12} xs={0}>
+              <ProductsCheckout
+                style={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
+                className="w-full !border-0 !border-l !border-slate-300 !min-h-[calc(100dvh-60px)] !max-h-[calc(100dvh-60px)]"
+              >
+                <CashRegisterItemsList />
+                <CashierActions />
+              </ProductsCheckout>
+            </Col>
           </Row>
         </Content>
       </Layout>
-      {isPhablet && (
-        <FloatButton
-          style={{ transform: 'scale(1.8)' }}
-          icon={<UnorderedListOutlined />}
-          type="default"
-          onClick={() => setDrawerOpen(true)}
-        />
-      )}
-      <CashierModal open={open} currentProduct={currentProduct} onCancel={closeModal} />
-      <Drawer
-        title={<CashierCustomer />}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        width="100dvw"
-        height="100dvh"
-        styles={{ body: { padding: 0 } }}
-      >
-        <div className="relative w-[100dvw] overflow-x-hidden h-[calc(100dvh-73px)] ">
-          <CashRegisterItemsList />
-          <div className="p-4 bottom-0 w-full h-[269px] border-t border-dashed border-slate-400 md:border-none">
-            <CashierActions onClose={() => setDrawerOpen(false)} />
-          </div>
-        </div>
-      </Drawer>
     </Layout>
-  );
-};
-
-type ItemProductsProps = {
-  title?: string;
-  imageSrc?: string;
-  category?: string;
-  size?: string;
-  onClick?: () => void;
-};
-
-const ItemProduct = (props: ItemProductsProps) => {
-  let category = props?.category || 'Sin categoría';
-  let size = props?.size || '- - -';
-  return (
-    <Col lg={6} md={6} xs={8}>
-      <CardProduct onClick={props?.onClick}>
-        <img className="card-product-image" src={props?.imageSrc || FallbackImage} alt={props.title} />
-        <Typography.Text className="card-product-name" style={{ fontWeight: 600, margin: '8px 0' }}>
-          {props?.title ?? 'Producto sin nombre'}
-        </Typography.Text>
-        <div className="card-product-tags">
-          <Tag color={functions.getTagColor(size)}>{size}</Tag>
-          <Tag color={functions.getTagColor(category)}>{category}</Tag>
-        </div>
-      </CardProduct>
-    </Col>
   );
 };
 

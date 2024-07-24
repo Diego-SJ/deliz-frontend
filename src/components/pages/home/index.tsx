@@ -47,7 +47,7 @@ const Home = () => {
 
           return (
             <CardCategory key={cat.id} style={{ background: cat.gradient.radial }}>
-              <img src={product?.image_url} alt={product?.name} />
+              <img src={product?.image_url || ''} alt={product?.name} />
               <Typography.Text>{cat.name}</Typography.Text>
             </CardCategory>
           );

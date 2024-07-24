@@ -51,6 +51,7 @@ export type PriceList = {
   [key: string]: {
     price_id: string;
     unit_price: number;
+    is_default: boolean;
   };
 };
 

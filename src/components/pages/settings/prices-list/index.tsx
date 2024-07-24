@@ -10,6 +10,7 @@ const PricesListPage = () => {
   const mounted = useRef(false);
   const dispatch = useAppDispatch();
   const { prices_list } = useAppSelector(state => state.branches);
+  const { company_id } = useAppSelector(state => state.app.company);
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
@@ -23,6 +24,7 @@ const PricesListPage = () => {
 
   const openModal = () => {
     setOpen(true);
+    form.setFieldsValue({ company_id });
   };
 
   const closeModal = () => {
@@ -138,6 +140,9 @@ const PricesListPage = () => {
             : 'Una vez creado el tipo de precio, podrás asignarlo a tus productos'}
         </Typography.Text>
         <Form form={form} layout="vertical" className="mt-4">
+          <Form.Item name="company_id" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item name="price_id" hidden>
             <Input />
           </Form.Item>

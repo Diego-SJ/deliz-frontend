@@ -50,7 +50,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
     if (open) {
       if (action === 'EDIT' && casherItem) {
         setQuantity(casherItem.quantity);
-        setChecked(casherItem.wholesale_price);
       } else {
         setChecked(true);
       }

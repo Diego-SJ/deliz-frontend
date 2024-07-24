@@ -2,7 +2,7 @@ import { Button, Card, Form, Input, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbSettings from '../menu/breadcrumb';
 import LogoManagement from './logo-management';
-import { Business } from '@/redux/reducers/app/types';
+import { Company } from '@/redux/reducers/app/types';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { appActions } from '@/redux/reducers/app';
 import { useTransition } from 'react';
@@ -12,12 +12,12 @@ const GeneralSettingsPage = () => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
   const [loading, startTransition] = useTransition();
-  const { business } = useAppSelector(state => state.app);
+  const { company } = useAppSelector(state => state.app);
 
   const onFinish = () => {
     startTransition(() => {
-      form.validateFields().then(async (values: Business) => {
-        await dispatch(appActions.business.upsertBusiness(values));
+      form.validateFields().then(async (values: Company) => {
+        await dispatch(appActions.company.upsertBusiness(values));
       });
     });
   };
@@ -44,10 +44,10 @@ const GeneralSettingsPage = () => {
             <Form
               form={form}
               layout="vertical"
-              initialValues={business}
+              initialValues={company}
               validateMessages={{ required: '${label} es obligatorio.', pattern: { mismatch: '${label} no es válido' } }}
             >
-              <Form.Item name="business_id" hidden>
+              <Form.Item name="company_id" hidden>
                 <Input />
               </Form.Item>
 

@@ -14,13 +14,14 @@ const customActions = {
   fetchProducts: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       let products = getState().products.products || [];
+      const company_id = getState().app.company.company_id;
 
       if (!products.length || args?.refetch) {
         dispatch(productActions.setLoading(true));
         const result = await supabase
           .from('products')
           .select(`*, categories(category_id,name), units(*), sizes(*)`)
-          // .not('product_id', 'in', '(0,3)')
+          .eq('company_id', company_id)
           .order('name', { ascending: true });
         products =
           result?.data?.map(item => {
@@ -69,29 +70,12 @@ const customActions = {
     dispatch(productActions.setCurrentProduct({ ...product, ...result.data }));
     message.info('Imagen eliminada');
   },
-  // replaceImage: async (image: RcFile, image_path?: string): Promise<string | boolean> => {
-  //   let filename = image_path?.replace(BUCKETS.PRODUCTS.IMAGES_PATH, '');
-  //   const { data, error } = await supabase.storage.from('deliz').update(`products/images/${filename}`, image, {
-  //     upsert: true,
-  //   });
-  //   let imageUrl: string | boolean = BUCKETS.PRODUCTS.IMAGES`${data?.fullPath || ''}` as string;
-
-  //   if (error) {
-  //     imageUrl = await productActions.saveImage(image);
-  //   }
-
-  //   if (!!imageUrl) {
-  //     return imageUrl as string;
-  //   }
-
-  //   message.error('No se pudo actualizar la imagen.', 4);
-  //   return false;
-  // },
-  saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch) => {
+  saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(productActions.setLoading(true));
+      const company_id = getState().app.company.company_id;
 
-      const result = await supabase.from('products').insert(product);
+      const result = await supabase.from('products').insert({ ...product, company_id });
 
       dispatch(productActions.setLoading(false));
 
@@ -99,7 +83,7 @@ const customActions = {
         message.error('No se pudo guardar el producto.', 4);
         return false;
       }
-      //await dispatch(productActions.fetchProducts({ refetch: true }));
+
       message.success('¡Producto agregado con éxito!', 4);
       return true;
     } catch (error) {
@@ -139,10 +123,15 @@ const customActions = {
   fetchCategories: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       let categories = getState().products.categories || [];
+      let company_id = getState().app.company.company_id;
 
       if (!categories.length || args?.refetch) {
         dispatch(productActions.setLoading(true));
-        const result = await supabase.from('categories').select('*');
+        const result = await supabase
+          .from('categories')
+          .select('*')
+          .eq('company_id', company_id)
+          .order('name', { ascending: true });
         categories =
           result?.data?.map(item => {
             return {
@@ -179,13 +168,14 @@ const customActions = {
         return false;
       }
     },
-    add: (category: Category) => async (dispatch: AppDispatch) => {
+    add: (category: Category) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
         dispatch(productActions.setLoading(true));
+        let company_id = getState().app.company.company_id;
 
         const { error, data } = await supabase
           .from('categories')
-          .insert([{ name: category.name, description: category.description, status: category.status }])
+          .insert([{ name: category.name, description: category.description, status: category.status, company_id }])
           .select()
           .single();
 
@@ -235,7 +225,12 @@ const customActions = {
         if (!!sizes?.data?.length && !args?.refetch) return true;
 
         dispatch(productActions.setLoading(true));
-        let { data: result, error } = await supabase.from('sizes').select('*').range(0, 9);
+        const company_id = getState()?.app?.company?.company_id;
+        let { data: result, error } = await supabase
+          .from('sizes')
+          .select('*')
+          .eq('company_id', company_id)
+          .order('created_at', { ascending: false });
         dispatch(productActions.setLoading(false));
 
         if (error) {
@@ -252,12 +247,13 @@ const customActions = {
         return false;
       }
     },
-    add: (size: Size) => async (dispatch: AppDispatch) => {
+    add: (size: Size) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
         dispatch(productActions.setLoading(true));
+        const company_id = getState()?.app?.company?.company_id;
         const { error } = await supabase
           .from('sizes')
-          .insert([{ name: size.name, description: size.description, short_name: size.short_name }])
+          .insert([{ name: size.name, description: size.description, short_name: size.short_name, company_id }])
           .select();
         dispatch(productActions.setLoading(false));
 
@@ -329,7 +325,12 @@ const customActions = {
         if (!!units?.data?.length && !args?.refetch) return true;
 
         dispatch(productActions.setLoading(true));
-        let { data: result, error } = await supabase.from('units').select('*').range(0, 9);
+        const company_id = getState()?.app?.company?.company_id;
+        let { data: result, error } = await supabase
+          .from('units')
+          .select('*')
+          .eq('company_id', company_id)
+          .order('created_at', { ascending: false });
         dispatch(productActions.setLoading(false));
 
         if (error) {
@@ -346,12 +347,13 @@ const customActions = {
         return false;
       }
     },
-    add: (unit: Unit) => async (dispatch: AppDispatch) => {
+    add: (unit: Unit) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
         dispatch(productActions.setLoading(true));
+        const company_id = getState()?.app?.company?.company_id;
         const { error } = await supabase
           .from('units')
-          .insert([{ name: unit.name, description: unit.description, short_name: unit.short_name }])
+          .insert([{ name: unit.name, description: unit.description, short_name: unit.short_name, company_id }])
           .select();
         dispatch(productActions.setLoading(false));
 

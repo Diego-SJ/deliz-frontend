@@ -1,9 +1,8 @@
-import { STATUS } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Category } from '@/redux/reducers/products/types';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useState } from 'react';
 
 const UI_TEXTS = {
@@ -42,20 +41,11 @@ const CategoryEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
         <Input placeholder="Nombre" />
       </Form.Item>
-      <Form.Item name="description" label="Descripción" rules={[{ required: true }]}>
+      <Form.Item name="description" label="Descripción">
         <TextArea rows={2} placeholder="Descripción" />
       </Form.Item>
-      <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-        <Select size="large" placeholder="Por default es Activo">
-          {STATUS.map(item => (
-            <Select.Option key={item.id} value={item.id}>
-              {item.name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
       <Form.Item>
-        <Button block type="primary" size="large" htmlType="submit" loading={loading}>
+        <Button block type="primary" htmlType="submit" loading={loading}>
           {UI_TEXTS.saveBtn[!current_category?.category_id ? 'add' : 'edit']}
         </Button>
       </Form.Item>

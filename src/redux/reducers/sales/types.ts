@@ -1,19 +1,27 @@
 import { Pagination } from '@supabase/supabase-js';
 import { Customer } from '../customers/types';
 import { Category, Product } from '../products/types';
+import { PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
 
 export type SalesSlice = {
   sales: SaleDetails[];
   current_sale: CurrentSale;
-  cash_register: CashRegister;
+  cash_register: Partial<CashRegister>;
   operating_expenses?: OperatingExpenses;
   cashiers?: Cashiers;
   loading: boolean;
   closing_days: ClosingDays;
 };
 
+export const PAYMENT_METHOD_NAME = {
+  CASH: 'en efectivo',
+  CC: 'con tarjeta',
+  DC: 'con tarjeta',
+  CARD: 'con tarjeta',
+  TRANSFER: 'por transferencia',
+};
+
 export type DiscountType = 'PERCENTAGE' | 'AMOUNT';
-export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';
 
 export type ClosingDays = {
   data: CashClosing[];
@@ -26,7 +34,7 @@ export type Sale = {
   sale_id?: number;
   customer_id?: number;
   created_at?: Date | string;
-  payment_method?: PaymentMethod;
+  payment_method?: string;
   status_id?: number;
   discount_type?: DiscountType;
   discount?: number;
@@ -52,7 +60,7 @@ export type SaleItem = {
   product_id?: number;
   price?: number;
   quantity?: number;
-  wholesale?: boolean;
+  wholesale?: boolean | null;
   products?: Product & { categories: Category };
   sale_id?: number;
   metadata?: any;
@@ -79,18 +87,21 @@ export type CashRegister = {
   discountType?: DiscountType;
   discountMoney?: number;
   status?: number;
-  customer_id?: number | string;
+  customer_id: number | null;
   mode?: 'sale' | 'order';
   zone?: number;
+  branch_id: string | null;
+  price_id: string | null;
 };
 
 // redux cash register item
 export type CashRegisterItem = {
-  key?: string;
-  customer_id?: number;
-  product: Product;
+  id: string;
+  customer_id: number | null;
+  product: Partial<Product> | null;
   quantity: number;
-  wholesale_price: boolean;
+  price: number;
+  price_type: 'DEFAULT' | 'PERSONALIZED';
 };
 
 // cash_closing table in BD

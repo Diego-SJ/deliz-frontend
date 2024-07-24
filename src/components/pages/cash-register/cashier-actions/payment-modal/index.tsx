@@ -1,18 +1,30 @@
-import NumberKeyboard from '@/components/atoms/NumberKeyboard';
-import { PAYMENT_METHODS } from '@/constants/payment_methods';
+import { PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
 import { STATUS_DATA } from '@/constants/status';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { cashiersActions } from '@/redux/reducers/cashiers';
 import { salesActions } from '@/redux/reducers/sales';
-import { PaymentMethod, Sale } from '@/redux/reducers/sales/types';
+import { Sale } from '@/redux/reducers/sales/types';
 import { APP_ROUTES } from '@/routes/routes';
 import functions from '@/utils/functions';
-import { Button, Col, DatePicker, InputNumber, Modal, Row, Select, Typography, message, notification } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import {
+  Button,
+  Col,
+  Collapse,
+  DatePicker,
+  Drawer,
+  InputNumber,
+  Modal,
+  Row,
+  Select,
+  Typography,
+  message,
+  notification,
+} from 'antd';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PaymentMethods from './payment-methods';
 
-type PaymentModalProps = {
+type PaySaleFormProps = {
   open?: boolean;
   total: number;
   onClose?: () => void;
@@ -21,18 +33,53 @@ type PaymentModalProps = {
 
 const { Title, Paragraph } = Typography;
 
-const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
+const PaySaleForm = ({ open, onClose, total = 0 }: PaySaleFormProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [receivedMoney, setReceivedMoney] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
+  const [paymentMethod, setPaymentMethod] = useState<string | string[]>(PAYMENT_METHODS_KEYS.CASH);
   const [deliveryDate, setDeliveryDate] = useState('');
   const [loading, setLoading] = useState(false);
   const { isTablet } = useMediaQuery();
   const inputRef = useRef<HTMLInputElement | null>(null);
-
   const [api, contextHolder] = notification.useNotification();
+
+  const touchStartY = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      touchEndY.current = null; // Reset touch end
+      touchStartY.current = event.touches[0].clientY;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      touchEndY.current = event.touches[0].clientY;
+    };
+
+    const handleTouchEnd = () => {
+      if (touchStartY.current !== null && touchEndY.current !== null) {
+        const deltaY = touchStartY.current - touchEndY.current;
+        // Detect if swipe down (swipe down will have deltaY < 0)
+        if (deltaY < -50) {
+          if (onClose) onClose();
+          console.log('Swipe down detected');
+          // Ejecuta la acción deseada para el swipe down
+        }
+      }
+    };
+
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [onClose]);
 
   useEffect(() => {
     if (open) {
@@ -78,7 +125,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
   const handleClose = () => {
     if (onClose) onClose();
     setReceivedMoney(0);
-    setPaymentMethod('CASH');
+    setPaymentMethod(PAYMENT_METHODS_KEYS.CASH);
     inputRef.current = null;
   };
 
@@ -98,7 +145,7 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
     }
 
     let newSale: Sale = {
-      payment_method: paymentMethod,
+      payment_method: paymentMethod as string,
       status_id: getSaleStatus(),
       amount_paid: receivedMoney || 0,
       cashback: total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney),
@@ -121,64 +168,11 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
     setLoading(false);
   };
 
-  return (
-    <div>
-      {contextHolder}
-      <Modal
-        open={open}
-        onCancel={handleClose}
-        destroyOnClose
-        width={380}
-        footer={[
-          <Row key="actions" gutter={10}>
-            <Col span={12}>
-              <Button key="back" size="large" block onClick={handleClose} loading={loading}>
-                Cancelar
-              </Button>
-            </Col>
-            <Col span={12}>
-              <Button block type="primary" onClick={handleOk} size="large" disabled={receivedMoney < 0} loading={loading}>
-                {getSaleStatus() === STATUS_DATA.PENDING.id ? 'Pagar luego' : 'Finalizar'}
-              </Button>
-            </Col>
-          </Row>,
-        ]}
-      >
-        <Title level={2} style={{ margin: '20px 0 10px', textAlign: 'center' }}>{`Total: ${functions.money(total)}`}</Title>
-
-        <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Método de pago</Paragraph>
-        <Select
-          style={{ width: '100%', marginBottom: 10 }}
-          size="large"
-          virtual={false}
-          value={paymentMethod}
-          options={PAYMENT_METHODS}
-          onChange={value => setPaymentMethod(value)}
-        />
-
+  const PaymentForm = useCallback(() => {
+    return (
+      <>
         {cash_register?.mode !== 'order' ? (
-          <>
-            <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Cantidad recibida</Paragraph>
-            <InputNumber
-              ref={inputRef}
-              min={0}
-              placeholder="0"
-              size="large"
-              addonBefore="$"
-              value={receivedMoney}
-              style={{ width: '100%', marginBottom: 10 }}
-              readOnly={isTablet}
-              onFocus={target => {
-                target.currentTarget.select();
-              }}
-              onChange={value => setReceivedMoney(value || 0)}
-            />
-
-            <Title level={4} type={total - receivedMoney > 0 ? 'danger' : 'success'} style={{ margin: '0', textAlign: 'center' }}>
-              {`${total - receivedMoney > 0 ? 'Por pagar' : 'Cambio'}: ${functions.money(Math.abs(total - receivedMoney))}`}
-            </Title>
-            {isTablet && <NumberKeyboard value={receivedMoney} withDot onChange={value => setReceivedMoney(value || 0)} />}
-          </>
+          <></>
         ) : (
           <>
             <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Fecha de entrega</Paragraph>
@@ -192,9 +186,46 @@ const PaymentModal = ({ open, onClose, total = 0 }: PaymentModalProps) => {
             />
           </>
         )}
-      </Modal>
+      </>
+    );
+  }, [receivedMoney, total, cash_register]);
+
+  return (
+    <div>
+      {contextHolder}
+      {!isTablet ? (
+        <Modal
+          open={open}
+          onCancel={handleClose}
+          title="Finalizar venta"
+          style={{ top: 50 }}
+          width={500}
+          footer={
+            [
+              // <Row key="actions" gutter={10}>
+              //   <Col span={12}>
+              //     <Button key="back" size="large" block onClick={handleClose} loading={loading}>
+              //       Cancelar
+              //     </Button>
+              //   </Col>
+              //   <Col span={12}>
+              //     <Button block type="primary" onClick={handleOk} size="large" disabled={receivedMoney < 0} loading={loading}>
+              //       {getSaleStatus() === STATUS_DATA.PENDING.id ? 'Pagar luego' : 'Finalizar'}
+              //     </Button>
+              //   </Col>
+              // </Row>,
+            ]
+          }
+        >
+          <PaymentMethods total={total} />
+        </Modal>
+      ) : (
+        <Drawer title="Finalizar venta" height="90dvh" open={open} onClose={handleClose} placement="bottom">
+          <PaymentMethods total={total} />
+        </Drawer>
+      )}
     </div>
   );
 };
 
-export default PaymentModal;
+export default memo(PaySaleForm);

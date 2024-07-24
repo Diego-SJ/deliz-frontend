@@ -24,7 +24,7 @@ type UploadPropsType = {
 
 const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
   const dispatch = useAppDispatch();
-  const { modal, message } = App.useApp();
+  const { modal } = App.useApp();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
 

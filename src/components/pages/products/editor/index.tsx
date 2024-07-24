@@ -312,37 +312,39 @@ const ProductEditor = () => {
         </Row> */}
           </Form>
 
-          <CardRoot title="Eliminar producto" className="my-5">
-            <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
-              <Typography.Text type="danger">
-                Una vez eliminado el producto, no se podrá recuperar la información.
-              </Typography.Text>
-              <Button
-                ghost
-                danger
-                className="w-full md:max-w-40"
-                onClick={() => {
-                  modal.confirm({
-                    title: 'Eliminar producto',
-                    type: 'error',
-                    okText: 'Eliminar',
-                    onOk: confirmDelete,
-                    okType: 'danger',
-                    cancelText: 'Cancelar',
-                    content: '¿Confirma que deseas eliminar el producto?',
-                    footer: (_, { OkBtn, CancelBtn }) => (
-                      <>
-                        <CancelBtn />
-                        <OkBtn />
-                      </>
-                    ),
-                  });
-                }}
-              >
-                Eliminar
-              </Button>
-            </div>
-          </CardRoot>
+          {action === 'edit' && (
+            <CardRoot title="Eliminar producto" className="my-5">
+              <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
+                <Typography.Text type="danger">
+                  Una vez eliminado el producto, no se podrá recuperar la información.
+                </Typography.Text>
+                <Button
+                  ghost
+                  danger
+                  className="w-full md:max-w-40"
+                  onClick={() => {
+                    modal.confirm({
+                      title: 'Eliminar producto',
+                      type: 'error',
+                      okText: 'Eliminar',
+                      onOk: confirmDelete,
+                      okType: 'danger',
+                      cancelText: 'Cancelar',
+                      content: '¿Confirma que deseas eliminar el producto?',
+                      footer: (_, { OkBtn, CancelBtn }) => (
+                        <>
+                          <CancelBtn />
+                          <OkBtn />
+                        </>
+                      ),
+                    });
+                  }}
+                >
+                  Eliminar
+                </Button>
+              </div>
+            </CardRoot>
+          )}
         </div>
       </div>
       <Card

@@ -9,7 +9,7 @@ export const productHelpers = {
         ?.toLowerCase() || ''
     );
   },
-  searchProducts: function (searchText: string, products: Product[], categoryId: string | number): Product[] {
+  searchProducts: function (searchText: string, products: Product[]): Product[] {
     const normalizedSearchText = this.normalizeText(searchText);
 
     const regex = new RegExp(normalizedSearchText, 'i');
@@ -17,5 +17,8 @@ export const productHelpers = {
     return products.filter(product => {
       return regex?.test(this.normalizeText(product?.name)) || regex?.test(this.normalizeText(product?.description));
     });
+  },
+  getProductPrice: (product: Product, price_id?: string | null): number => {
+    return (product?.price_list || {})[price_id || '']?.unit_price || product.raw_price || product.retail_price || 0;
   },
 };

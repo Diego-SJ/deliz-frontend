@@ -38,11 +38,11 @@ const CategoryEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       <Form.Item name="short_name" label="Abreviación" rules={[{ required: true }]}>
         <Input placeholder="Abreviación" />
       </Form.Item>
-      <Form.Item name="description" label="Descripción" rules={[{ required: true }]}>
+      <Form.Item name="description" label="Descripción">
         <TextArea rows={2} placeholder="Descripción" />
       </Form.Item>
       <Form.Item>
-        <Button block type="primary" size="large" htmlType="submit" loading={loading}>
+        <Button block type="primary" htmlType="submit" loading={loading}>
           {sizes?.drawer === 'new' ? 'Guardar' : 'Guardar cambios'}
         </Button>
       </Form.Item>

@@ -1,5 +1,6 @@
 import CardRoot from '@/components/atoms/Card';
 import { useAppSelector } from '@/hooks/useStore';
+import { Price } from '@/redux/reducers/branches/type';
 import { PriceList } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import { Form, InputNumber, Typography } from 'antd';
@@ -15,9 +16,12 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
   const { prices_list } = useAppSelector(state => state.branches);
   const [unitPrice, setUnitPrice] = useState(0);
 
-  const handleChange = (value: number, price_id: string) => {
+  const handleChange = (value: number, price: Price) => {
     setPriceList(prev => {
-      let newData = { ...prev, [price_id]: { price_id, unit_price: value } };
+      let newData = {
+        ...prev,
+        [price.price_id]: { price_id: price.price_id, is_default: !!price.is_default, unit_price: value },
+      };
       if (onChange) onChange(newData);
       return newData;
     });
@@ -64,7 +68,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
                 <Typography.Text style={{ margin: 0 }}>{price.name}</Typography.Text>
                 <InputNumber
                   value={priceList[price.price_id]?.unit_price || 0}
-                  onChange={value => handleChange(value as number, price.price_id)}
+                  onChange={value => handleChange(value as number, price)}
                   onFocus={({ target }) => (target as HTMLInputElement).select()}
                   prefix="$"
                   className="w-full mb-0"

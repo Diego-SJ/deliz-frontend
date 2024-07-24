@@ -1,9 +1,9 @@
 export type AppSlice = {
-  business: Business;
+  company: Company;
 };
 
-export type Business = {
-  business_id: string;
+export type Company = {
+  company_id: string;
   name: string;
   logo_url: string | null;
   phone: string;

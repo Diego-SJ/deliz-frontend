@@ -33,26 +33,32 @@ const customActions = {
       return false;
     }
   },
-  saveCustomer: (customer: Customer) => async (dispatch: AppDispatch) => {
+  saveCustomer: (customer: Customer) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(customerActions.setLoading(true));
+      const branch_id = getState().branches.currentBranch?.branch_id;
 
-      const result = await supabase.from('customers').insert({
-        name: customer.name,
-        address: customer.address,
-        email: customer.email,
-        phone: customer.phone,
-      } as Customer);
+      const { data, error } = await supabase
+        .from('customers')
+        .insert({
+          name: customer.name,
+          address: customer.address,
+          email: customer.email,
+          phone: customer.phone,
+          branch_id,
+        } as Customer)
+        .select()
+        .single();
 
       dispatch(customerActions.setLoading(false));
 
-      if (result.error) {
+      if (error) {
         message.error('No se pudo guardar la información.', 4);
         return false;
       }
       await dispatch(customActions.fetchCustomers({ refetch: true }));
-      message.success('Cliente agregado con éxito!', 4);
-      return true;
+      message.success('Cliente agregado con éxito!', 3);
+      return data;
     } catch (error) {
       dispatch(customerActions.setLoading(false));
       return false;
@@ -61,6 +67,7 @@ const customActions = {
   updateCustomer: (customer: Customer) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(customerActions.setLoading(true));
+      const branch_id = getState().branches.currentBranch?.branch_id;
 
       const oldData = getState().customers.current_customer;
       const newData = {
@@ -68,6 +75,7 @@ const customActions = {
         address: customer.address,
         email: customer.email,
         phone: customer.phone,
+        branch_id,
       } as Customer;
 
       const result = await supabase.from('customers').update(newData).eq('customer_id', oldData.customer_id);

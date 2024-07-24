@@ -1,5 +1,5 @@
 import Popover from '@/components/atoms/Popover';
-import { CaretDownOutlined, ExclamationCircleOutlined, LogoutOutlined, SettingOutlined, TeamOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, ExclamationCircleOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import { Modal, Typography } from 'antd';
 import { useTheme } from 'styled-components';
 import { PopoverBody, IconItem } from './styles';

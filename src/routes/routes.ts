@@ -73,6 +73,9 @@ export const APP_ROUTES = {
             hash: (_: TemplateStringsArray, branch_id: string) => `/app/settings/branches/edit/${branch_id}`,
           },
         },
+        CASH_REGISTERS: {
+          path: '/app/settings/cash-registers',
+        },
         PRICES_LIST: { path: '/app/settings/prices-list' },
         CATEGORIES: { path: '/app/settings/categories' },
         SIZES: {

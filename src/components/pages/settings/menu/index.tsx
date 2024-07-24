@@ -2,13 +2,11 @@ import { APP_ROUTES } from '@/routes/routes';
 import {
   BankOutlined,
   DollarOutlined,
-  ExpandAltOutlined,
+  GoldOutlined,
   InboxOutlined,
   LineHeightOutlined,
-  MoneyCollectOutlined,
   ProductOutlined,
   SettingOutlined,
-  TeamOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { createElement } from 'react';
@@ -34,10 +32,16 @@ const SettingsMenu = () => {
             onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path),
           },
           {
-            key: 2,
+            key: 7,
             icon: createElement(BankOutlined),
             label: 'Sucursales',
             onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.path),
+          },
+          {
+            key: 2,
+            icon: createElement(InboxOutlined),
+            label: 'Cajas',
+            onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CASH_REGISTERS.path),
           },
           {
             key: 3,
@@ -59,7 +63,7 @@ const SettingsMenu = () => {
           },
           {
             key: 6,
-            icon: createElement(InboxOutlined),
+            icon: createElement(GoldOutlined),
             label: 'Unidades',
             onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path),
           },

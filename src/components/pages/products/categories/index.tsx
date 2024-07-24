@@ -3,7 +3,7 @@ import { productActions } from '@/redux/reducers/products';
 import { Category } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Col, Drawer, Input, Row, Tag, Typography } from 'antd';
+import { Avatar, Button, Card, Col, Drawer, Input, List, Row, Tag, Typography } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { STATUS_OBJ } from '@/constants/status';
@@ -11,6 +11,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import CategoryEditor from './editor';
 import BreadcrumbSettings from '../../settings/menu/breadcrumb';
 import ActionTableButtons from '@/components/molecules/Table/action-table-btns';
+import CardRoot from '@/components/atoms/Card';
 
 type DataType = Category;
 
@@ -125,16 +126,37 @@ const CategoriesPage = () => {
               />
             </Col>
           </Row>
-          <Card styles={{ body: { padding: 0 } }} className="overflow-hidden shadow-md rounded-xl">
-            <Table
-              size="small"
-              className="border-none"
-              scroll={{ y: 'calc(100vh - 300px)', x: 700 }}
-              columns={columns}
+          <CardRoot style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Categorías">
+            <List
+              itemLayout="horizontal"
+              footer={
+                <div className="px-2">
+                  <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
+                    Agregar nueva
+                  </Button>
+                </div>
+              }
+              className="px-0"
               dataSource={options}
-              pagination={false}
+              renderItem={item => (
+                <List.Item
+                  styles={{ actions: { paddingRight: 15, margin: 0 } }}
+                  classNames={{ actions: 'flex' }}
+                  className="flex"
+                  actions={[
+                    <ActionTableButtons
+                      deleteFunction={productActions.categories.delete(item.category_id as number)}
+                      editFunction={productActions.setCurrentCategory(item)}
+                    />,
+                  ]}
+                >
+                  <div className="pl-4 md:pl-6 flex gap-4">
+                    <Typography.Text>{item.name}</Typography.Text>
+                  </div>
+                </List.Item>
+              )}
             />
-          </Card>
+          </CardRoot>
           <Drawer
             title={!!current_category?.category_id ? 'Editar categoría' : 'Agregar nueva categoría'}
             width={isTablet ? 350 : 420}

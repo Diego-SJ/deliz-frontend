@@ -1,7 +1,7 @@
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
-import { Cashier, PaymentMethod } from '@/redux/reducers/sales/types';
+import { Cashier } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import StoreSvg from '@/assets/img/svg/store.svg';
 import CashierSvg from '@/assets/img/svg/cashier.svg';
@@ -32,6 +32,7 @@ import {
 import { useState } from 'react';
 import { cashiersActions } from '@/redux/reducers/cashiers';
 import CardRoot from '@/components/atoms/Card';
+import { PAYMENT_METHOD_NAME } from '@/constants/payment_methods';
 
 type Props = {
   onSuccess?: (args: boolean) => void;
@@ -41,14 +42,6 @@ export const OPERATION_TYPE_NAME = {
   INCOME: 'Ingreso',
   EXPENSE: 'Retiro',
   SALE: 'Venta',
-};
-
-export const PAYMENT_METHOD_NAME = {
-  CASH: 'en efectivo',
-  CC: 'con tarjeta',
-  DC: 'con tarjeta',
-  CARD: 'con tarjeta',
-  TRANSFER: 'por transferencia',
 };
 
 export const getImageType = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
@@ -160,7 +153,7 @@ const OpenCashier = ({ onSuccess }: Props) => {
         amount: amount as number,
         name,
         operation_type: operationType as 'INCOME' | 'EXPENSE',
-        payment_method: payment_method as PaymentMethod,
+        payment_method: payment_method as any,
       }),
     );
 

@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { AppSlice, Business } from './types';
+import { AppSlice, Company } from './types';
 import customActions from './actions';
 
 const initialState: AppSlice = {
-  business: {
-    business_id: '',
+  company: {
+    company_id: '',
     name: '',
     logo_url: '',
     phone: '',
@@ -20,8 +20,8 @@ const app = createSlice({
   initialState,
   reducers: {
     resetSlice: () => initialState,
-    setBusiness: (state, action: PayloadAction<Partial<Business>>) => {
-      state.business = { ...state.business, ...action.payload };
+    setCompany: (state, action: PayloadAction<Partial<Company>>) => {
+      state.company = { ...state.company, ...action.payload };
     },
   },
 });

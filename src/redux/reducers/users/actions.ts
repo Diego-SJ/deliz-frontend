@@ -17,8 +17,11 @@ const customActions = {
       return false;
     }
 
-    await dispatch(appActions.business.getBusiness(data.business_id));
     await dispatch(userActions.setUserAuth({ profile: data, authenticated: true }));
+
+    await dispatch(appActions.company.getCompany(data.company_id));
+    await dispatch(branchesActions.getBranches());
+    await dispatch(branchesActions.getCashRegistersByCompanyId());
     return true;
   },
   signOut: () => async (dispatch: AppDispatch) => {
@@ -30,6 +33,24 @@ const customActions = {
     dispatch(userActions.resetSlice());
     dispatch(branchesActions.resetSlice());
     dispatch(appActions.resetSlice());
+  },
+  toggleFavoriteProduct: (product_id: number) => async (dispatch: AppDispatch, getState: any) => {
+    const { profile } = getState().users.user_auth;
+    let favorite_products = [...profile.favorite_products];
+
+    if (favorite_products.includes(product_id)) {
+      favorite_products.splice(favorite_products.indexOf(product_id), 1);
+    } else {
+      favorite_products.push(product_id);
+    }
+
+    const { data } = await supabase
+      .from('profiles')
+      .update({ favorite_products })
+      .eq('profile_id', profile.profile_id)
+      .select()
+      .single();
+    await dispatch(userActions.setProfile({ favorite_products: data.favorite_products || [] }));
   },
 };
 

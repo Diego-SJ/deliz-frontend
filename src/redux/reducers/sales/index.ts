@@ -22,7 +22,7 @@ const initialState: SalesSlice = {
     status: 5, // pending
     shipping: 0,
     discountMoney: 0,
-    customer_id: '',
+    customer_id: null,
     zone: 1,
   },
   operating_expenses: { data: [], drawer: null, pagination: {} as Pagination, selected: {} as OperatingExpense },
@@ -47,7 +47,7 @@ const sales = createSlice({
     setCurrentSale(state, action: PayloadAction<CurrentSale>) {
       state.current_sale = { ...state.current_sale, ...action.payload };
     },
-    updateCashRegister(state, action: PayloadAction<CashRegister>) {
+    updateCashRegister(state, action: PayloadAction<Partial<CashRegister>>) {
       state.cash_register = { ...state.cash_register, ...action.payload };
     },
     setClosingDays(state, action: PayloadAction<ClosingDays>) {

@@ -6,8 +6,8 @@ import {
   TeamOutlined,
   ExclamationCircleOutlined,
   BarChartOutlined,
-  BarcodeOutlined,
   SettingOutlined,
+  PlusCircleOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
 import DelizLogo from '@/assets/img/webp/deliz-logo-bn.webp';
-import { Modal } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import useMediaQuery from '@/hooks/useMediaQueries';
@@ -25,16 +25,16 @@ type SideMenuProps = {
 };
 
 const ITEM_LIST = [
-  {
-    key: 'point_of_sale',
-    icon: BarcodeOutlined,
-    label: 'Punto de venta',
-    path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
-  },
+  // {
+  //   key: 'point_of_sale',
+  //   icon: BarcodeOutlined,
+  //   label: 'Punto de venta',
+  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
+  // },
   {
     key: 'dashboard',
     icon: HomeOutlined,
-    label: 'Dashboard',
+    label: 'Inicio',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
 
@@ -118,7 +118,7 @@ const SideMenu = (props: SideMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user_auth } = useAppSelector(({ users }) => users);
-  const { business } = useAppSelector(({ app }) => app);
+  const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
   const [currentItems, setCurrentItems] = useState<any[]>([]);
   const isSales = user_auth?.profile?.role === 'SALES';
@@ -148,11 +148,25 @@ const SideMenu = (props: SideMenuProps) => {
 
   return (
     <>
-      <Logo src={!!business?.logo_url ? business.logo_url : DelizLogo} title="D'eliz" />
+      <Logo src={!!company?.logo_url ? company.logo_url : DelizLogo} title="D'eliz" />
+
+      <div className="flex px-4 mt-10 mb-6">
+        <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
+          <Button
+            size="large"
+            className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
+            icon={<PlusCircleOutlined />}
+            onClick={() => handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path)}
+          >
+            {isPhablet && !isTablet ? '' : 'Nueva venta'}
+          </Button>
+        </Tooltip>
+      </div>
+
       <MenuRoot
         theme={'dark' as any}
         mode="inline"
-        className="my-10"
+        className="mb-10"
         inlineCollapsed={isPhablet && !isTablet}
         items={currentItems.map((item, key) => ({
           key,

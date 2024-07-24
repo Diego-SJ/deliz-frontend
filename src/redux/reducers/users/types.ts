@@ -16,5 +16,6 @@ export type Profile = {
   role: string;
   branches: string[];
   cashiers: string[];
-  business_id: string;
+  company_id: string;
+  favorite_products: number[];
 };

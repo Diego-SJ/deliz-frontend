@@ -22,6 +22,7 @@ import INITIAL_STATE from '@/constants/initial-states';
 import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
 import { cashiersActions } from '../cashiers';
+import { productHelpers } from '@/utils/products';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -220,10 +221,10 @@ const customActions = {
         let saleItems: SaleItem[] = state.map(item => {
           return {
             sale_id: sale.sale_id,
-            price: item.wholesale_price ? item.product.wholesale_price : item.product.retail_price,
-            product_id: item.product.product_id,
+            price: item.price,
+            product_id: item.product?.product_id,
             quantity: item.quantity,
-            wholesale: item.wholesale_price,
+            wholesale: null,
             metadata: item?.product?.product_id === 0 ? { name: item?.product?.name } : {},
           } as SaleItem;
         });
@@ -311,7 +312,8 @@ const customActions = {
     }
   },
   cashRegister: {
-    reset: () => async (dispatch: AppDispatch) => {
+    reset: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const { branch_id, price_id } = getState().sales.cash_register;
       const defaultCashRegisterValues: CashRegister = {
         items: [],
         discount: 0,
@@ -319,26 +321,59 @@ const customActions = {
         discountType: 'AMOUNT',
         shipping: 0,
         status: 5,
+        branch_id: branch_id || null,
+        price_id: price_id || null,
         customer_id: INITIAL_STATE.customerId,
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },
-    add: (newItem: CashRegisterItem) => async (dispatch: AppDispatch, getState: AppState) => {
-      const customer_id = getState().sales.cash_register?.customer_id as number;
+    add: (newItem: Partial<CashRegisterItem>) => async (dispatch: AppDispatch, getState: AppState) => {
+      const { customer_id = null, price_id = null } = getState().sales.cash_register;
+      const price = productHelpers.getProductPrice(newItem.product as Product, price_id);
+      let currentItems = [...(getState().sales.cash_register?.items || [])];
 
-      let items = [...(getState().sales.cash_register?.items ?? []), { ...newItem, key: uuidv4(), customer_id }].filter(Boolean);
-      dispatch(salesActions.updateCashRegister({ items }));
+      let newItemData: CashRegisterItem = {
+        id: uuidv4(),
+        customer_id,
+        price,
+        product: newItem.product as Product,
+        quantity: newItem.quantity || 1,
+        price_type: newItem.price_type || 'DEFAULT',
+      };
+
+      const itemDefaultExists = currentItems.findIndex(item => {
+        return item.product?.product_id === newItem.product?.product_id && item.price_type === 'DEFAULT';
+      });
+
+      if (itemDefaultExists >= 0) {
+        newItemData.quantity = currentItems[itemDefaultExists].quantity + newItemData.quantity;
+        currentItems.splice(itemDefaultExists, 1);
+      }
+
+      currentItems.push(newItemData);
+
+      dispatch(salesActions.updateCashRegister({ items: currentItems }));
     },
-    remove: (key: string) => async (dispatch: AppDispatch, getState: AppState) => {
+    remove: (id: string) => async (dispatch: AppDispatch, getState: AppState) => {
       let items = getState().sales.cash_register?.items ?? [];
-      items = items.filter(item => item.key !== key);
+      items = items.filter(item => item.id !== id);
       dispatch(salesActions.updateCashRegister({ items }));
     },
-    update: (newItem: CashRegisterItem) => async (dispatch: AppDispatch, getState: AppState) => {
-      let items = [...(getState().sales.cash_register?.items ?? [])]?.filter(Boolean);
-      let index = items.findIndex(item => item.key === newItem.key);
-      items.splice(index, 1, { ...newItem });
+    update: (newItem: Partial<CashRegisterItem>) => async (dispatch: AppDispatch, getState: AppState) => {
+      let items = [...(getState().sales.cash_register?.items ?? [])];
+      let index = items.findIndex(item => item.id === newItem.id);
+      items.splice(index, 1, { ...(newItem as CashRegisterItem) });
       dispatch(salesActions.updateCashRegister({ items }));
+    },
+    changePrice: (price_id: string | null) => async (dispatch: AppDispatch, getState: AppState) => {
+      let items = [...(getState().sales.cash_register?.items ?? [])];
+
+      items = items.map(item => {
+        let price = productHelpers.getProductPrice(item.product as Product, price_id);
+        return { ...item, price, price_type: 'DEFAULT' };
+      });
+
+      dispatch(salesActions.updateCashRegister({ items, price_id: price_id }));
     },
     applyShipping: (shipping: number) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.updateCashRegister({ shipping }));
@@ -346,7 +381,7 @@ const customActions = {
     applyDiscount: (discount: number, discountType: DiscountType) => async (dispatch: AppDispatch, getState: AppState) => {
       let items = [...(getState().sales.cash_register?.items ?? [])]?.filter(Boolean);
       let subtotal = items?.reduce((total, item) => {
-        let productPrice = item.wholesale_price ? item.product.wholesale_price : item.product.retail_price;
+        let productPrice = item.price;
         productPrice = productPrice * item.quantity;
         return productPrice + total;
       }, 0);
@@ -360,7 +395,7 @@ const customActions = {
 
       dispatch(salesActions.updateCashRegister({ discount, discountType, discountMoney }));
     },
-    setCustomerId: (customer_id: number) => async (dispatch: AppDispatch) => {
+    setCustomerId: (customer_id: number | null) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.updateCashRegister({ customer_id }));
     },
   },

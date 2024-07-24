@@ -21,6 +21,9 @@ const users = createSlice({
     setUserAuth(state, action: PayloadAction<Partial<UserAuth>>) {
       state.user_auth = { ...state.user_auth, ...action.payload };
     },
+    setProfile(state, action: PayloadAction<Partial<UserAuth['profile']>>) {
+      state.user_auth.profile = { ...state.user_auth.profile, ...action.payload };
+    },
   },
 });
 

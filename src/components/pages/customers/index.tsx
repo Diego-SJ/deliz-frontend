@@ -138,7 +138,7 @@ const Customers = () => {
         styles={{ body: { paddingBottom: 80 } }}
         destroyOnClose
       >
-        <CustomerEditor onSuccess={onClose} />
+        <CustomerEditor onSuccess={() => onClose} />
       </Drawer>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Cashier, PaymentMethod, SaleDetails } from '../sales/types';
+import { Cashier, SaleDetails } from '../sales/types';
 
 export type CashiersSlice = {
   cash_operations: CashOperations;
@@ -30,7 +30,7 @@ export type OperationItem = {
   amount: number;
   total?: number;
   operation_type: 'EXPENSE' | 'INCOME' | 'SALE';
-  payment_method: PaymentMethod;
+  payment_method: string;
   created_at: string;
   cashier_id: number;
   user_id: string;
@@ -45,5 +45,5 @@ export type CashOperation = {
   created_at: string;
   user_id?: string;
   cashier_id: number;
-  payment_method: PaymentMethod;
+  payment_method: string;
 };

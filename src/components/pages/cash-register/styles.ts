@@ -4,49 +4,24 @@ import styled from 'styled-components';
 export const ProductsContainer = styled(Card)`
   &.ant-card {
     height: 100%;
-    background: #e2e2e2;
     padding: 0;
     border-color: transparent;
     border-radius: 0;
-    max-height: calc(100dvh - 64px);
-    overflow-y: auto;
+    max-height: calc(100dvh - 60px);
+    overflow-y: hidden;
     width: 100%;
 
     .ant-card-body {
-      padding: 10px;
+      padding: 0 10px;
     }
   }
 `;
 
 export const ProductsCheckout = styled(Card)`
   &.ant-card {
-    background: ${({ theme }) => theme.colors.background.primary};
     padding: 0 10px;
     border-color: transparent;
     border-radius: 0;
-
-    & > .ant-card-body {
-      min-height: calc(100vh - 67px);
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-
-      & div.cashier-search {
-        display: flex;
-        column-gap: 10px;
-        height: 55px;
-        padding-top: 10px;
-      }
-
-      & div.cashier-items {
-        min-height: calc(100vh - 380px);
-        max-height: calc(100vh - 380px);
-      }
-
-      & div.cashier-actions {
-        height: 255px;
-      }
-    }
   }
 `;
 
@@ -195,33 +170,5 @@ export const CardProduct = styled.div`
 
   &:hover {
     box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-product-image {
-    height: 8rem;
-    width: 8rem;
-  }
-
-  .card-product-tags {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-  }
-
-  @media screen and (max-width: ${({ theme }) => theme.breakPoints.md}) {
-    aspect-ratio: unset;
-
-    .card-product-image {
-      height: 4.5rem;
-      width: 4.5rem;
-      aspect-ratio: 1/1;
-    }
-
-    .card-product-name {
-      font-size: 0.8rem;
-      line-height: 1;
-    }
   }
 `;

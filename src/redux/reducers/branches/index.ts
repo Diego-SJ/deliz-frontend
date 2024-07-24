@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { Branch, BranchesSlice, Price } from './type';
+import { Branch, BranchesSlice, CashRegister, Price } from './type';
 import { customActions } from './actions';
 
 const initialState: BranchesSlice = {
@@ -7,6 +7,8 @@ const initialState: BranchesSlice = {
   branches: [],
   prices_list: [],
   cuurentPrices: null,
+  currentCashRegister: null,
+  cash_registers: [],
 };
 
 const branches = createSlice({
@@ -25,6 +27,12 @@ const branches = createSlice({
     },
     setCurrentPrices: (state, action: PayloadAction<Partial<Price> | null>) => {
       state.cuurentPrices = action.payload;
+    },
+    setCurrentCashRegister: (state, action: PayloadAction<Partial<CashRegister> | null>) => {
+      state.currentCashRegister = action.payload;
+    },
+    setCashRegisters: (state, action: PayloadAction<CashRegister[]>) => {
+      state.cash_registers = action.payload;
     },
   },
 });

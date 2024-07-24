@@ -3,6 +3,8 @@ export type BranchesSlice = {
   branches: Branch[];
   cuurentPrices: Partial<Price> | null;
   prices_list: Price[];
+  currentCashRegister: Partial<CashRegister> | null;
+  cash_registers: CashRegister[];
 };
 
 export type Branch = {
@@ -24,5 +26,14 @@ export type Price = {
   price_id: string;
   name: string;
   created_at: string;
+  is_default: boolean;
+};
+
+export type CashRegister = {
+  cash_register_id: string;
+  company_id: string;
+  branch_id: string;
+  created_at: string;
+  name: string;
   is_default: boolean;
 };

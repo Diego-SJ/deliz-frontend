@@ -20,7 +20,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 const LogoManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const { modal, message } = App.useApp();
-  const { business } = useAppSelector(({ app }) => app);
+  const { company } = useAppSelector(({ app }) => app);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -28,23 +28,23 @@ const LogoManagement: React.FC = () => {
 
   useEffect(() => {
     setFileList(
-      business.logo_url
+      company.logo_url
         ? [
             {
               uid: '-1',
-              name: business.logo_url,
+              name: company.logo_url,
               status: 'done',
-              url: business.logo_url,
+              url: company.logo_url,
             },
           ]
         : [],
     );
-  }, [business?.logo_url]);
+  }, [company?.logo_url]);
 
   const onUpload = async (file: UploadFile[]) => {
     uploadLogoTransition(() => {
       if (!file[0]?.originFileObj) return;
-      dispatch(appActions.business.saveLogo(file[0]));
+      dispatch(appActions.company.saveLogo(file[0]));
     });
   };
 
@@ -73,7 +73,7 @@ const LogoManagement: React.FC = () => {
       icon: <CloseCircleOutlined style={{ color: 'red' }} />,
       cancelText: 'Cancelar',
       onOk: async () => {
-        await dispatch(appActions.business.deleteLogo());
+        await dispatch(appActions.company.deleteLogo());
         message.success('Logo cambiado correctamente');
       },
     });
