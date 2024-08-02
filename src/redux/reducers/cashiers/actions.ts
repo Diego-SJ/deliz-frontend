@@ -3,10 +3,9 @@ import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { cashiersActions } from '.';
-import { CashCut, CashOperation, CashOperations, FetchCashCutArgs } from './types';
+import { CashCut, CashOperation, FetchCashCutArgs } from './types';
 import { salesActions } from '../sales';
-import { Cashier, Sale, SaleDetails } from '../sales/types';
-import { cashierHelpers } from '@/utils/cashiers';
+import { Cashier, SaleDetails } from '../sales/types';
 import { STATUS_DATA } from '@/constants/status';
 
 const customActions = {
@@ -64,42 +63,6 @@ const customActions = {
 
         dispatch(cashiersActions.setCashOperations({ sales_by_cashier: data }));
         return true;
-      } catch (error) {
-        dispatch(cashiersActions.setLoading(false));
-        return false;
-      }
-    },
-    calculateCashierData: (args?: { cashier?: Cashier }) => async (dispatch: AppDispatch, getState: AppState) => {
-      if (!args?.cashier?.cashier_id) await dispatch(salesActions.cashiers.getActiveCashier());
-      await dispatch(cashiersActions.cash_operations.get());
-      await dispatch(cashiersActions.cash_operations.getSalesByCashier());
-
-      try {
-        let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-        let { data = [], sales_by_cashier = [] } = getState()?.cashiers?.cash_operations;
-
-        let sales_amount = sales_by_cashier?.reduce((acc, item) => {
-          let _total = (item?.amount_paid || 0) < (item?.total || 0) ? item?.amount_paid : item?.total;
-          return acc + (_total || 0);
-        }, 0);
-        let incomes_amount = data
-          ?.filter(item => item?.operation_type === 'INCOME')
-          ?.reduce((acc, item) => acc + item?.amount, 0);
-        let expenses_amount = data
-          ?.filter(item => item?.operation_type === 'EXPENSE')
-          ?.reduce((acc, item) => acc + item?.amount, 0);
-        let total_amount = (activeCashier?.initial_amount || 0) + sales_amount + incomes_amount - expenses_amount;
-
-        let amounts = {
-          initial_amount: activeCashier?.initial_amount,
-          sales_amount,
-          incomes_amount,
-          expenses_amount,
-          total_amount,
-          operations: cashierHelpers.calculateAmounts(data, sales_by_cashier),
-        };
-
-        dispatch(cashiersActions.setCashOperations(amounts));
       } catch (error) {
         dispatch(cashiersActions.setLoading(false));
         return false;
@@ -163,44 +126,6 @@ const customActions = {
   cashier_detail: {
     set: (cashier: Cashier) => async (dispatch: AppDispatch) => {
       dispatch(cashiersActions.setCashierDetail({ data: cashier }));
-    },
-    getCashierOperationsById: (cashier_id: number) => async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        if (!cashier_id) return false;
-
-        dispatch(cashiersActions.setLoading(true));
-        let { data: operations, error: operationsError } = await supabase
-          .from('cash_operations')
-          .select('*')
-          .eq('cashier_id', cashier_id);
-
-        let { data: sales, error: salesOperation } = await supabase
-          .from('sales')
-          .select(
-            `
-        *,
-        customers ( name ),
-        status ( status_id, name )
-      `,
-          )
-          .eq('cashier_id', cashier_id)
-          .eq('status_id', 4);
-
-        dispatch(cashiersActions.setLoading(false));
-
-        if (operationsError || salesOperation) {
-          message.error('No se pudo cargar esta información', 4);
-          return false;
-        }
-
-        let data = cashierHelpers.calculateAmounts(operations as CashOperation[], sales as SaleDetails[]);
-
-        dispatch(cashiersActions.setCashierDetail({ operations: data }));
-        return true;
-      } catch (error) {
-        dispatch(cashiersActions.setLoading(false));
-        return false;
-      }
     },
   },
   cash_cuts: {

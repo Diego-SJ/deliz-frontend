@@ -1,11 +1,10 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { Breadcrumb, Col, Row, message, Tag, Dropdown, Button, Typography } from 'antd';
+import { Breadcrumb, Col, Row, Tag, Dropdown, Button, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { salesActions } from '@/redux/reducers/sales';
 import { Cashier } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
 import { cashiersActions } from '@/redux/reducers/cashiers';
@@ -102,8 +101,12 @@ const CloseSales = () => {
   };
 
   const onRefresh = async () => {
-    const result = await dispatch(salesActions.cashiers.get({ refetch: true }));
-    if (result) message.info('Información actualizada');
+    dispatch(
+      cashiersActions.cash_cuts.fetchCashCutsByCashRegister({
+        cash_register_id: filters.cash_register_id || '',
+        order: filters.order,
+      }),
+    );
   };
 
   return (

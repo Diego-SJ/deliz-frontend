@@ -27,10 +27,10 @@ const UpdateCashier: FC<UpdateSaleButton> = () => {
   const handleOk = async () => {
     setLoading(true);
 
-    const newSale: Sale = {
+    const newSale = {
       cashier_id: cashierId,
       sale_id: current_sale?.metadata?.sale_id,
-    };
+    } as Sale;
 
     const success = await dispatch(salesActions.updateSale(newSale));
 

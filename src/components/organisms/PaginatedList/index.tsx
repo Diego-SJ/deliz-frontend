@@ -1,4 +1,3 @@
-import React from 'react';
 import { List, ListProps as ListPropsAnt } from 'antd';
 import styled from 'styled-components';
 
@@ -27,7 +26,7 @@ const PaginatedList = <T,>(props: CustomListProps<T>) => {
 
   return (
     <StyledList
-      {...restProps}
+      {...(restProps as any)}
       $bodyHeight={$bodyHeight}
       pagination={{ position: 'bottom', align: 'center' }}
       className={`${className || ''} bg-white rounded-lg shadow-lg`}

@@ -129,7 +129,7 @@ const SearchProducts = () => {
             {currentProducts.length > 0 ? (
               <Row ref={listReft} gutter={[20, 20]}>
                 {currentProducts.map((product, index) => {
-                  const price = productHelpers.getProductPrice(product, price_id);
+                  const price = productHelpers.getProductPrice(product, price_id || null);
                   return (
                     <Col key={product.product_id} lg={12} md={24} xs={24}>
                       <div
