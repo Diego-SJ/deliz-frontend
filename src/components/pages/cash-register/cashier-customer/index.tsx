@@ -7,6 +7,7 @@ import { Customer } from '@/redux/reducers/customers/types';
 import { useEffect, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import functions from '@/utils/functions';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type Option = {
   value: number | string;
@@ -24,6 +25,7 @@ const CashierCustomer = () => {
   const [openForm, setOpenForm] = useState(false);
   const { customer_id } = cash_register;
   const [hoverDelete, setHoverDelete] = useState(false);
+  const { isTablet } = useMediaQuery();
 
   useEffect(() => {
     let _customers: Option[] = customers.map(item => ({ value: item.customer_id, label: item.name, ...item }));
@@ -152,23 +154,30 @@ const CashierCustomer = () => {
         )}
       </div>
 
-      <Modal
-        title={<Typography.Title level={4}>Agregar cliente</Typography.Title>}
-        footer={null}
-        width={400}
-        destroyOnClose
-        onCancel={onClose}
-        open={openForm}
-      >
-        <CUstomerForm />
-      </Modal>
-      <Drawer
-        title={<Typography.Title level={4}>Agregar cliente</Typography.Title>}
-        width={350}
-        styles={{ body: { paddingBottom: 80 } }}
-      >
-        <CUstomerForm />
-      </Drawer>
+      {!isTablet ? (
+        <Modal
+          title={<Typography.Title level={4}>Agregar cliente</Typography.Title>}
+          footer={null}
+          width={400}
+          destroyOnClose
+          onCancel={onClose}
+          open={openForm}
+        >
+          <CUstomerForm />
+        </Modal>
+      ) : (
+        <Drawer
+          open={openForm}
+          onClose={onClose}
+          placement="bottom"
+          height="90dvh"
+          title={<Typography.Title level={4}>Agregar cliente</Typography.Title>}
+          width={350}
+          styles={{ body: { paddingBottom: 80 } }}
+        >
+          <CUstomerForm />
+        </Drawer>
+      )}
     </>
   );
 };

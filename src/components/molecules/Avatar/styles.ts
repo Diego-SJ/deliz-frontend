@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 import Avatar from 'antd/lib/avatar/avatar';
 
-export const AvatarRoot = styled.div`
-  display: flex;
-  align-items: center;
-  column-gap: 16px;
-`;
-
 export const AvatarShape = styled(Avatar)`
   &.ant-avatar {
     &.bordered {

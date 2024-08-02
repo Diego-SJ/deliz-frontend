@@ -5,6 +5,7 @@ import { salesActions } from '@/redux/reducers/sales';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { DeleteOutlined } from '@ant-design/icons';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 type Props = {
   title?: string;
@@ -20,6 +21,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { isTablet } = useMediaQuery();
 
   const handleOk = async () => {
     if (!current_sale?.metadata?.sale_id) {
@@ -45,7 +47,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
 
   return (
     <>
-      <Button danger type="primary" block onClick={onClick} icon={<DeleteOutlined />}>
+      <Button danger type="primary" size={isTablet ? 'large' : 'middle'} block onClick={onClick} icon={<DeleteOutlined />}>
         Eliminar venta
       </Button>
       <Modal

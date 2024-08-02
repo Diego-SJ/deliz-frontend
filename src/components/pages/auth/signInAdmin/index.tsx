@@ -1,5 +1,5 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { Button, Form, Input, Typography, message } from 'antd';
+import { App, Button, Form, Input, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FormContainer, LayoutContent } from './styles';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
@@ -13,6 +13,7 @@ const SignInAdmin = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
 
   const handleOnFinish = async (values: any) => {
     setLoading(true);
@@ -20,17 +21,21 @@ const SignInAdmin = () => {
       email: values.email,
       password: values.password,
     });
-    setLoading(false);
 
-    if (error) return message.error(error?.message ?? 'No se pudo iniciar sesión.');
+    if (error) {
+      setLoading(false);
+      return message.error(error?.message ?? 'No se pudo iniciar sesión.');
+    }
 
     if (data) {
       const profileSuccess = await dispatch(userActions.loginSuccess(data.user.id));
-      if (profileSuccess) {
+      if (profileSuccess === true) {
+        setLoading(false);
         message.success('¡Bienvenido!');
         navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
       }
     }
+    setLoading(false);
   };
 
   return (

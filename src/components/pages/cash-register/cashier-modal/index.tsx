@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, InputNumber, Modal, Row, Switch, Tag, Typography } from 'antd';
+import { Button, Col, InputNumber, Modal, Row, Switch, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
@@ -6,11 +6,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Product } from '@/redux/reducers/products/types';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
-import useMediaQuery from '@/hooks/useMediaQueries';
-import { DollarOutlined, EditOutlined, FileImageOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { APP_ROUTES } from '@/routes/routes';
-import functions from '@/utils/functions';
+import { DollarOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { productHelpers } from '@/utils/products';
+import ProductAvatar from '@/components/atoms/ProductAvatar';
 
 type CashierModalProps = {
   open?: boolean;
@@ -18,8 +16,6 @@ type CashierModalProps = {
   casherItem?: CashRegisterItem;
   onCancel?: () => void;
 };
-
-const { Title, Paragraph } = Typography;
 
 const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
   const dispatch = useAppDispatch();
@@ -65,7 +61,7 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
     let productUpdated: CashRegisterItem = {
       ...(casherItem as CashRegisterItem),
       quantity: Number(quantity),
-      price: useCustomPrice ? productPrice : productHelpers.getProductPrice(casherItem?.product as Product, price_id),
+      price: useCustomPrice ? productPrice : productHelpers.getProductPrice(casherItem?.product as Product, price_id || null),
       price_type: useCustomPrice ? 'PERSONALIZED' : 'DEFAULT',
     };
     dispatch(salesActions.cashRegister.update(productUpdated));
@@ -95,41 +91,12 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
       ]}
     >
       <ModalBody>
-        <div className="w-full flex gap-4 items-center pt-2">
-          <Avatar
-            src={currentProduct?.image_url}
-            size={60}
-            shape="square"
-            icon={<FileImageOutlined className="text-slate-400 text-2xl" />}
-            className="bg-slate-100 p-1 !min-w-16 !max-h-16 max-w-16 min-h-16"
-          />
-          <div className="flex flex-col justify-between w-full">
-            <Title level={5} className="!m-0 !leading-5">
-              {currentProduct?.name}
-            </Title>
+        <ProductAvatar product={currentProduct} stock={stock} enableEdit={true} />
 
-            <div className="flex justify-between items-center mb-0">
-              <Paragraph className="!m-0 text-slate-400">{currentProduct?.categories?.name || 'Sin categoría'}</Paragraph>
-
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => {
-                  window.open(
-                    APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'edit'}/${currentProduct?.product_id}`,
-                    '_blank',
-                  );
-                }}
-              />
-            </div>
-            <Tag color={`${stock > 0 ? `` : 'volcano'}`} className="w-fit">
-              {stock > 0 ? `${stock} unidades` : 'Sin stock'}
-            </Tag>
-          </div>
-        </div>
         <Space height="10px" />
         <div className="flex flex-col w-full gap-4">
           <div className="">
-            <Paragraph className="!m-0 !mb-2 font-medium">Cantidad</Paragraph>
+            <Typography.Paragraph className="!m-0 !mb-2 font-medium">Cantidad</Typography.Paragraph>
             <InputNumber
               ref={quantityInput}
               min={0}
@@ -152,7 +119,7 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
           </div>
           <div>
             <div className="flex gap-4 items-center !mb-3">
-              <Paragraph className="!m-0 font-medium">Precio personalizado</Paragraph>
+              <Typography.Paragraph className="!m-0 font-medium">Precio personalizado</Typography.Paragraph>
               <Switch onChange={setUseCustomPrice} checked={useCustomPrice} className="w-fit" />
             </div>
             {useCustomPrice && (

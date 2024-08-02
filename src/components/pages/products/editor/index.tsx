@@ -140,7 +140,7 @@ const ProductEditor = () => {
 
   return (
     <>
-      <div className="flex flex-col pt-4 px-4 pb-10 w-full min-h-[calc(100vh-82px)] max-h-[calc(100vh-82px)] overflow-auto">
+      <div className="flex flex-col pt-4 px-4 pb-10 w-full min-h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] overflow-auto">
         <div className="w-full max-w-[900px] mx-auto mb-20">
           <Row justify="space-between" className="mb-3">
             <Col span={24}>
@@ -191,14 +191,15 @@ const ProductEditor = () => {
               <Col md={12} xs={24}>
                 <CardRoot title="Información del producto">
                   <Form.Item name="product_id" hidden>
-                    <Input />
+                    <Input size="large" />
                   </Form.Item>
                   <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
-                    <Input placeholder="E.g: Helado de nuez" />
+                    <Input size="large" placeholder="E.g: Helado de nuez" />
                   </Form.Item>
 
                   <Form.Item name="category_id" label="Categoría">
                     <Select
+                      size="large"
                       placeholder="Selecciona o crea una nueva categoría"
                       dropdownRender={menu => (
                         <>
@@ -221,10 +222,10 @@ const ProductEditor = () => {
                   </Form.Item>
                   <div className="flex gap-4">
                     <Form.Item name="code" label="Código de barras" className="mb-0 w-full">
-                      <Input placeholder="Opcional" />
+                      <Input size="large" placeholder="Opcional" />
                     </Form.Item>
                     <Form.Item name="sku" label="SKU" className="w-full">
-                      <Input placeholder="Opcional" />
+                      <Input size="large" placeholder="Opcional" />
                     </Form.Item>
                   </div>
 
@@ -249,6 +250,7 @@ const ProductEditor = () => {
                   <div className="flex gap-4">
                     <Form.Item name="unit_id" label="Unidad" className="w-full">
                       <Select
+                        size="large"
                         placeholder="Unidad de venta"
                         virtual={false}
                         options={units?.data?.map(size => ({ value: size.unit_id, label: size?.name }))}
@@ -256,6 +258,7 @@ const ProductEditor = () => {
                     </Form.Item>
                     <Form.Item name="size_id" label="Tamaño" className="w-full">
                       <Select
+                        size="large"
                         placeholder="Grande"
                         virtual={false}
                         options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
@@ -264,7 +267,7 @@ const ProductEditor = () => {
                   </div>
 
                   <Form.Item name="description" label="Descripción" className="mb-0">
-                    <TextArea rows={2} placeholder="E.g: Helado de nuez" />
+                    <TextArea size="large" rows={2} placeholder="E.g: Helado de nuez" />
                   </Form.Item>
                 </CardRoot>
               </Col>
@@ -321,6 +324,7 @@ const ProductEditor = () => {
                 <Button
                   ghost
                   danger
+                  size="large"
                   className="w-full md:max-w-40"
                   onClick={() => {
                     modal.confirm({
@@ -353,10 +357,10 @@ const ProductEditor = () => {
         styles={{ body: { padding: '0px', height: '80px' } }}
       >
         <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
-          <Button className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
+          <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
             Cancelar
           </Button>
-          <Button type="primary" className="w-full md:w-40" onClick={onFinish} loading={loading}>
+          <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
             {UI_TEXTS.saveBtn[action]}
           </Button>
         </div>

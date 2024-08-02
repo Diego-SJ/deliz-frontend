@@ -1,9 +1,10 @@
-import { Button, Dropdown, Modal, Typography, Avatar } from 'antd';
+import { Button, Dropdown, Typography, Avatar } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
 import {
   DollarCircleOutlined,
   HomeOutlined,
   MenuOutlined,
+  SettingOutlined,
   ShopOutlined,
   ShoppingOutlined,
   TeamOutlined,
@@ -11,17 +12,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { branchesActions } from '@/redux/reducers/branches';
-import { Branch } from '@/redux/reducers/branches/type';
+import { useAppSelector } from '@/hooks/useStore';
+import ChangeBranchModal from './change-branch-modal';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const [open, setOpen] = useState(false);
-  const { currentBranch, branches } = useAppSelector(({ branches }) => branches);
-  const { cashiers } = useAppSelector(({ sales }) => sales);
+  const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
 
   const onNavigate = (path: string) => {
     navigate(path);
@@ -31,9 +29,8 @@ const CashierHeader = () => {
     setOpen(prev => !prev);
   };
 
-  const handleBranchChange = (branch: Branch) => {
+  const handleBranchChange = () => {
     handleOpen();
-    dispatch(branchesActions.setCurrentBranch(branch as Branch));
   };
 
   return (
@@ -82,6 +79,16 @@ const CashierHeader = () => {
                 ),
                 onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
               },
+              {
+                key: 'settings',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <SettingOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Configuración</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path),
+              },
             ],
           }}
         >
@@ -107,38 +114,12 @@ const CashierHeader = () => {
               Sucursal {currentBranch?.name || 'Principal'}
             </Typography.Title>
             <Typography.Text className="leading-tight capitalize font-light" type="secondary">
-              Caja: {cashiers?.activeCashier?.name}
+              Caja {currentCashRegister?.name}
             </Typography.Text>
           </div>
         </div>
       </HeaderActions>
-      <Modal
-        open={open}
-        width={400}
-        title={<Typography.Title level={4}>Selecciona una sucursal</Typography.Title>}
-        onCancel={handleOpen}
-        footer={null}
-      >
-        <Typography.Paragraph className="text-sm font-light" style={{ marginBottom: 20 }}>
-          Selecciona una sucursal para continuar
-        </Typography.Paragraph>
-
-        {branches.map(item => (
-          <div
-            key={item.branch_id}
-            onClick={() => {
-              handleBranchChange(item);
-              setOpen(false);
-            }}
-            className={`flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg mt-2 mb-2 ${
-              item?.branch_id === currentBranch?.branch_id ? 'bg-blue-600/5' : ''
-            }`}
-          >
-            <Avatar shape="square" size="large" icon={<ShopOutlined className="text-blue-600" />} className="bg-blue-600/10" />
-            <div className="flex flex-col">{item.name}</div>
-          </div>
-        ))}
-      </Modal>
+      <ChangeBranchModal onCancel={handleOpen} open={open} />
     </HeaderRoot>
   );
 };

@@ -3,6 +3,17 @@ import { addDays, format, formatDistance, isValid, subDays, subHours } from 'dat
 import { es } from 'date-fns/locale';
 import numeral from 'numeral';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import localeData from 'dayjs/plugin/localeData';
+import 'dayjs/locale/es'; // Importar el idioma español
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(localeData);
+dayjs.locale('es');
+
 const functions = {
   distanceTime: (date: Date): string => {
     return formatDistance(date, new Date(), { addSuffix: true });
@@ -22,6 +33,20 @@ const functions = {
   moneySimple: (number: string | number) => {
     return numeral(number).format('$0.0');
   },
+  formatToLocalTimezone(dateStr: string): string {
+    const date = dayjs.utc(dateStr);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const localDate = date.tz(timeZone);
+
+    return localDate.format('D [de] MMMM [del] YYYY, h:mma');
+  },
+  formatToLocalTimezoneShort(dateStr: string): string {
+    const date = dayjs.utc(dateStr);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const localDate = date.tz(timeZone);
+
+    return localDate.format('D [de] MMMM [del] YYYY, h:mma');
+  },
   date: (date: Date | string) => {
     // let [year, month, day] = (date + '')?.split('-');
     // let _date = `${month}/${day}/${year}`;
@@ -32,9 +57,13 @@ const functions = {
     if (!isValid(new Date(_date))) return _date;
     return format(new Date(_date), 'PPP', { locale: es });
   },
-  tableDate: (date: Date | string) => {
-    if (!!!date) return '- - -';
-    return format(new Date(date), 'PPp', { locale: es });
+  tableDate: (dateStr: Date | string | null) => {
+    if (!dateStr) return '- - -';
+    const date = dayjs.utc(dateStr?.toString());
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const localDate = date.tz(timeZone);
+
+    return localDate.format('D MMMM, YYYY h:mma');
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);
@@ -97,7 +126,7 @@ const functions = {
     code += product?.category_id;
     return code?.toUpperCase();
   },
-  datesAreEquals: (date1?: string | Date, date2?: string | Date | any) => {
+  datesAreEquals: (date1?: string | Date | null, date2?: string | Date | any) => {
     if (!date1 || !date2) return false;
     return format(new Date(date1), 'PP') === format(new Date(date2), 'PP');
   },

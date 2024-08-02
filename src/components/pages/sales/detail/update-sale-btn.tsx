@@ -1,137 +1,216 @@
-import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { Sale } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import { DollarOutlined } from '@ant-design/icons';
-import { Button, Col, InputNumber, Modal, Radio, Row, Typography } from 'antd';
+import { CreditCardOutlined, DollarOutlined, SwapOutlined } from '@ant-design/icons';
+import { App, Button, Collapse, InputNumber, Modal, Tag, Typography } from 'antd';
 import { FC, useRef, useState } from 'react';
 import { Amounts } from './index';
+import { PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
+import { STATUS_DATA } from '@/constants/status';
 
 type UpdateSaleButton = {
   amounts: Amounts;
 };
 
-const { Title, Paragraph } = Typography;
-
 const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
   const dispatch = useAppDispatch();
   const { current_sale } = useAppSelector(({ sales }) => sales);
-
-  const [saleStatus, setSaleStatus] = useState<number>(5); // 4 paid, 5 pending, 6 cancelled
   const [receivedMoney, setReceivedMoney] = useState(0);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { isTablet } = useMediaQuery();
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS_KEYS.CASH);
   const { total = 0, amount_paid, pending } = amounts;
   const cashback = pending - receivedMoney;
-  const priceRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [suggestion1, suggestion2] = functions.findNearestDenominations(pending);
+  const { message } = App.useApp();
+
+  const handleCancel = () => {
+    setReceivedMoney(0);
+    setPaymentMethod(PAYMENT_METHODS_KEYS.CASH);
+    setOpen(false);
+  };
 
   const handleOk = async () => {
+    if (receivedMoney <= 0) {
+      message.error(`El monto recibido debe ser mayor o igual a ${functions.money(pending)}`);
+      return;
+    }
     setLoading(true);
 
     const newSale: Sale = {
-      status_id: saleStatus,
+      status_id: STATUS_DATA.COMPLETED.id,
       amount_paid: receivedMoney + amount_paid >= total ? total : receivedMoney + amount_paid,
       sale_id: current_sale?.metadata?.sale_id,
       cashback: cashback >= 0 ? 0 : Math.abs(cashback),
-    };
+      payment_method: paymentMethod,
+    } as Sale;
+
     const success = await dispatch(salesActions.upsertSale(newSale));
 
-    if (success) {
-      setReceivedMoney(0);
-      closeModal();
-    }
+    if (success) handleCancel();
     setLoading(false);
   };
 
   const openModal = () => {
     setOpen(true);
-    setSaleStatus(current_sale.metadata?.status_id as number);
     setTimeout(() => {
-      priceRef.current?.focus();
-      priceRef.current?.select();
+      inputRef.current?.focus();
+      inputRef.current?.select();
     }, 300);
-  };
-
-  const onAmountChange = (value: number) => {
-    setSaleStatus(value >= pending ? 4 : 5);
-    setReceivedMoney(value);
-  };
-
-  const onStatusChange = (status: number) => {
-    setSaleStatus(status);
-  };
-
-  const closeModal = () => {
-    setOpen(false);
-    setReceivedMoney(0);
   };
 
   return (
     <>
-      <Button type="primary" icon={<DollarOutlined />} block onClick={openModal}>
+      <Button size={isTablet ? 'large' : 'middle'} type="primary" icon={<DollarOutlined />} block onClick={openModal}>
         Registrar Cobro
       </Button>
 
-      <Modal
-        open={open}
-        onCancel={closeModal}
-        maskClosable={false}
-        destroyOnClose
-        width={380}
-        footer={[
-          <Row key="actions" gutter={10} style={{ marginTop: 30 }}>
-            <Col span={12}>
-              <Button key="back" block onClick={closeModal} loading={loading}>
-                Cancelar
-              </Button>
-            </Col>
-            <Col span={12}>
-              <Button block type="primary" onClick={handleOk} disabled={receivedMoney < 0} loading={loading}>
-                Actualizar
-              </Button>
-            </Col>
-          </Row>,
-        ]}
-      >
-        <Title level={2} style={{ margin: 0 }}>{`Total: ${functions.money(total)}`}</Title>
-        <Title level={4} style={{ margin: 0 }}>{`Abono: ${functions.money(amount_paid)}`}</Title>
-        <Title level={4} type={receivedMoney >= pending ? 'success' : 'danger'} style={{ margin: 0 }}>
-          {`Pendiente: ${functions.money(pending - receivedMoney <= 0 ? 0 : pending - receivedMoney)}`}
-        </Title>
-        <Title level={4} type="warning" style={{ margin: 0 }}>
-          {`Cambio: ${functions.money(cashback >= 0 ? 0 : Math.abs(cashback))}`}
-        </Title>
-        <Paragraph style={{ margin: '10px 0 5px', fontWeight: 600 }}>Estatus:</Paragraph>
-        <Radio.Group
-          style={{ width: '100%', marginBottom: 10 }}
-          buttonStyle="solid"
-          value={saleStatus}
-          onChange={({ target }) => setSaleStatus(target.value)}
-        >
-          <Radio.Button style={{ width: '33.33%' }} value={4}>
-            Pagado
-          </Radio.Button>
-          <Radio.Button style={{ width: '33.33%' }} value={5}>
-            Pendiente
-          </Radio.Button>
-          <Radio.Button style={{ width: '33.33%' }} value={6}>
-            Cancelada
-          </Radio.Button>
-        </Radio.Group>
-        <Paragraph style={{ margin: '0 0 5px', fontWeight: 600 }}>Cantidad recibida:</Paragraph>
-        <InputNumber
-          ref={priceRef}
-          min={0}
-          placeholder="0"
-          addonBefore="$"
-          value={receivedMoney}
-          style={{ width: '100%', margin: '0' }}
-          onChange={value => onAmountChange(value || 0)}
+      <Modal open={open} onCancel={handleCancel} destroyOnClose width={400} footer={null}>
+        <div className="bg-gray-50 text-center rounded-lg px-5 py-6 mb-4">
+          <Typography.Paragraph className="!m-0 text-lg font-normal text-gray-400">Monto pendiente</Typography.Paragraph>
+          <Typography.Title level={2} className="!m-0 !font-extrabold !text-5xl">
+            {functions.money(pending)}
+          </Typography.Title>
+          {receivedMoney - pending > 0 && (
+            <Tag bordered={false} color="blue" className="mt-3 px-3 py-1 text-base">
+              Cambio {functions.money(receivedMoney - pending)}
+            </Tag>
+          )}
+        </div>
+        <Collapse
+          defaultActiveKey={[PAYMENT_METHODS_KEYS.CASH]}
+          accordion
+          destroyInactivePanel={false}
+          onChange={value => {
+            let _paymentMethod = typeof value === 'string' ? value : value[0];
+            setReceivedMoney(_paymentMethod !== PAYMENT_METHODS_KEYS.CASH ? pending : 0);
+            setPaymentMethod(_paymentMethod);
+          }}
+          items={[
+            {
+              key: PAYMENT_METHODS_KEYS.CASH,
+              label: (
+                <div className="flex items-center gap-3">
+                  <DollarOutlined />
+                  Efectivo
+                </div>
+              ),
+              showArrow: false,
+              children: (
+                <>
+                  <InputNumber
+                    ref={inputRef}
+                    min={0}
+                    placeholder="0"
+                    size="large"
+                    addonBefore="$"
+                    value={receivedMoney}
+                    style={{ width: '100%', marginBottom: 10 }}
+                    onFocus={target => {
+                      target.currentTarget.select();
+                    }}
+                    type="number"
+                    inputMode="decimal"
+                    onChange={value => {
+                      setReceivedMoney(value || 0);
+                    }}
+                    onPressEnter={handleOk}
+                  />
+                  <div className="flex justify-between gap-4">
+                    {receivedMoney > 0 ? (
+                      <Button
+                        className="w-full"
+                        type="primary"
+                        size="large"
+                        disabled={receivedMoney < total}
+                        loading={loading}
+                        onClick={handleOk}
+                      >
+                        {receivedMoney < total ? 'Monto menor al total' : `Recibir ${functions.money(receivedMoney)}`}
+                      </Button>
+                    ) : (
+                      <>
+                        <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(pending)}>
+                          {functions.money(total)}
+                        </Button>
+                        <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(suggestion1)}>
+                          {functions.money(suggestion1)}
+                        </Button>
+                        <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(suggestion2)}>
+                          {functions.money(suggestion2)}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </>
+              ),
+            },
+            {
+              key: PAYMENT_METHODS_KEYS.CC,
+              label: (
+                <div className="flex items-center gap-3">
+                  <CreditCardOutlined />
+                  Tarjeta de crédito
+                </div>
+              ),
+              showArrow: false,
+              children: (
+                <>
+                  <Typography.Paragraph className="!m-0 !mb-3 text-md font-normal" type="secondary">
+                    Registrar compra con tarjeta de crédito
+                  </Typography.Paragraph>
+                  <Button type="primary" block size="large" loading={loading} onClick={handleOk}>
+                    Cobrar {functions.money(pending)}
+                  </Button>
+                </>
+              ),
+            },
+            {
+              key: PAYMENT_METHODS_KEYS.DC,
+              label: (
+                <div className="flex items-center gap-3">
+                  <CreditCardOutlined />
+                  Tarjeta de debito
+                </div>
+              ),
+              showArrow: false,
+              children: (
+                <>
+                  <Typography.Paragraph className="!m-0 !mb-3 text-md font-normal" type="secondary">
+                    Registrar compra con tarjeta de debito
+                  </Typography.Paragraph>
+                  <Button type="primary" block size="large" loading={loading} onClick={handleOk}>
+                    Cobrar {functions.money(pending)}
+                  </Button>
+                </>
+              ),
+            },
+            {
+              key: PAYMENT_METHODS_KEYS.TRANSFER,
+              label: (
+                <div className="flex items-center gap-3">
+                  <SwapOutlined />
+                  Transferencia
+                </div>
+              ),
+              showArrow: false,
+              children: (
+                <>
+                  <Typography.Paragraph className="!m-0 !mb-3 text-md font-normal" type="secondary">
+                    Registrar compra con transferencia
+                  </Typography.Paragraph>
+                  <Button type="primary" block size="large" loading={loading} onClick={handleOk}>
+                    Cobrar {functions.money(pending)}
+                  </Button>
+                </>
+              ),
+            },
+          ]}
         />
-        {isTablet && <NumberKeyboard value={receivedMoney} withDot onChange={value => onAmountChange(value || 0)} />}
       </Modal>
     </>
   );

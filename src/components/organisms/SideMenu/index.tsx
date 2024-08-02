@@ -5,12 +5,11 @@ import {
   ShoppingOutlined,
   TeamOutlined,
   ExclamationCircleOutlined,
-  BarChartOutlined,
   SettingOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
@@ -19,6 +18,7 @@ import { Button, Modal, Tooltip } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import CashRegisterSvg from '@/assets/img/jsx/cashier-menu';
 
 type SideMenuProps = {
   onClick?: () => void;
@@ -54,22 +54,23 @@ const ITEM_LIST = [
     key: 'sales',
     icon: DollarOutlined,
     label: 'Ventas',
-    children: [
-      {
-        key: 'sales.orders',
-        label: 'Pedidos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
-      },
-      {
-        key: 'sales.main',
-        label: 'Ventas',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
-      },
-    ],
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+    // children: [
+    //   // {
+    //   //   key: 'sales.orders',
+    //   //   label: 'Pedidos',
+    //   //   path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
+    //   // },
+    //   {
+    //     key: 'sales.main',
+    //     label: 'Ventas',
+    //     path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+    //   },
+    // ],
   },
   {
     key: 'cashiers',
-    icon: BarChartOutlined,
+    icon: CashRegisterSvg,
     label: 'Cajas',
     children: [
       {
@@ -84,6 +85,23 @@ const ITEM_LIST = [
       },
     ],
   },
+  // {
+  //   key: 'expenses',
+  //   icon: BarChartOutlined,
+  //   label: 'Compras y Gastos',
+  //   children: [
+  //     {
+  //       key: 'expenses.expenses',
+  //       label: 'Gastos',
+  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+  //     },
+  //     {
+  //       key: 'expenses.purchases',
+  //       label: 'Compras',
+  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+  //     },
+  //   ],
+  // },
   {
     key: 'settings',
     icon: SettingOutlined,
@@ -117,6 +135,7 @@ const SideMenu = (props: SideMenuProps) => {
   const { isTablet, isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const { user_auth } = useAppSelector(({ users }) => users);
   const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
@@ -141,7 +160,7 @@ const SideMenu = (props: SideMenuProps) => {
     });
   };
 
-  const handlePathChange = (path?: string) => {
+  const handlePathChange = (path: string) => {
     if (path) navigate(path);
     if (props?.onClick) props.onClick();
   };
@@ -156,7 +175,9 @@ const SideMenu = (props: SideMenuProps) => {
             size="large"
             className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
             icon={<PlusCircleOutlined />}
-            onClick={() => handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path)}
+            onClick={() => {
+              handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
+            }}
           >
             {isPhablet && !isTablet ? '' : 'Nueva venta'}
           </Button>
@@ -172,6 +193,7 @@ const SideMenu = (props: SideMenuProps) => {
           key,
           icon: React.createElement(item.icon),
           label: item.label,
+          className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
           onClick: () => handlePathChange(item?.path),
           children: item?.children?.length
             ? item.children.map((subItem: any) => ({
@@ -187,7 +209,7 @@ const SideMenu = (props: SideMenuProps) => {
         mode="inline"
         theme={'dark' as any}
         style={{ borderInlineEnd: 'none' }}
-        inlineCollapsed={isPhablet}
+        inlineCollapsed={isPhablet && !isTablet}
         items={[
           {
             key: 1,

@@ -52,6 +52,21 @@ const PricesListPage = () => {
     });
   };
 
+  const onSave = async () => {
+    await form
+      .validateFields()
+      .then(async values => {
+        await dispatch(branchesActions.upsertPrice(values));
+
+        form.resetFields();
+        closeModal();
+        message.success('Precio guardado correctamente');
+      })
+      .catch(() => {
+        message.error('Por favor, completa los campos requeridos');
+      });
+  };
+
   return (
     <div className="p-4 max-w-[730px] w-full mx-auto">
       <BreadcrumbSettings items={[{ label: 'Lista de precios' }]} />
@@ -117,18 +132,7 @@ const PricesListPage = () => {
         title={form.getFieldValue('price_id') ? 'Editar precio' : 'Nuevo precio'}
         onCancel={closeModal}
         onOk={async () => {
-          await form
-            .validateFields()
-            .then(async values => {
-              await dispatch(branchesActions.upsertPrice(values));
-
-              form.resetFields();
-              closeModal();
-              message.success('Precio guardado correctamente');
-            })
-            .catch(() => {
-              message.error('Por favor, completa los campos requeridos');
-            });
+          await onSave();
         }}
         width={340}
         okText="Guardar"
@@ -147,7 +151,7 @@ const PricesListPage = () => {
             <Input />
           </Form.Item>
           <Form.Item label="Nombre" name="name" rules={[{ required: true, message: 'Este campo es requerido' }]}>
-            <Input placeholder="Nombre del precio" />
+            <Input placeholder="Nombre del precio" onPressEnter={onSave} />
           </Form.Item>
         </Form>
       </Modal>

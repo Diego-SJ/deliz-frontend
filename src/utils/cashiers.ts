@@ -1,4 +1,6 @@
 import { ZONES } from '@/constants/zones';
+import { Company } from '@/redux/reducers/app/types';
+import { Branch } from '@/redux/reducers/branches/type';
 import { CashOperation, OperationItem } from '@/redux/reducers/cashiers/types';
 import { Product } from '@/redux/reducers/products/types';
 import { SaleDetails } from '@/redux/reducers/sales/types';
@@ -49,5 +51,10 @@ export const cashierHelpers = {
     let phoneClean = phone?.replace(/[\s-]/g, '')?.trim();
     let regex = /^[0-9]{10}$/;
     return regex.test(phoneClean);
+  },
+  getAddress: (branch: Branch) => {
+    return `${branch?.street || 'Domicilio Conocido'} ${branch?.ext_number || 'S/N'}, ${branch?.city || 'México'}, ${
+      branch?.zip_code || '000000'
+    }`;
   },
 };

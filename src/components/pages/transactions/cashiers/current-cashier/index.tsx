@@ -1,23 +1,21 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch } from '@/hooks/useStore';
 import { Breadcrumb, Col, Row } from 'antd';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import OpenCashier from './open-cashier';
+import ActiveCashier from './active-cashier';
 import { cashiersActions } from '@/redux/reducers/cashiers';
 
 const CurrentCashier = () => {
   const dispatch = useAppDispatch();
-  const { cashiers } = useAppSelector(({ sales }) => sales);
-  const firstRender = useRef(true);
+  const firstRender = useRef(false);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-
-      dispatch(cashiersActions.cash_operations.calculateCashierData());
+    if (!firstRender.current) {
+      firstRender.current = true;
+      dispatch(cashiersActions.cash_cuts.fetchCashCutData());
     }
-  }, [cashiers?.data, dispatch]);
+  }, [firstRender]);
 
   return (
     <div className="max-w-[1200px] mx-auto">
@@ -34,7 +32,7 @@ const CurrentCashier = () => {
           />
         </Col>
       </Row>
-      <OpenCashier />
+      <ActiveCashier />
     </div>
   );
 };

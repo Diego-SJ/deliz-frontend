@@ -8,6 +8,7 @@ import { RcFile } from 'antd/es/upload';
 
 export interface FetchFunction {
   refetch?: boolean;
+  startLoading?: boolean;
 }
 
 const customActions = {

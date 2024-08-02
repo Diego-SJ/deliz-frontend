@@ -64,42 +64,42 @@ const AddBranchForm = () => {
           </Form.Item>
           <Card title="Sucursal" className="shadow-md rounded-xl" loading={loading}>
             <Form.Item className="mb-0 w-full" name="name" label="Nombre" rules={[{ required: true }]}>
-              <Input placeholder="Nombre de la sucursal" />
+              <Input placeholder="Nombre de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
           </Card>
 
           <Card title="Dirección" className="shadow-md rounded-xl" loading={loading}>
             <Form.Item className="w-full" name="street" label="Dirección">
-              <Input placeholder="Dirección de la sucursal" />
+              <Input placeholder="Dirección de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
             <div className="flex md:gap-8 flex-col md:flex-row">
               <Form.Item className="w-full" name="ext_number" label="No. Exterior">
-                <Input placeholder="No. Exterior" className="w-full" />
+                <Input placeholder="No. Exterior" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
               <Form.Item className="w-full" name="int_number" label="No. Interior">
-                <Input placeholder="No. Interior" className="w-full" />
+                <Input placeholder="No. Interior" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
             </div>
             <div className="flex md:gap-8 flex-col md:flex-row">
               <Form.Item className="w-full" name="city" label="Ciudad">
-                <Input placeholder="Ciudad de la sucursal" className="w-full" />
+                <Input placeholder="Ciudad de la sucursal" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
               <Form.Item className="w-full" name="state" label="Estado">
-                <Input placeholder="Estado de la sucursal" className="w-full" />
+                <Input placeholder="Estado de la sucursal" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
             </div>
             <Form.Item className="mb-0 w-full" name="zip_code" label="Código postal">
-              <Input placeholder="Código postal de la sucursal" />
+              <Input placeholder="Código postal de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
           </Card>
 
           <Card title="Contacto" className="shadow-md rounded-xl" loading={loading}>
             <div className="flex md:gap-8 flex-col md:flex-row">
               <Form.Item className="mb-0 w-full" name="phone" label="Teléfono">
-                <Input placeholder="Teléfono de la sucursal" className="w-full" />
+                <Input placeholder="Teléfono de la sucursal" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
               <Form.Item className="mb-0 w-full" name="email" label="Correo electrónico">
-                <Input placeholder="Correo electrónico de la sucursal" className="w-full" />
+                <Input placeholder="Correo electrónico de la sucursal" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
             </div>
           </Card>

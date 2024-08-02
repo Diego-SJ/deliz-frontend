@@ -13,6 +13,12 @@ const initialState: AppSlice = {
     theme: '',
     created_at: '',
   },
+  navigation: {
+    menu: {
+      activeItem: '',
+      activeTitle: '',
+    },
+  },
 };
 
 const app = createSlice({
@@ -22,6 +28,9 @@ const app = createSlice({
     resetSlice: () => initialState,
     setCompany: (state, action: PayloadAction<Partial<Company>>) => {
       state.company = { ...state.company, ...action.payload };
+    },
+    setNavigation: (state, action: PayloadAction<Partial<AppSlice['navigation']>>) => {
+      state.navigation = { ...state.navigation, ...action.payload };
     },
   },
 });

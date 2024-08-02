@@ -7,14 +7,19 @@ import { AppDispatch, AppState } from '@/redux/store';
 export const customActions = {
   upsertBranch: (branch: Partial<Branch>) => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = getState()?.app?.company?.company_id;
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('branches')
       .upsert({ ...branch, company_id })
-      .select();
+      .select()
+      .single();
 
     if (error) {
       message.error('Error al guardar los datos');
       return;
+    }
+
+    if (!branch?.branch_id) {
+      await dispatch(branchesActions.upsertCashRegister({ branch_id: data.branch_id, is_default: true, name: 'Principal' }));
     }
 
     await dispatch(branchesActions.getBranches());
@@ -34,7 +39,6 @@ export const customActions = {
     }
 
     dispatch(branchesActions.setBranches(data));
-    dispatch(branchesActions.setCurrentBranch(data?.find(branch => branch.main_branch) || data[0]));
   },
   getBranchById: (branch_id: string) => async (dispatch: AppDispatch) => {
     const { data, error } = await supabase.from('branches').select('*').eq('branch_id', branch_id).single();
@@ -119,6 +123,29 @@ export const customActions = {
 
     dispatch(branchesActions.setCashRegisters(data));
   },
+  getCurrentCashRegister: () => async (dispatch: AppDispatch, getState: AppState) => {
+    const branch_id = getState().branches?.currentBranch?.branch_id;
+    let currentCashRegister = { ...(getState().branches?.currentCashRegister || {}) };
+
+    if (!currentCashRegister?.cash_register_id) {
+      let { data, error } = await supabase
+        .from('cash_registers')
+        .select('*')
+        .eq('is_default', true)
+        .eq('branch_id', branch_id)
+        .single();
+
+      if (error) {
+        message.error('No se pudo obtener la caja actual', 4);
+        return null;
+      }
+
+      currentCashRegister = data;
+      dispatch(branchesActions.setCurrentCashRegister(currentCashRegister));
+    }
+
+    return currentCashRegister;
+  },
   upsertCashRegister: (cash_register: Partial<CashRegister>) => async (dispatch: AppDispatch, getState: AppState) => {
     const { company_id } = getState().app.company;
 
@@ -127,6 +154,7 @@ export const customActions = {
       .upsert({
         ...cash_register,
         company_id,
+        is_default: cash_register?.is_default || false,
       })
       .select();
 

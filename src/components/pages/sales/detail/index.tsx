@@ -1,31 +1,7 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { theme } from '@/styles/theme/config';
-import {
-  MailOutlined,
-  PhoneOutlined,
-  EnvironmentOutlined,
-  EditOutlined,
-  UserOutlined,
-  FileImageOutlined,
-} from '@ant-design/icons';
-import {
-  Avatar,
-  Breadcrumb,
-  Card,
-  Col,
-  Typography,
-  Row,
-  Alert,
-  Table,
-  AlertProps,
-  Button,
-  Modal,
-  InputNumber,
-  Select,
-} from 'antd';
-import Meta from 'antd/es/card/Meta';
-import { ColumnsType } from 'antd/es/table';
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Col, Typography, Row, Alert, Table, AlertProps, Divider, Button, App, Dropdown } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
 import { useEffect, useRef, useState } from 'react';
@@ -33,26 +9,17 @@ import { salesActions } from '@/redux/reducers/sales';
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { STATUS, STATUS_DATA } from '@/constants/status';
 import { BUCKETS } from '@/constants/buckets';
-import { ModalBody } from '../../cash-register/styles';
-import Space from '@/components/atoms/Space';
-import useMediaQuery from '@/hooks/useMediaQueries';
-import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import UpdateSaleButton from './update-sale-btn';
 import PrintInvoiceButton from './print-invoice-btn';
-import PopsicleIcon from '@/assets/img/jsx/popsicle';
-import { customerActions } from '@/redux/reducers/customers';
-import { Customer } from '@/redux/reducers/customers/types';
-import UpdateCashier from './update-sale-cashier';
-import AddNewItem from './add-new-item-btn';
+import AddNewItem from './detail-item-actions/add-new-item';
 import DeleteButton from '@/components/molecules/Table/delete-btn';
 import DeleteSaleButton from './delete-sale-btn';
 import CardRoot from '@/components/atoms/Card';
-
-type DataType = SaleItem;
-type Option = {
-  value: number | string;
-  label: string;
-};
+import EditSaleItemModal from './detail-item-actions/edit-item';
+import ChangeCustomerModal from './change-customer';
+import { PAYMENT_METHOD_SHORT_NAME } from '@/constants/payment_methods';
+import useMediaQuery from '@/hooks/useMediaQueries';
+import PaginatedList from '@/components/organisms/PaginatedList';
 
 export type Amounts = {
   total: number;
@@ -60,31 +27,22 @@ export type Amounts = {
   pending: number;
   cashback: number;
   amount_paid: number;
-  discount?: string;
+  discount?: number;
 };
 
-const initalAmounts = { total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0, discount: '' };
+const initalAmounts = { total: 0, subtotal: 0, pending: 0, cashback: 0, amount_paid: 0, discount: 0 };
 
 const SaleDetail = () => {
   const dispatch = useAppDispatch();
   const { sale_id } = useParams();
   const { current_sale, loading: isLoading } = useAppSelector(({ sales }) => sales);
-  const { customers } = useAppSelector(({ customers }) => customers);
-  const [customerList, setCustomerList] = useState<Option[]>([]);
   const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [currentItem, setCurrentItem] = useState<SaleItem>();
-  const [newQuantity, setNewQuantity] = useState<number>(0);
-  const [newPrice, setNewPrice] = useState(0);
-  const [customerId, setCustomerId] = useState<number | null>(null);
-  const [modalAction, setModalAction] = useState<'EDIT_PRODUCT' | 'EDIT_CUSTOMER'>('EDIT_PRODUCT');
-  const [currentInput, setCurrentInput] = useState<'price' | 'quantity'>('price');
-  const [currentCustomer, setCurrentCustomer] = useState<Customer>({} as Customer);
   const firstRender = useRef(false);
   const { isTablet } = useMediaQuery();
+  const { modal } = App.useApp();
   const { metadata, items = [] } = current_sale;
-  const currentProduct = currentItem?.products;
 
   useEffect(() => {
     if (!firstRender.current && !!sale_id) {
@@ -98,14 +56,11 @@ const SaleDetail = () => {
     let subtotal = items?.reduce((acum, item) => acum + (item?.price || 0) * (item?.quantity || 0), 0);
     let color = STATUS.find(item => item.id === metadata?.status_id)?.color ?? 'info';
     let total = subtotal + (metadata?.shipping || 0);
-    let _discount = '$0';
     // get discount function
     if (metadata?.discount_type === 'AMOUNT') {
       total = total - (metadata?.discount || 0);
-      _discount = `$${metadata?.discount || 0}`;
     } else if (metadata?.discount_type === 'PERCENTAGE') {
       total = total - (total * (metadata?.discount || 0)) / 100;
-      _discount = `${metadata?.discount || 0}%`;
     }
 
     const _amounts = {
@@ -115,63 +70,18 @@ const SaleDetail = () => {
       amount_paid: metadata?.amount_paid || 0,
       pending: total - (metadata?.amount_paid || 0),
       total: total,
-      discount: _discount,
+      discount: metadata?.discount || 0,
     };
     setAmounts(_amounts);
   }, [items, metadata]);
 
-  useEffect(() => {
-    let _customers = customers?.map(item => ({ value: item?.customer_id, label: item?.name }));
-    let _customer = customers?.find(i => i?.customer_id === metadata?.customer_id) as Customer;
-    setCurrentCustomer(_customer);
-    setCustomerList(_customers);
-  }, [customers, metadata]);
-
   const onRowClick = (record: SaleItem) => {
     setCurrentItem(record);
-    setNewQuantity(record?.quantity || 0);
-    setNewPrice(record?.price || 0);
-    setModalAction('EDIT_PRODUCT');
     setOpen(true);
-  };
-
-  const onAmountsChange = (value: number | null) => {
-    if (currentInput === 'price') setNewPrice(value || 0);
-    else if (currentInput === 'quantity') setNewQuantity(value || 0);
   };
 
   const closeModal = () => {
     setOpen(false);
-
-    setModalAction('EDIT_PRODUCT');
-  };
-
-  const updateItem = async () => {
-    setLoading(true);
-    const result = await dispatch(salesActions.updateSaleItem({ ...currentItem, quantity: newQuantity, price: newPrice }));
-    if (result) closeModal();
-    setLoading(false);
-  };
-
-  const updateCustomer = async () => {
-    if (customerId) {
-      setLoading(true);
-      const { customers, status, ...sale } = { ...current_sale.metadata };
-      const result = await dispatch(salesActions.upsertSale({ ...sale, customer_id: customerId }));
-      if (result) closeModal();
-      setLoading(false);
-    }
-  };
-
-  const handleModal = () => {
-    dispatch(customerActions.fetchCustomers());
-    setModalAction('EDIT_CUSTOMER');
-    setOpen(true);
-  };
-
-  const onModalSave = () => {
-    if (modalAction === 'EDIT_PRODUCT') updateItem();
-    else if (modalAction === 'EDIT_CUSTOMER') updateCustomer();
   };
 
   return (
@@ -199,18 +109,27 @@ const SaleDetail = () => {
         <Col xl={{ span: 8 }} xs={24} md={24}>
           {/* SALE AMOUNTS */}
           <CardRoot loading={isLoading} title="Resumen">
+            <Alert
+              message={metadata?.status.name ?? '- - -'}
+              type={ALERT_COLORS[metadata?.status_id ?? 6]}
+              showIcon
+              style={{ marginBottom: 15 }}
+            />
             <Row gutter={[10, 10]}>
               <Col span={12}>
-                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Productos: ${functions.money(
+                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Subtotal: ${functions.money(
                   amounts?.subtotal,
                 )}`}</Typography.Paragraph>
-                <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Envío: ${functions.money(
-                  metadata?.shipping,
-                )}`}</Typography.Paragraph>
-                <Typography.Paragraph
-                  type="secondary"
-                  style={{ margin: 0 }}
-                >{`Descuento: ${amounts?.discount}`}</Typography.Paragraph>
+                {(metadata?.shipping || 0) > 0 && (
+                  <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Envío: ${functions.money(
+                    metadata?.shipping,
+                  )}`}</Typography.Paragraph>
+                )}
+                {!!amounts?.discount && (
+                  <Typography.Paragraph type="secondary" style={{ margin: 0 }}>{`Descuento:  ${
+                    metadata?.discount_type === 'AMOUNT' ? '$' : ''
+                  }${amounts?.discount}${metadata?.discount_type === 'PERCENTAGE' ? '%' : ''}`}</Typography.Paragraph>
+                )}
                 {Number(amounts?.pending) > 0 && (
                   <Typography.Paragraph className="text-amber-600" style={{ margin: 0 }}>{`Pendiente: ${functions.money(
                     amounts?.pending,
@@ -231,265 +150,267 @@ const SaleDetail = () => {
             <Typography.Title level={3} style={{ margin: 0, marginTop: 10 }}>{`Total: ${functions.money(
               amounts?.total,
             )}`}</Typography.Title>
-          </CardRoot>
 
-          {/* SALE STATUS */}
-          <CardRoot style={{ marginTop: 20 }} loading={isLoading} title="Estatus">
-            <Alert
-              message={metadata?.status.name ?? '- - -'}
-              action={metadata?.status_id === STATUS_DATA.COMPLETED.id ? functions.dateTime(metadata.created_at) : ''}
-              type={ALERT_COLORS[metadata?.status_id ?? 6]}
-              showIcon
-              style={{ marginBottom: 15 }}
-            />
-            <Row gutter={[10, 10]}>
-              <Col span={24}>
-                <UpdateSaleButton amounts={amounts} />
-              </Col>
-            </Row>
+            {[STATUS_DATA.PENDING.id].includes(current_sale?.metadata?.status_id as number) && (
+              <Row gutter={[10, 10]} className="!mt-4">
+                <Col span={24}>
+                  <UpdateSaleButton amounts={amounts} />
+                </Col>
+              </Row>
+            )}
           </CardRoot>
 
           {/* CUSTOMER CARD DETAILS */}
-          <CardRoot loading={isLoading} style={{ marginTop: 20 }} title="Cliente">
-            <Meta
-              avatar={
-                <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1" size={55} style={{ background: '#eee' }} />
-              }
-              title={currentCustomer?.name ?? '- - -'}
-              description="Cliente"
-            />
+          <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
+            <div className="w-full ">
+              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                Cliente
+              </Typography.Title>
+              <div className="flex items-center justify-between">
+                <Typography.Paragraph className="w-full !m-0" type="secondary">
+                  {current_sale?.metadata?.customers?.name || 'Público general'}
+                </Typography.Paragraph>
 
-            <Col style={{ marginTop: 5 }}>
-              <Row align="middle">
-                <PhoneOutlined className="text-base mr-3 text-primary" />
-                <Typography.Paragraph
-                  style={{ margin: '10px 0' }}
-                  type="secondary"
-                  copyable={{ tooltips: ['Copiar', '¡Copiado!'] }}
-                >
-                  {currentCustomer?.phone ?? '- - -'}
+                <ChangeCustomerModal />
+              </div>
+            </div>
+            <Divider className="!my-3" />
+            <div className="w-full ">
+              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                Fecha
+              </Typography.Title>
+              <div className="flex items-center justify-between">
+                <Typography.Paragraph className="w-full !m-0" type="secondary">
+                  {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
                 </Typography.Paragraph>
-              </Row>
-              <Row align="middle">
-                <MailOutlined className="text-base mr-3 text-primary" />
-                <Typography.Paragraph
-                  style={{ margin: '10px 0' }}
-                  type="secondary"
-                  copyable={{ tooltips: ['Copiar', '¡Copiado!'] }}
-                >
-                  {currentCustomer?.email ?? '- - -'}
+              </div>
+            </div>
+            <Divider className="!my-3" />
+            <div className="w-full ">
+              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                Método de pago
+              </Typography.Title>
+              <div className="flex items-center justify-between">
+                <Typography.Paragraph className="w-full !m-0" type="secondary">
+                  {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
                 </Typography.Paragraph>
-              </Row>
-              <Row align="middle">
-                <EnvironmentOutlined className="text-base mr-3 text-primary" />
-                <Typography.Paragraph
-                  style={{ margin: '10px 0' }}
-                  type="secondary"
-                  copyable={{ tooltips: ['Copiar', '¡Copiado!'] }}
-                >
-                  {currentCustomer?.address ?? '- - -'}
+              </div>
+            </div>
+            <Divider className="!my-3" />
+            <div className="w-full ">
+              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                Caja
+              </Typography.Title>
+              <div className="flex items-center justify-between">
+                <Typography.Paragraph className="w-full !m-0" type="secondary">
+                  Caja {(metadata as any)?.cash_registers?.name || '- - -'}
                 </Typography.Paragraph>
-              </Row>
-            </Col>
-            <Button type="default" icon={<EditOutlined />} block onClick={handleModal}>
-              Cambiar cliente
-            </Button>
+              </div>
+            </div>
+            <Divider className="!my-3" />
+
+            <div className="w-full ">
+              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                Sucursal
+              </Typography.Title>
+              <div className="flex items-center justify-between">
+                <Typography.Paragraph className="w-full !m-0" type="secondary">
+                  Sucursal {(metadata as any)?.branches?.name || '- - -'}
+                </Typography.Paragraph>
+              </div>
+            </div>
           </CardRoot>
         </Col>
         <Col xl={{ span: 16 }} xs={24} md={24}>
           <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
             <Row gutter={[20, 20]}>
-              <Col xs={24} md={6}>
+              <Col xs={12} md={6}>
                 <PrintInvoiceButton amounts={amounts} />
               </Col>
-              <Col xs={24} md={6}>
+              <Col xs={12} md={6}>
                 <AddNewItem />
               </Col>
-              <Col xs={24} md={6}>
+              {/* <Col xs={12} md={6}>
                 <UpdateCashier />
-              </Col>
-              <Col xs={24} md={6}>
+              </Col> */}
+              <Col xs={12} md={6}>
                 <DeleteSaleButton />
               </Col>
             </Row>
           </CardRoot>
-          <CardRoot styles={{ body: { padding: '0 0 2px 0', overflow: 'hidden' } }}>
-            <Table
-              loading={isLoading}
-              columns={[
-                {
-                  title: 'Producto',
-                  dataIndex: 'products',
-                  render: (_, record) => {
-                    let imageUrl = !!record?.products?.image_url ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}` : null;
-                    return (
-                      <div className="flex gap-4 items-center">
-                        <Avatar
-                          src={imageUrl}
-                          icon={<FileImageOutlined className="text-primary" />}
-                          className="bg-primary/10 p-1"
-                        />
-                        <div>
-                          <b>{record?.products?.name ?? '- - -'}</b>
-                          <br />
-                          <span>{record?.products?.categories?.name ?? '- - -'}</span>
+          {!isTablet ? (
+            <CardRoot styles={{ body: { padding: '0 0 2px 0', overflow: 'hidden' } }}>
+              <Table
+                loading={isLoading}
+                rowKey={record => record?.sale_detail_id?.toString() || ''}
+                columns={[
+                  {
+                    title: 'Producto',
+                    dataIndex: 'products',
+                    render: (_, record) => {
+                      let imageUrl = !!record?.products?.image_url
+                        ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}`
+                        : null;
+                      return (
+                        <div className="flex gap-4 items-center pl-3">
+                          <Avatar
+                            src={imageUrl}
+                            icon={<FileImageOutlined className="text-slate-600" />}
+                            className="bg-slate-600/10 p-1 w-10 h-10 min-w-10"
+                          />
+                          <div>
+                            <p className="text-slate-700 font-medium">
+                              {record?.products?.name || record?.metadata?.product_name || '- - -'}
+                            </p>
+                            <span>{record?.products?.categories?.name || 'Sin categoría'}</span>
+                          </div>
                         </div>
-                      </div>
-                    );
+                      );
+                    },
                   },
-                },
-                {
-                  title: 'Cantidad',
-                  dataIndex: 'quantity',
-                  width: 100,
-                  align: 'center',
-                },
-                {
-                  title: 'Precio',
-                  dataIndex: 'price',
-                  width: 100,
-                  align: 'center',
-                  render: (value: number) => functions.money(value),
-                },
-                {
-                  title: 'Total',
-                  dataIndex: 'retail_price',
-                  width: 100,
-                  align: 'center',
-                  render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
-                },
-                {
-                  title: 'Acciones',
-                  dataIndex: 'sale_detail_id',
-                  width: 150,
-                  align: 'center',
-                  render: (id: number, record) => {
-                    return (
-                      <DeleteButton deleteFunction={salesActions.deleteItemById(id)} editFunction={() => onRowClick(record)} />
-                    );
+
+                  {
+                    title: 'Precio',
+                    dataIndex: 'price',
+                    width: 100,
+                    align: 'center',
+                    render: (value: number) => functions.money(value),
                   },
-                },
-              ]}
+                  {
+                    title: 'Cantidad',
+                    dataIndex: 'quantity',
+                    width: 100,
+                    align: 'center',
+                  },
+                  {
+                    title: 'Total',
+                    dataIndex: 'retail_price',
+                    width: 100,
+                    align: 'center',
+                    render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
+                  },
+                  {
+                    title: '',
+                    dataIndex: 'sale_detail_id',
+                    width: 150,
+                    align: 'center',
+                    render: (_, record) => {
+                      return (
+                        <Dropdown
+                          menu={{
+                            items: [
+                              {
+                                key: 'edit',
+                                label: 'Editar',
+                                icon: <EditOutlined />,
+                                onClick: () => onRowClick(record),
+                              },
+                              {
+                                key: 'delete',
+                                label: 'Eliminar',
+                                icon: <DeleteOutlined />,
+                                onClick: () => {
+                                  modal.confirm({
+                                    title: 'Eliminar producto',
+                                    content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
+                                    onOk: async () => {
+                                      await dispatch(salesActions.deleteItemById(record.products?.product_id || 0));
+                                    },
+                                    okText: 'Eliminar',
+                                    okType: 'danger',
+                                    cancelText: 'Cancelar',
+                                    maskClosable: true,
+                                  });
+                                },
+                              },
+                            ],
+                          }}
+                          trigger={['click']}
+                        >
+                          <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
+                        </Dropdown>
+                      );
+                    },
+                  },
+                ]}
+                dataSource={items}
+                size="small"
+                scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
+                pagination={false}
+              />
+            </CardRoot>
+          ) : (
+            <PaginatedList
+              className="mt-4 !max-h-[calc(100dvh-44px)]"
+              $bodyHeight="calc(100dvh - 300px)"
+              pagination={{ position: 'bottom', align: 'center' }}
               dataSource={items}
-              size="small"
-              scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
-              pagination={false}
+              rootClassName="sadasd"
+              renderItem={item => {
+                return (
+                  <div key={item.product_id} className="flex py-3 pl-4 pr-4 border-b border-gray-200 cursor-pointer items-center">
+                    <Avatar
+                      src={item.products?.image_url}
+                      icon={<FileImageOutlined className="text-slate-600 text-2xl" />}
+                      className={`bg-slate-600/10 p-1 w-14 min-w-14 h-14 min-h-14`}
+                      size="large"
+                      shape="square"
+                    />
+                    <div className="flex items-start flex-col gap-1 pl-4">
+                      <Typography.Paragraph className="!mb-0 text-base">
+                        {item.products?.name || item?.metadata?.product_name}
+                      </Typography.Paragraph>
+                      <Typography.Text type="secondary">{item?.products?.categories?.name || 'Sin categoría'}</Typography.Text>
+                      <Typography.Text className="!mb-2" type="secondary">
+                        {item.quantity} x {functions.money(item.price)}
+                      </Typography.Text>
+                    </div>
+
+                    <div className="flex flex-col text-end justify-center self-end ml-auto my-auto gap-4">
+                      <Dropdown
+                        className="!-mt-3"
+                        menu={{
+                          items: [
+                            {
+                              key: 'edit',
+                              label: 'Editar',
+                              icon: <EditOutlined />,
+                              onClick: () => onRowClick(item),
+                            },
+                            {
+                              key: 'delete',
+                              label: 'Eliminar',
+                              icon: <DeleteOutlined />,
+                              onClick: () => {
+                                modal.confirm({
+                                  title: 'Eliminar producto',
+                                  content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
+                                  onOk: async () => {
+                                    await dispatch(salesActions.deleteItemById(item.products?.product_id || 0));
+                                  },
+                                  okText: 'Eliminar',
+                                  okType: 'danger',
+                                  cancelText: 'Cancelar',
+                                  maskClosable: true,
+                                });
+                              },
+                            },
+                          ],
+                        }}
+                        trigger={['click']}
+                      >
+                        <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
+                      </Dropdown>
+                      <span className="font-medium mt-2">{functions.money(Number(item.quantity) * Number(item.price))}</span>
+                    </div>
+                  </div>
+                );
+              }}
             />
-          </CardRoot>
+          )}
         </Col>
       </Row>
-      <Modal
-        open={open}
-        onCancel={closeModal}
-        maskClosable={false}
-        destroyOnClose
-        width={380}
-        footer={[
-          <Row key="actions" gutter={10}>
-            <Col span={12}>
-              <Button key="back" block onClick={closeModal} loading={loading}>
-                Cancelar
-              </Button>
-            </Col>
-            <Col span={12}>
-              <Button block type="primary" onClick={onModalSave} loading={loading}>
-                Actualizar
-              </Button>
-            </Col>
-          </Row>,
-        ]}
-      >
-        <ModalBody>
-          {modalAction === 'EDIT_PRODUCT' ? (
-            <>
-              <Avatar
-                src={
-                  currentProduct?.image_url ? (
-                    BUCKETS.PRODUCTS.IMAGES`${currentProduct?.image_url}`
-                  ) : (
-                    <PopsicleIcon style={{ width: isTablet ? 25 : 47 }} />
-                  )
-                }
-                size={isTablet ? 60 : 100}
-                style={{ background: '#e2e2e2', padding: 5 }}
-                shape="circle"
-              />
-              <Typography.Title level={3} style={{ marginBottom: 0 }}>
-                {currentProduct?.name}
-              </Typography.Title>
-              <Typography.Paragraph style={{ marginBottom: 5, textAlign: 'center' }}>
-                {currentProduct?.categories?.name}
-              </Typography.Paragraph>
-              <Space height="10px" />
-
-              <Row gutter={[10, 10]}>
-                <Col span={12}>
-                  <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
-                    Cantidad
-                  </Typography.Title>
-                  <InputNumber
-                    min={0}
-                    placeholder="Cantidad"
-                    style={{ width: '100%', textAlign: 'center' }}
-                    value={newQuantity}
-                    onPressEnter={updateItem}
-                    readOnly={isTablet}
-                    onFocus={target => {
-                      setCurrentInput('quantity');
-                      target.currentTarget.select();
-                    }}
-                    onChange={onAmountsChange}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
-                    Precio
-                  </Typography.Title>
-                  <InputNumber
-                    min={0}
-                    placeholder="Precio"
-                    style={{ width: '100%', textAlign: 'center' }}
-                    value={newPrice}
-                    readOnly={isTablet}
-                    onFocus={target => {
-                      setCurrentInput('price');
-                      target.currentTarget.select();
-                    }}
-                    onChange={onAmountsChange}
-                  />
-                </Col>
-              </Row>
-
-              <Space height="10px" />
-              {isTablet && (
-                <NumberKeyboard
-                  value={currentInput === 'price' ? newPrice : newQuantity}
-                  withDot={currentInput === 'price'}
-                  onChange={onAmountsChange}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              <Typography.Title level={5} style={{ textAlign: 'start', width: '100%' }}>
-                Nuevo cliente:
-              </Typography.Title>
-              <Select
-                showSearch
-                style={{ width: '100%' }}
-                value={customerId}
-                placeholder="Buscar cliente"
-                suffixIcon={<UserOutlined />}
-                optionFilterProp="children"
-                onChange={setCustomerId}
-                virtual={false}
-                filterOption={(input, option) => functions.includes(option?.label, input?.toLowerCase())}
-                options={customerList}
-              />
-            </>
-          )}
-        </ModalBody>
-      </Modal>
+      <EditSaleItemModal currentItem={currentItem} open={open} onClose={closeModal} />
     </div>
   );
 };

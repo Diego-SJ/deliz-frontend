@@ -1,36 +1,29 @@
-import Avatar from '@/components/molecules/Avatar';
-import { Button, Divider, Space, Typography } from 'antd';
+import { Button, Space } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
 import MenuPopover from '@/components/molecules/MenuPopover';
-import { useAppSelector } from '@/hooks/useStore';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { MenuOutlined } from '@ant-design/icons';
+import { PageTitleProvider } from '@/contexts/page-title-context';
+import HeaderTitlte from './header-title';
 
 type HeaderProps = {
   onClick?: () => void;
 };
 
 const Header = ({ onClick }: HeaderProps) => {
-  // const theme = useTheme();
-  const { user_auth } = useAppSelector(({ users }) => users);
   const { isTablet } = useMediaQuery();
 
   return (
-    <HeaderRoot>
+    <HeaderRoot className="border-b border-gray-200">
       {isTablet ? (
         <Button onClick={onClick} size="large" type="dashed" icon={<MenuOutlined />}></Button>
       ) : (
-        <Typography.Title level={4}>Dashboard</Typography.Title>
+        <PageTitleProvider>
+          <HeaderTitlte />
+        </PageTitleProvider>
       )}
       <HeaderActions>
-        {/* <Space size="middle">
-          <SearchOutlined  style={{ fontSize: 22, color: theme.colors.tertiary }} />
-          <MessagesPopover />
-          <NotificationsPopover />
-        </Space> */}
-        <Divider type="vertical" />
         <Space size={isTablet ? 0 : 50}>
-          <Avatar title={isTablet ? '' : 'Admin'} subtitle={isTablet ? '' : user_auth?.profile?.email} bordered />
           <MenuPopover />
         </Space>
       </HeaderActions>

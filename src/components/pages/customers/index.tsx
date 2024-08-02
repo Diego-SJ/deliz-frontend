@@ -2,7 +2,7 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Drawer, Input, Row } from 'antd';
+import { Avatar, Breadcrumb, Button, Col, Drawer, Input, Row, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,7 @@ import CustomerEditor from './editor';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import Table from '@/components/molecules/Table';
 import CardRoot from '@/components/atoms/Card';
+import PaginatedList from '@/components/organisms/PaginatedList';
 
 type DataType = Customer;
 
@@ -21,16 +22,34 @@ const columns: ColumnsType<DataType> = [
     dataIndex: 'name',
     render: text => {
       return (
-        <div className="flex items-center gap-4 pl-4">
-          <Avatar className="bg-primary/10 text-primary font-semibold">{text.charAt(0)}</Avatar>
+        <div className="flex items-center gap-4 pl-2">
+          <Avatar className="bg-slate-600/10 text-slate-600">{text.charAt(0)}</Avatar>
           <p className="m-0 ">{text}</p>
         </div>
       );
     },
   },
   { title: 'Dirección', dataIndex: 'address' },
-  { title: 'Teléfono', dataIndex: 'phone' },
-  { title: 'Correo', dataIndex: 'email' },
+  {
+    title: 'Teléfono',
+    dataIndex: 'phone',
+    render: text =>
+      text ? (
+        <Typography.Text type="secondary" copyable>
+          {text}
+        </Typography.Text>
+      ) : null,
+  },
+  {
+    title: 'Correo',
+    dataIndex: 'email',
+    render: text =>
+      text ? (
+        <Typography.Text copyable className="!text-primary">
+          {text}
+        </Typography.Text>
+      ) : null,
+  },
 ];
 
 const Customers = () => {
@@ -83,7 +102,7 @@ const Customers = () => {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto">
+    <div className="max-w-[1200px] mx-auto ">
       <Row justify="space-between" align="middle">
         <Col span={24}>
           <Breadcrumb
@@ -102,6 +121,7 @@ const Customers = () => {
           <Row gutter={[10, 10]} className="mt-3 mb-6">
             <Col lg={{ span: 6 }} sm={18} xs={24}>
               <Input
+                size={isTablet ? 'large' : 'middle'}
                 placeholder="Buscar por nombre, telefono o dirección"
                 style={{ width: '100%' }}
                 allowClear
@@ -109,30 +129,64 @@ const Customers = () => {
               />
             </Col>
             <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
-              <Button block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
+              <Button size={isTablet ? 'large' : 'middle'} block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
                 Nuevo
               </Button>
             </Col>
           </Row>
-          <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
-            <Table
-              onRow={record => {
-                return {
-                  onClick: () => onRowClick(record), // click row
-                };
-              }}
-              size="small"
-              scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
-              columns={columns}
+          {!isTablet ? (
+            <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+              <Table
+                onRow={record => {
+                  return {
+                    onClick: () => onRowClick(record), // click row
+                  };
+                }}
+                size="small"
+                scroll={{ y: 'calc(100vh - 320px)', x: 700 }}
+                columns={columns}
+                dataSource={options}
+                onRefresh={onRefresh}
+              />
+            </CardRoot>
+          ) : (
+            <PaginatedList
+              className="mt-3 !max-h-[calc(100dvh-64px)]"
+              $bodyHeight="calc(100dvh - 300px)"
+              pagination={{ position: 'bottom', align: 'center' }}
               dataSource={options}
-              onRefresh={onRefresh}
+              rootClassName="sadasd"
+              renderItem={item => {
+                return (
+                  <div
+                    key={item.customer_id}
+                    onClick={() => onRowClick(item)}
+                    className="flex py-3 pl-2 pr-4 border-b border-gray-200 cursor-pointer items-center"
+                  >
+                    <Avatar className="bg-slate-600/10 text-slate-600 w-10 min-w-10 h-10">{item?.name?.charAt(0)}</Avatar>
+                    <div className="flex items-start flex-col gap-2 pl-4">
+                      <Typography.Paragraph className="!mb-0">{item.name}</Typography.Paragraph>
+                      <Typography.Text type="secondary">{item.address || 'Direcicón no registrada'}</Typography.Text>
+                      <Typography.Text className="!text-primary" type="secondary">
+                        {item.email || 'Sin correo'}
+                      </Typography.Text>
+                    </div>
+
+                    <div className="flex flex-col text-end justify-center h-full items-end self-end ml-auto min-w-24">
+                      <Typography.Text type="secondary">{item.phone?.trim()?.replaceAll(' ', '')}</Typography.Text>
+                    </div>
+                  </div>
+                );
+              }}
             />
-          </CardRoot>
+          )}
         </Col>
       </Row>
       <Drawer
         title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
-        width={isTablet ? 350 : 420}
+        width={isTablet ? '' : 420}
+        height={isTablet ? '90dvh' : ''}
+        placement={isTablet ? 'bottom' : 'right'}
         onClose={() => onClose(true)}
         open={!!current_customer.customer_id}
         styles={{ body: { paddingBottom: 80 } }}

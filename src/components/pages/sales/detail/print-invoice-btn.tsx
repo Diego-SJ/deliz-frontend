@@ -1,33 +1,34 @@
 import { FileProtectOutlined, PrinterOutlined, WhatsAppOutlined } from '@ant-design/icons';
-import { Button, Col, Drawer, Row, Typography, message } from 'antd';
+import { Avatar, Button, Col, Drawer, Row, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import FallbackImage from '@/assets/img/webp/logo-deliz.webp';
 import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
-import { CustomTable, DrawerBody, FooterReceipt, ImageLogo, ProductCategory, ProductCell, ProductName } from './styles';
+import { CustomTable, DrawerBody, FooterReceipt, ImageLogo } from './styles';
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { toPng, toBlob } from 'html-to-image';
 import useWhatsappApi from '@/hooks/useWhatsappAPI';
 import { cashierHelpers } from '@/utils/cashiers';
-
-const paymentMethod: { [key: string]: string } = {
-  CASH: 'Efectivo',
-  TRANSFER: 'Transferencia',
-  CARD: 'Tarjeta',
-};
+import useMediaQuery from '@/hooks/useMediaQueries';
+import { PAYMENT_METHOD_SHORT_NAME } from '@/constants/payment_methods';
+import { Branch, CashRegister } from '@/redux/reducers/branches/type';
 
 type PrintInvoiceButtonProps = {
-  amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number; discount?: string };
+  amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number; discount?: number };
 };
 
 const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
+  const { company } = useAppSelector(({ app }) => app);
   const { sendMessage, loading: messageLoading } = useWhatsappApi();
   const { metadata, items = [] } = current_sale;
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const elementRef = useRef<any>(null);
   const [totalItems, setTotalItems] = useState(0);
+  const { isTablet } = useMediaQuery();
+  const saleBranch = (current_sale?.metadata as any)?.branches as Branch;
+  const saleCashRegister = (current_sale?.metadata as any)?.cash_registers as CashRegister;
 
   useEffect(() => {
     let _totalItems = items?.reduce((total, item) => (item?.quantity || 0) + total, 0);
@@ -72,7 +73,14 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
 
   return (
     <>
-      <Button type="default" icon={<FileProtectOutlined />} block onClick={showDrawer} loading={loading}>
+      <Button
+        size={isTablet ? 'large' : 'middle'}
+        type="default"
+        icon={<FileProtectOutlined />}
+        block
+        onClick={showDrawer}
+        loading={loading}
+      >
         Ver nota
       </Button>
 
@@ -102,18 +110,18 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
               style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', flexDirection: 'column' }}
             >
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: '0 0 10px' }}>
-                Fecha: {functions.tableDate(current_sale?.metadata?.created_at || '')}
+                Fecha: {functions.formatToLocalTimezone(current_sale?.metadata?.created_at?.toString() || '')}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 800, margin: 0 }}>Cliente:</Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                {metadata?.customers?.name || '- - -'}
+                {metadata?.customers?.name || 'Público General'}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                {metadata?.customers?.phone || '- - -'}
+                {metadata?.customers?.phone || 'Tel.: N/A'}
               </Typography.Paragraph>
             </Col>
             <Col span={8} style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-              <ImageLogo src={FallbackImage} alt="Paleteria deliz" />
+              <Avatar src={company?.logo_url || FallbackImage} className="w-20 h-20 min-w-20 bg-slate-100 p-2" shape="circle" />
             </Col>
           </Row>
           <CustomTable
@@ -124,8 +132,10 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
                 render: (_, record: SaleItem) => {
                   return (
                     <div>
-                      <ProductName>{record?.products?.name ?? '- - -'}</ProductName>
-                      <ProductCategory>{record?.products?.categories?.name ?? '- - -'}</ProductCategory>
+                      <p className="text-sm text-slate-600">{record?.products?.name ?? '- - -'}</p>
+                      <span className="block text-xs text-slate-400">
+                        {record?.products?.categories?.name || 'Sin categoría'}
+                      </span>
                     </div>
                   );
                 },
@@ -134,20 +144,22 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
                 title: 'Cantidad',
                 dataIndex: 'quantity',
                 align: 'center',
-                render: (value: number) => <ProductCell> {value}</ProductCell>,
+                render: (value: number) => <span className="block text-xs text-slate-600"> {value}</span>,
               },
               {
                 title: 'Precio',
                 dataIndex: 'price',
                 align: 'center',
-                render: (value: number) => <ProductCell> {functions.money(value)}</ProductCell>,
+                render: (value: number) => <span className="block text-xs text-slate-600"> {functions.money(value)}</span>,
               },
               {
                 title: 'Total',
                 dataIndex: 'retail_price',
                 align: 'center',
                 render: (_: number, record: SaleItem) => (
-                  <ProductCell>{functions.money((record.quantity || 0) * (record.price || 0))}</ProductCell>
+                  <span className="block text-xs text-slate-600">
+                    {functions.money((record.quantity || 0) * (record.price || 0))}
+                  </span>
                 ),
               },
             ]}
@@ -172,7 +184,9 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
                 Envio: {functions.money(metadata?.shipping || 0)}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                Descuento: {amounts?.discount}
+                {`Descuento:  ${metadata?.discount_type === 'AMOUNT' ? '$' : ''}${amounts?.discount}${
+                  metadata?.discount_type === 'PERCENTAGE' ? '%' : ''
+                }`}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 13, fontWeight: 800, margin: 0 }}>
                 TOTAL: {functions.money(amounts?.total || 0)}
@@ -181,19 +195,25 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
           </Row>
           <FooterReceipt>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-              Forma de pago: {paymentMethod[metadata?.payment_method || ''] || '- - -'}
+              Forma de pago: {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
             </Typography.Paragraph>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
               Estatus de la venta: {metadata?.status?.name || '- - -'}
             </Typography.Paragraph>
-            <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-              PALETERIA D'ELIZ
+            <Typography.Paragraph className="uppercase" type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+              {company?.name || '- - -'}
             </Typography.Paragraph>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-              Caxuxi Hgo. 42640
+              Sucursal {saleBranch?.name || '- - -'}
             </Typography.Paragraph>
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-              Contacto: +52 (771) 176 3694
+              Caja {saleCashRegister?.name || '- - -'}
+            </Typography.Paragraph>
+            <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+              {cashierHelpers.getAddress(saleBranch)}
+            </Typography.Paragraph>
+            <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+              Contacto: {saleBranch?.phone || 'Tel.: N/A'}
             </Typography.Paragraph>
 
             <Typography.Paragraph type="secondary" style={{ fontSize: 12, fontWeight: 400, margin: '20px 0 10px' }}>

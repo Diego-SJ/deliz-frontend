@@ -1,5 +1,6 @@
 export type UsersSlice = {
   user_auth: UserAuth;
+  users: Profile[];
   loading: boolean;
 };
 
@@ -10,7 +11,9 @@ export type UserAuth = {
 
 export type Profile = {
   profile_id: string;
+  password: string;
   email: string;
+  phone: string;
   first_name: string;
   last_name: string;
   role: string;

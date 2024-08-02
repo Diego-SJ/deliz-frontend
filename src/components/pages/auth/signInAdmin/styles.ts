@@ -3,9 +3,9 @@ import styled from 'styled-components';
 
 export const LayoutContent = styled.div`
   min-width: 100vw;
-  min-height: 100vh;
+  min-height: 100dvh;
   max-width: 100vw;
-  max-height: 100vh;
+  max-height: 100dvh;
   padding: 20px;
 
   display: grid;

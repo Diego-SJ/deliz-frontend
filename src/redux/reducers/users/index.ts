@@ -7,6 +7,7 @@ const initialState: UsersSlice = {
     profile: null,
     authenticated: false,
   },
+  users: [],
   loading: false,
 };
 
@@ -23,6 +24,9 @@ const users = createSlice({
     },
     setProfile(state, action: PayloadAction<Partial<UserAuth['profile']>>) {
       state.user_auth.profile = { ...state.user_auth.profile, ...action.payload };
+    },
+    setUsers(state, action: PayloadAction<UsersSlice['users']>) {
+      state.users = action.payload;
     },
   },
 });

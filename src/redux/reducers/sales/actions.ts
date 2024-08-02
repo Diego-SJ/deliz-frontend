@@ -16,63 +16,59 @@ import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
-import { STATUS_OBJ } from '@/constants/status';
 import { Product } from '../products/types';
-import INITIAL_STATE from '@/constants/initial-states';
 import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
 import { cashiersActions } from '../cashiers';
 import { productHelpers } from '@/utils/products';
+import { STATUS_DATA } from '@/constants/status';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    try {
-      let salesList: SaleDetails[] = getState().sales.sales || [];
+    let salesList: SaleDetails[] = getState().sales.sales || [];
+    const company_id = getState().app.company.company_id;
 
-      if (!salesList.length || args?.refetch) {
-        dispatch(salesActions.setLoading(true));
-        const { data, error } = await supabase.from('sales').select(`
-          *,
-          customers ( * ),
-          status ( status_id, name )
-        `);
+    if (!salesList.length || args?.refetch) {
+      dispatch(salesActions.setLoading(true));
+      const { data, error } = await supabase
+        .from('sales')
+        .select(`*,customers ( * ), status ( status_id, name )`)
+        .in('status_id', [STATUS_DATA.COMPLETED.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
+        .eq('company_id', company_id)
+        .order('created_at', { ascending: false });
 
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo cargar la lista de ventas');
-          return false;
-        }
-
-        salesList = data?.map(item => ({ ...item, key: item?.sale_id } as SaleDetails)) || [];
-        salesList = salesList?.sort((a, b) => Number(new Date(b?.created_at)) - Number(new Date(a?.created_at)));
-
-        dispatch(salesActions.setSales(salesList as SaleDetails[]));
-        return true;
-      }
-    } catch (error) {
       dispatch(salesActions.setLoading(false));
-      return false;
+
+      if (error) {
+        message.error('No se pudo cargar la lista de ventas');
+        return false;
+      }
+
+      salesList = data as SaleDetails[];
+
+      dispatch(salesActions.setSales(salesList));
+      return true;
     }
   },
-  getSaleById: (args?: { sale_id?: number; refetch?: boolean }) => async (dispatch: AppDispatch, getState: AppState) => {
+  getSaleById: (args?: { sale_id?: number } & FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       const sale = getState().sales.current_sale;
 
       if (!sale.items?.length || args?.refetch) {
-        dispatch(salesActions.setLoading(true));
+        dispatch(salesActions.setLoading(args?.startLoading ?? true));
         const { data, error } = await supabase
           .from('sale_detail')
           .select('*, products (*, categories (*))')
-          .eq('sale_id', args?.sale_id);
+          .eq('sale_id', args?.sale_id)
+          .order('created_at', { ascending: false });
 
         const { data: metadata } = await supabase
           .from('sales')
-          .select('*, customers (*), status (status_id, name)')
+          .select('*, customers (*), status (status_id, name), branches (*), cash_registers (*)')
           .eq('sale_id', args?.sale_id);
 
         let items: SaleItem[] =
-          data?.map((item, key) => {
+          data?.map(item => {
             let product = { ...item?.products };
             if (item?.product_id === 0) {
               product = {
@@ -81,7 +77,7 @@ const customActions = {
                 categories: { ...product?.categories, name: 'Item extra' },
               } as Product;
             }
-            return { ...item, key, products: product } as SaleItem;
+            return { ...item, products: product } as SaleItem;
           }) || [];
 
         dispatch(salesActions.setCurrentSale({ items, metadata: metadata?.length ? (metadata[0] as SaleDetails) : undefined }));
@@ -103,10 +99,10 @@ const customActions = {
     const { error } = await supabase.rpc('add_sale_item', {
       p_metadata: item.metadata || {},
       p_price: item?.price,
-      p_product_id: item.product_id,
+      p_product_id: item.product_id || null,
       p_quantity: item.quantity,
       p_sale_id: item.sale_id,
-      p_wholesale: item.wholesale,
+      p_wholesale: !!item.wholesale,
     });
 
     if (error) {
@@ -117,57 +113,54 @@ const customActions = {
     await dispatch(salesActions.getSaleById({ refetch: true, sale_id: item.sale_id }));
   },
   createSale:
-    (sale: Sale) =>
+    (sale: Partial<Sale>) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<Sale | null> => {
       try {
         dispatch(salesActions.setLoading(true));
         const state = getState().sales;
-        let activeCashier = await dispatch(salesActions.cashiers.getActiveCashier());
+        let { currentCashRegister, currentBranch } = getState().branches;
+        let activeCashCut = getState()?.cashiers?.active_cash_cut;
+        let { company_id } = getState().app.company;
         let newSale: Sale = {
           ...sale,
           customer_id: state.cash_register.customer_id as number,
           discount: state.cash_register.discount,
           discount_type: state.cash_register.discountType,
           shipping: state.cash_register.shipping,
-          cashier_id: activeCashier?.cashier_id,
+          cash_register_id: currentCashRegister?.cash_register_id!,
+          branch_id: currentBranch?.branch_id!,
+          company_id,
+          cash_cut_id: activeCashCut?.cash_cut_id || null,
         };
 
-        const { data, error } = await supabase.from('sales').insert(newSale).select();
+        const { data, error } = await supabase.from('sales').insert(newSale).select()?.single();
         dispatch(salesActions.setLoading(false));
 
         if (error) {
           message.error('No se pudo registrar la venta');
           return null;
         }
-        message.success('Registrando venta', 2);
-        return data[0] as Sale;
+
+        return data as Sale;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
         return null;
       }
     },
-  upsertSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
+  upsertSale: (item: Partial<Sale>) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
-      let newItem = { ...item, updated_at: new Date() };
-      delete newItem.key;
+      const { error } = await supabase
+        .from('sales')
+        .upsert({ ...item, updated_at: new Date() })
+        .eq('sale_id', item.sale_id)
+        .single();
 
-      const result = await supabase.from('sales').upsert(newItem).eq('sale_id', newItem.sale_id);
-
-      if (result.error) {
+      if (error) {
         message.error('No se pudo actualizar la información.', 4);
         return false;
       }
 
-      const { current_sale } = getState()?.sales;
-
-      let newMetadata = {
-        ...current_sale.metadata,
-        ...(newItem as SaleDetails),
-        status: { status_id: item.status_id as number, name: STATUS_OBJ[item.status_id as number].name },
-      };
-      await dispatch(salesActions.setCurrentSale({ metadata: newMetadata }));
-      await dispatch(salesActions.fetchSales({ refetch: true }));
-
+      await dispatch(salesActions.getSaleById({ refetch: true, sale_id: item.sale_id, startLoading: false }));
       message.success('¡Venta actualizada!', 4);
       return true;
     } catch (error) {
@@ -205,7 +198,7 @@ const customActions = {
   restProductsStock: async (products: SaleItem[]) => {
     let _products = products?.filter(p => p?.product_id !== 0);
     for (let p of _products) {
-      const { data, error } = await supabase.rpc('reduce_product_quantity', {
+      await supabase.rpc('reduce_product_quantity', {
         p_id: p.product_id,
         p_quantity: p.quantity,
       });
@@ -215,17 +208,19 @@ const customActions = {
     (sale: Sale) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<boolean> => {
       try {
-        message.info('Registrando productos...', 2);
         const state = getState().sales.cash_register.items || [];
 
         let saleItems: SaleItem[] = state.map(item => {
           return {
             sale_id: sale.sale_id,
             price: item.price,
-            product_id: item.product?.product_id,
+            product_id: item.product?.product_id || null,
             quantity: item.quantity,
             wholesale: null,
-            metadata: item?.product?.product_id === 0 ? { name: item?.product?.name } : {},
+            metadata: {
+              price_type: item.price_type,
+              product_name: item.product?.name,
+            },
           } as SaleItem;
         });
 
@@ -251,7 +246,6 @@ const customActions = {
     try {
       let newItem = { ...item };
       delete newItem.products;
-      delete newItem.key;
 
       const result = await supabase.rpc('update_product_in_sale', {
         p_new_price: newItem?.price,
@@ -323,7 +317,7 @@ const customActions = {
         status: 5,
         branch_id: branch_id || null,
         price_id: price_id || null,
-        customer_id: INITIAL_STATE.customerId,
+        customer_id: null,
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },

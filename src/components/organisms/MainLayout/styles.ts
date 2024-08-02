@@ -29,5 +29,6 @@ export const LayoutContent = styled(Layout)`
   flex-direction: column;
   padding: 0px;
   max-height: calc(100dvh - 64px);
+  min-height: calc(100dvh - 64px);
   overflow-y: auto;
 `;

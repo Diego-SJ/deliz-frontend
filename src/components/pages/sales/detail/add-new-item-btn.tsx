@@ -150,7 +150,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
 
   return (
     <>
-      <Button icon={<PlusCircleOutlined />} block onClick={openModal}>
+      <Button size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} block onClick={openModal}>
         Agregar item
       </Button>
       <Modal
@@ -206,10 +206,11 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           <Select
             style={{ width: '100%' }}
             showSearch
+            size={isTablet ? 'large' : 'middle'}
             virtual={false}
             placeholder="Selecciona un producto"
             optionFilterProp="children"
-            value={`${currentProduct?.product_id ?? ''}`}
+            value={currentProduct?.product_id ? currentProduct?.product_id + '' : undefined}
             filterOption={filterOption}
             options={products?.map(i => ({ value: `${i?.product_id}`, label: `${i?.name} - ${i?.categories?.name}` }))}
             onChange={onProductChange}
@@ -219,6 +220,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               <Space height="10px" />
               <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Nombre del producto</Paragraph>
               <Input
+                size={isTablet ? 'large' : 'middle'}
                 placeholder="Nombre del artículo"
                 value={productName}
                 onFocus={({ target }) => target.select()}
@@ -228,7 +230,12 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           )}
           <Space height="10px" />
 
-          <Radio.Group style={{ width: '100%' }} value={checked} onChange={e => onCheckChange(e.target.value)}>
+          <Radio.Group
+            size={isTablet ? 'large' : 'middle'}
+            style={{ width: '100%' }}
+            value={checked}
+            onChange={e => onCheckChange(e.target.value)}
+          >
             <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
               Menudeo
             </Radio.Button>
@@ -240,11 +247,11 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Precio</Paragraph>
           <InputNumber
             min={0}
+            size={isTablet ? 'large' : 'middle'}
             placeholder="Precio"
             className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
             style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
             value={subtotal}
-            readOnly={isTablet}
             addonAfter={specialPrice > 0 ? 'especial' : ''}
             onFocus={({ target }) => {
               target.select();
@@ -256,6 +263,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           <Space height="10px" />
           <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Cantidad</Paragraph>
           <InputNumber
+            size={isTablet ? 'large' : 'middle'}
             ref={quantityInput}
             min={0}
             placeholder="Cantidad"
@@ -263,7 +271,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
             value={quantity}
             onPressEnter={handleOk}
-            readOnly={isTablet}
             addonBefore={<ShoppingCartOutlined />}
             onFocus={({ target }) => {
               target.select();
@@ -272,13 +279,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             onChange={value => onQuantityChange(value as number)}
           />
           <Space height="10px" />
-          {isTablet && (
-            <NumberKeyboard
-              withDot={currentInput === 'price'}
-              value={currentInput === 'quantity' ? Number(quantity) : subtotal}
-              onChange={value => onInputsChange(value)}
-            />
-          )}
         </ModalBody>
       </Modal>
     </>

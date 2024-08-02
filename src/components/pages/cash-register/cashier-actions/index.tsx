@@ -6,7 +6,7 @@ import {
   DollarCircleOutlined,
   PercentageOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Segmented, Typography, message } from 'antd';
+import { Avatar, Button, Col, Input, InputNumber, Modal, Row, Segmented, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ContainerItems } from './styles';
 import { ModalBody } from '../styles';
@@ -38,7 +38,7 @@ type CashierActionsProps = {
   onClose?: () => void;
 };
 
-const CashierActions = ({ onClose }: CashierActionsProps) => {
+const CashierActions = ({}: CashierActionsProps) => {
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [open, setOpen] = useState(false);

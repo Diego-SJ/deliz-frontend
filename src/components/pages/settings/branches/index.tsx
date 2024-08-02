@@ -1,6 +1,6 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { BuildOutlined, PlusCircleOutlined, ShopOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, List, Result, Tag, Typography } from 'antd';
+import { PlusCircleOutlined, ShopOutlined } from '@ant-design/icons';
+import { Avatar, Button, List, Result, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbSettings from '../menu/breadcrumb';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';

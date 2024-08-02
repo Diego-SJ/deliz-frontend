@@ -35,6 +35,8 @@ import CategoriesPage from '@/components/pages/products/categories';
 import ProductSizesPage from '@/components/pages/products/sizes';
 import ProductUnitsPage from '@/components/pages/products/units';
 import CashRegistersPage from '@/components/pages/settings/cash-registers';
+import UsersSettingsPage from '@/components/pages/settings/users';
+import ManageUserProfile from '@/components/pages/settings/users/add-user-form';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -183,7 +185,7 @@ const AppRouter = () => {
         {/* SETTINGS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsPage />}>
           {isTablet && <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsMenu />} />}
-          {!isTablet && <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<GeneralSettingsPage />} />}
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path + '/general'} element={<GeneralSettingsPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path} element={<GeneralSettingsPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.path} element={<BranchesPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.ADD.path} element={<AddBranchForm />} />
@@ -193,7 +195,10 @@ const AppRouter = () => {
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path} element={<ProductSizesPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path} element={<ProductUnitsPage />} />
           <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CASH_REGISTERS.path} element={<CashRegistersPage />} />
-          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path} element={<div>USERS</div>} />
+
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path} element={<UsersSettingsPage />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.ADD.path} element={<ManageUserProfile />} />
+          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.EDIT.path} element={<ManageUserProfile />} />
         </Route>
         {/* SETTINGS ROUTES - END */}
 

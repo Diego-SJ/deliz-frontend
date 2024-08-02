@@ -12,7 +12,7 @@ const SettingsPage = () => {
           <SettingsMenu />
         </div>
       ) : null}
-      <div className="h-[calc(100vh-64px)] overflow-y-scroll w-full relative">
+      <div className="h-[calc(100dvh-64px)] overflow-y-scroll w-full relative">
         <Outlet />
       </div>
     </div>

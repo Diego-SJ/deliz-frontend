@@ -30,9 +30,8 @@ export type ClosingDays = {
 
 // sales table in DB
 export type Sale = {
-  key?: number;
   sale_id?: number;
-  customer_id?: number;
+  customer_id?: number | null;
   created_at?: Date | string;
   payment_method?: string;
   status_id?: number;
@@ -43,8 +42,12 @@ export type Sale = {
   cashback?: number;
   total?: number;
   updated_at?: string | Date;
-  cashier_id?: number;
   order_due_date?: string | Date;
+  cashier_id?: number;
+  cash_register_id: string | null;
+  branch_id: string | null;
+  company_id: string | null;
+  cash_cut_id: string | null;
 };
 
 export type SaleMetadata = {
@@ -54,7 +57,6 @@ export type SaleMetadata = {
 
 // sales_detail table in DB
 export type SaleItem = {
-  key?: number;
   sale_detail_id?: number;
   created_at?: Date | string;
   product_id?: number;
@@ -63,7 +65,11 @@ export type SaleItem = {
   wholesale?: boolean | null;
   products?: Product & { categories: Category };
   sale_id?: number;
-  metadata?: any;
+  metadata?: {
+    price_type?: 'DEFAULT' | 'PERSONALIZED';
+    product_name?: string;
+    [key: string]: any;
+  };
 };
 
 export type CurrentSale = {

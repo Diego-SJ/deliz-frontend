@@ -1,16 +1,18 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { Breadcrumb, Card, Col, Row, Typography, Calendar, Avatar, List, CalendarProps, Badge, Tag } from 'antd';
+import { Breadcrumb, Card, Col, Row, Typography, Calendar, Avatar, List, CalendarProps, Badge, Tag, Tooltip } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_DATA } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails, SaleMetadata } from '@/redux/reducers/sales/types';
 import dayjs, { Dayjs } from 'dayjs';
-import { ShoppingCartOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { theme } from '@/styles/theme/config';
 import CardRoot from '@/components/atoms/Card';
+import { orderActions } from '@/redux/reducers/orders';
+import { Order } from '@/redux/reducers/orders/types';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -18,22 +20,34 @@ export const PAYMENT_METHOD: { [key: string]: string } = {
   TRANSFER: 'Transferencia',
 };
 
-const dateCellRender = (value: Dayjs, orders: SaleMetadata[]) => {
-  const pendings =
-    orders?.filter(i => i?.status_id === STATUS_DATA.ORDER.id && functions.datesAreEquals(i?.order_due_date, value))?.length || 0;
-  const paymentPending =
-    orders?.filter(i => i?.status_id === STATUS_DATA.PENDING.id && functions.datesAreEquals(i?.created_at, value))?.length || 0;
+const dateCellRender = (date1: Dayjs, orders: Order[]) => {
+  let pendingOrders = 0;
+  let paymentPending = 0;
+
+  for (let i = 0; i < orders.length; i++) {
+    let currentOrder = orders[i];
+    if (
+      currentOrder?.status?.status_id === STATUS_DATA.ORDER.id &&
+      date1.isSame(new Date(currentOrder?.order_due_date!), 'day')
+    ) {
+      pendingOrders++;
+    }
+    if (currentOrder?.status?.status_id === STATUS_DATA.PENDING.id && date1.isSame(new Date(currentOrder?.created_at!), 'day')) {
+      paymentPending++;
+    }
+  }
+
   return (
-    <div className="bg-pink-400">
-      {pendings > 0 && (
-        <small>
-          <Badge color="geekblue" /> <strong>{pendings}</strong> {pendings > 1 ? 'pedidos' : 'pedido'}
-        </small>
+    <div className="felx flex-col">
+      {pendingOrders > 0 && (
+        <Tooltip title={`${pendingOrders} pedido${pendingOrders > 0 ? 's' : ''} pendiente${pendingOrders > 0 ? 's' : ''}`}>
+          <Tag className="w-full mb-2" color="blue" children={pendingOrders} icon={<ShoppingCartOutlined />} />
+        </Tooltip>
       )}
       {paymentPending > 0 && (
-        <small>
-          <Badge color="gold" /> <strong>{paymentPending}</strong> {paymentPending > 1 ? 'pendientes' : 'pendiente'}
-        </small>
+        <Tooltip title={`${paymentPending} venta${paymentPending > 0 ? 's' : ''} sin completar`}>
+          <Tag className="w-full" color="gold" children={paymentPending} icon={<ClockCircleOutlined />} />
+        </Tooltip>
       )}
     </div>
   );
@@ -42,63 +56,27 @@ const dateCellRender = (value: Dayjs, orders: SaleMetadata[]) => {
 const Orders = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { sales, cashiers } = useAppSelector(({ sales }) => sales);
-  const [orders, setOrders] = useState<SaleMetadata[]>([]);
+  const { orders } = useAppSelector(({ orders }) => orders);
   const [ordersByDate, setOrdersByDate] = useState<SaleMetadata[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(dayjs().month());
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const isFirstRender = useRef(true);
-  const activeCashier = cashiers?.activeCashier;
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      dispatch(salesActions.fetchSales());
+      dispatch(orderActions.fetchOrdersAndPendings());
       return;
     }
-  }, [dispatch, activeCashier?.cashier_id]);
+  }, [dispatch]);
 
-  useEffect(() => {
-    let _orders: SaleMetadata[] = [];
-
-    sales?.forEach(i => {
-      if ([STATUS_DATA.ORDER.id, STATUS_DATA.PENDING.id].includes(i?.status_id as number)) {
-        _orders.push(i);
-      }
-    });
-    setOrders(_orders);
-  }, [sales]);
-
-  useEffect(() => {
-    if (orders?.length) {
-      let _orders: SaleMetadata[] = orders?.filter(i => {
-        return (
-          functions.datesAreEquals(i?.order_due_date, selectedDate) ||
-          (functions.datesAreEquals(i?.created_at, selectedDate) && i?.status_id !== STATUS_DATA.ORDER.id)
-        );
-      });
-
-      setOrdersByDate(_orders);
+  const onChangeDate = (date: Dayjs) => {
+    if (date.month() !== currentMonth) {
+      setCurrentMonth(date.month());
+      dispatch(orderActions.fetchOrdersAndPendings(date));
     }
-  }, [orders, selectedDate]);
-
-  const applyFilters = ({ status, endDate, startDate }: { status?: number; endDate?: string; startDate?: string }) => {
-    // if (!status && !startDate && !endDate) {
-    //   setAuxSales(sales);
-    // } else {
-    //   let salesList = sales?.filter(item => {
-    //     let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
-    //     let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
-    //     let matchStatus = !!status ? item?.status_id === status : true;
-    //     return matchStatus && matchDate1 && matchDate2;
-    //   });
-    //   setAuxSales(salesList);
-    // }
   };
-
-  useEffect(() => {
-    applyFilters(filters);
-  }, [filters]);
 
   const onAddNew = () => {
     navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path + '?mode=order');
@@ -109,10 +87,9 @@ const Orders = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
-  const cellRender: CalendarProps<Dayjs>['cellRender'] = useCallback(
-    (current: any, info: any) => {
-      if (info.type === 'date') return dateCellRender(current, orders);
-      if (info.type === 'month') return null;
+  const cellRender = useCallback<NonNullable<CalendarProps<Dayjs>['cellRender']>>(
+    (currentDate, info) => {
+      if (info.type === 'date') return dateCellRender(currentDate, orders);
       return info.originNode;
     },
     [orders],
@@ -192,12 +169,15 @@ const Orders = () => {
           </CardRoot>
         </Col>
         <Col xs={24} lg={14}>
-          <CardRoot styles={{ body: { padding: 10 } }} style={{ overflow: 'hidden' }}>
+          <CardRoot className="" styles={{ body: { padding: 10 } }}>
             <Calendar
-              className="w-full max-h-[calc(100vh-200px)]"
+              className="w-full h-full !max-h-[400px]"
               value={selectedDate}
               onSelect={setSelectedDate}
               cellRender={cellRender}
+              onChange={date => {
+                onChangeDate(date);
+              }}
             />
           </CardRoot>
         </Col>

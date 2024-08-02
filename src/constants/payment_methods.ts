@@ -16,6 +16,12 @@ export const PAYMENT_METHOD_NAME: { [key: string]: string } = {
   CASH: 'en efectivo',
   CC: 'con tarjeta',
   DC: 'con tarjeta',
-  CARD: 'con tarjeta',
   TRANSFER: 'por transferencia',
+};
+
+export const PAYMENT_METHOD_SHORT_NAME: { [key: string]: string } = {
+  CASH: 'Efectivo',
+  CC: 'Tarjeta de crédito',
+  DC: 'Tarjeta de débito',
+  TRANSFER: 'Transferencia',
 };

@@ -37,7 +37,7 @@ const ExistencesTable = ({ onChange, setInventory, inventory }: Props) => {
         <div className="flex w-full flex-col">
           {branches.map((branch, index) => (
             <div key={index} className="w-full flex items-center my-2">
-              <div className="w-[70%] py-1 flex gap-2 items-center">
+              <div className="w-[70%] py-1 flex gap-3 items-center">
                 <Avatar size={40} icon={<ShopOutlined className="text-gray-600" />} className="bg-gray-600/10" />
                 <Typography.Text style={{ margin: 0 }}>{branch.name}</Typography.Text>
               </div>
@@ -47,7 +47,8 @@ const ExistencesTable = ({ onChange, setInventory, inventory }: Props) => {
                   className="max-w-32 w-full"
                   min={0}
                   type="number"
-                  inputMode="decimal"
+                  inputMode="numeric"
+                  size="large"
                   onFocus={({ target }) => (target as HTMLInputElement).select()}
                   onChange={value => handleChange(value as number, branch.branch_id)}
                 />

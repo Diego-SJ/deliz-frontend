@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Col, Drawer, FloatButton, Layout, Row } from 'antd';
+import { useEffect, useRef } from 'react';
+import { Col, Layout, Row } from 'antd';
 import { ProductsCheckout } from './styles';
 import CashRegisterItemsList from './cart-items-list';
 import CashierActions from './cashier-actions';
@@ -8,12 +8,12 @@ import CashierCustomer from './cashier-customer';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { customerActions } from '@/redux/reducers/customers';
-import useMediaQuery from '@/hooks/useMediaQueries';
-import { UnorderedListOutlined } from '@ant-design/icons';
 import { salesActions } from '@/redux/reducers/sales';
 import { useParams } from 'react-router-dom';
 import ChangePrice from './change-price';
 import SearchProducts from './search-products';
+import { branchesActions } from '@/redux/reducers/branches';
+import OpenCashCut from './open-cash-cut';
 
 const { Content } = Layout;
 
@@ -23,8 +23,6 @@ const CashRegister = () => {
   const params = useParams();
   const { products } = useAppSelector(({ products }) => products);
   const { customers } = useAppSelector(({ customers }) => customers);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const { isTablet } = useMediaQuery();
   const firstRender = useRef<boolean>(false);
 
   useEffect(() => {
@@ -32,7 +30,8 @@ const CashRegister = () => {
       firstRender.current = true;
       dispatch(productActions.fetchProducts({ refetch: true }));
       dispatch(customerActions.fetchCustomers({ refetch: true }));
-      dispatch(salesActions.cashiers.getActiveCashier());
+      dispatch(branchesActions.getPrices());
+      dispatch(branchesActions.getCurrentCashRegister());
     }
   }, [products, customers, dispatch]);
 
@@ -77,6 +76,7 @@ const CashRegister = () => {
           </Row>
         </Content>
       </Layout>
+      <OpenCashCut />
     </Layout>
   );
 };

@@ -12,5 +12,5 @@ export type Customer = {
   created_at?: Date | string;
   phone?: string;
   email?: string;
-  branch_id: string;
+  company_id: string;
 };

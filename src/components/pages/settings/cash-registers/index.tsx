@@ -41,6 +41,7 @@ const CashRegistersPage = () => {
 
   const onEdit = (data: CashRegister) => {
     form.setFieldValue('name', data.name);
+    form.setFieldValue('is_default', data.is_default);
     form.setFieldValue('cash_register_id', data.cash_register_id);
     form.setFieldValue('branch_id', selectedBranch?.branch_id);
     openModal();
@@ -106,18 +107,16 @@ const CashRegistersPage = () => {
               styles={{ actions: { paddingRight: 15, margin: 0 } }}
               classNames={{ actions: 'flex' }}
               className="flex"
-              actions={
-                item.is_default
-                  ? undefined
-                  : [
-                      <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
-                        Editar
-                      </Button>,
-                      <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.cash_register_id)}>
-                        Eliminar
-                      </Button>,
-                    ]
-              }
+              actions={[
+                <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
+                  Editar
+                </Button>,
+                item?.is_default ? null : (
+                  <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.cash_register_id)}>
+                    Eliminar
+                  </Button>
+                ),
+              ]}
             >
               <div className="pl-4 md:pl-6 flex gap-4">
                 <Typography.Text>Caja {item.name}</Typography.Text>
@@ -162,6 +161,9 @@ const CashRegistersPage = () => {
         </Typography.Text>
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item name="cash_register_id" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="is_default" hidden>
             <Input />
           </Form.Item>
           <Form.Item name="branch_id" hidden>

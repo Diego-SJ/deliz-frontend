@@ -43,12 +43,12 @@ export const APP_ROUTES = {
         path: '/app/transactions',
         title: 'Cierre de ventas',
         OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
-        CASHIERS: { path: '/app/transactions/cashiers' },
+        CASHIERS: { path: '/app/transactions/cashiers', title: 'Cortes de caja' },
         CASHIER_DETAIL: {
-          path: '/app/transactions/cashiers/:cashier_id',
-          hash: (_: TemplateStringsArray, cashier_id: number) => `/app/transactions/cashiers/${cashier_id}`,
+          path: '/app/transactions/cashiers/:cash_cut_id',
+          hash: (_: TemplateStringsArray, cash_cut_id: string) => `/app/transactions/cashiers/${cash_cut_id}`,
         },
-        CURRENT_CASHIER: { path: '/app/transactions/current-cashier' },
+        CURRENT_CASHIER: { path: '/app/transactions/current-cashier', title: 'Caja registradora' },
       },
       ORDERS: {
         path: '/app/orders',
@@ -61,8 +61,15 @@ export const APP_ROUTES = {
       SETTINGS: {
         path: '/app/settings',
         title: 'Configuración',
-        USERS: { path: '/app/settings/users' },
-        GENERAL: { path: '/app/settings/general' },
+        USERS: {
+          path: '/app/settings/users',
+          ADD: { path: '/app/settings/users/add' },
+          EDIT: {
+            path: '/app/settings/users/edit/:profile_id',
+            hash: (_: TemplateStringsArray, user_id: string) => `/app/settings/users/edit/${user_id}`,
+          },
+        },
+        GENERAL: { path: '/app/settings' },
         BRANCHES: {
           path: '/app/settings/branches',
           ADD: {

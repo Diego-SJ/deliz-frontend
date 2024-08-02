@@ -7,6 +7,7 @@ import {
   LineHeightOutlined,
   ProductOutlined,
   SettingOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { createElement } from 'react';
@@ -29,7 +30,7 @@ const SettingsMenu = () => {
             key: 1,
             icon: createElement(SettingOutlined),
             label: 'General',
-            onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path),
+            onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path + '/general'),
           },
           {
             key: 7,
@@ -66,6 +67,12 @@ const SettingsMenu = () => {
             icon: createElement(GoldOutlined),
             label: 'Unidades',
             onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path),
+          },
+          {
+            key: 8,
+            icon: createElement(TeamOutlined),
+            label: 'Usuarios y permisos',
+            onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path),
           },
         ]}
       ></Menu>

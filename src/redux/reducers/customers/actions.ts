@@ -36,7 +36,7 @@ const customActions = {
   saveCustomer: (customer: Customer) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(customerActions.setLoading(true));
-      const branch_id = getState().branches.currentBranch?.branch_id;
+      const company_id = getState().app.company.company_id;
 
       const { data, error } = await supabase
         .from('customers')
@@ -45,7 +45,7 @@ const customActions = {
           address: customer.address,
           email: customer.email,
           phone: customer.phone,
-          branch_id,
+          company_id,
         } as Customer)
         .select()
         .single();
@@ -67,7 +67,7 @@ const customActions = {
   updateCustomer: (customer: Customer) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       dispatch(customerActions.setLoading(true));
-      const branch_id = getState().branches.currentBranch?.branch_id;
+      const company_id = getState().app.company.company_id;
 
       const oldData = getState().customers.current_customer;
       const newData = {
@@ -75,7 +75,7 @@ const customActions = {
         address: customer.address,
         email: customer.email,
         phone: customer.phone,
-        branch_id,
+        company_id,
       } as Customer;
 
       const result = await supabase.from('customers').update(newData).eq('customer_id', oldData.customer_id);

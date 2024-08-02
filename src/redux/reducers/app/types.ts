@@ -1,5 +1,11 @@
 export type AppSlice = {
   company: Company;
+  navigation: {
+    menu: {
+      activeItem: string;
+      activeTitle: string;
+    };
+  };
 };
 
 export type Company = {

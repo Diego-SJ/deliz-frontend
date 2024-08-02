@@ -40,6 +40,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
               className="w-full"
               placeholder="0.0"
               min={0}
+              size="large"
               addonAfter="Por unidad"
               value={unitPrice}
               type="number"
@@ -71,6 +72,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
                   onChange={value => handleChange(value as number, price)}
                   onFocus={({ target }) => (target as HTMLInputElement).select()}
                   prefix="$"
+                  size="large"
                   className="w-full mb-0"
                   type="number"
                   inputMode="decimal"

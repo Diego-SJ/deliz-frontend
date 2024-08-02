@@ -67,13 +67,13 @@ const Dashboard = () => {
           onClick={addCustomer}
         />
 
-        <CardButton
+        {/* <CardButton
           title="Nuevo pedido"
           description="Accede al punto de venta para crear un pedido"
           icon={<ShoppingCartOutlined className="text-blue-600" />}
           className="bg-blue-600/10 shadow-md shadow-blue-600/40"
           onClick={newOrder}
-        />
+        /> */}
 
         <Drawer
           title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
