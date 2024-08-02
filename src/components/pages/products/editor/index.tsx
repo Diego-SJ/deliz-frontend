@@ -134,7 +134,11 @@ const ProductEditor = () => {
 
   const confirmDelete = async () => {
     setLoading(true);
-    await dispatch(productActions.deleteProduct(current_product));
+    const success = await dispatch(productActions.deleteProduct(current_product));
+    if (success) {
+      clearFields();
+      navigate(-1);
+    }
     setLoading(false);
   };
 

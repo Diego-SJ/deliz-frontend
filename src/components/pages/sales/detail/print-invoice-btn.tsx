@@ -93,10 +93,10 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex gap-4 px-6 justify-center pt-4">
-          <Button onClick={downloadInvoice} icon={<PrinterOutlined />}>
+          <Button block onClick={downloadInvoice} icon={<PrinterOutlined />}>
             Imprimir
           </Button>
-          <Button onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined />} loading={messageLoading}>
+          <Button hidden onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined />} loading={messageLoading}>
             Enviar via Whatsapp
           </Button>
         </div>

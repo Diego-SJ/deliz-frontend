@@ -192,7 +192,7 @@ const SideMenu = (props: SideMenuProps) => {
         items={currentItems.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),
-          label: item.label,
+          label: isPhablet && !isTablet ? '' : item.label,
           className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
           onClick: () => handlePathChange(item?.path),
           children: item?.children?.length
