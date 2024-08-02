@@ -10,7 +10,7 @@ const UI_TEXTS = {
 const { TextArea } = Input;
 
 type CustomerEditorProps = {
-  onSuccess?: (success: boolean) => void;
+  onSuccess?: (customer: Customer | null) => void;
 };
 
 const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
@@ -19,13 +19,13 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
   const { current_customer, loading } = useAppSelector(({ customers }) => customers);
 
   const onFinish = async (values: Customer) => {
-    let success = false;
+    let success: boolean | Customer = false;
     if (current_customer?.customer_id === -1) success = await dispatch(customerActions.saveCustomer(values));
     else success = await dispatch(customerActions.updateCustomer(values));
 
     if (onSuccess && success) {
       form.resetFields();
-      onSuccess(success);
+      onSuccess((success as Customer) || values || null);
     }
   };
 
@@ -39,22 +39,20 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       validateMessages={{ required: '${label} es obligatorio.', types: { email: 'Formato del correo inválido' } }}
     >
       <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
-        <Input placeholder="E.g: Fulanito" />
+        <Input size="large" placeholder="E.g: Fulanito" />
       </Form.Item>
-      <Form.Item name="phone" label="Teléfono" rules={[{ required: true }]}>
-        <Input placeholder="772 000 00 00" />
+      <Form.Item name="phone" label="Teléfono">
+        <Input size="large" placeholder="772 000 00 00" />
       </Form.Item>
       <Form.Item name="email" label="Correo" rules={[{ type: 'email' }]}>
-        <Input placeholder="ejemplo@email.com" />
+        <Input size="large" placeholder="ejemplo@email.com" />
       </Form.Item>
       <Form.Item name="address" label="Dirección">
-        <TextArea rows={2} placeholder="E.g: Calle Pirul 6" />
+        <TextArea size="large" rows={2} placeholder="E.g: Calle Pirul 6" />
       </Form.Item>
-      <Form.Item>
-        <Button block type="primary" size="large" htmlType="submit" loading={loading}>
-          {UI_TEXTS.saveBtn[current_customer?.customer_id === -1 ? 'add' : 'edit']}
-        </Button>
-      </Form.Item>
+      <Button size="large" block type="primary" htmlType="submit" loading={loading}>
+        {UI_TEXTS.saveBtn[current_customer?.customer_id === -1 ? 'add' : 'edit']}
+      </Button>
     </Form>
   );
 };

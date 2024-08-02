@@ -1,19 +1,19 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { Button, Form, Input, Typography, message } from 'antd';
+import { App, Button, Form, Input, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FormContainer, LayoutContent } from './styles';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 import { useState } from 'react';
 import { supabase } from '@/config/supabase';
-import { useDispatch } from 'react-redux';
 import { userActions } from '@/redux/reducers/users';
-import { UserAuth } from '@/redux/reducers/users/types';
+import { useAppDispatch } from '@/hooks/useStore';
 
 const SignInAdmin = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
 
   const handleOnFinish = async (values: any) => {
     setLoading(true);
@@ -21,15 +21,21 @@ const SignInAdmin = () => {
       email: values.email,
       password: values.password,
     });
-    setLoading(false);
 
-    if (error) return message.error(error?.message ?? 'No se pudo iniciar sesión.');
+    if (error) {
+      setLoading(false);
+      return message.error(error?.message ?? 'No se pudo iniciar sesión.');
+    }
 
     if (data) {
-      message.success('¡Bienvenido!');
-      await dispatch(userActions.setUserAuth(data as UserAuth));
-      navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
+      const profileSuccess = await dispatch(userActions.loginSuccess(data.user.id));
+      if (profileSuccess === true) {
+        setLoading(false);
+        message.success('¡Bienvenido!');
+        navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
+      }
     }
+    setLoading(false);
   };
 
   return (

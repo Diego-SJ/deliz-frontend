@@ -10,10 +10,9 @@ import { CashRegisterItem, SaleItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
-import { DollarOutlined, PlusOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { DollarOutlined, PlusCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { ModalBody } from '../../cash-register/styles';
 import { ProductInfo } from './styles';
-import { ta } from 'date-fns/locale';
 
 type CashierModalProps = {
   currentProduct?: Product;
@@ -51,7 +50,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
     if (open) {
       if (action === 'EDIT' && casherItem) {
         setQuantity(casherItem.quantity);
-        setChecked(casherItem.wholesale_price);
       } else {
         setChecked(true);
       }
@@ -152,7 +150,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
 
   return (
     <>
-      <Button type="default" icon={<PlusOutlined rev={{}} />} block size="large" onClick={openModal}>
+      <Button size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} block onClick={openModal}>
         Agregar item
       </Button>
       <Modal
@@ -164,12 +162,12 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
         footer={[
           <Row key="actions" gutter={10}>
             <Col span={12}>
-              <Button size="large" key="back" block onClick={handleOnClose} loading={loading}>
+              <Button key="back" block onClick={handleOnClose} loading={loading}>
                 Cancelar
               </Button>
             </Col>
             <Col span={12}>
-              <Button size="large" block type="primary" onClick={handleOk} disabled={disableSaveBtn()} loading={loading}>
+              <Button block type="primary" onClick={handleOk} disabled={disableSaveBtn()} loading={loading}>
                 Guardar
               </Button>
             </Col>
@@ -207,12 +205,12 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Producto</Paragraph>
           <Select
             style={{ width: '100%' }}
-            size="large"
             showSearch
+            size={isTablet ? 'large' : 'middle'}
             virtual={false}
             placeholder="Selecciona un producto"
             optionFilterProp="children"
-            value={`${currentProduct?.product_id ?? ''}`}
+            value={currentProduct?.product_id ? currentProduct?.product_id + '' : undefined}
             filterOption={filterOption}
             options={products?.map(i => ({ value: `${i?.product_id}`, label: `${i?.name} - ${i?.categories?.name}` }))}
             onChange={onProductChange}
@@ -222,8 +220,8 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               <Space height="10px" />
               <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Nombre del producto</Paragraph>
               <Input
+                size={isTablet ? 'large' : 'middle'}
                 placeholder="Nombre del artículo"
-                size="large"
                 value={productName}
                 onFocus={({ target }) => target.select()}
                 onChange={({ target }) => setProductName(target.value)}
@@ -232,7 +230,12 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           )}
           <Space height="10px" />
 
-          <Radio.Group size="large" style={{ width: '100%' }} value={checked} onChange={e => onCheckChange(e.target.value)}>
+          <Radio.Group
+            size={isTablet ? 'large' : 'middle'}
+            style={{ width: '100%' }}
+            value={checked}
+            onChange={e => onCheckChange(e.target.value)}
+          >
             <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
               Menudeo
             </Radio.Button>
@@ -244,33 +247,31 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
           <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Precio</Paragraph>
           <InputNumber
             min={0}
+            size={isTablet ? 'large' : 'middle'}
             placeholder="Precio"
-            size="large"
             className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
             style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
             value={subtotal}
-            readOnly={isTablet}
             addonAfter={specialPrice > 0 ? 'especial' : ''}
             onFocus={({ target }) => {
               target.select();
               setCurrentInput('price');
             }}
-            addonBefore={<DollarOutlined rev={{}} />}
+            addonBefore={<DollarOutlined />}
             onChange={value => setSpecialPrice(value as number)}
           />
           <Space height="10px" />
           <Paragraph style={{ margin: '0 0 5px', fontWeight: 600, width: '100%' }}>Cantidad</Paragraph>
           <InputNumber
+            size={isTablet ? 'large' : 'middle'}
             ref={quantityInput}
             min={0}
             placeholder="Cantidad"
-            size="large"
             className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
             style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
             value={quantity}
             onPressEnter={handleOk}
-            readOnly={isTablet}
-            addonBefore={<ShoppingCartOutlined rev={{}} />}
+            addonBefore={<ShoppingCartOutlined />}
             onFocus={({ target }) => {
               target.select();
               setCurrentInput('quantity');
@@ -278,13 +279,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             onChange={value => onQuantityChange(value as number)}
           />
           <Space height="10px" />
-          {isTablet && (
-            <NumberKeyboard
-              withDot={currentInput === 'price'}
-              value={currentInput === 'quantity' ? Number(quantity) : subtotal}
-              onChange={value => onInputsChange(value)}
-            />
-          )}
         </ModalBody>
       </Modal>
     </>

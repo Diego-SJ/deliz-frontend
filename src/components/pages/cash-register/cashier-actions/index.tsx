@@ -1,47 +1,49 @@
-import { DeleteFilled, PercentageOutlined, SendOutlined, PlusCircleFilled } from '@ant-design/icons';
-import { Avatar, Button, Col, Input, InputNumber, Modal, Radio, Row, Tooltip, Typography, message } from 'antd';
-import { useEffect, useState } from 'react';
-import { ActionButton, ContainerItems } from './styles';
-import { ModalBody, SalePrices } from '../styles';
+import {
+  TruckOutlined,
+  ClearOutlined,
+  TagsOutlined,
+  SignatureOutlined,
+  DollarCircleOutlined,
+  PercentageOutlined,
+} from '@ant-design/icons';
+import { Avatar, Button, Col, Input, InputNumber, Modal, Row, Segmented, Typography, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { ContainerItems } from './styles';
+import { ModalBody } from '../styles';
 import Space from '@/components/atoms/Space';
-import { useTheme } from 'styled-components';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { DiscountType } from '@/redux/reducers/sales/types';
-import { EXTRA_ITEM_BASE } from '@/constants/mocks';
 import functions from '@/utils/functions';
 import PaymentModal from './payment-modal';
-import NumberKeyboard from '@/components/atoms/NumberKeyboard';
-import useMediaQuery from '@/hooks/useMediaQueries';
+import SubtotalBox from './subtotal-box';
 
 type ModalAction = '' | 'APPLY_SHIPPING' | 'APPLY_DISCOUNT' | 'ADD_NEW_ITEM';
 
 const MODAL_TITLE = {
   '': '',
-  APPLY_SHIPPING: 'Aplicar envío',
+  APPLY_SHIPPING: 'Agregar envío',
   APPLY_DISCOUNT: 'Aplicar descuento',
-  ADD_NEW_ITEM: 'Agregar extra',
+  ADD_NEW_ITEM: 'Entrada manual',
 };
 
 const MODAL_ICON = {
   '': '',
-  APPLY_SHIPPING: <SendOutlined rev={{}} />,
-  APPLY_DISCOUNT: <PercentageOutlined rev={{}} />,
-  ADD_NEW_ITEM: <PlusCircleFilled rev={{}} />,
+  APPLY_SHIPPING: <TruckOutlined className="text-slate-600" />,
+  APPLY_DISCOUNT: <TagsOutlined className="text-slate-600" />,
+  ADD_NEW_ITEM: <SignatureOutlined className="text-slate-600" />,
 };
 
 type CashierActionsProps = {
   onClose?: () => void;
 };
 
-const CashierActions = ({ onClose }: CashierActionsProps) => {
-  const theme = useTheme();
+const CashierActions = ({}: CashierActionsProps) => {
   const dispatch = useAppDispatch();
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [open, setOpen] = useState(false);
   const [shippingPrice, setShippingPrice] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
-  // const [checked, setChecked] = useState(true);
   const [productName, setProductName] = useState('');
   const [modalAction, setModalAction] = useState<ModalAction>('');
   const [discountType, setDiscountType] = useState<DiscountType>('PERCENTAGE');
@@ -53,17 +55,17 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
   const [subTotal, setSubTotal] = useState(0);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
-  const { isTablet } = useMediaQuery();
+  const discountInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     let totalItemsInList = 0;
     let items = cash_register?.items?.reduce((total, item) => {
-      let productPrice = item.product?.wholesale_price * item?.quantity;
+      let productPrice = item.price * item?.quantity;
       totalItemsInList += item.quantity;
       return productPrice + total;
     }, 0);
-    setTotalItems(totalItemsInList);
 
+    setTotalItems(totalItemsInList);
     setSubTotal(items || 0);
   }, [cash_register]);
 
@@ -72,17 +74,18 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
   }, [subTotal, shipping, discountMoney]);
 
   useEffect(() => {
-    setShippingPrice(cash_register?.shipping || 0);
-    setDiscountAmount(cash_register?.discount || 0);
-    setDiscountType(cash_register?.discountType || 'AMOUNT');
-  }, [cash_register]);
+    if (open) {
+      setShippingPrice(cash_register?.shipping || 0);
+      setDiscountAmount(cash_register?.discount || 0);
+      setDiscountType(cash_register?.discountType || 'AMOUNT');
+    }
+  }, [cash_register, open]);
 
   const cleanFields = () => {
     setShippingPrice(0);
     setDiscountAmount(0);
     setItemExtra({ price: 0, quantity: 0 });
     setProductName('');
-    // setChecked(false);
   };
 
   const handleOnClose = () => {
@@ -98,14 +101,10 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
     } else if (modalAction === 'ADD_NEW_ITEM') {
       dispatch(
         salesActions.cashRegister.add({
-          product: {
-            ...EXTRA_ITEM_BASE,
-            name: productName,
-            retail_price: itemExtra.price,
-            wholesale_price: itemExtra.price,
-          },
+          product: { name: productName, raw_price: itemExtra.price },
+          price: itemExtra.price,
           quantity: itemExtra.quantity,
-          wholesale_price: true,
+          price_type: 'PERSONALIZED',
         }),
       );
     }
@@ -118,7 +117,6 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
   };
 
   const onPaySale = () => {
-    if (!!!cash_register?.customer_id) return message.info('Selecciona un cliente para poder finalizar la venta');
     if (!cash_register?.items?.length) return message.info('Agrega items a la lista.');
     setOpenPaymentModal(true);
   };
@@ -128,6 +126,7 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
       title: 'Cancelar orden',
       content: <Typography.Paragraph>Se perderan los cambios actuales ¿desea continuar?</Typography.Paragraph>,
       okText: 'Aceptar',
+      maskClosable: true,
       cancelText: 'Cancelar',
       onOk: () => dispatch(salesActions.cashRegister.reset()),
     });
@@ -144,100 +143,103 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
       if (discountType === 'AMOUNT') return discountAmount < 0;
       else if (discountType === 'PERCENTAGE') return discountAmount < 0 || discountAmount > 100;
     }
-    return !productName;
+    return !productName || !itemExtra.price || !itemExtra.quantity;
   };
 
   return (
-    <div className="cashier-actions md:border-t md:border-dashed md:border-gray-400">
-      <ContainerItems>
-        <p className="text-base text-gray-500 w-full text-start pt-[10px]">
-          Productos <span className="min-w-[100px]">{totalItems || 0}</span>
-        </p>
-        <SalePrices>
-          <p className="text-base text-gray-500 w-full text-end ">
-            Subtotal <span className="min-w-[100px] inline-flex justify-end">{functions.money(subTotal)}</span>
+    <>
+      <div className="flex flex-col bg-white justify-between cashier-actions md:border-t md:border-dashed md:border-gray-300 p-3 h-[230px]">
+        <ContainerItems>
+          <p className="text-sm w-full text-start font-light">
+            Productos <span className="min-w-[100px] font-medium">{totalItems || 0}</span>
           </p>
-          <p className="text-base text-gray-500 w-full text-end ">
-            Descuento
-            <span className="min-w-[100px] inline-flex justify-end">{`-${functions.money(discountMoney)} ${
-              discountType === 'PERCENTAGE' ? `(${discount}%)` : ''
-            }`}</span>
-          </p>
-          <p className="text-base text-gray-500 w-full text-end ">
-            Envio <span className="min-w-[100px] inline-flex justify-end">{functions.money(shipping)}</span>
-          </p>
-          <p className="text-lg text-gray-800 w-full text-end font-semibold">
-            TOTAL <span className="min-w-[100px] inline-flex justify-end">{functions.money(total)}</span>
-          </p>
-        </SalePrices>
-      </ContainerItems>
-      <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }} style={{ marginBottom: 10 }}>
-        <Col span={6}>
-          <Tooltip title="Aplicar envío">
-            <ActionButton onClick={() => openModal('APPLY_SHIPPING')}>
-              <Button icon={<SendOutlined rev={{}} />} size="small" type="primary" shape="circle" />
-              Envio
-            </ActionButton>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="Aplicar descuento">
-            <ActionButton onClick={() => openModal('APPLY_DISCOUNT')}>
-              <Button icon={<PercentageOutlined rev={{}} />} size="small" type="primary" shape="circle" />
+          <div className="flex flex-col">
+            <p className="text-sm w-full text-end font-light">
+              Subtotal <span className="min-w-[100px] font-medium inline-flex justify-end">{functions.money(subTotal)}</span>
+            </p>
+            <p className="text-sm w-full text-end font-light">
               Descuento
-            </ActionButton>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="Cancelar orden">
-            <ActionButton onClick={cancelOrder}>
-              <Button icon={<DeleteFilled rev={{}} />} size="small" type="primary" shape="circle" />
-              Cancelar
-            </ActionButton>
-          </Tooltip>
-        </Col>
-        {/* <Col span={6}>
-          <Tooltip title="Imprimir ticket">
-            <ActionButton>
-              <Button icon={<PrinterFilled rev={{}} />} size="small" type="primary" shape="circle" />
-            </ActionButton>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="Guardar borrador">
-            <ActionButton>
-              <Button icon={<SaveFilled rev={{}} />} size="small" type="primary" shape="circle" />
-            </ActionButton>
-          </Tooltip>
-        </Col> */}
-        <Col span={6}>
-          <Tooltip title="Agregar extra">
-            <ActionButton onClick={() => openModal('ADD_NEW_ITEM')}>
-              <Button icon={<PlusCircleFilled rev={{}} />} size="small" type="primary" shape="circle" />
-              Extra
-            </ActionButton>
-          </Tooltip>
-        </Col>
-      </Row>
-      <div className="flex gap-4">
-        {isTablet && (
-          <Button type="default" block size="large" onClick={onClose}>
-            Cerrar
+              <span className="min-w-[100px] inline-flex justify-end font-medium">{`-${functions.money(discountMoney)} ${
+                discountType === 'PERCENTAGE' ? `(${discount}%)` : ''
+              }`}</span>
+            </p>
+            <p className="text-sm w-full text-end font-light">
+              Envio <span className="min-w-[100px] inline-flex justify-end font-medium">{functions.money(shipping)}</span>
+            </p>
+          </div>
+        </ContainerItems>
+        <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }}>
+          <Col span={6}>
+            <div
+              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+              onClick={() => openModal('APPLY_SHIPPING')}
+            >
+              <Avatar
+                icon={<TruckOutlined className="text-slate-600 !text-lg" />}
+                shape="square"
+                className="mb-1 bg-slate-600/10"
+              />
+              <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
+            </div>
+          </Col>
+          <Col span={6}>
+            <div
+              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+              onClick={() => openModal('APPLY_DISCOUNT')}
+            >
+              <Avatar
+                icon={<TagsOutlined className="text-slate-600 !text-lg" />}
+                shape="square"
+                className="mb-1 bg-slate-600/10"
+              />
+              <span className="text-xs lowercase select-none text-center leading-3 !font-light">descuento</span>
+            </div>
+          </Col>
+          <Col span={6}>
+            <div
+              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+              onClick={cancelOrder}
+            >
+              <Avatar
+                icon={<ClearOutlined className="text-slate-600 !text-lg" />}
+                shape="square"
+                className="mb-1 bg-slate-600/10"
+              />
+              <span className="text-xs lowercase select-none text-center leading-3 !font-light">borrar</span>
+            </div>
+          </Col>
+          <Col span={6}>
+            <div
+              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+              onClick={() => openModal('ADD_NEW_ITEM')}
+            >
+              <Avatar
+                icon={<SignatureOutlined className="text-slate-600 !text-lg" />}
+                shape="square"
+                className="mb-1 bg-slate-600/10"
+              />
+              <span className="text-xs lowercase select-none text-center leading-3 !font-light">manual</span>
+            </div>
+          </Col>
+        </Row>
+        <div className="flex">
+          <Button type="primary" block size="large" className="font-bold " onClick={onPaySale}>
+            {mode === 'order' ? 'Registrar Pedido de' : 'Cobrar'} {functions.money(total)}
           </Button>
-        )}
-        <Button type="primary" block size="large" onClick={onPaySale}>
-          {mode === 'order' ? 'REGISTRAR PEDIDO' : 'PAGAR'}
-        </Button>
+        </div>
       </div>
+
       {contextHolder}
 
       <Modal
         open={open}
         onOk={handleOk}
-        width={370}
+        width={400}
         onCancel={handleOnClose}
+        destroyOnClose
+        forceRender
         footer={[
-          <Row key="actions" gutter={10}>
+          <Row key="actions" gutter={20} className="!mt-7">
             <Col span={12}>
               <Button key="back" size="large" block onClick={handleOnClose}>
                 Cancelar
@@ -252,33 +254,37 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
         ]}
       >
         <ModalBody>
-          <Avatar icon={MODAL_ICON[modalAction]} size={60} style={{ background: theme.colors.primary }} />
-          <Typography.Title level={3} style={{ marginBottom: 0 }}>
-            {MODAL_TITLE[modalAction]}
-          </Typography.Title>
+          <div className="flex gap-3 w-full justify-start items-center my-3">
+            <Avatar shape="square" className="bg-slate-600/10" icon={MODAL_ICON[modalAction]} />
+            <Typography.Title level={4} style={{ marginBottom: 0 }}>
+              {MODAL_TITLE[modalAction]}
+            </Typography.Title>
+          </div>
           <Space height="10px" />
           {modalAction === 'APPLY_DISCOUNT' && (
             <>
-              <Radio.Group
-                style={{ width: '100%' }}
+              <Segmented
+                className="w-full"
                 size="large"
                 value={discountType}
-                onChange={e => setDiscountType(e.target.value)}
-              >
-                <Radio.Button value="AMOUNT" style={{ width: '50%', textAlign: 'center' }}>
-                  Cantidad $
-                </Radio.Button>
-                <Radio.Button value="PERCENTAGE" style={{ width: '50%', textAlign: 'center' }}>
-                  Porcentaje %
-                </Radio.Button>
-              </Radio.Group>
+                options={[
+                  { label: 'Cantidad', value: 'AMOUNT', icon: <DollarCircleOutlined /> },
+                  { label: 'Porcentaje', value: 'PERCENTAGE', icon: <PercentageOutlined /> },
+                ]}
+                block
+                onChange={value => {
+                  setDiscountType(value as DiscountType);
+                  discountInputRef.current?.focus();
+                }}
+              />
               <Space height="10px" />
               <InputNumber
+                ref={discountInputRef}
                 min={0}
                 max={discountType === 'PERCENTAGE' ? 100 : undefined}
+                addonBefore={discountType === 'PERCENTAGE' ? <PercentageOutlined /> : <DollarCircleOutlined />}
                 placeholder="0"
                 size="large"
-                readOnly={isTablet}
                 type="number"
                 inputMode="decimal"
                 style={{ width: '100%', textAlign: 'center' }}
@@ -289,44 +295,37 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
                 onChange={value => setDiscountAmount(value || 0)}
                 onPressEnter={handleOk}
               />
-              {isTablet && <NumberKeyboard value={discountAmount} withDot onChange={setDiscountAmount} />}
             </>
           )}
           {modalAction === 'APPLY_SHIPPING' && (
-            <>
+            <div className="flex flex-col w-full">
+              <SubtotalBox
+                prevAmount={total - (cash_register?.shipping || 0)}
+                amount={total + shippingPrice - (cash_register?.shipping || 0)}
+                hasChanged={shippingPrice > 0 && !!cash_register?.shipping}
+              />
+
               <InputNumber
                 min={0}
                 placeholder="0.0"
                 size="large"
                 type="number"
                 inputMode="decimal"
+                addonBefore={<DollarCircleOutlined />}
                 style={{ width: '100%', textAlign: 'center' }}
                 value={shippingPrice}
-                readOnly={isTablet}
                 onFocus={target => {
                   target.currentTarget?.select();
                 }}
                 onPressEnter={handleOk}
                 onChange={value => setShippingPrice(value || 0)}
               />
-              {isTablet && <NumberKeyboard value={shippingPrice} withDot onChange={setShippingPrice} />}
-            </>
+            </div>
           )}
 
           {modalAction === 'ADD_NEW_ITEM' && (
             <>
-              {/* <Radio.Group style={{ width: '100%' }} size="large" value={checked} onChange={e => setChecked(e.target.value)}>
-                <Radio.Button value={false} style={{ width: '50%', textAlign: 'center' }}>
-                  Menudeo
-                </Radio.Button>
-                <Radio.Button value={true} style={{ width: '50%', textAlign: 'center' }}>
-                  Mayoreo
-                </Radio.Button>
-              </Radio.Group> */}
-              <Space height="10px" />
-              <Typography.Title level={5} style={{ width: '100%' }}>
-                Nombre del artíulo
-              </Typography.Title>
+              <Typography.Paragraph className="w-full !m-0 !mb-1">Nombre del artíulo</Typography.Paragraph>
               <Input
                 placeholder="Nombre del artículo"
                 size="large"
@@ -334,16 +333,15 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
                 onChange={({ target }) => setProductName(target.value)}
               />
               <Space height="10px" />
-              <Row gutter={[10, 10]}>
+              <Row gutter={20}>
                 <Col span={12}>
-                  <Typography.Title level={5} style={{ width: '100%' }}>
-                    Cantidad
-                  </Typography.Title>
+                  <Typography.Paragraph className="w-full !m-0 !mb-1">Cantidad</Typography.Paragraph>
                   <InputNumber
                     min={0}
                     placeholder="0"
                     size="large"
                     type="number"
+                    inputMode="numeric"
                     className={currentInput === 'quantity' ? 'ant-input-number-focused' : ''}
                     style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
                     value={itemExtra.quantity}
@@ -351,43 +349,40 @@ const CashierActions = ({ onClose }: CashierActionsProps) => {
                       setCurrentInput('quantity');
                       target.currentTarget.select();
                     }}
-                    readOnly={isTablet}
+                    onPressEnter={() => {
+                      if (itemExtra.quantity > 0 && itemExtra.price > 0) handleOk();
+                    }}
                     onChange={value => onInputsChange(value || 0)}
                   />
                 </Col>
                 <Col span={12}>
-                  <Typography.Title level={5} style={{ width: '100%' }}>
-                    Precio
-                  </Typography.Title>
+                  <Typography.Paragraph className="w-full !m-0 !mb-1">Precio</Typography.Paragraph>
                   <InputNumber
                     min={0}
                     placeholder="0.0"
                     size="large"
+                    type="number"
+                    inputMode="decimal"
                     className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
                     style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
                     onFocus={target => {
                       setCurrentInput('price');
                       target.currentTarget?.select();
                     }}
+                    onPressEnter={() => {
+                      if (itemExtra.quantity > 0 && itemExtra.price > 0) handleOk();
+                    }}
                     value={itemExtra.price}
-                    readOnly={isTablet}
                     onChange={value => onInputsChange(value || 0)}
                   />
                 </Col>
               </Row>
-              {isTablet && (
-                <NumberKeyboard
-                  withDot={currentInput === 'price'}
-                  value={currentInput === 'quantity' ? itemExtra.quantity : itemExtra.price}
-                  onChange={value => onInputsChange(value)}
-                />
-              )}
             </>
           )}
         </ModalBody>
       </Modal>
       <PaymentModal total={total} open={openPaymentModal} onClose={() => setOpenPaymentModal(false)} />
-    </div>
+    </>
   );
 };
 

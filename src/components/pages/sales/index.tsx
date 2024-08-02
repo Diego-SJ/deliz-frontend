@@ -1,38 +1,43 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { DollarOutlined, LineChartOutlined, PlusOutlined, ReconciliationOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Col, DatePicker, Row, Select, Tag, message, Typography, Avatar, Input } from 'antd';
+import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, message, Input, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
+import { STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails } from '@/redux/reducers/sales/types';
 import Table from '@/components/molecules/Table';
+import CardRoot from '@/components/atoms/Card';
+import useMediaQuery from '@/hooks/useMediaQueries';
+import PaginatedList from '@/components/organisms/PaginatedList';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
   CARD: 'Tarjeta',
+  CC: 'Tarjeta crédito',
+  DC: 'Tarjeta débito',
   TRANSFER: 'Transferencia',
 };
 
 const columns: ColumnsType<SaleDetails> = [
-  { title: '#', dataIndex: 'sale_id', width: 50, align: 'center' },
+  { title: '#', dataIndex: 'sale_id', width: 80, align: 'center' },
   {
     title: 'Cliente',
     dataIndex: 'customers',
     align: 'left',
-    render: value => value?.name,
+    width: 300,
+    render: value => value?.name || 'Público general',
   },
   {
-    title: 'Monto',
+    title: 'Total',
     width: 120,
     align: 'center',
     dataIndex: 'total',
-    render: (value = 0, record) => {
-      let _total = (record?.amount_paid || 0) - (record?.cashback || 0);
-      return functions.money(value || _total);
+    render: (value = 0) => {
+      return functions.money(value || 0);
     },
   },
   {
@@ -47,9 +52,9 @@ const columns: ColumnsType<SaleDetails> = [
     dataIndex: 'status',
     width: 130,
     align: 'center',
-    render: status => {
+    render: (status, record) => {
       const _status = STATUS_OBJ[status?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
+      return <Tag color={_status?.color ?? 'orange'}>{record?.status?.name}</Tag>;
     },
   },
   {
@@ -68,8 +73,6 @@ const columns: ColumnsType<SaleDetails> = [
   // },
 ];
 
-const { Title } = Typography;
-
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -77,16 +80,13 @@ const Sales = () => {
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
-  const [totalSaleAmount, setTotalSaleAmount] = useState(0);
-  const [todaySales, setTodaySales] = useState(0);
+  const { isTablet } = useMediaQuery();
   const activeCashier = cashiers?.activeCashier;
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       dispatch(salesActions.fetchSales({ refetch: true }));
-
-      if (!activeCashier?.cashier_id) dispatch(salesActions.cashiers.getActiveCashier());
       return;
     }
   }, [dispatch, activeCashier?.cashier_id]);
@@ -94,28 +94,6 @@ const Sales = () => {
   useEffect(() => {
     setAuxSales(sales);
   }, [sales]);
-
-  useEffect(() => {
-    let totalAmounts = auxSales?.reduce((acc, item) => {
-      let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
-      return (item?.total || _total) + acc;
-    }, 0);
-
-    setTotalSaleAmount(totalAmounts);
-  }, [auxSales]);
-
-  useEffect(() => {
-    let _todaySales = sales
-      ?.filter(i => {
-        return i?.cashier_id === activeCashier?.cashier_id && i?.status_id === STATUS_DATA.COMPLETED.id;
-      })
-      ?.reduce((acc, item) => {
-        let _total = (item?.amount_paid || 0) - (item?.cashback || 0);
-        return (item?.total || _total) + acc;
-      }, 0);
-
-    setTodaySales(_todaySales);
-  }, [sales, activeCashier]);
 
   const applyFilters = useCallback(
     ({
@@ -167,8 +145,8 @@ const Sales = () => {
   };
 
   return (
-    <>
-      <Row justify="space-between" align="middle">
+    <div className="max-w-[1200px] mx-auto">
+      <Row justify="space-between" align="middle" className="mb-3">
         <Col lg={{ span: 12 }}>
           <Breadcrumb
             items={[
@@ -181,44 +159,16 @@ const Sales = () => {
           />
         </Col>
       </Row>
-      <Row style={{ width: '100%', marginTop: 10 }} gutter={[10, 10]}>
-        <Col xs={24} md={12} lg={8}>
-          <Card style={{ width: '100%' }}>
-            <Card.Meta
-              avatar={<Avatar icon={<LineChartOutlined rev={{}} />} style={{ background: '#2db7f5' }} size={60} />}
-              title={functions?.money(totalSaleAmount)}
-              description="Total de ventas"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} md={12} lg={8}>
-          <Card>
-            <Card.Meta
-              avatar={<Avatar icon={<ReconciliationOutlined rev={{}} />} style={{ background: '#a52df5' }} size={60} />}
-              title={sales?.length || 0}
-              description="Ventas totales"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} md={12} lg={8}>
-          <Card>
-            <Card.Meta
-              avatar={<Avatar icon={<DollarOutlined rev={{}} />} style={{ background: '#4beb88' }} size={60} />}
-              title={functions.money(todaySales)}
-              description="Ventas de hoy"
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row style={{ marginTop: '10px' }}>
+      <Row>
         <Col span={24}>
-          <Row gutter={[10, 10]} style={{ marginBottom: 10 }}>
+          <Row gutter={[10, 10]} className="!mb-0">
             <Col lg={6} xs={24}>
               <Input
                 placeholder="Nombre cliente, dirección"
                 style={{ width: '100%' }}
                 allowClear
-                prefix={<SearchOutlined rev={{}} />}
+                size={isTablet ? 'large' : 'middle'}
+                prefix={<SearchOutlined />}
                 onChange={({ target }) => applyFilters({ searchText: target.value })}
               />
             </Col>
@@ -228,6 +178,7 @@ const Sales = () => {
                 style={{ width: '100%' }}
                 allowClear
                 virtual={false}
+                size={isTablet ? 'large' : 'middle'}
                 onChange={status => setFilters(p => ({ ...p, status }))}
               >
                 <Select.Option key={4} value={4}>
@@ -236,47 +187,86 @@ const Sales = () => {
                 <Select.Option key={5} value={5}>
                   {STATUS_OBJ[5].name}
                 </Select.Option>
-                <Select.Option key={7} value={7}>
-                  {STATUS_OBJ[7].name}
-                </Select.Option>
               </Select>
             </Col>
             <Col lg={4} xs={12}>
               <DatePicker
-                placeholder="Inicio"
+                placeholder="Desde"
                 style={{ width: '100%' }}
+                size={isTablet ? 'large' : 'middle'}
+                readOnly
                 onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
               />
             </Col>
             <Col lg={4} xs={12}>
               <DatePicker
-                placeholder="Fin"
+                placeholder="Hasta"
                 style={{ width: '100%' }}
+                size={isTablet ? 'large' : 'middle'}
                 onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
               />
             </Col>
-            <Col lg={6} xs={24}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+            <Col lg={{ offset: 1, span: 5 }} xs={12}>
+              <Button block type="primary" size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} onClick={onAddNew}>
                 Nueva
               </Button>
             </Col>
           </Row>
-          <Table
-            onRow={record => {
-              return {
-                onClick: () => onRowClick(record), // click row
-              };
-            }}
-            size="small"
-            columns={columns}
-            dataSource={auxSales}
-            scroll={{ x: 700 }}
-            onRefresh={onRefresh}
-            totalItems={sales?.length || 0}
-          />
+
+          {!isTablet ? (
+            <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }} className={`!mt-6`}>
+              <Table
+                onRow={record => {
+                  return {
+                    onClick: () => onRowClick(record), // click row
+                  };
+                }}
+                rowKey={record => record.sale_id}
+                columns={columns}
+                dataSource={auxSales}
+                scroll={{ x: 700, y: 'calc(100dvh - 350px)' }}
+                onRefresh={onRefresh}
+                totalItems={sales?.length || 0}
+              />
+            </CardRoot>
+          ) : (
+            <PaginatedList
+              className="mt-4 !max-h-[calc(100dvh-284px)]"
+              $bodyHeight="calc(100dvh - 340px)"
+              pagination={{ position: 'bottom', align: 'center' }}
+              dataSource={auxSales}
+              rootClassName="sadasd"
+              renderItem={item => {
+                const _status = STATUS_OBJ[item?.status_id || 1];
+                return (
+                  <div
+                    key={item.sale_id}
+                    onClick={() => onRowClick(item)}
+                    className="flex justify-between py-3 px-4 items-center border-b border-gray-200 cursor-pointer"
+                  >
+                    <div className="flex flex-col w-1/3">
+                      <Typography.Text strong className="!mb-2">
+                        {item?.customers?.name || 'Público general'}
+                      </Typography.Text>
+                      <Typography.Text type="secondary">{functions.tableDate(item.created_at)}</Typography.Text>
+                    </div>
+                    <Typography.Text>{functions.money(item.total)}</Typography.Text>
+                    <div className="flex flex-col w-1/3 text-end justify-end">
+                      <Typography.Text className="!mb-2" type="secondary">
+                        {PAYMENT_METHOD[item.payment_method || '']}
+                      </Typography.Text>
+                      <Tag className="ml-auto w-fit mx-0" color={_status?.color ?? 'orange'}>
+                        {item?.status?.name}
+                      </Tag>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          )}
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

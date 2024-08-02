@@ -26,19 +26,20 @@ export default createGlobalStyle`
 
   #root{
     margin: 0;
+    --primary: ${({ theme }) => theme.colors.primary};
   }
 
   body {
     background: ${({ theme }) => theme.colors.background.secondary};
   }
 
+  html, body {
+    overscroll-behavior: none;
+  }
+
   // ---------------------------------------------
   // override ant styles
   // ---------------------------------------------
-
-  .ant-btn-primary {
-    background-color: ${({ theme }) => theme.colors.primary};
-  }
 
   .app-custom-popover.nopadding {
     .ant-popover-content {
@@ -48,5 +49,26 @@ export default createGlobalStyle`
         }
       }
     }
+  }
+
+  .ant-tag {
+    border-radius: 15px;
+  }
+
+  .ant-select.xl-select .ant-select-selector .ant-select-selection-search .ant-select-selection-search-input {
+    height: 100%;
+  }
+
+  .search-products-input.ant-input-group-wrapper.ant-input-group-wrapper-lg.ant-input-group-wrapper-outlined 
+  .ant-input-wrapper.ant-input-group .ant-input-affix-wrapper.ant-input-affix-wrapper-lg,
+  .search-products-input.ant-input-group-wrapper.ant-input-group-wrapper-lg.ant-input-group-wrapper-outlined 
+  .ant-input-wrapper.ant-input-group .ant-input-group-addon .ant-btn {
+    border-color: rgb(229 229 229 / var(--tw-border-opacity));
+  }
+
+  .search-products-input.ant-input-group-wrapper.ant-input-group-wrapper-lg.ant-input-group-wrapper-outlined
+  .ant-input-wrapper.ant-input-group .ant-input-affix-wrapper.ant-input-affix-wrapper-lg.ant-input-affix-wrapper-focused {
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}20;
   }
 `;

@@ -2,13 +2,13 @@ import { Header } from 'antd/lib/layout/layout';
 import styled from 'styled-components';
 
 export const HeaderRoot = styled(Header)`
-  padding: 0 20px 0 16px;
+  height: 60px;
+  box-sizing: border-box;
   background: ${({ theme }) => theme.colors.background.primary};
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 9px -5px rgba(0, 0, 0, 0.6);
   z-index: 3;
 
   .ant-typography {

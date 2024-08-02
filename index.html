@@ -2,91 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-
     <title>Paleteria Deliz</title>
+
+    <!-- PWA assets load -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" sizes="180x180" />
+    <link rel="mask-icon" href="/mask-icon.svg" color="#FFFFFF" />
+    <meta name="theme-color" content="#ffffff" />
   </head>
-  <body>
+
+  <body class="overscroll-none">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!--BEGIN QUALTRICS WEBSITE FEEDBACK SNIPPET-->
-
-    <script type="text/javascript">
-      (function () {
-        var g = function (e, h, f, g) {
-          this.get = function (a) {
-            for (var a = a + '=', c = document.cookie.split(';'), b = 0, e = c.length; b < e; b++) {
-              for (var d = c[b]; ' ' == d.charAt(0); ) d = d.substring(1, d.length);
-              if (0 == d.indexOf(a)) return d.substring(a.length, d.length);
-            }
-            return null;
-          };
-
-          this.set = function (a, c) {
-            var b = '',
-              b = new Date();
-            b.setTime(b.getTime() + 6048e5);
-            b = '; expires=' + b.toGMTString();
-            document.cookie = a + '=' + c + b + '; path=/; ';
-          };
-
-          this.check = function () {
-            var a = this.get(f);
-            if (a) a = a.split(':');
-            else if (100 != e) 'v' == h && (e = Math.random() >= e / 100 ? 0 : 100), (a = [h, e, 0]), this.set(f, a.join(':'));
-            else return !0;
-            var c = a[1];
-            if (100 == c) return !0;
-            switch (a[0]) {
-              case 'v':
-                return !1;
-              case 'r':
-                return (c = a[2] % Math.floor(100 / c)), a[2]++, this.set(f, a.join(':')), !c;
-            }
-            return !0;
-          };
-
-          this.go = function () {
-            if (this.check()) {
-              var a = document.createElement('script');
-              a.type = 'text/javascript';
-              a.src = g;
-              document.body && document.body.appendChild(a);
-            }
-          };
-
-          this.start = function () {
-            var t = this;
-            'complete' !== document.readyState
-              ? window.addEventListener
-                ? window.addEventListener(
-                    'load',
-                    function () {
-                      t.go();
-                    },
-                    !1,
-                  )
-                : window.attachEvent &&
-                  window.attachEvent('onload', function () {
-                    t.go();
-                  })
-              : t.go();
-          };
-        };
-
-        try {
-          new g(
-            100,
-            'r',
-            'QSI_S_ZN_0pv8BzHiSQT0Cua',
-            'https://zn0pv8bzhisqt0cua-clara.siteintercept.qualtrics.com/SIE/?Q_ZID=ZN_0pv8BzHiSQT0Cua',
-          ).start();
-        } catch (i) {}
-      })();
-    </script>
-    <div id="ZN_0pv8BzHiSQT0Cua"><!--DO NOT REMOVE-CONTENTS PLACED HERE--></div>
-
-    <!--END WEBSITE FEEDBACK SNIPPET-->
   </body>
 </html>

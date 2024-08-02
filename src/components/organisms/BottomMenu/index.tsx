@@ -19,7 +19,7 @@ const BottomMenu = () => {
           className={`${pathname === APP_ROUTES.AUTH.MAIN.path ? 'active' : ''}`}
           size="large"
           shape="round"
-          icon={<HomeOutlined rev={{}} />}
+          icon={<HomeOutlined />}
           type="text"
           onClick={() => onClick(APP_ROUTES.AUTH.MAIN.path)}
         />
@@ -29,16 +29,16 @@ const BottomMenu = () => {
           className={`${pathname.includes(APP_ROUTES.PUBLIC.PRODUCTS.path) ? 'active' : ''}`}
           size="large"
           shape="round"
-          icon={<BarcodeOutlined rev={{}} />}
+          icon={<BarcodeOutlined />}
           type="text"
           onClick={() => onClick(APP_ROUTES.PUBLIC.PRODUCTS.path)}
         />
       </Tooltip>
       <Tooltip title="Carrito">
-        <Button size="large" shape="round" icon={<ShoppingCartOutlined rev={{}} />} type="text" />
+        <Button size="large" shape="round" icon={<ShoppingCartOutlined />} type="text" />
       </Tooltip>
       <Tooltip title="Perfil">
-        <Button size="large" shape="round" icon={<UserOutlined rev={{}} />} type="text" />
+        <Button size="large" shape="round" icon={<UserOutlined />} type="text" />
       </Tooltip>
     </BottomMenuRoot>
   );

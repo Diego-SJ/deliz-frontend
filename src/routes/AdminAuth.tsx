@@ -7,8 +7,8 @@ const AdminAuth = ({ children }: { children: JSX.Element }) => {
   const { user_auth } = useAppSelector(({ users }) => users);
   const location = useLocation();
 
-  if (!user_auth?.user?.id && location?.pathname !== ADMIN_PATH) return <Navigate to={ADMIN_PATH} replace />;
-  else if (!!user_auth?.user?.id && location?.pathname === ADMIN_PATH)
+  if (!user_auth?.authenticated && location?.pathname !== ADMIN_PATH) return <Navigate to={ADMIN_PATH} replace />;
+  else if (user_auth?.authenticated && location?.pathname === ADMIN_PATH)
     return <Navigate to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} replace />;
   return children;
 };

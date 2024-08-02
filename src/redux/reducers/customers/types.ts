@@ -1,6 +1,6 @@
 export type CustomersSlice = {
   customers: Customer[];
-  current_customer: Customer;
+  current_customer: Partial<Customer>;
   loading: boolean;
 };
 
@@ -12,4 +12,5 @@ export type Customer = {
   created_at?: Date | string;
   phone?: string;
   email?: string;
+  company_id: string;
 };

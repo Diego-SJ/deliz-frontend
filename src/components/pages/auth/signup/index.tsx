@@ -29,7 +29,7 @@ const SignUp = () => {
           >
             <Typography.Title level={2}>Bienvenido a Ecommerce</Typography.Title>
             <Form.Item>
-              <Button size="large" icon={<GoogleOutlined rev={{}} />}>
+              <Button size="large" icon={<GoogleOutlined />}>
                 Registrate con Google
               </Button>
             </Form.Item>

@@ -108,7 +108,7 @@ const NumberKeyboard = ({ onChange, withDot = false, value = 0 }: NumberKeyboard
         </Button>
       </CardBtn>
       <CardBtn span={8}>
-        <Button {...buttonProps} onClick={onDelete} icon={<DoubleLeftOutlined rev={{}} />} />
+        <Button {...buttonProps} onClick={onDelete} icon={<DoubleLeftOutlined />} />
       </CardBtn>
     </Row>
   );

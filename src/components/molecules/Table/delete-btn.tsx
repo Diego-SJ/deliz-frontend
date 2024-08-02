@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Col, Modal, Row, Tooltip } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '@/hooks/useStore';
 
@@ -38,30 +38,28 @@ const DeleteButton: React.FC<Props> = ({ title, content, deleteFunction, editFun
 
   return (
     <>
-      <Row gutter={[10, 10]}>
-        <Col>
-          <Tooltip title="Eliminar">
-            <Button onClick={() => showModal('delete')}>
-              <DeleteOutlined rev={{}} />
+      <div className="flex gap-3 justify-center">
+        <Tooltip title="Eliminar">
+          <Button onClick={() => showModal('delete')}>
+            <DeleteOutlined />
+          </Button>
+        </Tooltip>
+        {(editFunction || onEdit) && (
+          <Tooltip title="Editar">
+            <Button onClick={handleEdit}>
+              <EditOutlined />
             </Button>
           </Tooltip>
-        </Col>
-        {(editFunction || onEdit) && (
-          <Col>
-            <Tooltip title="Editar">
-              <Button onClick={handleEdit}>
-                <EditOutlined rev={{}} />
-              </Button>
-            </Tooltip>
-          </Col>
         )}
-      </Row>
+      </div>
+
       <Modal
         title={title || 'Eliminar elemento'}
         open={!!modalStatus}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        okType="danger"
         okText={confirmLoading ? 'Guardando...' : 'Confirmar'}
         cancelText="Cancelar"
         width={350}

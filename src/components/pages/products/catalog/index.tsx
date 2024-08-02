@@ -100,7 +100,7 @@ const ProductsCatalog = () => {
                     size="large"
                     shape="circle"
                     type="primary"
-                    icon={<ShoppingCartOutlined rev={{}} />}
+                    icon={<ShoppingCartOutlined />}
                     onClick={() => addProductToCart(p)}
                   ></Button>
                 </ProductCard>

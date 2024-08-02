@@ -19,7 +19,7 @@ const customers = createSlice({
     setCustomers(state, action: PayloadAction<Customer[]>) {
       state.customers = action.payload;
     },
-    setCurrentCustomer(state, action: PayloadAction<Customer>) {
+    setCurrentCustomer(state, action: PayloadAction<Partial<Customer>>) {
       state.current_customer = action.payload;
     },
   },

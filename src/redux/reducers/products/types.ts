@@ -12,6 +12,7 @@ export type ProductsSlice = {
 
 export type Product = {
   key?: number;
+
   product_id: number;
   name: string;
   description?: string;
@@ -21,11 +22,37 @@ export type Product = {
   category_id: number;
   retail_price: number;
   wholesale_price: number;
-  image_url?: string;
+  image_url?: string | null;
   unit_id?: number;
   size_id?: number;
   code?: string;
+
+  // relations
   categories?: Category;
+  sizes?: Size;
+  units?: Unit;
+
+  // new columns
+  raw_price?: number;
+  inventory?: Inventory;
+  price_list?: PriceList;
+};
+
+export type Inventory = {
+  [key: string]: {
+    branch_id: string;
+    stock: number;
+    min_stock?: number;
+    max_stock?: number;
+  };
+};
+
+export type PriceList = {
+  [key: string]: {
+    price_id: string;
+    unit_price: number;
+    is_default: boolean;
+  };
 };
 
 export type Category = {

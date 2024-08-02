@@ -26,8 +26,9 @@ export const APP_ROUTES = {
         UNITS: { path: '/app/products/units' },
       },
       PRODUCT_EDITOR: {
-        path: '/app/products/:action',
-        hash: (_: TemplateStringsArray, action: 'edit' | 'add') => `/app/products/${action}`,
+        path: '/app/products/:action/:product_id',
+        hash: (_: TemplateStringsArray, action: 'edit' | 'add', product_id?: number) =>
+          `/app/products/${action}/${product_id || 'new'}`,
         title: 'Editar producto',
       },
       PRODUCTS_ID: { path: (_: TemplateStringsArray, id: number) => `/app/products/${id}`, title: 'Productos' },
@@ -42,12 +43,12 @@ export const APP_ROUTES = {
         path: '/app/transactions',
         title: 'Cierre de ventas',
         OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
-        CASHIERS: { path: '/app/transactions/cashiers' },
+        CASHIERS: { path: '/app/transactions/cashiers', title: 'Cortes de caja' },
         CASHIER_DETAIL: {
-          path: '/app/transactions/cashiers/:cashier_id',
-          hash: (_: TemplateStringsArray, cashier_id: number) => `/app/transactions/cashiers/${cashier_id}`,
+          path: '/app/transactions/cashiers/:cash_cut_id',
+          hash: (_: TemplateStringsArray, cash_cut_id: string) => `/app/transactions/cashiers/${cash_cut_id}`,
         },
-        CURRENT_CASHIER: { path: '/app/transactions/current-cashier' },
+        CURRENT_CASHIER: { path: '/app/transactions/current-cashier', title: 'Caja registradora' },
       },
       ORDERS: {
         path: '/app/orders',
@@ -57,7 +58,40 @@ export const APP_ROUTES = {
       },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes', PRODUCTS: { path: '/app/reports/products' } },
-      SETTINGS: { path: '/app/settings', title: 'Configuración' },
+      SETTINGS: {
+        path: '/app/settings',
+        title: 'Configuración',
+        USERS: {
+          path: '/app/settings/users',
+          ADD: { path: '/app/settings/users/add' },
+          EDIT: {
+            path: '/app/settings/users/edit/:profile_id',
+            hash: (_: TemplateStringsArray, user_id: string) => `/app/settings/users/edit/${user_id}`,
+          },
+        },
+        GENERAL: { path: '/app/settings' },
+        BRANCHES: {
+          path: '/app/settings/branches',
+          ADD: {
+            path: '/app/settings/branches/add',
+          },
+          EDIT: {
+            path: '/app/settings/branches/edit/:branch_id',
+            hash: (_: TemplateStringsArray, branch_id: string) => `/app/settings/branches/edit/${branch_id}`,
+          },
+        },
+        CASH_REGISTERS: {
+          path: '/app/settings/cash-registers',
+        },
+        PRICES_LIST: { path: '/app/settings/prices-list' },
+        CATEGORIES: { path: '/app/settings/categories' },
+        SIZES: {
+          path: '/app/settings/sizes',
+        },
+        UNITS: {
+          path: '/app/settings/units',
+        },
+      },
     },
   },
 };

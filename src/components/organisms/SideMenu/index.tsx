@@ -5,65 +5,44 @@ import {
   ShoppingOutlined,
   TeamOutlined,
   ExclamationCircleOutlined,
-  BarChartOutlined,
-  BarcodeOutlined,
-  PieChartOutlined,
   SettingOutlined,
+  PlusCircleOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
-import DelizLogo from '@/assets/img/webp/logo-deliz.webp';
-import { Modal } from 'antd';
+import DelizLogo from '@/assets/img/webp/deliz-logo-bn.webp';
+import { Button, Modal, Tooltip } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import CashRegisterSvg from '@/assets/img/jsx/cashier-menu';
 
 type SideMenuProps = {
   onClick?: () => void;
 };
 
 const ITEM_LIST = [
+  // {
+  //   key: 'point_of_sale',
+  //   icon: BarcodeOutlined,
+  //   label: 'Punto de venta',
+  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
+  // },
   {
     key: 'dashboard',
     icon: HomeOutlined,
-    label: 'Dashboard',
+    label: 'Inicio',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
-  {
-    key: 'point_of_sale',
-    icon: BarcodeOutlined,
-    label: 'Punto de venta',
-    path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
-  },
+
   {
     key: 'products',
     icon: ShoppingOutlined,
     label: 'Productos',
-    children: [
-      {
-        key: 'products.list',
-        label: 'Productos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
-      },
-      {
-        key: 'products.categories',
-        label: 'Categorias',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.CATEGORIES.path,
-      },
-      {
-        key: 'products.size',
-        label: 'Tamaños',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path,
-      },
-      {
-        key: 'products.units',
-        label: 'Unidades de medida',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path,
-      },
-    ],
+    path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
   },
   {
     key: 'customers',
@@ -75,22 +54,23 @@ const ITEM_LIST = [
     key: 'sales',
     icon: DollarOutlined,
     label: 'Ventas',
-    children: [
-      {
-        key: 'sales.orders',
-        label: 'Pedidos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
-      },
-      {
-        key: 'sales.main',
-        label: 'Ventas',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
-      },
-    ],
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+    // children: [
+    //   // {
+    //   //   key: 'sales.orders',
+    //   //   label: 'Pedidos',
+    //   //   path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
+    //   // },
+    //   {
+    //     key: 'sales.main',
+    //     label: 'Ventas',
+    //     path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+    //   },
+    // ],
   },
   {
-    key: 'transactions',
-    icon: BarChartOutlined,
+    key: 'cashiers',
+    icon: CashRegisterSvg,
     label: 'Cajas',
     children: [
       {
@@ -100,16 +80,33 @@ const ITEM_LIST = [
       },
       {
         key: 'transactions.cashiers',
-        label: 'Cajas',
+        label: 'Historial de cajas',
         path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
       },
     ],
   },
+  // {
+  //   key: 'expenses',
+  //   icon: BarChartOutlined,
+  //   label: 'Compras y Gastos',
+  //   children: [
+  //     {
+  //       key: 'expenses.expenses',
+  //       label: 'Gastos',
+  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+  //     },
+  //     {
+  //       key: 'expenses.purchases',
+  //       label: 'Compras',
+  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+  //     },
+  //   ],
+  // },
   {
     key: 'settings',
     icon: SettingOutlined,
     label: 'Configuración',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path,
+    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path,
   },
 ];
 
@@ -120,13 +117,6 @@ const SALES_ACTIONS = [
     label: 'Dashboard',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
-  // {
-  //   key: 'point_of_sale',
-  //   icon: BarcodeOutlined,
-  //   label: 'Punto de venta',
-  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
-  // },
-
   {
     key: 'customers',
     icon: TeamOutlined,
@@ -142,22 +132,15 @@ const SALES_ACTIONS = [
 ];
 
 const SideMenu = (props: SideMenuProps) => {
-  const location = useLocation();
   const { isTablet, isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [currentKey, setCurrentKey] = useState(0);
+  const location = useLocation();
   const { user_auth } = useAppSelector(({ users }) => users);
+  const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
   const [currentItems, setCurrentItems] = useState<any[]>([]);
-  const isSales = user_auth?.user?.email === 'sales@deliz.com';
-
-  useEffect(() => {
-    const key = currentItems.findIndex(item => {
-      return location.pathname.includes(item?.path || '');
-    });
-    setCurrentKey(key || 0);
-  }, [location.pathname, currentItems]);
+  const isSales = user_auth?.profile?.role === 'SALES';
 
   useEffect(() => {
     if (isSales) setCurrentItems(SALES_ACTIONS);
@@ -167,7 +150,7 @@ const SideMenu = (props: SideMenuProps) => {
   const handleLogout = () => {
     modal.confirm({
       title: 'Cerrar sesión',
-      icon: <ExclamationCircleOutlined rev={{}} />,
+      icon: <ExclamationCircleOutlined />,
       content: 'Tu sesión será finalizada ¿deseas continuar?',
       okText: 'Continuar',
       cancelText: 'Cancelar',
@@ -177,22 +160,40 @@ const SideMenu = (props: SideMenuProps) => {
     });
   };
 
-  const handlePathChange = (path?: string) => {
+  const handlePathChange = (path: string) => {
     if (path) navigate(path);
     if (props?.onClick) props.onClick();
   };
 
   return (
     <>
-      <Logo src={DelizLogo} title="D'eliz" />
+      <Logo src={!!company?.logo_url ? company.logo_url : DelizLogo} title="D'eliz" />
+
+      <div className="flex px-4 mt-10 mb-6">
+        <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
+          <Button
+            size="large"
+            className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
+            icon={<PlusCircleOutlined />}
+            onClick={() => {
+              handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
+            }}
+          >
+            {isPhablet && !isTablet ? '' : 'Nueva venta'}
+          </Button>
+        </Tooltip>
+      </div>
+
       <MenuRoot
-        selectedKeys={[`${currentKey}`]}
+        theme={'dark' as any}
         mode="inline"
+        className="mb-10"
         inlineCollapsed={isPhablet && !isTablet}
         items={currentItems.map((item, key) => ({
           key,
           icon: React.createElement(item.icon),
           label: item.label,
+          className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
           onClick: () => handlePathChange(item?.path),
           children: item?.children?.length
             ? item.children.map((subItem: any) => ({
@@ -201,11 +202,14 @@ const SideMenu = (props: SideMenuProps) => {
               }))
             : null,
         }))}
+        style={{ borderInlineEnd: 'none' }}
       />
       <MenuRoot
         className="bottom"
         mode="inline"
-        inlineCollapsed={isPhablet}
+        theme={'dark' as any}
+        style={{ borderInlineEnd: 'none' }}
+        inlineCollapsed={isPhablet && !isTablet}
         items={[
           {
             key: 1,

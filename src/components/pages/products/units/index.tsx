@@ -1,64 +1,19 @@
-import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
-import { Size, Unit } from '@/redux/reducers/products/types';
-import functions from '@/utils/functions';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Drawer, Input, Row, Tag } from 'antd';
-import { ColumnsType } from 'antd/es/table';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Table from '@/components/molecules/Table';
-import DeleteButton from '@/components/molecules/Table/delete-btn';
+import { Unit } from '@/redux/reducers/products/types';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Drawer, List, Tag, Typography } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import SizeEditor from './editor';
+import ActionTableButtons from '@/components/molecules/Table/action-table-btns';
+import BreadcrumbSettings from '../../settings/menu/breadcrumb';
 
-type DataType = Unit;
-
-const columns: ColumnsType<DataType> = [
-  {
-    title: '',
-    dataIndex: 'name',
-    width: 55,
-    render: value => <Avatar size="large">{value.substring(0, 2)}</Avatar>,
-  },
-  {
-    title: 'Nombre',
-    dataIndex: 'name',
-    render: text => <p style={{ fontWeight: 'bold' }}>{text}</p>,
-  },
-  {
-    title: 'Abreviación',
-    dataIndex: 'short_name',
-    render: text => <Tag color="blue">{text}</Tag>,
-  },
-  {
-    title: 'Descripción',
-    dataIndex: 'description',
-    render: value => <span>{value || '- - -'}</span>,
-  },
-  {
-    title: 'Fecha creación',
-    dataIndex: 'created_at',
-    render: created_at => {
-      const date = functions.tableDate(created_at);
-      return <span>{date}</span>;
-    },
-  },
-  {
-    title: 'Acciones',
-    dataIndex: 'unit_id',
-    render: (id: number, record) => {
-      return <DeleteButton deleteFunction={productActions.units.delete(id)} editFunction={productActions.units.edit(record)} />;
-    },
-  },
-];
-
-const ProductSizes = () => {
+const ProductUnitsPage = () => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { units } = useAppSelector(({ products }) => products);
-  const [options, setOptions] = useState<Size[]>([]);
+  const [options, setOptions] = useState<Unit[]>([]);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -77,83 +32,70 @@ const ProductSizes = () => {
     dispatch(productActions.setUnit({ drawer: 'new' }));
   };
 
-  const getPanelValue = useCallback(
-    ({ searchText }: { searchText?: string }) => {
-      let _options = units?.data?.filter(item => {
-        return functions.includes(item.name, searchText) || functions.includes(item.description, searchText);
-      });
-      setOptions(_options || []);
-    },
-    [units?.data],
-  );
-
-  const onRefresh = () => {
-    dispatch(productActions.sizes.get({ refetch: true }));
-  };
-
   const onClose = () => {
     dispatch(productActions.setUnit({ selected: {} as Unit, drawer: null }));
   };
 
   return (
-    <div>
-      <Row justify="space-between" align="middle">
-        <Col span={8} xs={24}>
-          <Breadcrumb
-            items={[
-              {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
-                key: 'dashboard',
-              },
-              {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path}>Productos</Link>,
-                key: 'products',
-              },
-              { title: 'Unidades de medida' },
-            ]}
-          />
-        </Col>
-      </Row>
-      <Row style={{ marginTop: '10px' }}>
-        <Col span={24}>
-          <Row gutter={[10, 10]} style={{ marginBottom: 20 }}>
-            <Col lg={6} xs={24}>
-              <Input
-                placeholder="Buscar elemento"
-                style={{ width: '100%' }}
-                allowClear
-                onChange={({ target }) => getPanelValue({ searchText: target.value })}
-                prefix={<SearchOutlined rev={{}} />}
-              />
-            </Col>
-            <Col lg={{ span: 6, offset: 12 }} xs={{ offset: 0, span: 24 }}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
-                Nuevo
+    <div className="p-4 max-w-[730px] w-full mx-auto">
+      <BreadcrumbSettings items={[{ label: 'Unidades' }]} />
+
+      <div className="flex flex-col mb-0 w-full">
+        <Typography.Title level={4}>Unidades de medida</Typography.Title>
+
+        <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
+          <Typography.Text type="secondary">Administra las unidades de medida que tendrán tus productos</Typography.Text>
+
+          <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+            Agregar nuevo
+          </Button>
+        </div>
+      </div>
+
+      <Card style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Unidades" className="shadow-md rounded-xl">
+        <List
+          itemLayout="horizontal"
+          footer={
+            <div className="px-2">
+              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
+                Agregar nuevo
               </Button>
-            </Col>
-          </Row>
-          <Table
-            size="small"
-            scroll={{ y: 'calc(100vh - 300px)', x: 700 }}
-            columns={columns}
-            onRefresh={onRefresh}
-            totalItems={units?.data?.length}
-            dataSource={options}
-          />
-          <Drawer
-            title={units?.drawer === 'edit' ? 'Editar unidad' : 'Agregar nueva unidad'}
-            width={isTablet ? 350 : 420}
-            onClose={onClose}
-            open={!!units?.drawer}
-            styles={{ body: { paddingBottom: 80 } }}
-            destroyOnClose
-          >
-            <SizeEditor onSuccess={onClose} />
-          </Drawer>
-        </Col>
-      </Row>
+            </div>
+          }
+          className="px-0"
+          dataSource={options}
+          renderItem={item => (
+            <List.Item
+              styles={{ actions: { paddingRight: 15, margin: 0 } }}
+              classNames={{ actions: 'flex' }}
+              className="flex"
+              actions={[
+                <ActionTableButtons
+                  deleteFunction={productActions.units.delete(item.unit_id as number)}
+                  editFunction={productActions.units.edit(item)}
+                />,
+              ]}
+            >
+              <div className="pl-4 md:pl-6 flex gap-4">
+                <Typography.Text>{item.name}</Typography.Text>
+                <Tag>{item.short_name}</Tag>
+              </div>
+            </List.Item>
+          )}
+        />
+      </Card>
+      <Drawer
+        title={units?.drawer === 'edit' ? 'Editar unidad' : 'Agregar nueva unidad'}
+        width={isTablet ? 350 : 420}
+        onClose={onClose}
+        open={!!units?.drawer}
+        styles={{ body: { paddingBottom: 80 } }}
+        destroyOnClose
+      >
+        <SizeEditor onSuccess={onClose} />
+      </Drawer>
     </div>
   );
 };
 
-export default ProductSizes;
+export default ProductUnitsPage;

@@ -14,7 +14,6 @@ export const LayoutSider = styled(Sider)`
     min-height: 100vh;
     max-height: 100vh;
     overflow: auto;
-    background: ${({ theme }) => theme.colors.background.primary};
   }
 `;
 
@@ -28,7 +27,8 @@ export const LayoutContainer = styled(Layout)`
 export const LayoutContent = styled(Layout)`
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 0px;
   max-height: calc(100dvh - 64px);
+  min-height: calc(100dvh - 64px);
   overflow-y: auto;
 `;

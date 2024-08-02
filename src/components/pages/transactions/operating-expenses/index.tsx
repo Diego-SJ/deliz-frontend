@@ -157,11 +157,11 @@ const OperatingExpenses = () => {
                 style={{ width: '100%' }}
                 allowClear
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
-                prefix={<SearchOutlined rev={{}} />}
+                prefix={<SearchOutlined />}
               />
             </Col>
             <Col lg={{ span: 6, offset: 12 }} xs={{ offset: 0, span: 24 }}>
-              <Button block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+              <Button block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
                 Nuevo gasto
               </Button>
             </Col>

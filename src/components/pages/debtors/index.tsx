@@ -182,7 +182,7 @@ const DebtorsClients = () => {
                 />
               </Col>
               <Col lg={{ span: 6, offset: 0 }} xs={{ offset: 0, span: 12 }}>
-                <Button size="large" block type="primary" icon={<PlusOutlined rev={{}} />} onClick={onAddNew}>
+                <Button size="large" block type="primary" icon={<PlusOutlined />} onClick={onAddNew}>
                   Nueva
                 </Button>
               </Col>
@@ -202,7 +202,7 @@ const DebtorsClients = () => {
               <Row>
                 <Col span={6}>
                   <Tooltip title="Recargar">
-                    <Button size="large" type="primary" icon={<ReloadOutlined rev={{}} />} onClick={onRefresh}>
+                    <Button size="large" type="primary" icon={<ReloadOutlined />} onClick={onRefresh}>
                       Recargar
                     </Button>
                   </Tooltip>

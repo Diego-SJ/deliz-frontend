@@ -16,61 +16,59 @@ import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
-import { STATUS_OBJ } from '@/constants/status';
 import { Product } from '../products/types';
-import INITIAL_STATE from '@/constants/initial-states';
 import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
+import { cashiersActions } from '../cashiers';
+import { productHelpers } from '@/utils/products';
+import { STATUS_DATA } from '@/constants/status';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    try {
-      let salesList: SaleDetails[] = getState().sales.sales || [];
+    let salesList: SaleDetails[] = getState().sales.sales || [];
+    const company_id = getState().app.company.company_id;
 
-      if (!salesList.length || args?.refetch) {
-        dispatch(salesActions.setLoading(true));
-        const { data, error } = await supabase.from('sales').select(`
-          *,
-          customers ( * ),
-          status ( status_id, name )
-        `);
+    if (!salesList.length || args?.refetch) {
+      dispatch(salesActions.setLoading(true));
+      const { data, error } = await supabase
+        .from('sales')
+        .select(`*,customers ( * ), status ( status_id, name )`)
+        .in('status_id', [STATUS_DATA.COMPLETED.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
+        .eq('company_id', company_id)
+        .order('created_at', { ascending: false });
 
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo cargar la lista de ventas');
-          return false;
-        }
-
-        salesList = data?.map(item => ({ ...item, key: item?.sale_id } as SaleDetails)) || [];
-        salesList = salesList?.sort((a, b) => Number(new Date(b?.created_at)) - Number(new Date(a?.created_at)));
-
-        dispatch(salesActions.setSales(salesList as SaleDetails[]));
-        return true;
-      }
-    } catch (error) {
       dispatch(salesActions.setLoading(false));
-      return false;
+
+      if (error) {
+        message.error('No se pudo cargar la lista de ventas');
+        return false;
+      }
+
+      salesList = data as SaleDetails[];
+
+      dispatch(salesActions.setSales(salesList));
+      return true;
     }
   },
-  getSaleById: (args?: { sale_id?: number; refetch?: boolean }) => async (dispatch: AppDispatch, getState: AppState) => {
+  getSaleById: (args?: { sale_id?: number } & FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       const sale = getState().sales.current_sale;
 
       if (!sale.items?.length || args?.refetch) {
-        dispatch(salesActions.setLoading(true));
+        dispatch(salesActions.setLoading(args?.startLoading ?? true));
         const { data, error } = await supabase
           .from('sale_detail')
           .select('*, products (*, categories (*))')
-          .eq('sale_id', args?.sale_id);
+          .eq('sale_id', args?.sale_id)
+          .order('created_at', { ascending: false });
 
         const { data: metadata } = await supabase
           .from('sales')
-          .select('*, customers (*), status (status_id, name)')
+          .select('*, customers (*), status (status_id, name), branches (*), cash_registers (*)')
           .eq('sale_id', args?.sale_id);
 
         let items: SaleItem[] =
-          data?.map((item, key) => {
+          data?.map(item => {
             let product = { ...item?.products };
             if (item?.product_id === 0) {
               product = {
@@ -79,7 +77,7 @@ const customActions = {
                 categories: { ...product?.categories, name: 'Item extra' },
               } as Product;
             }
-            return { ...item, key, products: product } as SaleItem;
+            return { ...item, products: product } as SaleItem;
           }) || [];
 
         dispatch(salesActions.setCurrentSale({ items, metadata: metadata?.length ? (metadata[0] as SaleDetails) : undefined }));
@@ -101,10 +99,10 @@ const customActions = {
     const { error } = await supabase.rpc('add_sale_item', {
       p_metadata: item.metadata || {},
       p_price: item?.price,
-      p_product_id: item.product_id,
+      p_product_id: item.product_id || null,
       p_quantity: item.quantity,
       p_sale_id: item.sale_id,
-      p_wholesale: item.wholesale,
+      p_wholesale: !!item.wholesale,
     });
 
     if (error) {
@@ -115,57 +113,54 @@ const customActions = {
     await dispatch(salesActions.getSaleById({ refetch: true, sale_id: item.sale_id }));
   },
   createSale:
-    (sale: Sale) =>
+    (sale: Partial<Sale>) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<Sale | null> => {
       try {
         dispatch(salesActions.setLoading(true));
         const state = getState().sales;
-        let activeCashier = await dispatch(salesActions.cashiers.getActiveCashier());
+        let { currentCashRegister, currentBranch } = getState().branches;
+        let activeCashCut = getState()?.cashiers?.active_cash_cut;
+        let { company_id } = getState().app.company;
         let newSale: Sale = {
           ...sale,
           customer_id: state.cash_register.customer_id as number,
           discount: state.cash_register.discount,
           discount_type: state.cash_register.discountType,
           shipping: state.cash_register.shipping,
-          cashier_id: activeCashier?.cashier_id,
+          cash_register_id: currentCashRegister?.cash_register_id!,
+          branch_id: currentBranch?.branch_id!,
+          company_id,
+          cash_cut_id: activeCashCut?.cash_cut_id || null,
         };
 
-        const { data, error } = await supabase.from('sales').insert(newSale).select();
+        const { data, error } = await supabase.from('sales').insert(newSale).select()?.single();
         dispatch(salesActions.setLoading(false));
 
         if (error) {
           message.error('No se pudo registrar la venta');
           return null;
         }
-        message.success('Registrando venta', 2);
-        return data[0] as Sale;
+
+        return data as Sale;
       } catch (error) {
         dispatch(salesActions.setLoading(false));
         return null;
       }
     },
-  upsertSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
+  upsertSale: (item: Partial<Sale>) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
-      let newItem = { ...item, updated_at: new Date() };
-      delete newItem.key;
+      const { error } = await supabase
+        .from('sales')
+        .upsert({ ...item, updated_at: new Date() })
+        .eq('sale_id', item.sale_id)
+        .single();
 
-      const result = await supabase.from('sales').upsert(newItem).eq('sale_id', newItem.sale_id);
-
-      if (result.error) {
+      if (error) {
         message.error('No se pudo actualizar la información.', 4);
         return false;
       }
 
-      const { current_sale } = getState()?.sales;
-
-      let newMetadata = {
-        ...current_sale.metadata,
-        ...(newItem as SaleDetails),
-        status: { status_id: item.status_id as number, name: STATUS_OBJ[item.status_id as number].name },
-      };
-      await dispatch(salesActions.setCurrentSale({ metadata: newMetadata }));
-      await dispatch(salesActions.fetchSales({ refetch: true }));
-
+      await dispatch(salesActions.getSaleById({ refetch: true, sale_id: item.sale_id, startLoading: false }));
       message.success('¡Venta actualizada!', 4);
       return true;
     } catch (error) {
@@ -203,7 +198,7 @@ const customActions = {
   restProductsStock: async (products: SaleItem[]) => {
     let _products = products?.filter(p => p?.product_id !== 0);
     for (let p of _products) {
-      const { data, error } = await supabase.rpc('reduce_product_quantity', {
+      await supabase.rpc('reduce_product_quantity', {
         p_id: p.product_id,
         p_quantity: p.quantity,
       });
@@ -213,17 +208,19 @@ const customActions = {
     (sale: Sale) =>
     async (dispatch: AppDispatch, getState: AppState): Promise<boolean> => {
       try {
-        message.info('Registrando productos...', 2);
         const state = getState().sales.cash_register.items || [];
 
         let saleItems: SaleItem[] = state.map(item => {
           return {
             sale_id: sale.sale_id,
-            price: item.wholesale_price ? item.product.wholesale_price : item.product.retail_price,
-            product_id: item.product.product_id,
+            price: item.price,
+            product_id: item.product?.product_id || null,
             quantity: item.quantity,
-            wholesale: item.wholesale_price,
-            metadata: item?.product?.product_id === 0 ? { name: item?.product?.name } : {},
+            wholesale: null,
+            metadata: {
+              price_type: item.price_type,
+              product_name: item.product?.name,
+            },
           } as SaleItem;
         });
 
@@ -249,7 +246,6 @@ const customActions = {
     try {
       let newItem = { ...item };
       delete newItem.products;
-      delete newItem.key;
 
       const result = await supabase.rpc('update_product_in_sale', {
         p_new_price: newItem?.price,
@@ -310,7 +306,8 @@ const customActions = {
     }
   },
   cashRegister: {
-    reset: () => async (dispatch: AppDispatch) => {
+    reset: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const { branch_id, price_id } = getState().sales.cash_register;
       const defaultCashRegisterValues: CashRegister = {
         items: [],
         discount: 0,
@@ -318,26 +315,59 @@ const customActions = {
         discountType: 'AMOUNT',
         shipping: 0,
         status: 5,
-        customer_id: INITIAL_STATE.customerId,
+        branch_id: branch_id || null,
+        price_id: price_id || null,
+        customer_id: null,
       };
       dispatch(salesActions.updateCashRegister(defaultCashRegisterValues));
     },
-    add: (newItem: CashRegisterItem) => async (dispatch: AppDispatch, getState: AppState) => {
-      const customer_id = getState().sales.cash_register?.customer_id as number;
+    add: (newItem: Partial<CashRegisterItem>) => async (dispatch: AppDispatch, getState: AppState) => {
+      const { customer_id = null, price_id = null } = getState().sales.cash_register;
+      const price = productHelpers.getProductPrice(newItem.product as Product, price_id);
+      let currentItems = [...(getState().sales.cash_register?.items || [])];
 
-      let items = [...(getState().sales.cash_register?.items ?? []), { ...newItem, key: uuidv4(), customer_id }].filter(Boolean);
-      dispatch(salesActions.updateCashRegister({ items }));
+      let newItemData: CashRegisterItem = {
+        id: uuidv4(),
+        customer_id,
+        price,
+        product: newItem.product as Product,
+        quantity: newItem.quantity || 1,
+        price_type: newItem.price_type || 'DEFAULT',
+      };
+
+      const itemDefaultExists = currentItems.findIndex(item => {
+        return item.product?.product_id === newItem.product?.product_id && item.price_type === 'DEFAULT';
+      });
+
+      if (itemDefaultExists >= 0) {
+        newItemData.quantity = currentItems[itemDefaultExists].quantity + newItemData.quantity;
+        currentItems.splice(itemDefaultExists, 1);
+      }
+
+      currentItems.push(newItemData);
+
+      dispatch(salesActions.updateCashRegister({ items: currentItems }));
     },
-    remove: (key: string) => async (dispatch: AppDispatch, getState: AppState) => {
+    remove: (id: string) => async (dispatch: AppDispatch, getState: AppState) => {
       let items = getState().sales.cash_register?.items ?? [];
-      items = items.filter(item => item.key !== key);
+      items = items.filter(item => item.id !== id);
       dispatch(salesActions.updateCashRegister({ items }));
     },
-    update: (newItem: CashRegisterItem) => async (dispatch: AppDispatch, getState: AppState) => {
-      let items = [...(getState().sales.cash_register?.items ?? [])]?.filter(Boolean);
-      let index = items.findIndex(item => item.key === newItem.key);
-      items.splice(index, 1, { ...newItem });
+    update: (newItem: Partial<CashRegisterItem>) => async (dispatch: AppDispatch, getState: AppState) => {
+      let items = [...(getState().sales.cash_register?.items ?? [])];
+      let index = items.findIndex(item => item.id === newItem.id);
+      items.splice(index, 1, { ...(newItem as CashRegisterItem) });
       dispatch(salesActions.updateCashRegister({ items }));
+    },
+    changePrice: (price_id: string | null) => async (dispatch: AppDispatch, getState: AppState) => {
+      let items = [...(getState().sales.cash_register?.items ?? [])];
+
+      items = items.map(item => {
+        let price = productHelpers.getProductPrice(item.product as Product, price_id);
+        return { ...item, price, price_type: 'DEFAULT' };
+      });
+
+      dispatch(salesActions.updateCashRegister({ items, price_id: price_id }));
     },
     applyShipping: (shipping: number) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.updateCashRegister({ shipping }));
@@ -345,7 +375,7 @@ const customActions = {
     applyDiscount: (discount: number, discountType: DiscountType) => async (dispatch: AppDispatch, getState: AppState) => {
       let items = [...(getState().sales.cash_register?.items ?? [])]?.filter(Boolean);
       let subtotal = items?.reduce((total, item) => {
-        let productPrice = item.wholesale_price ? item.product.wholesale_price : item.product.retail_price;
+        let productPrice = item.price;
         productPrice = productPrice * item.quantity;
         return productPrice + total;
       }, 0);
@@ -359,7 +389,7 @@ const customActions = {
 
       dispatch(salesActions.updateCashRegister({ discount, discountType, discountMoney }));
     },
-    setCustomerId: (customer_id: number) => async (dispatch: AppDispatch) => {
+    setCustomerId: (customer_id: number | null) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.updateCashRegister({ customer_id }));
     },
   },
@@ -506,155 +536,6 @@ const customActions = {
     edit: (expense: OperatingExpense) => async (dispatch: AppDispatch) => {
       dispatch(salesActions.setExpense({ selected: expense, drawer: 'edit' }));
     },
-  },
-  cashiers: {
-    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        let cashiers = getState()?.sales?.cashiers;
-
-        if (!!cashiers?.data?.length && !args?.refetch) return true;
-
-        dispatch(salesActions.setLoading(true));
-        let { data: result, error } = await supabase.from('cashiers').select('*'); //.range(0, 9);
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo cargar esta información', 4);
-          return false;
-        }
-
-        let data = result?.map(item => ({ ...item, key: item.cashier_id as number } as Cashier)) ?? [];
-        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
-        let activeCashier = (result as Cashier[])?.filter(item => !!item?.is_open)[0] || null;
-
-        dispatch(salesActions.setCashiers({ data, activeCashier }));
-        return data;
-      } catch (error) {
-        dispatch(salesActions.setLoading(false));
-        return false;
-      }
-    },
-    add: (cashier: Cashier) => async (dispatch: AppDispatch) => {
-      try {
-        dispatch(salesActions.setLoading(true));
-        const { data, error } = await supabase
-          .from('cashiers')
-          .insert([
-            {
-              name: cashier?.name || '',
-              initial_amount: cashier.initial_amount || 0,
-              final_amount: cashier.final_amount,
-              close_date: null,
-              is_open: true,
-              branch_id: '81a16d60-40a5-4dba-a3c1-bc9372240bae',
-            },
-          ])
-          .select();
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo guardar el registro.', 4);
-          return false;
-        }
-
-        dispatch(salesActions.setCashiers({ activeCashier: data[0] as Cashier }));
-        await dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Registro agregado', 4);
-        return true;
-      } catch (error) {
-        dispatch(salesActions.setLoading(false));
-        return false;
-      }
-    },
-    delete: (cashier_id: number) => async (dispatch: AppDispatch) => {
-      try {
-        dispatch(salesActions.setLoading(true));
-        const { error } = await supabase.from('cashiers').delete().eq('cashier_id', cashier_id);
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error(`No se pudo eliminar este elemento: ${error.message}`);
-          return false;
-        }
-
-        dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Elemento eliminado');
-      } catch (error) {
-        message.error('No se pudo eliminar este elemento');
-        dispatch(salesActions.setLoading(false));
-        return false;
-      }
-    },
-    update: (cashier: Cashier) => async (dispatch: AppDispatch) => {
-      try {
-        dispatch(salesActions.setLoading(true));
-        const { error } = await supabase
-          .from('cashiers')
-          .update({ ...cashier, received_amount: cashier.received_amount })
-          .eq('cashier_id', cashier.cashier_id);
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo actualizar el registro.', 4);
-          return false;
-        }
-
-        await dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Registro actualizado', 4);
-        return true;
-      } catch (error) {
-        message.error('No se pudo actualizar el registro.', 4);
-        dispatch(salesActions.setLoading(false));
-        return false;
-      }
-    },
-    edit: (cashier: Cashier) => async (dispatch: AppDispatch) => {
-      dispatch(salesActions.setCashiers({ selected: cashier, drawer: 'edit' }));
-    },
-    closeDay: (receivedAmount: number) => async (dispatch: AppDispatch) => {
-      try {
-        dispatch(salesActions.setLoading(true));
-
-        let { error } = await supabase.rpc('close_current_cashier', {
-          p_branch_id: '81a16d60-40a5-4dba-a3c1-bc9372240bae',
-          p_cashier_id: 0,
-          p_received_amount: receivedAmount,
-        });
-        dispatch(salesActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo actualizar el registro.', 4);
-          return false;
-        }
-
-        await dispatch(salesActions.cashiers.get({ refetch: true }));
-        message.success('Caja cerrada con exito', 4);
-        return true;
-      } catch (error) {
-        message.error('No se pudo actualizar el registro.', 4);
-        dispatch(salesActions.setLoading(false));
-        return false;
-      }
-    },
-    getActiveCashier:
-      () =>
-      async (dispatch: AppDispatch): Promise<Cashier | null> => {
-        let { data: cashiers, error } = await supabase
-          .from('cashiers')
-          .select('*')
-          .eq('is_open', true)
-          .eq('branch_id', '81a16d60-40a5-4dba-a3c1-bc9372240bae');
-
-        if (error) {
-          message.error('No se pudo obtener la caja actual', 4);
-          return null;
-        }
-
-        let activeCashier = cashiers ? (cashiers[0] as Cashier) : ({} as Cashier);
-        dispatch(salesActions.setCashiers({ activeCashier }));
-
-        return activeCashier;
-      },
   },
 };
 

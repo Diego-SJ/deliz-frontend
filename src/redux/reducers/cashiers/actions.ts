@@ -3,26 +3,26 @@ import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { cashiersActions } from '.';
-import { CashOperation, OperationItem } from './types';
+import { CashCut, CashOperation, FetchCashCutArgs } from './types';
 import { salesActions } from '../sales';
-import { Cashier, Sale, SaleDetails } from '../sales/types';
-import { cashierHelpers } from '@/utils/cashiers';
+import { Cashier, SaleDetails } from '../sales/types';
+import { STATUS_DATA } from '@/constants/status';
 
 const customActions = {
   cash_operations: {
-    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    get: () => async (dispatch: AppDispatch, getState: AppState) => {
       try {
-        let cash_operations = getState()?.cashiers?.cash_operations;
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-
-        if (!!cash_operations?.data?.length && !args?.refetch) return true;
         if (!activeCashier?.cashier_id) return true;
 
         dispatch(cashiersActions.setLoading(true));
+
         let { data: result, error } = await supabase
           .from('cash_operations')
           .select('*')
-          .eq('cashier_id', activeCashier?.cashier_id); //.range(0, 9);
+          .eq('cashier_id', activeCashier?.cashier_id)
+          .order('created_at', { ascending: false });
+
         dispatch(cashiersActions.setLoading(false));
 
         if (error) {
@@ -31,7 +31,6 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.cash_operation_id as string } as CashOperation)) ?? [];
-        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(cashiersActions.setCashOperations({ data }));
         return true;
@@ -40,27 +39,19 @@ const customActions = {
         return false;
       }
     },
-    getSalesByCashier: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    getSalesByCashier: (_?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
-        let sales_by_cashier = getState()?.cashiers?.cash_operations?.sales_by_cashier;
         let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-
-        if (!!sales_by_cashier?.length && !args?.refetch) return true;
-
         if (!activeCashier?.cashier_id) return false;
 
         dispatch(cashiersActions.setLoading(true));
+
         let { data: result, error } = await supabase
           .from('sales')
-          .select(
-            `
-        *,
-        customers ( name ),
-        status ( status_id, name )
-      `,
-          )
+          .select(`*, customers ( name ), status ( status_id, name )`)
           .eq('cashier_id', activeCashier?.cashier_id)
-          .eq('status_id', 4); //.range(0, 9);
+          .order('created_at', { ascending: false });
+
         dispatch(cashiersActions.setLoading(false));
 
         if (error) {
@@ -69,7 +60,6 @@ const customActions = {
         }
 
         let data = result?.map(item => ({ ...item, key: item.sale_id as number } as SaleDetails)) ?? [];
-        data = data?.sort((a, b) => Number(new Date(b?.created_at || '')) - Number(new Date(a?.created_at || '')));
 
         dispatch(cashiersActions.setCashOperations({ sales_by_cashier: data }));
         return true;
@@ -78,52 +68,26 @@ const customActions = {
         return false;
       }
     },
-    calculateCashierData: () => async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        let activeCashier = getState()?.sales?.cashiers?.activeCashier;
-        let { data = [], sales_by_cashier = [] } = getState()?.cashiers?.cash_operations;
-
-        let sales_amount = sales_by_cashier?.reduce((acc, item) => acc + (item?.total || 0), 0);
-        let incomes_amount = data
-          ?.filter(item => item?.operation_type === 'INCOME')
-          ?.reduce((acc, item) => acc + item?.amount, 0);
-        let expenses_amount = data
-          ?.filter(item => item?.operation_type === 'EXPENSE')
-          ?.reduce((acc, item) => acc + item?.amount, 0);
-        let total_amount = (activeCashier?.initial_amount || 0) + sales_amount + incomes_amount - expenses_amount;
-
-        let amounts = {
-          initial_amount: activeCashier?.initial_amount,
-          sales_amount,
-          incomes_amount,
-          expenses_amount,
-          total_amount,
-          operations: cashierHelpers.calculateAmounts(data, sales_by_cashier),
-        };
-
-        dispatch(cashiersActions.setCashOperations(amounts));
-      } catch (error) {
-        dispatch(cashiersActions.setLoading(false));
-        return false;
-      }
-    },
     add: (expense: Partial<CashOperation>) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
-        let activeCashier = getState()?.sales?.cashiers?.activeCashier;
+        let activeCashCut = getState()?.cashiers?.active_cash_cut;
 
         dispatch(cashiersActions.setLoading(true));
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('cash_operations')
           .insert([
             {
               name: expense.name || '',
               operation_type: expense.operation_type,
               amount: expense.amount || 0,
-              cashier_id: activeCashier?.cashier_id,
               payment_method: expense.payment_method,
+              cash_register_id: activeCashCut?.cash_register_id,
+              branch_id: activeCashCut?.branch_id,
+              cash_cut_id: activeCashCut?.cash_cut_id,
             },
           ])
-          .select();
+          .select()
+          .single();
         dispatch(cashiersActions.setLoading(false));
 
         if (error) {
@@ -131,8 +95,7 @@ const customActions = {
           return false;
         }
 
-        await dispatch(cashiersActions.cash_operations.get({ refetch: true }));
-        await dispatch(cashiersActions.cash_operations.calculateCashierData());
+        await dispatch(cashiersActions.cash_cuts.fetchCashCutData({ cashCut: data }));
         message.success('Registro agregado', 4);
         return true;
       } catch (error) {
@@ -151,7 +114,7 @@ const customActions = {
           return false;
         }
 
-        dispatch(cashiersActions.cash_operations.get({ refetch: true }));
+        dispatch(cashiersActions.cash_operations.get());
         message.success('Elemento eliminado');
       } catch (error) {
         message.error('No se pudo eliminar este elemento');
@@ -164,43 +127,272 @@ const customActions = {
     set: (cashier: Cashier) => async (dispatch: AppDispatch) => {
       dispatch(cashiersActions.setCashierDetail({ data: cashier }));
     },
-    getCashierOperationsById: (cashier_id: number) => async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        if (!cashier_id) return false;
+  },
+  cash_cuts: {
+    openCashier: (cashCut: Partial<CashCut>) => async (dispatch: AppDispatch, getState: AppState) => {
+      const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
+      const branch_id = getState()?.branches?.currentBranch?.branch_id;
+      const { data, error } = await supabase
+        .from('cash_cuts')
+        .insert([
+          {
+            ...cashCut,
+            is_open: true,
+            branch_id,
+            cash_register_id,
+          },
+        ])
+        .select()
+        .single();
 
-        dispatch(cashiersActions.setLoading(true));
-        let { data: operations, error: operationsError } = await supabase
-          .from('cash_operations')
+      if (error) {
+        message.error('No se pudo abrir la caja');
+        return false;
+      }
+
+      dispatch(cashiersActions.setActiveCashCut(data as CashCut));
+      message.success('Caja abierta');
+      return true;
+    },
+    fetchCashCutData: (args?: FetchCashCutArgs) => async (dispatch: AppDispatch, getState: AppState) => {
+      const { cashCut, fetchOperations = false, fetchSales = false } = args || {};
+      const state = getState();
+      const cash_register_id = state?.branches?.currentCashRegister?.cash_register_id;
+      const initialState = {
+        cash_register_id,
+        branch_id: state?.branches?.currentBranch?.branch_id,
+        is_open: false,
+        initial_amount: 0,
+        sales_amount: 0,
+        incomes_amount: 0,
+        expenses_amount: 0,
+        cash_cut_id: null,
+        final_amount: 0,
+        received_amount: 0,
+        notes: '',
+        opening_date: '',
+        operations: [],
+        closing_date: null,
+      } as CashCut;
+
+      if (!cash_register_id) {
+        message.error('No se pudo cargar la información de la caja', 4);
+      }
+
+      let cashCutData = cashCut;
+
+      if (!cashCut) {
+        const { data, error: cashCutError } = await supabase
+          .from('cash_cuts')
           .select('*')
-          .eq('cashier_id', cashier_id);
+          .eq('cash_register_id', cash_register_id)
+          .eq('is_open', true)
+          .single();
 
-        let { data: sales, error: salesOperation } = await supabase
-          .from('sales')
-          .select(
-            `
-        *,
-        customers ( name ),
-        status ( status_id, name )
-      `,
-          )
-          .eq('cashier_id', cashier_id)
-          .eq('status_id', 4);
-
-        dispatch(cashiersActions.setLoading(false));
-
-        if (operationsError || salesOperation) {
-          message.error('No se pudo cargar esta información', 4);
+        if (cashCutError) {
+          dispatch(cashiersActions.setActiveCashCut(initialState));
+          // message.error('No se pudo cargar la información de la caja', 4);
           return false;
         }
 
-        let data = cashierHelpers.calculateAmounts(operations as CashOperation[], sales as SaleDetails[]);
+        cashCutData = data as CashCut;
+      }
 
-        dispatch(cashiersActions.setCashierDetail({ operations: data }));
+      // Fetch data in parallel
+      const [salesData, operationsData] = await Promise.all([
+        supabase
+          .from('sales')
+          .select('sale_id, total, customers ( name ), created_at, payment_method, branch_id')
+          .eq('cash_cut_id', cashCutData?.cash_cut_id)
+          .eq('status_id', STATUS_DATA.COMPLETED.id),
+        supabase.from('cash_operations').select('*').eq('cash_cut_id', cashCutData?.cash_cut_id),
+      ]);
+
+      // Extract data and error
+      const { data: sales } = salesData;
+      const { data: operations } = operationsData;
+
+      // Combine operations with sales
+      let combinedOperations: CashOperation[] = [];
+      let incomes_amount = 0;
+      let expenses_amount = 0;
+
+      if (operations) {
+        combinedOperations = [
+          ...operations.map((item: any) => {
+            if (item.operation_type === 'INCOME') incomes_amount += item.amount;
+            if (item.operation_type === 'EXPENSE') expenses_amount += item.amount;
+            return {
+              ...item,
+              cash_operation_id: item.cash_operation_id.toString(),
+            } as CashOperation;
+          }),
+        ];
+      }
+
+      let sales_amount = 0;
+      if (sales) {
+        combinedOperations = [
+          ...combinedOperations,
+          ...sales.map((item: any) => {
+            sales_amount += item.total;
+            return {
+              cash_operation_id: item?.sale_id?.toString() || '',
+              name: `Cliente ${item?.customers?.name || 'Público general'}`,
+              operation_type: 'SALE',
+              amount: item.total,
+              created_at: item.created_at,
+              payment_method: item?.payment_method || '',
+              cash_register_id: cash_register_id || '',
+              branch_id: item?.branch_id || '',
+            } as CashOperation;
+          }),
+        ];
+      }
+
+      combinedOperations?.sort((a, b) => new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime());
+
+      const final_amount = (cashCutData?.initial_amount || 0) + sales_amount + incomes_amount - expenses_amount;
+      const currentCashCutData = {
+        ...cashCutData,
+        sales_amount,
+        operations: combinedOperations,
+        incomes_amount,
+        expenses_amount,
+        final_amount,
+      } as CashCut;
+
+      // Dispatch the action with the fetched data
+      dispatch(cashiersActions.setActiveCashCut(cashCutData?.cash_cut_id ? currentCashCutData : initialState));
+      return true;
+    },
+    fetchCashCutsByCashRegister:
+      ({ cash_register_id, order }: { order: string; cash_register_id: string }) =>
+      async (dispatch: AppDispatch) => {
+        let supabaseQuery = supabase.from('cash_cuts').select('*').eq('cash_register_id', cash_register_id).eq('is_open', false);
+
+        if (order) {
+          const [field, direction] = order.split(',');
+          supabaseQuery.order(field, { ascending: direction === 'true' });
+        }
+
+        const { data, error: cashCutError } = await supabaseQuery;
+
+        if (cashCutError) {
+          dispatch(cashiersActions.setCashCuts([]));
+          return false;
+        }
+        dispatch(cashiersActions.setCashCuts(data));
         return true;
-      } catch (error) {
-        dispatch(cashiersActions.setLoading(false));
+      },
+    fetchCashCutDataById:
+      (cash_cut_id: string) => async (): Promise<(CashCut & { branches: any; cash_registers: any }) | null> => {
+        if (!cash_cut_id) {
+          message.error('No se pudo cargar la información de la caja', 4);
+        }
+
+        const { data, error: cashCutError } = await supabase
+          .from('cash_cuts')
+          .select('*, branches (name), cash_registers (name)')
+          .eq('cash_cut_id', cash_cut_id)
+          .single();
+
+        if (cashCutError) {
+          message.error('No se pudo cargar la información de la caja', 4);
+          return null;
+        }
+
+        // Fetch data in parallel
+        const [salesData, operationsData] = await Promise.all([
+          supabase
+            .from('sales')
+            .select('sale_id, total, customers ( name ), created_at, payment_method, branch_id')
+            .eq('cash_cut_id', cash_cut_id)
+            .eq('status_id', STATUS_DATA.COMPLETED.id),
+          supabase.from('cash_operations').select('*').eq('cash_cut_id', cash_cut_id),
+        ]);
+
+        // Extract data and error
+        const { data: sales } = salesData;
+        const { data: operations } = operationsData;
+
+        // Combine operations with sales
+        let combinedOperations: CashOperation[] = [];
+
+        if (operations) {
+          combinedOperations = [
+            ...operations.map((item: any) => {
+              return {
+                ...item,
+                cash_operation_id: item.cash_operation_id.toString(),
+              } as CashOperation;
+            }),
+          ];
+        }
+
+        if (sales) {
+          combinedOperations = [
+            ...combinedOperations,
+            ...sales.map((item: any) => {
+              return {
+                cash_operation_id: item?.sale_id?.toString() || '',
+                name: `Cliente ${item?.customers?.name || 'Público general'}`,
+                operation_type: 'SALE',
+                amount: item.total,
+                created_at: item.created_at,
+                payment_method: item?.payment_method || '',
+                cash_register_id: data?.cash_register_id || '',
+                branch_id: item?.branch_id || '',
+              } as CashOperation;
+            }),
+          ];
+        }
+
+        combinedOperations?.sort((a, b) => new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime());
+
+        const currentCashCutData = {
+          ...data,
+          operations: combinedOperations,
+        } as CashCut & { branches: any; cash_registers: any };
+
+        return currentCashCutData;
+      },
+    makeCashCut: (receivedAmount: number) => async (dispatch: AppDispatch, getState: AppState) => {
+      dispatch(salesActions.setLoading(true));
+      const state = getState();
+      const cash_cut_id = getState()?.cashiers?.active_cash_cut?.cash_cut_id;
+
+      let { error } = await supabase.rpc('make_cash_cut', {
+        p_received_amount: receivedAmount,
+        p_cash_cut_id: cash_cut_id,
+      });
+      dispatch(salesActions.setLoading(false));
+
+      if (error) {
+        message.error('No se pudo actualizar el registro.', 4);
         return false;
       }
+
+      dispatch(
+        cashiersActions.setActiveCashCut({
+          cash_register_id: state?.branches?.currentCashRegister?.cash_register_id || null,
+          branch_id: state?.branches?.currentBranch?.branch_id || null,
+          is_open: false,
+          initial_amount: 0,
+          sales_amount: 0,
+          incomes_amount: 0,
+          expenses_amount: 0,
+          cash_cut_id: null,
+          final_amount: 0,
+          received_amount: 0,
+          notes: '',
+          opening_date: '',
+          operations: [],
+          closing_date: null,
+        }),
+      );
+      message.success('Corte de caja realizado', 4);
+      return true;
     },
   },
 };

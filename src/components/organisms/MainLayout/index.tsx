@@ -5,7 +5,7 @@ import { MainLayoutProps } from './types';
 import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './styles';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { Drawer } from 'antd';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 const SIDER_WIDTH = 250;
 
@@ -19,21 +19,32 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
   return (
     <LayoutRoot hasSider={!isTablet}>
       {!isTablet && (
-        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet}>
+        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet} className="bg-[#001628]">
           <SideMenu />
         </LayoutSider>
       )}
-      <Drawer placement="left" width={300} open={open} onClose={handleDrawer} styles={{ body: { padding: 0 } }}>
+      <Drawer
+        placement="left"
+        width={300}
+        open={open}
+        onClose={handleDrawer}
+        styles={{ body: { padding: 0, background: '#001628' }, header: { background: '#001628' } }}
+        className="bg-[#001628]"
+      >
         <SideMenu onClick={handleDrawer} />
       </Drawer>
       <LayoutContainer>
         <Header onClick={handleDrawer} />
-        <LayoutContent>
+        <LayoutContent className="relative">
           <Outlet />
         </LayoutContent>
       </LayoutContainer>
     </LayoutRoot>
   );
+};
+
+export const PaddingLayout = ({ children }: { children?: ReactNode }) => {
+  return <div className="p-4 relative">{children}</div>;
 };
 
 export default MainLayout;

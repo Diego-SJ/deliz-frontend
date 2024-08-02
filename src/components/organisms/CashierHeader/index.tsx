@@ -1,22 +1,25 @@
-import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
+import { Button, Dropdown, Typography, Avatar } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { AppstoreOutlined, HomeOutlined, ShoppingCartOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  DollarCircleOutlined,
+  HomeOutlined,
+  MenuOutlined,
+  SettingOutlined,
+  ShopOutlined,
+  ShoppingOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
-import FallbackImage from '@/assets/img/webp/ice-cream.webp';
-import useMediaQuery from '@/hooks/useMediaQueries';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { salesActions } from '@/redux/reducers/sales';
+import { useAppSelector } from '@/hooks/useStore';
+import ChangeBranchModal from './change-branch-modal';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isMobile } = useMediaQuery();
+
   const [open, setOpen] = useState(false);
-  const { user_auth } = useAppSelector(({ users }) => users);
-  const { cash_register } = useAppSelector(({ sales }) => sales);
-  const isSales = user_auth?.user?.email === 'sales@deliz.com';
+  const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
 
   const onNavigate = (path: string) => {
     navigate(path);
@@ -26,111 +29,97 @@ const CashierHeader = () => {
     setOpen(prev => !prev);
   };
 
-  const handleSelect = (zone: number) => {
-    dispatch(salesActions.updateCashRegister({ zone }));
+  const handleBranchChange = () => {
+    handleOpen();
   };
 
   return (
-    <HeaderRoot>
-      <div>
-        <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
-          <Avatar size={40} src={FallbackImage} style={{ marginBottom: 5 }} />
-          {!isMobile && (
-            <Typography.Title level={5} style={{ margin: '0 0 2px 0' }}>
-              Punto de venta
-            </Typography.Title>
-          )}
-        </Space>
-
-        <Select
-          placeholder="Selecciona una zona"
-          // size="large"
-          style={{ width: isMobile ? 90 : 200, marginLeft: isMobile ? '0.5rem' : '2rem' }}
-          value={cash_register?.zone}
-          onChange={handleSelect}
-          options={[
-            { label: 'Zona 1', value: 1 },
-            { label: 'Zona 2', value: 2 },
-          ]}
-        />
+    <HeaderRoot className="border-b border-gray-300 px-3">
+      <div className="flex items-center">
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: 'home',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <HomeOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Inicio</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path),
+              },
+              {
+                key: 'products',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <ShoppingOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Productos</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path),
+              },
+              {
+                key: 'sales',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <DollarCircleOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Ventas</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
+              },
+              {
+                key: 'customers',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <TeamOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Clientes</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
+              },
+              {
+                key: 'settings',
+                label: (
+                  <div className="flex gap-4 w-40 items-center py-1">
+                    <SettingOutlined className="text-lg" />
+                    <Typography.Text className="!text-base">Configuración</Typography.Text>
+                  </div>
+                ),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path),
+              },
+            ],
+          }}
+        >
+          <div className="flex">
+            <Button icon={<MenuOutlined className="text-2xl font-light" />} size="large" />
+          </div>
+        </Dropdown>
       </div>
-      <HeaderActions>
-        <Space>
-          {!isSales && (
-            <Tooltip title="Ventas">
-              <Button
-                icon={<ShoppingCartOutlined rev={{}} />}
-                type="dashed"
-                onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path)}
-              >
-                {isMobile ? '' : 'Ventas'}
-              </Button>
-            </Tooltip>
-          )}
 
-          <Tooltip title="Clientes">
-            <Button
-              icon={<TeamOutlined rev={{}} />}
-              type="dashed"
-              onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path)}
-            >
-              {isMobile ? '' : 'Clientes'}
-            </Button>
-          </Tooltip>
-          {!isSales && (
-            <Tooltip title="Productos">
-              <Button
-                icon={<AppstoreOutlined rev={{}} />}
-                type="dashed"
-                onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path)}
-              >
-                {isMobile ? '' : 'Productos'}
-              </Button>
-            </Tooltip>
-          )}
-          {/* <Tooltip title="Venta aleatoria">
-            <Button icon={<InteractionOutlined rev={{}} />} type="dashed" size="large" shape="circle" onClick={handleOpen} />
-          </Tooltip> */}
-        </Space>
-        <Divider type="vertical" />
-        <Tooltip title="Ir a inicio">
-          <Button
-            icon={<HomeOutlined rev={{}} />}
-            type="dashed"
-            size="large"
-            shape="circle"
-            onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
+      <HeaderActions>
+        <div
+          onClick={handleOpen}
+          className="flex gap-4 min-w-44 items-center hover:bg-slate-50 py-1 pl-3 pr-4 rounded-lg border border-transparent cursor-pointer hover:border-primary/30 "
+        >
+          <Avatar
+            shape="square"
+            size={40}
+            className={'bg-primary/10'}
+            icon={<ShopOutlined className="text-primary text-2xl font-light" />}
           />
-        </Tooltip>
+          <div className="flex flex-col">
+            <Typography.Title className="avatar-title m-0 !text-sm leading-tight !font-medium capitalize" level={5}>
+              Sucursal {currentBranch?.name || 'Principal'}
+            </Typography.Title>
+            <Typography.Text className="leading-tight capitalize font-light" type="secondary">
+              Caja {currentCashRegister?.name}
+            </Typography.Text>
+          </div>
+        </div>
       </HeaderActions>
-      <Modal
-        open={open}
-        onCancel={handleOpen}
-        footer={
-          <Row key="actions" gutter={10}>
-            <Col span={12}>
-              <Button key="back" block onClick={handleOpen}>
-                Cancelar
-              </Button>
-            </Col>
-            <Col span={12}>
-              <Button block type="primary" onClick={handleOpen}>
-                Guardar
-              </Button>
-            </Col>
-          </Row>
-        }
-      >
-        <Form layout="vertical" title="Generar venta aleatoría">
-          <Typography.Title level={4}>Generar venta aleatoría</Typography.Title>
-          <Form.Item label="$ Cantidad" rules={[{ required: true }]}>
-            <InputNumber style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item label="$ Cantidad" rules={[{ required: true }]}>
-            <Select></Select>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <ChangeBranchModal onCancel={handleOpen} open={open} />
     </HeaderRoot>
   );
 };
