@@ -13,6 +13,7 @@ const CashRegistersPage = () => {
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
   const { cash_registers, branches } = useAppSelector(({ branches }) => branches);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [options, setOptions] = useState<CashRegister[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
   const isFirstRender = useRef(true);
@@ -84,9 +85,12 @@ const CashRegistersPage = () => {
             }}
             placeholder="Selecciona una sucursal"
           />
-          <Button icon={<PlusCircleOutlined />} onClick={openModal}>
-            Agregar nueva
-          </Button>
+
+          {permissions?.branches?.add_branch && (
+            <Button icon={<PlusCircleOutlined />} onClick={openModal}>
+              Agregar nueva
+            </Button>
+          )}
         </div>
       </div>
 
@@ -94,11 +98,13 @@ const CashRegistersPage = () => {
         <List
           itemLayout="horizontal"
           footer={
-            <div className="px-2">
-              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
-                Agregar nueva
-              </Button>
-            </div>
+            permissions?.branches?.add_branch ? (
+              <div className="px-2">
+                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
+                  Agregar nueva
+                </Button>
+              </div>
+            ) : null
           }
           className="px-0"
           dataSource={options}
@@ -108,10 +114,12 @@ const CashRegistersPage = () => {
               classNames={{ actions: 'flex' }}
               className="flex"
               actions={[
-                <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
-                  Editar
-                </Button>,
-                item?.is_default ? null : (
+                permissions?.cash_registers?.edit_cash_register ? (
+                  <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
+                    Editar
+                  </Button>
+                ) : null,
+                item?.is_default || !permissions?.cash_registers?.delete_cash_register ? null : (
                   <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.cash_register_id)}>
                     Eliminar
                   </Button>

@@ -4,7 +4,7 @@ import { Avatar, Button, List, Result, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbSettings from '../menu/breadcrumb';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { branchesActions } from '@/redux/reducers/branches';
 import CardRoot from '@/components/atoms/Card';
 
@@ -13,8 +13,14 @@ const BranchesPage = () => {
   const dispatch = useAppDispatch();
   const { branches } = useAppSelector(state => state.branches);
 
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const firstRender = useRef(false);
+
   useEffect(() => {
-    dispatch(branchesActions.getBranches());
+    if (!firstRender.current) {
+      firstRender.current = true;
+      dispatch(branchesActions.getBranches());
+    }
   }, [dispatch]);
 
   const onAddBranch = () => {
@@ -33,10 +39,11 @@ const BranchesPage = () => {
         <Typography.Title level={4}>Sucursales</Typography.Title>
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text className="text-gray-500">Administra tus sucursales aquí</Typography.Text>
-
-          <Button icon={<PlusCircleOutlined />} onClick={onAddBranch}>
-            Agregar sucursal
-          </Button>
+          {permissions?.branches?.add_branch && (
+            <Button icon={<PlusCircleOutlined />} onClick={onAddBranch}>
+              Agregar sucursal
+            </Button>
+          )}
         </div>
       </div>
 
@@ -45,11 +52,13 @@ const BranchesPage = () => {
           <List
             itemLayout="horizontal"
             footer={
-              <div className="px-2">
-                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddBranch}>
-                  Agregar nuevo
-                </Button>
-              </div>
+              permissions?.branches?.add_branch ? (
+                <div className="px-2">
+                  <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddBranch}>
+                    Agregar nuevo
+                  </Button>
+                </div>
+              ) : null
             }
             className="px-0"
             dataSource={branches}

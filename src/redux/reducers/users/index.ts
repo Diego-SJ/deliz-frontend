@@ -4,7 +4,11 @@ import customActions from './actions';
 
 const initialState: UsersSlice = {
   user_auth: {
-    profile: null,
+    profile: {
+      permissions: {} as any,
+      role: '',
+    },
+    isAdmin: false,
     authenticated: false,
   },
   users: [],

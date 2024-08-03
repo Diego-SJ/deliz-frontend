@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { branchesActions } from '@/redux/reducers/branches';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, Modal, Typography } from 'antd';
@@ -12,6 +12,7 @@ const AddBranchForm = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isMainBranch, setIsMainBranch] = useState(false);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [loading, setLoading] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
 
@@ -36,6 +37,8 @@ const AddBranchForm = () => {
   };
 
   const onSubmit = async () => {
+    if (!permissions?.branches?.edit_branch && !permissions?.branches?.add_branch) return;
+
     setLoadingSave(true);
     await form.validateFields().then(async values => {
       await dispatch(branchesActions.upsertBranch(values));
@@ -46,7 +49,13 @@ const AddBranchForm = () => {
 
   return (
     <>
-      <div className={`flex flex-col gap-2 p-4 min-h-[calc(100%-82px)] max-h-[calc(100%-82px)] overflow-auto`}>
+      <div
+        className={`flex flex-col gap-2 p-4 ${
+          permissions?.branches?.edit_branch || permissions?.branches?.add_branch
+            ? 'min-h-[calc(100%-82px)] max-h-[calc(100%-82px)] '
+            : ''
+        } overflow-auto`}
+      >
         <div className="flex gap-4 max-w-[700px] mx-auto w-full">
           <Button icon={<ArrowLeftOutlined />} shape="circle" onClick={() => navigate(-1)} />
           <Typography.Title level={4}>{branch_id ? 'Actualizar sucursal' : 'Agregar nueva sucursal'}</Typography.Title>
@@ -105,7 +114,7 @@ const AddBranchForm = () => {
           </Card>
         </Form>
 
-        {branch_id && !isMainBranch && (
+        {branch_id && !isMainBranch && permissions?.branches?.delete_branch && (
           <Card title="Eliminar sucursal" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
               <Typography.Text type="danger">
@@ -139,20 +148,22 @@ const AddBranchForm = () => {
           </Card>
         )}
       </div>
-      <Card
-        className="rounded-none box-border"
-        classNames={{ body: 'w-full flex items-center' }}
-        styles={{ body: { padding: '0px', height: '80px' } }}
-      >
-        <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
-          <Button className="w-full md:w-40" onClick={() => navigate(-1)} loading={loadingSave}>
-            Cancelar
-          </Button>
-          <Button type="primary" className="w-full md:w-40" onClick={onSubmit} loading={loadingSave}>
-            Guardar
-          </Button>
-        </div>
-      </Card>
+      {permissions?.branches?.edit_branch || permissions?.branches?.add_branch ? (
+        <Card
+          className="rounded-none box-border"
+          classNames={{ body: 'w-full flex items-center' }}
+          styles={{ body: { padding: '0px', height: '80px' } }}
+        >
+          <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
+            <Button className="w-full md:w-40" onClick={() => navigate(-1)} loading={loadingSave}>
+              Cancelar
+            </Button>
+            <Button type="primary" className="w-full md:w-40" onClick={onSubmit} loading={loadingSave}>
+              Guardar
+            </Button>
+          </div>
+        </Card>
+      ) : null}
     </>
   );
 };

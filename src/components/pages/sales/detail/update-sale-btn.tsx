@@ -25,7 +25,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
   const { total = 0, amount_paid, pending } = amounts;
   const cashback = pending - receivedMoney;
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [suggestion1, suggestion2] = functions.findNearestDenominations(pending);
+  const [_, suggestion1, suggestion2] = functions.getRoundedValues(pending);
   const { message } = App.useApp();
 
   const handleCancel = () => {

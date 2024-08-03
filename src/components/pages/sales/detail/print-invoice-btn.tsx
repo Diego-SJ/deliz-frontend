@@ -20,6 +20,7 @@ type PrintInvoiceButtonProps = {
 const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
   const { company } = useAppSelector(({ app }) => app);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { sendMessage, loading: messageLoading } = useWhatsappApi();
   const { metadata, items = [] } = current_sale;
   const [open, setOpen] = useState(false);
@@ -93,9 +94,11 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex gap-4 px-6 justify-center pt-4">
-          <Button block onClick={downloadInvoice} icon={<PrinterOutlined />}>
-            Imprimir
-          </Button>
+          {permissions?.sales?.download_receipt && (
+            <Button block onClick={downloadInvoice} icon={<PrinterOutlined />}>
+              Imprimir
+            </Button>
+          )}
           <Button hidden onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined />} loading={messageLoading}>
             Enviar via Whatsapp
           </Button>

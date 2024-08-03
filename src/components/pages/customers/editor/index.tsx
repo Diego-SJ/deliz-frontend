@@ -17,6 +17,7 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { current_customer, loading } = useAppSelector(({ customers }) => customers);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
 
   const onFinish = async (values: Customer) => {
     let success: boolean | Customer = false;
@@ -50,9 +51,11 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       <Form.Item name="address" label="Dirección">
         <TextArea size="large" rows={2} placeholder="E.g: Calle Pirul 6" />
       </Form.Item>
-      <Button size="large" block type="primary" htmlType="submit" loading={loading}>
-        {UI_TEXTS.saveBtn[current_customer?.customer_id === -1 ? 'add' : 'edit']}
-      </Button>
+      {permissions?.customers?.edit_customer && (
+        <Button size="large" block type="primary" htmlType="submit" loading={loading}>
+          {UI_TEXTS.saveBtn[current_customer?.customer_id === -1 ? 'add' : 'edit']}
+        </Button>
+      )}
     </Form>
   );
 };

@@ -3,65 +3,19 @@ import { productActions } from '@/redux/reducers/products';
 import { Category } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Col, Drawer, Input, List, Row, Tag, Typography } from 'antd';
-import Table, { ColumnsType } from 'antd/es/table';
+import { Button, Col, Drawer, Input, List, Row, Typography } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { STATUS_OBJ } from '@/constants/status';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CategoryEditor from './editor';
 import BreadcrumbSettings from '../../settings/menu/breadcrumb';
 import ActionTableButtons from '@/components/molecules/Table/action-table-btns';
 import CardRoot from '@/components/atoms/Card';
 
-type DataType = Category;
-
-const columns: ColumnsType<DataType> = [
-  {
-    title: 'Categoría',
-    align: 'center',
-    dataIndex: 'name',
-    width: 'auto',
-    render: text => {
-      return (
-        <div className="flex gap-4 pl-2 items-center">
-          <Avatar size="large" shape="circle" className="bg-gray-100/10 border border-secondary/40 text-secondary">
-            {text.substring(0, 2)}
-          </Avatar>
-          <p className="">{text}</p>
-        </div>
-      );
-    },
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    align: 'center',
-    width: 200,
-    render: (statusId: number) => {
-      const status = STATUS_OBJ[statusId];
-      return <Tag color={status?.color ?? 'orange'}>{status?.name ?? 'Desconocido'}</Tag>;
-    },
-  },
-  {
-    title: 'Acciones',
-    dataIndex: 'category_id',
-    align: 'center',
-    width: 200,
-    render: (category_id: number, record) => {
-      return (
-        <ActionTableButtons
-          deleteFunction={productActions.categories.delete(category_id)}
-          editFunction={productActions.setCurrentCategory(record)}
-        />
-      );
-    },
-  },
-];
-
 const CategoriesPage = () => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { categories, current_category } = useAppSelector(({ products }) => products);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Category[]>([]);
   const [drawerStatus, setDrawerStatus] = useState<'new' | 'edit' | null>(null);
   const isFirstRender = useRef(true);
@@ -107,9 +61,11 @@ const CategoriesPage = () => {
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra las categorías de productos que deseas ofrecer</Typography.Text>
 
-          <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
-            Agregar nueva
-          </Button>
+          {permissions?.categories?.add_category && (
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+              Agregar nueva
+            </Button>
+          )}
         </div>
       </div>
 
@@ -130,11 +86,13 @@ const CategoriesPage = () => {
             <List
               itemLayout="horizontal"
               footer={
-                <div className="px-2">
-                  <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
-                    Agregar nueva
-                  </Button>
-                </div>
+                permissions?.categories?.add_category ? (
+                  <div className="px-2">
+                    <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
+                      Agregar nueva
+                    </Button>
+                  </div>
+                ) : null
               }
               className="px-0"
               dataSource={options}
@@ -145,6 +103,8 @@ const CategoriesPage = () => {
                   className="flex"
                   actions={[
                     <ActionTableButtons
+                      hideDeleteButton={!permissions?.categories?.delete_category}
+                      hideEditButton={!permissions?.categories?.edit_category}
                       deleteFunction={productActions.categories.delete(item.category_id as number)}
                       editFunction={productActions.setCurrentCategory(item)}
                     />,

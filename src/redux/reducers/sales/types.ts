@@ -108,6 +108,7 @@ export type CashRegisterItem = {
   quantity: number;
   price: number;
   price_type: 'DEFAULT' | 'PERSONALIZED';
+  created_at?: Date | string;
 };
 
 // cash_closing table in BD

@@ -32,6 +32,7 @@ export const getColorName = (type: 'INCOME' | 'EXPENSE' | 'SALE') => {
 const OpenCashier = () => {
   const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
 
   return (
     <div className="max-w-[900px] mx-auto">
@@ -56,7 +57,7 @@ const OpenCashier = () => {
                     }
                     description={<Typography.Text className="text-neutral-400">Sucursal {currentBranch?.name}</Typography.Text>}
                   />
-                  {!!active_cash_cut?.cash_cut_id && <CashCutForm />}
+                  {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut && <CashCutForm />}
                 </div>
               </CardRoot>
             </Col>
@@ -68,8 +69,12 @@ const OpenCashier = () => {
                   <Typography.Title level={5} className="m-0 py-3 px-4" style={{ marginBottom: 0 }}>
                     Administración del dinero
                   </Typography.Title>
-                  <Divider className="m-0" />
-                  <AddOperationDrawer />
+                  {permissions?.cash_registers?.make_cash_cut_operation && (
+                    <>
+                      <Divider className="m-0" />
+                      <AddOperationDrawer />
+                    </>
+                  )}
                   <Divider className="mt-0 mb-4" />
                   <div className="flex flex-col px-4">
                     <div className="flex justify-between py-1 ">

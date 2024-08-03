@@ -14,6 +14,7 @@ import { APP_ROUTES } from '@/routes/routes';
 import { salesActions } from '@/redux/reducers/sales';
 import CashRegisterItemsList from '../cart-items-list';
 import CashierActions from '../cashier-actions';
+import { useDebouncedCallback } from 'use-debounce';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ const SearchProducts = () => {
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
   const [searchText, setSearchText] = useState<string>('');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+  const [inputIsFocused, setInputIsFocused] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
   const searchInputRef = useRef<InputRef>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -31,7 +33,7 @@ const SearchProducts = () => {
 
   useEffect(() => {
     let _products = productHelpers.searchProducts(searchText, products);
-    setCurrentProducts(_products);
+    setCurrentProducts(_products?.slice(0, 16) || []);
   }, [products, searchText]);
 
   useEffect(() => {
@@ -109,6 +111,10 @@ const SearchProducts = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
+  const handleInputTextChange = useDebouncedCallback(value => {
+    setSearchText(value);
+  }, 250);
+
   return (
     <>
       <div className="px-3">
@@ -118,13 +124,19 @@ const SearchProducts = () => {
           size="large"
           className="search-products-input m-0 !border-neutral-200"
           placeholder="Buscar producto"
-          onFocus={() => searchInputRef.current?.select()}
-          onChange={({ target }) => setSearchText(target.value)}
+          onFocus={() => {
+            setInputIsFocused(!isTablet);
+            setCurrentProducts(products?.slice(0, 16) || []);
+            searchInputRef.current?.select();
+          }}
+          onChange={({ target }) => {
+            handleInputTextChange(target.value);
+          }}
         />
       </div>
 
       <div className="min-h-[calc(100dvh-169px)] max-h-[calc(100dvh-169px)] overflow-x-auto pt-0 pb-0 md:pt-4 md:pb-4">
-        {!!searchText ? (
+        {!!searchText || inputIsFocused ? (
           <div className="px-3 pt-2 md:pt-0">
             {currentProducts.length > 0 ? (
               <Row ref={listReft} gutter={[20, 20]}>
@@ -141,6 +153,7 @@ const SearchProducts = () => {
                         onFocus={() => setSelectedCardIndex(index)}
                         onKeyDown={event => {
                           if (event.key === 'Enter') {
+                            setInputIsFocused(false);
                             handleItemInteract(product);
                           }
                         }}
@@ -152,7 +165,10 @@ const SearchProducts = () => {
                           price={price}
                           category={(product as any)?.categories?.name}
                           size={(product as any)?.sizes?.name}
-                          onClick={() => handleItemInteract(product)}
+                          onClick={() => {
+                            handleItemInteract(product);
+                            setInputIsFocused(false);
+                          }}
                           isFavorite={profile?.favorite_products?.includes(product.product_id)}
                           onFavorite={() => handleFavorite(product.product_id)}
                         />

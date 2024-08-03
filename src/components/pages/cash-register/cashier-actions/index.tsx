@@ -48,6 +48,7 @@ const CashierActions = ({}: CashierActionsProps) => {
   const [modalAction, setModalAction] = useState<ModalAction>('');
   const [discountType, setDiscountType] = useState<DiscountType>('PERCENTAGE');
   const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [itemExtra, setItemExtra] = useState({ price: 0, quantity: 0 });
   const [total, setTotal] = useState(0);
   const { shipping = 0, discountMoney = 0, discount = 0, mode = null } = cash_register;
@@ -169,32 +170,37 @@ const CashierActions = ({}: CashierActionsProps) => {
           </div>
         </ContainerItems>
         <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }}>
-          <Col span={6}>
-            <div
-              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
-              onClick={() => openModal('APPLY_SHIPPING')}
-            >
-              <Avatar
-                icon={<TruckOutlined className="text-slate-600 !text-lg" />}
-                shape="square"
-                className="mb-1 bg-slate-600/10"
-              />
-              <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
-            </div>
-          </Col>
-          <Col span={6}>
-            <div
-              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
-              onClick={() => openModal('APPLY_DISCOUNT')}
-            >
-              <Avatar
-                icon={<TagsOutlined className="text-slate-600 !text-lg" />}
-                shape="square"
-                className="mb-1 bg-slate-600/10"
-              />
-              <span className="text-xs lowercase select-none text-center leading-3 !font-light">descuento</span>
-            </div>
-          </Col>
+          {permissions?.pos?.apply_shipping && (
+            <Col span={6}>
+              <div
+                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                onClick={() => openModal('APPLY_SHIPPING')}
+              >
+                <Avatar
+                  icon={<TruckOutlined className="text-slate-600 !text-lg" />}
+                  shape="square"
+                  className="mb-1 bg-slate-600/10"
+                />
+                <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
+              </div>
+            </Col>
+          )}
+          {permissions?.pos?.apply_discount && (
+            <Col span={6}>
+              <div
+                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                onClick={() => openModal('APPLY_DISCOUNT')}
+              >
+                <Avatar
+                  icon={<TagsOutlined className="text-slate-600 !text-lg" />}
+                  shape="square"
+                  className="mb-1 bg-slate-600/10"
+                />
+                <span className="text-xs lowercase select-none text-center leading-3 !font-light">descuento</span>
+              </div>
+            </Col>
+          )}
+
           <Col span={6}>
             <div
               className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
@@ -208,19 +214,22 @@ const CashierActions = ({}: CashierActionsProps) => {
               <span className="text-xs lowercase select-none text-center leading-3 !font-light">borrar</span>
             </div>
           </Col>
-          <Col span={6}>
-            <div
-              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
-              onClick={() => openModal('ADD_NEW_ITEM')}
-            >
-              <Avatar
-                icon={<SignatureOutlined className="text-slate-600 !text-lg" />}
-                shape="square"
-                className="mb-1 bg-slate-600/10"
-              />
-              <span className="text-xs lowercase select-none text-center leading-3 !font-light">manual</span>
-            </div>
-          </Col>
+
+          {permissions?.pos?.add_manual_item && (
+            <Col span={6}>
+              <div
+                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                onClick={() => openModal('ADD_NEW_ITEM')}
+              >
+                <Avatar
+                  icon={<SignatureOutlined className="text-slate-600 !text-lg" />}
+                  shape="square"
+                  className="mb-1 bg-slate-600/10"
+                />
+                <span className="text-xs lowercase select-none text-center leading-3 !font-light">manual</span>
+              </div>
+            </Col>
+          )}
         </Row>
         <div className="flex">
           <Button type="primary" block size="large" className="font-bold " onClick={onPaySale}>

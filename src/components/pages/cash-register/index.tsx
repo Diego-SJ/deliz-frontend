@@ -14,6 +14,7 @@ import ChangePrice from './change-price';
 import SearchProducts from './search-products';
 import { branchesActions } from '@/redux/reducers/branches';
 import OpenCashCut from './open-cash-cut';
+import { cashiersActions } from '@/redux/reducers/cashiers';
 
 const { Content } = Layout;
 
@@ -32,6 +33,7 @@ const CashRegister = () => {
       dispatch(customerActions.fetchCustomers({ refetch: true }));
       dispatch(branchesActions.getPrices());
       dispatch(branchesActions.getCurrentCashRegister());
+      dispatch(cashiersActions.cash_cuts.fetchCashCutData());
     }
   }, [products, customers, dispatch]);
 

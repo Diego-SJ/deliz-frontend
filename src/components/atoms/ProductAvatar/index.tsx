@@ -15,6 +15,7 @@ type Props = {
 
 const ProductAvatar = ({ product, stock = 0, enableEdit = false, icon, onButtonClick, isManualEntry = false }: Props) => {
   const { currentBranch } = useAppSelector(({ branches }) => branches);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const productStock = stock || product?.inventory?.[currentBranch?.branch_id || '']?.stock || 0;
 
   const handleClick = () => {
@@ -49,7 +50,7 @@ const ProductAvatar = ({ product, stock = 0, enableEdit = false, icon, onButtonC
             {product?.categories?.name || 'Sin categoría'}
           </Typography.Paragraph>
 
-          {(enableEdit || onButtonClick) && (
+          {(enableEdit || onButtonClick) && !!permissions?.products?.edit_product && (
             <Button
               icon={icon || <EditOutlined />}
               onClick={() => {

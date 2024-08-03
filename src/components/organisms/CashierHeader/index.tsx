@@ -20,6 +20,7 @@ const CashierHeader = () => {
 
   const [open, setOpen] = useState(false);
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
 
   const onNavigate = (path: string) => {
     navigate(path);
@@ -27,10 +28,6 @@ const CashierHeader = () => {
 
   const handleOpen = () => {
     setOpen(prev => !prev);
-  };
-
-  const handleBranchChange = () => {
-    handleOpen();
   };
 
   return (
@@ -49,36 +46,43 @@ const CashierHeader = () => {
                 ),
                 onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path),
               },
-              {
-                key: 'products',
-                label: (
-                  <div className="flex gap-4 w-40 items-center py-1">
-                    <ShoppingOutlined className="text-lg" />
-                    <Typography.Text className="!text-base">Productos</Typography.Text>
-                  </div>
-                ),
-                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path),
-              },
-              {
-                key: 'sales',
-                label: (
-                  <div className="flex gap-4 w-40 items-center py-1">
-                    <DollarCircleOutlined className="text-lg" />
-                    <Typography.Text className="!text-base">Ventas</Typography.Text>
-                  </div>
-                ),
-                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
-              },
-              {
-                key: 'customers',
-                label: (
-                  <div className="flex gap-4 w-40 items-center py-1">
-                    <TeamOutlined className="text-lg" />
-                    <Typography.Text className="!text-base">Clientes</Typography.Text>
-                  </div>
-                ),
-                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
-              },
+
+              !!permissions?.products?.show_in_catalog
+                ? {
+                    key: 'products',
+                    label: (
+                      <div className="flex gap-4 w-40 items-center py-1">
+                        <ShoppingOutlined className="text-lg" />
+                        <Typography.Text className="!text-base">Productos</Typography.Text>
+                      </div>
+                    ),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path),
+                  }
+                : null,
+              permissions?.sales?.view_sales
+                ? {
+                    key: 'sales',
+                    label: (
+                      <div className="flex gap-4 w-40 items-center py-1">
+                        <DollarCircleOutlined className="text-lg" />
+                        <Typography.Text className="!text-base">Ventas</Typography.Text>
+                      </div>
+                    ),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
+                  }
+                : null,
+              permissions?.customers?.view_customers
+                ? {
+                    key: 'customers',
+                    label: (
+                      <div className="flex gap-4 w-40 items-center py-1">
+                        <TeamOutlined className="text-lg" />
+                        <Typography.Text className="!text-base">Clientes</Typography.Text>
+                      </div>
+                    ),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
+                  }
+                : null,
               {
                 key: 'settings',
                 label: (

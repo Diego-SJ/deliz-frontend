@@ -130,33 +130,16 @@ const functions = {
     if (!date1 || !date2) return false;
     return format(new Date(date1), 'PP') === format(new Date(date2), 'PP');
   },
+  getRoundedValues(x: number): [number, number, number] {
+    const roundedToBase50 = Math.ceil(x / 50) * 50;
+    let roundedToBase100 = Math.ceil(x / 100) * 100;
 
-  findNearestDenominations: function findNearestDenominations(amount: number): [number, number] {
-    const denominations = [5, 10, 20, 50, 100, 200, 500, 1000];
-    // Ordenar las denominaciones en orden ascendente (ya debería estar ordenado)
-    const sortedDenominations = denominations.sort((a, b) => a - b);
-
-    let lower = sortedDenominations[0];
-    let upper = sortedDenominations[sortedDenominations.length - 1];
-
-    // Encuentra la denominación más cercana inferior y superior
-    for (let i = 0; i < sortedDenominations.length; i++) {
-      if (sortedDenominations[i] >= amount) {
-        upper = sortedDenominations[i];
-        if (i > 0) {
-          lower = sortedDenominations[i - 1];
-        }
-        break;
-      }
+    // Si el resultado de base 50 es igual al resultado de base 100, incrementar el de base 100 en 100 unidades
+    if (roundedToBase50 === roundedToBase100) {
+      roundedToBase100 += 100;
     }
 
-    // Ajustar lower y upper si el amount es mayor que la denominación más alta
-    if (amount > sortedDenominations[sortedDenominations.length - 1]) {
-      lower = sortedDenominations[sortedDenominations.length - 1];
-      upper = sortedDenominations[sortedDenominations.length - 1] * 2;
-    }
-
-    return [lower, upper];
+    return [x, roundedToBase50, roundedToBase100];
   },
 };
 
