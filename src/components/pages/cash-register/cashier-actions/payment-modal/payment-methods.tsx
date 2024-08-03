@@ -11,6 +11,7 @@ import {
   CreditCardOutlined,
   DollarOutlined,
   ExportOutlined,
+  LoadingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
 import { Avatar, Button, Collapse, DatePicker, InputNumber, Tag, Typography } from 'antd';
@@ -36,7 +37,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [suggestion1, suggestion2] = functions.findNearestDenominations(total);
+  const [_, suggestion1, suggestion2] = functions.getRoundedValues(total);
   const { receivedMoney, paymentMethod, saleCreated } = value;
   const [orderDueDate, setOrderDueDate] = useState('');
   const { isTablet } = useMediaQuery();
@@ -91,8 +92,14 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
           {!isOrder && (
             <div className={`flex justify-between items-center mb-3`}>
               <Typography.Title level={5}>Método de pago</Typography.Title>
-              <Button size="small" type="link" className="pb-1" onClick={() => saveSale(STATUS_DATA.PENDING.id)}>
-                Guardar borrador
+              <Button
+                icon={loading ? <LoadingOutlined /> : null}
+                size="small"
+                type="link"
+                className="pb-1"
+                onClick={() => saveSale(STATUS_DATA.PENDING.id)}
+              >
+                Guardar como borrador
               </Button>
             </div>
           )}

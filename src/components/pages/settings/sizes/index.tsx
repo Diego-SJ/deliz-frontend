@@ -14,6 +14,7 @@ const ProductSizesPage = () => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { sizes } = useAppSelector(({ products }) => products);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Size[]>([]);
   const isFirstRender = useRef(true);
 
@@ -47,9 +48,11 @@ const ProductSizesPage = () => {
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra los tamaños de productos que deseas ofrecer</Typography.Text>
 
-          <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
-            Agregar nuevo
-          </Button>
+          {permissions?.sizes?.add_size && (
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+              Agregar nuevo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -57,11 +60,13 @@ const ProductSizesPage = () => {
         <List
           itemLayout="horizontal"
           footer={
-            <div className="px-2">
-              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
-                Agregar nuevo
-              </Button>
-            </div>
+            permissions?.sizes?.add_size ? (
+              <div className="px-2">
+                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
+                  Agregar nuevo
+                </Button>
+              </div>
+            ) : null
           }
           className="px-0"
           dataSource={options}
@@ -72,6 +77,8 @@ const ProductSizesPage = () => {
               className="flex"
               actions={[
                 <ActionTableButtons
+                  hideDeleteButton={!permissions?.sizes?.delete_size}
+                  hideEditButton={!permissions?.sizes?.edit_size}
                   deleteFunction={productActions.sizes.delete(item.size_id as number)}
                   editFunction={productActions.sizes.edit(item)}
                 />,

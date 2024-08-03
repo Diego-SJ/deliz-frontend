@@ -70,6 +70,7 @@ const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { products, categories } = useAppSelector(({ products }) => products);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Product[]>([]);
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
@@ -150,11 +151,19 @@ const Products = () => {
                 onChange={value => getPanelValue({ categoryId: value })}
               />
             </Col>
-            <Col lg={{ span: 4, offset: 8 }} xs={{ offset: 0, span: 12 }}>
-              <Button size={isTablet ? 'large' : 'middle'} block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
-                Nuevo
-              </Button>
-            </Col>
+            {permissions?.products?.add_product && (
+              <Col lg={{ span: 4, offset: 8 }} xs={{ offset: 0, span: 12 }}>
+                <Button
+                  size={isTablet ? 'large' : 'middle'}
+                  block
+                  type="primary"
+                  icon={<PlusCircleOutlined />}
+                  onClick={onAddNew}
+                >
+                  Nuevo
+                </Button>
+              </Col>
+            )}
           </Row>
           {!isTablet ? (
             <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>

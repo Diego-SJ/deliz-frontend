@@ -26,8 +26,9 @@ import CardRoot from '@/components/atoms/Card';
 import ExistencesTable from './existences-table';
 import PricesTable from './prices-table';
 import { branchesActions } from '@/redux/reducers/branches';
-import { QuickCategoryCreationForm } from '../categories/editor';
+
 import { BUCKETS } from '@/constants/buckets';
+import { QuickCategoryCreationForm } from '../../settings/categories/editor';
 
 type Params = {
   action: 'edit' | 'add';
@@ -48,6 +49,7 @@ const ProductEditor = () => {
   let { action = 'add', product_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
   const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const firstRender = useRef<boolean>(false);
   const [inventory, setInventory] = useState<Inventory>({});
@@ -122,8 +124,8 @@ const ProductEditor = () => {
         setLoading(true);
         let product = { ...values, inventory, price_list: priceList };
 
-        if (action === 'add') await saveNewProduct(product);
-        else if (action === 'edit') await saveEditionProduct(product);
+        if (action === 'add' && !!permissions?.products?.add_product) await saveNewProduct(product);
+        else if (action === 'edit' && !!permissions?.products?.edit_product) await saveEditionProduct(product);
 
         setLoading(false);
       })
@@ -232,10 +234,11 @@ const ProductEditor = () => {
                       <Input size="large" placeholder="Opcional" />
                     </Form.Item>
                   </div>
-
-                  <Form.Item name="show_in_catalog" label="Mostrar en el catálogo en línea" className="mb-0 w-full">
-                    <Switch />
-                  </Form.Item>
+                  {permissions?.products?.show_in_catalog && (
+                    <Form.Item name="show_in_catalog" label="Mostrar en el catálogo en línea" className="mb-0 w-full">
+                      <Switch />
+                    </Form.Item>
+                  )}
                 </CardRoot>
               </Col>
               <Col md={12} xs={24}>
@@ -288,38 +291,9 @@ const ProductEditor = () => {
                 <PricesTable setPriceList={setPriceList} priceList={priceList} />
               </Col>
             </Row>
-            {/* <Row gutter={[20, 5]}>
-          <Col lg={{ span: 12 }} xs={{ span: 24 }}></Col>
-          <Col lg={{ span: 12 }} xs={{ span: 24 }}>
-            <Row gutter={[20, 5]}>
-              <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
-                <Form.Item name="retail_price" label="Precio menudeo" rules={[{ type: 'number', min: 0, required: true }]}>
-                  <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
-                </Form.Item>
-                <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-                  <Select placeholder="Por default es Activo" virtual={false}>
-                    {STATUS.map(item => (
-                      <Select.Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item name="stock" label="Stock" rules={[{ type: 'number', min: 0, required: true }]}>
-                  <InputNumber style={{ width: '100%' }} placeholder="0" />
-                </Form.Item>
-              </Col>
-              <Col lg={{ span: 12 }} sm={{ span: 12 }} xs={{ span: 24 }}>
-                <Form.Item name="wholesale_price" label="Precio mayoreo" rules={[{ type: 'number', min: 0, required: true }]}>
-                  <InputNumber prefix="$" style={{ width: '100%' }} placeholder="0.0" />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Col>
-        </Row> */}
           </Form>
 
-          {action === 'edit' && (
+          {action === 'edit' && permissions?.products?.delete_product && (
             <CardRoot title="Eliminar producto" className="my-5">
               <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
                 <Typography.Text type="danger">
@@ -355,20 +329,23 @@ const ProductEditor = () => {
           )}
         </div>
       </div>
-      <Card
-        className="rounded-none box-border absolute bottom-0 left-0 w-full"
-        classNames={{ body: 'w-full flex items-center' }}
-        styles={{ body: { padding: '0px', height: '80px' } }}
-      >
-        <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
-          <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
-            Cancelar
-          </Button>
-          <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
-            {UI_TEXTS.saveBtn[action]}
-          </Button>
-        </div>
-      </Card>
+      {!!permissions?.products?.add_product ||
+        (!!permissions?.products?.edit_product && (
+          <Card
+            className="rounded-none box-border absolute bottom-0 left-0 w-full"
+            classNames={{ body: 'w-full flex items-center' }}
+            styles={{ body: { padding: '0px', height: '80px' } }}
+          >
+            <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
+              <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
+                Cancelar
+              </Button>
+              <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
+                {UI_TEXTS.saveBtn[action]}
+              </Button>
+            </div>
+          </Card>
+        ))}
     </>
   );
 };

@@ -18,6 +18,7 @@ const CashierCustomer = () => {
   const dispatch = useAppDispatch();
   const [customerList, setCustomerList] = useState<Option[]>([]);
   const { customers } = useAppSelector(({ customers }) => customers);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [currentCustomerId, setCurrentCustomerId] = useState<number | string | null>();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const { cash_register } = useAppSelector(({ sales }) => sales);
@@ -105,18 +106,20 @@ const CashierCustomer = () => {
               <Avatar shape="square" size="large" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
               <div className="flex flex-col">Público General</div>
             </div>
-            <div
-              onClick={onRegister}
-              className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg mb-3"
-            >
-              <Avatar
-                shape="square"
-                size="large"
-                icon={<UserAddOutlined className="text-green-600" />}
-                className="bg-green-600/10"
-              />
-              <div className="flex flex-col">Registra un cliente</div>
-            </div>
+            {permissions?.customers?.add_customer && (
+              <div
+                onClick={onRegister}
+                className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg mb-3"
+              >
+                <Avatar
+                  shape="square"
+                  size="large"
+                  icon={<UserAddOutlined className="text-green-600" />}
+                  className="bg-green-600/10"
+                />
+                <div className="flex flex-col">Registra un cliente</div>
+              </div>
+            )}
           </>
         )}
       </>

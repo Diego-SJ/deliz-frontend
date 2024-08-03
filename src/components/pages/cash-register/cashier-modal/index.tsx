@@ -22,6 +22,7 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
   const [quantity, setQuantity] = useState<number | string>(casherItem?.quantity || '0');
   const [productPrice, setProductPrice] = useState(0);
   const [currentInput, setCurrentInput] = useState<'quantity' | 'price'>('quantity');
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const quantityInput = useRef<HTMLInputElement>(null);
   const [useCustomPrice, setUseCustomPrice] = useState(false);
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
@@ -37,7 +38,8 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
       setTimeout(() => {
         quantityInput.current?.focus();
         quantityInput.current?.select();
-      }, 100);
+        quantityInput.current?.click();
+      }, 200);
     }
   }, [open, casherItem]);
 
@@ -117,32 +119,34 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
               onChange={value => setQuantity(value as number)}
             />
           </div>
-          <div>
-            <div className="flex gap-4 items-center !mb-3">
-              <Typography.Paragraph className="!m-0 font-medium">Precio personalizado</Typography.Paragraph>
-              <Switch onChange={setUseCustomPrice} checked={useCustomPrice} className="w-fit" />
+          {permissions?.pos?.add_custom_price && (
+            <div>
+              <div className="flex gap-4 items-center !mb-3">
+                <Typography.Paragraph className="!m-0 font-medium">Precio personalizado</Typography.Paragraph>
+                <Switch onChange={setUseCustomPrice} checked={useCustomPrice} className="w-fit" />
+              </div>
+              {useCustomPrice && (
+                <InputNumber
+                  min={0}
+                  placeholder="Precio personalizado"
+                  size="large"
+                  className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
+                  style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+                  value={productPrice}
+                  onPressEnter={handleOk}
+                  inputMode="decimal"
+                  type="number"
+                  onFocus={({ target }) => {
+                    target.select();
+                    setCurrentInput('price');
+                    setProductPrice(productPrice);
+                  }}
+                  addonBefore={<DollarOutlined />}
+                  onChange={value => setProductPrice(value as number)}
+                />
+              )}
             </div>
-            {useCustomPrice && (
-              <InputNumber
-                min={0}
-                placeholder="Precio personalizado"
-                size="large"
-                className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
-                style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
-                value={productPrice}
-                onPressEnter={handleOk}
-                inputMode="decimal"
-                type="number"
-                onFocus={({ target }) => {
-                  target.select();
-                  setCurrentInput('price');
-                  setProductPrice(productPrice);
-                }}
-                addonBefore={<DollarOutlined />}
-                onChange={value => setProductPrice(value as number)}
-              />
-            )}
-          </div>
+          )}
         </div>
 
         <Space height="10px" />

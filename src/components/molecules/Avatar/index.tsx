@@ -1,7 +1,7 @@
 import { Typography } from 'antd';
 import { AvatarInfo, AvatarShape } from './styles';
 import { AvatarProps } from './types';
-import { BankOutlined } from '@ant-design/icons';
+import { Store } from 'lucide-react';
 
 const Avatar = ({ avatar, title, subtitle }: AvatarProps) => {
   return (
@@ -10,7 +10,11 @@ const Avatar = ({ avatar, title, subtitle }: AvatarProps) => {
         {...avatar}
         size={avatar?.size ?? 40}
         className={'bg-primary/10 '}
-        icon={<BankOutlined className="text-primary" />}
+        icon={
+          <span>
+            <Store strokeWidth={1.5} className="text-primary" />
+          </span>
+        }
       />
       <AvatarInfo hidden={!title && !subtitle}>
         {title && <Typography.Paragraph className="avatar-title !m-0 font-medium select-none">{title}</Typography.Paragraph>}

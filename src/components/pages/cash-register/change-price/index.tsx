@@ -9,6 +9,7 @@ const ChangePrice = () => {
   const dispatch = useAppDispatch();
   const { prices_list } = useAppSelector(({ branches }) => branches);
   const { cash_register } = useAppSelector(({ sales }) => sales);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [currentPrice, setCurrentPrice] = useState<Price | null>(null);
   const { price_id } = cash_register;
   const [openForm, setOpenForm] = useState(false);
@@ -34,14 +35,16 @@ const ChangePrice = () => {
   };
 
   const onAddNew = () => {
-    setOpenForm(true);
+    if (!!permissions?.pos?.switch_prices) setOpenForm(true);
   };
 
   return (
     <>
       <div
         onClick={onAddNew}
-        className="flex gap-2 items-center justify-between h-[45px] cursor-pointer hover:bg-gray-50 px-3 rounded-lg bg-white border border-neutral-200 w-full"
+        className={`flex gap-2 items-center justify-between h-[45px] ${
+          !!permissions?.pos?.switch_prices ? 'cursor-pointer hover:bg-gray-50' : ''
+        } px-3 rounded-lg bg-white border border-neutral-200 w-full`}
       >
         <div className="flex gap-2 md:gap-5 items-center">
           <Avatar

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useTransition } from 'react';
 import { CloseCircleOutlined, FileImageOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Image, Upload } from 'antd';
+import { Avatar, Image, Upload } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { App } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -21,6 +21,7 @@ const LogoManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const { modal, message } = App.useApp();
   const { company } = useAppSelector(({ app }) => app);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -96,9 +97,9 @@ const LogoManagement: React.FC = () => {
         onPreview={handlePreview}
         onChange={handleChange}
       >
-        {fileList.length >= 1 ? null : uploadButton}
+        {permissions?.company?.edit_company ? (fileList.length >= 1 ? null : uploadButton) : null}
       </Upload>
-      {previewImage && (
+      {previewImage ? (
         <Image
           wrapperStyle={{ display: 'none' }}
           className="w-60 h-60 bg-black"
@@ -109,6 +110,8 @@ const LogoManagement: React.FC = () => {
           }}
           src={previewImage}
         />
+      ) : (
+        <>{!permissions?.company?.edit_company ? <Avatar className="w-48 h-48 bg-gray-100" src={previewImage} /> : null}</>
       )}
     </div>
   );

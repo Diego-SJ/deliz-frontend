@@ -1,3 +1,5 @@
+import { PERMISSIONS } from '@/components/pages/settings/users/permissions/data-and-types';
+
 export type UsersSlice = {
   user_auth: UserAuth;
   users: Profile[];
@@ -7,6 +9,7 @@ export type UsersSlice = {
 export type UserAuth = {
   profile: Partial<Profile> | null;
   authenticated: boolean;
+  isAdmin: boolean;
 };
 
 export type Profile = {
@@ -18,7 +21,10 @@ export type Profile = {
   last_name: string;
   role: string;
   branches: string[];
-  cashiers: string[];
+  cash_registers: string[];
   company_id: string;
   favorite_products: number[];
+  is_default: boolean;
+  is_inactive: boolean;
+  permissions: typeof PERMISSIONS | null;
 };

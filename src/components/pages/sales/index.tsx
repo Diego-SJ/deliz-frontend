@@ -23,7 +23,7 @@ export const PAYMENT_METHOD: { [key: string]: string } = {
 };
 
 const columns: ColumnsType<SaleDetails> = [
-  { title: '#', dataIndex: 'sale_id', width: 80, align: 'center' },
+  { title: 'Folio', dataIndex: 'sale_id', width: 80, align: 'center' },
   {
     title: 'Cliente',
     dataIndex: 'customers',
@@ -64,19 +64,13 @@ const columns: ColumnsType<SaleDetails> = [
     width: 210,
     render: (value: Date | string) => functions.tableDate(value),
   },
-  // {
-  //   title: 'Fecha actualización',
-  //   dataIndex: 'updated_at',
-  //   align: 'center',
-  //   width: 210,
-  //   render: (value: Date | string) => (value ? functions.dateTime(value) : 'N/A'),
-  // },
 ];
 
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { sales, cashiers } = useAppSelector(({ sales }) => sales);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
@@ -206,11 +200,19 @@ const Sales = () => {
                 onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
               />
             </Col>
-            <Col lg={{ offset: 1, span: 5 }} xs={12}>
-              <Button block type="primary" size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} onClick={onAddNew}>
-                Nueva
-              </Button>
-            </Col>
+            {permissions?.sales?.add_sale && (
+              <Col lg={{ offset: 1, span: 5 }} xs={12}>
+                <Button
+                  block
+                  type="primary"
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<PlusCircleOutlined />}
+                  onClick={onAddNew}
+                >
+                  Nueva
+                </Button>
+              </Col>
+            )}
           </Row>
 
           {!isTablet ? (

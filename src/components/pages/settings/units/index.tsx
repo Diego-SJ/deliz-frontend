@@ -13,6 +13,7 @@ const ProductUnitsPage = () => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { units } = useAppSelector(({ products }) => products);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Unit[]>([]);
   const isFirstRender = useRef(true);
 
@@ -46,9 +47,11 @@ const ProductUnitsPage = () => {
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra las unidades de medida que tendrán tus productos</Typography.Text>
 
-          <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
-            Agregar nuevo
-          </Button>
+          {permissions?.units?.add_unit && (
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+              Agregar nuevo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -56,11 +59,13 @@ const ProductUnitsPage = () => {
         <List
           itemLayout="horizontal"
           footer={
-            <div className="px-2">
-              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
-                Agregar nuevo
-              </Button>
-            </div>
+            permissions?.units?.add_unit ? (
+              <div className="px-2">
+                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
+                  Agregar nuevo
+                </Button>
+              </div>
+            ) : null
           }
           className="px-0"
           dataSource={options}
@@ -71,6 +76,8 @@ const ProductUnitsPage = () => {
               className="flex"
               actions={[
                 <ActionTableButtons
+                  hideDeleteButton={!permissions?.units?.delete_unit}
+                  hideEditButton={!permissions?.units?.edit_unit}
                   deleteFunction={productActions.units.delete(item.unit_id as number)}
                   editFunction={productActions.units.edit(item)}
                 />,

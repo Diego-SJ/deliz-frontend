@@ -4,7 +4,7 @@ import { App, Image, Upload as UploadAnt } from 'antd';
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
 import './styles.css';
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 
 const getBase64 = (file: RcFile): Promise<string> =>
@@ -26,6 +26,7 @@ const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
   const dispatch = useAppDispatch();
   const { modal } = App.useApp();
   const [previewOpen, setPreviewOpen] = useState(false);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [previewImage, setPreviewImage] = useState('');
 
   const handlePreview = async (file: UploadFile) => {
@@ -38,6 +39,10 @@ const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
   };
 
   const handleChange: UploadProps['onChange'] = ({ fileList: changeFileList }) => {
+    if (!permissions?.products?.update_image) {
+      return null;
+    }
+
     if (changeFileList.length) {
       let newFileList = changeFileList?.map(item => ({ ...item, status: 'done' } as UploadFile)) ?? [];
       setFileList(newFileList);
@@ -84,7 +89,10 @@ const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
             preview={{
               visible: previewOpen,
               onVisibleChange: visible => setPreviewOpen(visible),
-              afterOpenChange: visible => !visible && setPreviewImage(''),
+              afterOpenChange: visible => {
+                if (!permissions?.products?.update_image) return;
+                if (!visible) setPreviewImage('');
+              },
             }}
             src={previewImage}
           />

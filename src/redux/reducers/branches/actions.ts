@@ -27,11 +27,19 @@ export const customActions = {
   },
   getBranches: (companyId?: string) => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = companyId || getState()?.app?.company?.company_id;
-    const { data, error } = await supabase
+    const { profile } = getState().users?.user_auth;
+
+    const supabaseQuery = supabase
       .from('branches')
       .select('*')
       .order('created_at', { ascending: true })
       .eq('company_id', company_id);
+
+    if (profile?.role !== 'ADMIN') {
+      supabaseQuery.in('branch_id', profile?.branches || []);
+    }
+
+    const { data, error } = await supabaseQuery;
 
     if (error) {
       message.error('Error al obtener los datos');
@@ -110,11 +118,19 @@ export const customActions = {
   },
   getCashRegistersByCompanyId: () => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = getState().app.company.company_id;
-    const { data, error } = await supabase
+    const { profile } = getState().users.user_auth;
+
+    const supabaseQuery = supabase
       .from('cash_registers')
       .select('*')
       .eq('company_id', company_id)
       .order('created_at', { ascending: true });
+
+    if (profile?.role !== 'ADMIN') {
+      supabaseQuery.in('cash_register_id', profile?.cash_registers || []);
+    }
+
+    const { data, error } = await supabaseQuery;
 
     if (error) {
       message.error('Error al obtener los datos');

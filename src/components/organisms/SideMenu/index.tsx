@@ -19,72 +19,66 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CashRegisterSvg from '@/assets/img/jsx/cashier-menu';
+import { Profile } from '@/redux/reducers/users/types';
 
 type SideMenuProps = {
-  onClick?: () => void;
+  onClick?: (args?: any) => void;
 };
 
-const ITEM_LIST = [
-  // {
-  //   key: 'point_of_sale',
-  //   icon: BarcodeOutlined,
-  //   label: 'Punto de venta',
-  //   path: APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path,
-  // },
+const ITEM_LIST = (permissions: Profile['permissions']) => [
   {
     key: 'dashboard',
     icon: HomeOutlined,
     label: 'Inicio',
     path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
   },
-
-  {
-    key: 'products',
-    icon: ShoppingOutlined,
-    label: 'Productos',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
-  },
-  {
-    key: 'customers',
-    icon: TeamOutlined,
-    label: 'Clientes',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
-  },
-  {
-    key: 'sales',
-    icon: DollarOutlined,
-    label: 'Ventas',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
-    // children: [
-    //   // {
-    //   //   key: 'sales.orders',
-    //   //   label: 'Pedidos',
-    //   //   path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
-    //   // },
-    //   {
-    //     key: 'sales.main',
-    //     label: 'Ventas',
-    //     path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
-    //   },
-    // ],
-  },
-  {
-    key: 'cashiers',
-    icon: CashRegisterSvg,
-    label: 'Cajas',
-    children: [
-      {
-        key: 'transactions.current_cashier',
-        label: 'Caja actual',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
-      },
-      {
-        key: 'transactions.cashiers',
-        label: 'Historial de cajas',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
-      },
-    ],
-  },
+  permissions?.products?.view_catalog
+    ? {
+        key: 'products',
+        icon: ShoppingOutlined,
+        label: 'Productos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+      }
+    : null,
+  permissions?.customers?.view_customers
+    ? {
+        key: 'customers',
+        icon: TeamOutlined,
+        label: 'Clientes',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
+      }
+    : null,
+  permissions?.sales?.view_sales
+    ? {
+        key: 'sales',
+        icon: DollarOutlined,
+        label: 'Ventas',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+      }
+    : null,
+  permissions?.cash_registers?.view_current_cash_cut || permissions?.cash_registers?.view_history_cash_cuts
+    ? {
+        key: 'cashiers',
+        icon: CashRegisterSvg,
+        label: 'Cajas',
+        children: [
+          permissions?.cash_registers?.view_current_cash_cut
+            ? {
+                key: 'transactions.current_cashier',
+                label: 'Caja actual',
+                path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+              }
+            : null,
+          permissions?.cash_registers?.view_history_cash_cuts
+            ? {
+                key: 'transactions.cashiers',
+                label: 'Historial de cajas',
+                path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+              }
+            : null,
+        ].filter(Boolean),
+      }
+    : null,
   // {
   //   key: 'expenses',
   //   icon: BarChartOutlined,
@@ -110,42 +104,14 @@ const ITEM_LIST = [
   },
 ];
 
-const SALES_ACTIONS = [
-  {
-    key: 'dashboard',
-    icon: HomeOutlined,
-    label: 'Dashboard',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
-  },
-  {
-    key: 'customers',
-    icon: TeamOutlined,
-    label: 'Clientes',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
-  },
-  {
-    key: 'sales',
-    icon: DollarOutlined,
-    label: 'Pedidos',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path,
-  },
-];
-
 const SideMenu = (props: SideMenuProps) => {
   const { isTablet, isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { user_auth } = useAppSelector(({ users }) => users);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
-  const [currentItems, setCurrentItems] = useState<any[]>([]);
-  const isSales = user_auth?.profile?.role === 'SALES';
-
-  useEffect(() => {
-    if (isSales) setCurrentItems(SALES_ACTIONS);
-    else setCurrentItems(ITEM_LIST);
-  }, [isSales]);
 
   const handleLogout = () => {
     modal.confirm({
@@ -189,19 +155,21 @@ const SideMenu = (props: SideMenuProps) => {
         mode="inline"
         className="mb-10"
         inlineCollapsed={isPhablet && !isTablet}
-        items={currentItems.map((item, key) => ({
-          key,
-          icon: React.createElement(item.icon),
-          label: isPhablet && !isTablet ? '' : item.label,
-          className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
-          onClick: () => handlePathChange(item?.path),
-          children: item?.children?.length
-            ? item.children.map((subItem: any) => ({
-                ...subItem,
-                onClick: () => navigate(subItem.path),
-              }))
-            : null,
-        }))}
+        items={ITEM_LIST(permissions!)
+          ?.filter(Boolean)
+          .map((item: any, key: any) => ({
+            key,
+            icon: React.createElement(item?.icon),
+            label: isPhablet && !isTablet ? '' : item?.label,
+            className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
+            onClick: () => handlePathChange(item?.path),
+            children: item?.children?.length
+              ? item.children.map((subItem: any) => ({
+                  ...subItem,
+                  onClick: () => navigate(subItem.path),
+                }))
+              : null,
+          }))}
         style={{ borderInlineEnd: 'none' }}
       />
       <MenuRoot

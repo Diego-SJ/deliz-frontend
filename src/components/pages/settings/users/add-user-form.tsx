@@ -1,11 +1,13 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { branchesActions } from '@/redux/reducers/branches';
 import { Branch, CashRegister } from '@/redux/reducers/branches/type';
 import { userActions } from '@/redux/reducers/users';
+import { Profile } from '@/redux/reducers/users/types';
 import { ArrowLeftOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Button, Card, Form, Input, Modal, Select, Typography } from 'antd';
+import { App, Button, Card, Form, Input, Select, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Permissions from './permissions/index';
+import { PermissionsType } from './permissions/data-and-types';
 
 const getCashRegisters = (branches: Branch[], cash_registers: CashRegister[], branchesIds: string[]) => {
   const selectedBranches = branches.filter(cr => branchesIds.includes(cr.branch_id));
@@ -27,34 +29,41 @@ const getCashRegisters = (branches: Branch[], cash_registers: CashRegister[], br
 const ManageUserProfile = () => {
   const mounted = useRef(false);
   const [form] = Form.useForm();
-  const { branch_id } = useParams();
+  const { profile_id } = useParams();
   const { branches, cash_registers } = useAppSelector(({ branches }) => branches);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [isMainBranch, setIsMainBranch] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
+  const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
   const [selectedCashRegisters, setSelectedCashRegisters] = useState<string[]>([]);
+  const { modal } = App.useApp();
   const [selectedRole, setSelectedRole] = useState('ADMIN');
+  const [permissions, setPermissions] = useState<PermissionsType>({});
 
   const fetchDetails = async () => {
     setLoading(true);
-    const data = await dispatch(branchesActions.getBranchById(branch_id!));
-    form.setFieldsValue(data);
-    setIsMainBranch(!!data.main_branch);
+    const data = await dispatch(userActions.fetchUser(profile_id!));
+    const role = data?.role || 'ADMIN';
+    form.setFieldsValue({ ...data, role });
+    setSelectedRole(role);
+    setPermissions(data?.permissions || {});
+    setSelectedBranches(data?.branches || []);
+    setSelectedCashRegisters(data?.cash_registers || []);
+    setCurrentProfile(data);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (!!branch_id && !mounted.current) {
+    if (!!profile_id && !mounted.current) {
       mounted.current = true;
       fetchDetails();
     }
-  }, [branch_id, mounted]);
+  }, [profile_id, mounted]);
 
   const confirmDeleteBranch = async () => {
-    await dispatch(branchesActions.deleteBranch(branch_id!));
+    await dispatch(userActions.deleteUser(profile_id!));
     navigate(-1);
   };
 
@@ -63,9 +72,18 @@ const ManageUserProfile = () => {
     await form
       .validateFields()
       .then(async values => {
-        console.log(values);
-        const result = await dispatch(userActions.createUser(values));
-        if (result) navigate(-1);
+        const newValues = { ...values, permissions };
+
+        if (!profile_id) {
+          const result = await dispatch(userActions.createUser(newValues));
+          if (result) navigate(-1);
+        } else {
+          const result = await dispatch(userActions.updateProfile(newValues));
+
+          form.setFieldsValue(result);
+          setCurrentProfile(result);
+          setPermissions(result?.permissions || {});
+        }
       })
       .finally(() => setLoadingSave(false));
   };
@@ -89,7 +107,7 @@ const ManageUserProfile = () => {
       <div className={`flex flex-col gap-2 p-4 min-h-[calc(100%-82px)] max-h-[calc(100%-82px)] overflow-auto`}>
         <div className="flex gap-4 max-w-[700px] mx-auto w-full">
           <Button icon={<ArrowLeftOutlined />} shape="circle" onClick={() => navigate(-1)} />
-          <Typography.Title level={4}>{branch_id ? 'Actualizar perfil' : 'Registrar usuario'}</Typography.Title>
+          <Typography.Title level={4}>{profile_id ? 'Actualizar perfil' : 'Registrar usuario'}</Typography.Title>
         </div>
         <Form
           form={form}
@@ -104,6 +122,9 @@ const ManageUserProfile = () => {
           <Form.Item name="profile_id" hidden>
             <Input />
           </Form.Item>
+          <Form.Item name="is_default" hidden>
+            <Input />
+          </Form.Item>
           <Card title="Información básica" className="shadow-md rounded-xl" loading={loading}>
             <div className="flex flex-col md:flex-row gap-6 mb-4">
               <Form.Item className="mb-0 w-full" name="first_name" label="Nombre(s)">
@@ -116,6 +137,12 @@ const ManageUserProfile = () => {
             <Form.Item className="w-full mb-4" name="phone" label="Teléfono">
               <Input placeholder="Teléfono" inputMode="tel" onPressEnter={onSubmit} />
             </Form.Item>
+          </Card>
+
+          <Card title="Credenciales" className="shadow-md rounded-xl" loading={loading}>
+            <Typography.Paragraph className="!-mt-2 mb-2 text-slate-400 font-light">
+              Con ellas el usuario podrá acceder al sistema
+            </Typography.Paragraph>
             <div className="flex gap-6 mb-2 flex-col md:flex-row">
               <Form.Item
                 className="mb-0 w-full"
@@ -191,30 +218,32 @@ const ManageUserProfile = () => {
                     onChange={value => setSelectedCashRegisters(value)}
                   />
                 </Form.Item>
+
+                <Permissions value={permissions} onPermissionsChange={setPermissions} />
               </>
             )}
           </Card>
         </Form>
 
-        {branch_id && !isMainBranch && (
-          <Card title="Eliminar sucursal" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
+        {profile_id && !currentProfile?.is_default && (
+          <Card title="Inhabilitar usuario" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
               <Typography.Text type="danger">
-                Una vez eliminada la sucursal, no se podrá recuperar la información.
+                NOTA: Una vez eliminado, el usuario no podrá acceder al sistema ni realizar acciones.
               </Typography.Text>
               <Button
                 ghost
                 danger
                 className="w-full md:max-w-40"
                 onClick={() => {
-                  Modal.confirm({
-                    title: 'Eliminar sucursal',
-                    type: 'error',
-                    okText: 'Eliminar',
+                  modal.confirm({
+                    title: 'Eliminar usuario',
+                    type: 'warning',
+                    okText: 'Aceptar',
                     onOk: confirmDeleteBranch,
                     okType: 'danger',
                     cancelText: 'Cancelar',
-                    content: '¿Estás seguro de que deseas eliminar esta sucursal?',
+                    content: 'Una vez eliminado, el usuario no podrá acceder al sistema ni realizar acciones.',
                     footer: (_, { OkBtn, CancelBtn }) => (
                       <>
                         <CancelBtn />

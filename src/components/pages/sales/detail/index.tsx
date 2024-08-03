@@ -12,7 +12,6 @@ import { BUCKETS } from '@/constants/buckets';
 import UpdateSaleButton from './update-sale-btn';
 import PrintInvoiceButton from './print-invoice-btn';
 import AddNewItem from './detail-item-actions/add-new-item';
-import DeleteButton from '@/components/molecules/Table/delete-btn';
 import DeleteSaleButton from './delete-sale-btn';
 import CardRoot from '@/components/atoms/Card';
 import EditSaleItemModal from './detail-item-actions/edit-item';
@@ -36,6 +35,8 @@ const SaleDetail = () => {
   const dispatch = useAppDispatch();
   const { sale_id } = useParams();
   const { current_sale, loading: isLoading } = useAppSelector(({ sales }) => sales);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+
   const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
   const [open, setOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<SaleItem>();
@@ -151,7 +152,7 @@ const SaleDetail = () => {
               amounts?.total,
             )}`}</Typography.Title>
 
-            {[STATUS_DATA.PENDING.id].includes(current_sale?.metadata?.status_id as number) && (
+            {[STATUS_DATA.PENDING.id].includes(current_sale?.metadata?.status_id as number) && permissions?.sales?.edit_sale && (
               <Row gutter={[10, 10]} className="!mt-4">
                 <Col span={24}>
                   <UpdateSaleButton amounts={amounts} />
@@ -171,7 +172,7 @@ const SaleDetail = () => {
                   {current_sale?.metadata?.customers?.name || 'Público general'}
                 </Typography.Paragraph>
 
-                <ChangeCustomerModal />
+                {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
               </div>
             </div>
             <Divider className="!my-3" />
@@ -227,15 +228,16 @@ const SaleDetail = () => {
               <Col xs={12} md={6}>
                 <PrintInvoiceButton amounts={amounts} />
               </Col>
-              <Col xs={12} md={6}>
-                <AddNewItem />
-              </Col>
-              {/* <Col xs={12} md={6}>
-                <UpdateCashier />
-              </Col> */}
-              <Col xs={12} md={6}>
-                <DeleteSaleButton />
-              </Col>
+              {permissions?.sales?.edit_sale && (
+                <Col xs={12} md={6}>
+                  <AddNewItem />
+                </Col>
+              )}
+              {permissions?.sales?.delete_sale && (
+                <Col xs={12} md={6}>
+                  <DeleteSaleButton />
+                </Col>
+              )}
             </Row>
           </CardRoot>
           {!isTablet ? (
@@ -295,6 +297,7 @@ const SaleDetail = () => {
                     width: 150,
                     align: 'center',
                     render: (_, record) => {
+                      if (!permissions?.sales?.edit_sale) return null;
                       return (
                         <Dropdown
                           menu={{

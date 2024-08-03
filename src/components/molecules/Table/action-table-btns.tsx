@@ -7,10 +7,20 @@ type Props = {
   content?: string;
   deleteFunction?: any;
   editFunction?: any;
+  hideDeleteButton?: boolean;
+  hideEditButton?: boolean;
   onEdit?: () => void;
 };
 
-const ActionTableButtons: React.FC<Props> = ({ title, content, deleteFunction, editFunction, onEdit }) => {
+const ActionTableButtons: React.FC<Props> = ({
+  title,
+  content,
+  deleteFunction,
+  editFunction,
+  onEdit,
+  hideDeleteButton = false,
+  hideEditButton = false,
+}) => {
   const dispatch = useAppDispatch();
   const [modalStatus, setModalStatus] = useState<'edit' | 'delete' | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -38,14 +48,16 @@ const ActionTableButtons: React.FC<Props> = ({ title, content, deleteFunction, e
   return (
     <>
       <div className="flex gap-0 w-full justify-center">
-        {(editFunction || onEdit) && (
+        {(editFunction || onEdit) && !hideEditButton && (
           <Button type="link" onClick={handleEdit}>
             Editar
           </Button>
         )}
-        <Button danger type="link" onClick={() => showModal('delete')}>
-          Eliminar
-        </Button>
+        {!hideDeleteButton && (
+          <Button danger type="link" onClick={() => showModal('delete')}>
+            Eliminar
+          </Button>
+        )}
       </div>
       <Modal
         title={title || 'Eliminar elemento'}

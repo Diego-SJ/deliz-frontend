@@ -2,9 +2,12 @@ import CardRoot from '@/components/atoms/Card';
 import { useAppSelector } from '@/hooks/useStore';
 import { Price } from '@/redux/reducers/branches/type';
 import { PriceList } from '@/redux/reducers/products/types';
+import { APP_ROUTES } from '@/routes/routes';
 import functions from '@/utils/functions';
-import { Form, InputNumber, Typography } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Form, InputNumber, Typography } from 'antd';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   onChange?: (priceList: PriceList) => void;
@@ -13,6 +16,7 @@ type Props = {
 };
 
 const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
+  const navigate = useNavigate();
   const { prices_list } = useAppSelector(state => state.branches);
   const [unitPrice, setUnitPrice] = useState(0);
 
@@ -31,10 +35,12 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
     <CardRoot title="Precios">
       <div className="w-full">
         <div className="w-full md:max-w-[300px] mb-10 flex gap-2 items-start flex-col justify-center">
-          <Typography.Text style={{ margin: 0 }} className="font-semibold">
-            Precio de compra
-          </Typography.Text>
-          <Form.Item className="w-full mb-0" name="raw_price">
+          <Form.Item
+            label="Precio unitario"
+            className="w-full mb-0"
+            name="raw_price"
+            tooltip="Precio que cuesta fabricar o adquirir el producto. Este precio no se mostrará a los clientes."
+          >
             <InputNumber
               prefix="$"
               className="w-full"
@@ -63,12 +69,12 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
           </Typography.Title>
         </div>
         <div className="flex w-full flex-col">
-          {prices_list.map((price, index) => (
+          {prices_list?.map((price, index) => (
             <div key={index} className="w-full flex flex-col md:flex-row items-center mb-6 md:mb-1">
               <div className="w-full py-1 flex gap-2 items-start flex-col justify-center">
-                <Typography.Text style={{ margin: 0 }}>{price.name}</Typography.Text>
+                <Typography.Text className="!m-0 !text-sm">{price?.name || ''}</Typography.Text>
                 <InputNumber
-                  value={priceList[price.price_id]?.unit_price || 0}
+                  value={priceList[price?.price_id || '']?.unit_price || 0}
                   onChange={value => handleChange(value as number, price)}
                   onFocus={({ target }) => (target as HTMLInputElement).select()}
                   prefix="$"
@@ -93,6 +99,18 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
               </div>
             </div>
           ))}
+          {!prices_list?.length && (
+            <div className="flex justify-center flex-col items-center gap-2 my-3">
+              <div className="w-full text-center">No hay precios disponibles</div>
+              <Button
+                icon={<PlusCircleOutlined />}
+                className="w-fit"
+                onClick={() => navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path)}
+              >
+                Agregar precio
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </CardRoot>

@@ -11,6 +11,7 @@ const PricesListPage = () => {
   const dispatch = useAppDispatch();
   const { prices_list } = useAppSelector(state => state.branches);
   const { company_id } = useAppSelector(state => state.app.company);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
@@ -79,9 +80,11 @@ const PricesListPage = () => {
             Configura las listas de precios que deseas ofrecerle a tus clientes
           </Typography.Text>
 
-          <Button icon={<PlusCircleOutlined />} onClick={openModal}>
-            Agregar nuevo
-          </Button>
+          {permissions?.price_list?.add_price && (
+            <Button icon={<PlusCircleOutlined />} onClick={openModal}>
+              Agregar nuevo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -89,11 +92,13 @@ const PricesListPage = () => {
         <List
           itemLayout="horizontal"
           footer={
-            <div className="px-2">
-              <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
-                Agregar nuevo
-              </Button>
-            </div>
+            permissions?.price_list?.add_price ? (
+              <div className="px-2">
+                <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
+                  Agregar nuevo
+                </Button>
+              </div>
+            ) : null
           }
           className="px-0"
           dataSource={prices_list}
@@ -103,10 +108,12 @@ const PricesListPage = () => {
               classNames={{ actions: 'flex' }}
               className="flex"
               actions={[
-                <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
-                  Editar
-                </Button>,
-                item.is_default ? null : (
+                permissions?.price_list?.edit_price ? (
+                  <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
+                    Editar
+                  </Button>
+                ) : null,
+                item.is_default || !permissions?.price_list?.delete_price ? null : (
                   <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.price_id)}>
                     Eliminar
                   </Button>

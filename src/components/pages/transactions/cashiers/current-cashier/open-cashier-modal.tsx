@@ -8,6 +8,7 @@ const OpenCashierModal = () => {
 
   const dispatch = useAppDispatch();
   const { currentCashRegister } = useAppSelector(({ branches }) => branches);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -31,9 +32,11 @@ const OpenCashierModal = () => {
   return (
     <div className="min-h-60 flex justify-center items-center">
       <Empty description="Aún no tienes una caja abierta">
-        <Button onClick={() => setVisible(true)} loading={loading}>
-          Abrir Caja {currentCashRegister?.name}
-        </Button>
+        {permissions?.cash_registers?.open_cash_cut && (
+          <Button onClick={() => setVisible(true)} loading={loading}>
+            Abrir Caja {currentCashRegister?.name}
+          </Button>
+        )}
       </Empty>
       <Modal width={400} title={`Abrir Caja ${currentCashRegister?.name}`} open={visible} onCancel={onClose} footer={null}>
         <Form form={form} layout="vertical" initialValues={{ notes: '', initial_amount: 0 }}>

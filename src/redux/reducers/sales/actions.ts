@@ -5,7 +5,6 @@ import {
   CashClosing,
   CashRegister,
   CashRegisterItem,
-  Cashier,
   DiscountType,
   OperatingExpense,
   Sale,
@@ -19,7 +18,6 @@ import { productActions } from '../products';
 import { Product } from '../products/types';
 import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
-import { cashiersActions } from '../cashiers';
 import { productHelpers } from '@/utils/products';
 import { STATUS_DATA } from '@/constants/status';
 
@@ -27,16 +25,24 @@ const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     let salesList: SaleDetails[] = getState().sales.sales || [];
     const company_id = getState().app.company.company_id;
+    const isAdmin = getState().users.user_auth.profile?.role === 'ADMIN';
+    const { currentBranch, currentCashRegister } = getState().branches;
 
     if (!salesList.length || args?.refetch) {
       dispatch(salesActions.setLoading(true));
-      const { data, error } = await supabase
+      const supabaseQuery = supabase
         .from('sales')
         .select(`*,customers ( * ), status ( status_id, name )`)
         .in('status_id', [STATUS_DATA.COMPLETED.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
         .eq('company_id', company_id)
         .order('created_at', { ascending: false });
 
+      if (!isAdmin) {
+        supabaseQuery.eq('branch_id', currentBranch?.branch_id);
+        supabaseQuery.eq('cash_register_id', currentCashRegister?.cash_register_id);
+      }
+
+      const { data, error } = await supabaseQuery;
       dispatch(salesActions.setLoading(false));
 
       if (error) {
@@ -344,7 +350,7 @@ const customActions = {
         currentItems.splice(itemDefaultExists, 1);
       }
 
-      currentItems.push(newItemData);
+      currentItems.unshift(newItemData);
 
       dispatch(salesActions.updateCashRegister({ items: currentItems }));
     },

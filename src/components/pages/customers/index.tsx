@@ -56,6 +56,7 @@ const Customers = () => {
   const dispatch = useAppDispatch();
   const [options, setOptions] = useState<Customer[]>([]);
   const { customers, current_customer } = useAppSelector(({ customers }) => customers);
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
 
@@ -128,11 +129,19 @@ const Customers = () => {
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
-            <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
-              <Button size={isTablet ? 'large' : 'middle'} block type="primary" icon={<PlusCircleOutlined />} onClick={onAddNew}>
-                Nuevo
-              </Button>
-            </Col>
+            {permissions?.customers?.add_customer && (
+              <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
+                <Button
+                  size={isTablet ? 'large' : 'middle'}
+                  block
+                  type="primary"
+                  icon={<PlusCircleOutlined />}
+                  onClick={onAddNew}
+                >
+                  Nuevo
+                </Button>
+              </Col>
+            )}
           </Row>
           {!isTablet ? (
             <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>

@@ -25,9 +25,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
 import ExistencesTable from './existences-table';
 import PricesTable from './prices-table';
-import { branchesActions } from '@/redux/reducers/branches';
-import { QuickCategoryCreationForm } from '../categories/editor';
-import { BUCKETS } from '@/constants/buckets';
+import { QuickCategoryCreationForm } from '@/components/pages/settings/categories/editor';
 
 type Params = {
   action: 'edit' | 'add';
