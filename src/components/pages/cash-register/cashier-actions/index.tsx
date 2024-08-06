@@ -173,13 +173,13 @@ const CashierActions = ({}: CashierActionsProps) => {
           {permissions?.pos?.apply_shipping && (
             <Col span={6}>
               <div
-                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
                 onClick={() => openModal('APPLY_SHIPPING')}
               >
                 <Avatar
-                  icon={<TruckOutlined className="text-slate-600 !text-lg" />}
+                  icon={<TruckOutlined className="text-gray-400 !text-lg" />}
                   shape="square"
-                  className="mb-1 bg-slate-600/10"
+                  className="mb-1 bg-gray-300/10"
                 />
                 <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
               </div>
@@ -188,13 +188,13 @@ const CashierActions = ({}: CashierActionsProps) => {
           {permissions?.pos?.apply_discount && (
             <Col span={6}>
               <div
-                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
                 onClick={() => openModal('APPLY_DISCOUNT')}
               >
                 <Avatar
-                  icon={<TagsOutlined className="text-slate-600 !text-lg" />}
+                  icon={<TagsOutlined className="text-gray-400 !text-lg" />}
                   shape="square"
-                  className="mb-1 bg-slate-600/10"
+                  className="mb-1 bg-gray-300/10"
                 />
                 <span className="text-xs lowercase select-none text-center leading-3 !font-light">descuento</span>
               </div>
@@ -203,13 +203,13 @@ const CashierActions = ({}: CashierActionsProps) => {
 
           <Col span={6}>
             <div
-              className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+              className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
               onClick={cancelOrder}
             >
               <Avatar
-                icon={<ClearOutlined className="text-slate-600 !text-lg" />}
+                icon={<ClearOutlined className="text-gray-400 !text-lg" />}
                 shape="square"
-                className="mb-1 bg-slate-600/10"
+                className="mb-1 bg-gray-300/10"
               />
               <span className="text-xs lowercase select-none text-center leading-3 !font-light">borrar</span>
             </div>
@@ -218,13 +218,13 @@ const CashierActions = ({}: CashierActionsProps) => {
           {permissions?.pos?.add_manual_item && (
             <Col span={6}>
               <div
-                className="py-2 flex flex-col items-center border border-slate-600/10 hover:border-slate-600/40 h-full rounded-lg justify-center cursor-pointer"
+                className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
                 onClick={() => openModal('ADD_NEW_ITEM')}
               >
                 <Avatar
-                  icon={<SignatureOutlined className="text-slate-600 !text-lg" />}
+                  icon={<SignatureOutlined className="text-gray-400 !text-lg" />}
                   shape="square"
-                  className="mb-1 bg-slate-600/10"
+                  className="mb-1 bg-gray-300/10"
                 />
                 <span className="text-xs lowercase select-none text-center leading-3 !font-light">manual</span>
               </div>

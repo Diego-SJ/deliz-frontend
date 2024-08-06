@@ -107,7 +107,7 @@ const SaleDetail = () => {
         </Col>
       </Row>
       <Row style={{ marginTop: '20px' }} gutter={[20, 20]}>
-        <Col xl={{ span: 8 }} xs={24} md={24}>
+        <Col xl={{ span: 8 }} xs={24} md={24} lg={10}>
           {/* SALE AMOUNTS */}
           <CardRoot loading={isLoading} title="Resumen">
             <Alert
@@ -242,20 +242,20 @@ const SaleDetail = () => {
             </CardRoot>
           )}
         </Col>
-        <Col xl={{ span: 16 }} xs={24} md={24}>
+        <Col xl={{ span: 16 }} xs={24} md={24} lg={14}>
           {!isTablet && (
             <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
               <Row gutter={[20, 20]}>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={6} lg={8}>
                   <PrintInvoiceButton amounts={amounts} />
                 </Col>
                 {permissions?.sales?.edit_sale && (
-                  <Col xs={12} md={6}>
+                  <Col xs={12} md={6} lg={8}>
                     <AddNewItem />
                   </Col>
                 )}
                 {permissions?.sales?.delete_sale && (
-                  <Col xs={12} md={6}>
+                  <Col xs={12} md={6} lg={8}>
                     <DeleteSaleButton />
                   </Col>
                 )}
@@ -367,7 +367,7 @@ const SaleDetail = () => {
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-44px)]"
-              $bodyHeight="80dvh"
+              $bodyHeight={items?.length > 6 ? '80dvh' : 'auto'}
               pagination={false}
               dataSource={items}
               renderItem={item => {
@@ -411,7 +411,7 @@ const SaleDetail = () => {
                                   title: 'Eliminar producto',
                                   content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
                                   onOk: async () => {
-                                    await dispatch(salesActions.deleteItemById(item.products?.product_id || 0));
+                                    await dispatch(salesActions.deleteItemById(item.sale_detail_id || 0));
                                   },
                                   okText: 'Eliminar',
                                   okType: 'danger',
@@ -498,7 +498,7 @@ const SaleDetail = () => {
           )}
         </Col>
       </Row>
-      <EditSaleItemModal currentItem={currentItem} open={open} onClose={closeModal} />
+      {currentItem && <EditSaleItemModal currentItem={currentItem} open={open} onClose={closeModal} />}
     </div>
   );
 };

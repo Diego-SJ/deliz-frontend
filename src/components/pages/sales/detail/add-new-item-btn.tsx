@@ -8,7 +8,6 @@ import { Product } from '@/redux/reducers/products/types';
 import { CATEGORIES } from '@/constants/mocks';
 import { CashRegisterItem, SaleItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import NumberKeyboard from '@/components/atoms/NumberKeyboard';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { DollarOutlined, PlusCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { ModalBody } from '../../cash-register/styles';
@@ -44,7 +43,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   const { isTablet } = useMediaQuery();
   const { items = [] } = cash_register;
   const stock = currentProduct?.stock || 0;
-  const isExtra = casherItem?.product?.product_id === 0;
 
   useEffect(() => {
     if (open) {
@@ -78,12 +76,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
     setQuantityUsed(totalQuantity);
   }, [currentProduct, items, quantity]);
 
-  useEffect(() => {
-    if (stock - quantityUsed < 0 && !isExtra) {
-      message.error('No hay stock suficiente');
-    }
-  }, [stock, quantityUsed, isExtra]);
-
   const disableSaveBtn = () => {
     const overStock = action === 'EDIT' ? stock - quantityUsed < 0 : stock - quantityUsed < Number(quantity);
     const emptyValue = Number(quantity) <= 0;
@@ -106,10 +98,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   };
 
   const handleOk = async () => {
-    if (stock - quantityUsed < 0 && !isExtra) {
-      message.error('No hay stock suficiente');
-      return;
-    }
     setLoading(true);
     let newProduct: SaleItem = {
       sale_id: current_sale?.metadata?.sale_id,
@@ -132,11 +120,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
 
   const onQuantityChange = (value: number) => {
     setQuantity(value);
-  };
-
-  const onInputsChange = (value: number) => {
-    if (currentInput === 'quantity') onQuantityChange(value);
-    else setSpecialPrice(value);
   };
 
   const openModal = () => {
@@ -186,12 +169,6 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
               {currentProduct?.product_id !== 0 ? (
                 <Paragraph style={{ marginBottom: 0 }}>
                   {CATEGORIES.find(item => item.id === currentProduct?.category_id)?.name || '- - -'}
-                  {!isExtra && (
-                    <>
-                      <br />
-                      <b>({stock - quantityUsed < 0 ? 0 : stock - quantityUsed})</b> disponibles
-                    </>
-                  )}
                 </Paragraph>
               ) : null}
               <Title level={5} style={{ margin: 0 }}>

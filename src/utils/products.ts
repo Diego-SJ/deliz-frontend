@@ -14,7 +14,7 @@ export const productHelpers = {
 
     const regex = new RegExp(normalizedSearchText, 'i');
 
-    return products.filter(product => {
+    return products?.filter(product => {
       return regex?.test(this.normalizeText(product?.name)) || regex?.test(this.normalizeText(product?.description));
     });
   },
@@ -22,7 +22,8 @@ export const productHelpers = {
     return (product?.price_list || {})[price_id || '']?.unit_price || product?.raw_price || product?.retail_price || 0;
   },
   getProductStock: (product: Product | null, branch_id: string | null): number => {
-    return product?.inventory?.[branch_id || '']?.stock || 0;
+    console.log('stock', (product?.inventory || {})[branch_id || '']?.stock || 0);
+    return (product?.inventory || {})[branch_id || '']?.stock || 0;
   },
   calculateProductStock: (inventory: Inventory): { stock: number; hasStock: boolean } => {
     const stock = Object.values(inventory).reduce((acc, item) => acc + item.stock, 0) || 0;

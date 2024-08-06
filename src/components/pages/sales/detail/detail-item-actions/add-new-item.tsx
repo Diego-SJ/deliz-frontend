@@ -15,6 +15,7 @@ import {
   ShoppingCartOutlined,
   ShoppingOutlined,
   SignatureOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import ProductAvatar from '@/components/atoms/ProductAvatar';
 import { productHelpers } from '@/utils/products';
@@ -41,7 +42,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   const [loading, setLoading] = useState(false);
   const [productName, setProductName] = useState('');
   const quantityInput = useRef<HTMLInputElement>(null);
-  const { isTablet } = useMediaQuery();
+  const { isTablet, isPhablet } = useMediaQuery();
   const [productType, setProductType] = useState<'CATALOG' | 'CUSTOM'>('CATALOG');
   const stock = productHelpers.getProductStock(currentProduct, currentBranch?.branch_id || null);
 
@@ -110,7 +111,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   return (
     <>
       <Button size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} block onClick={openModal}>
-        {isTablet ? 'Agregar' : 'Agregar producto'}
+        {isPhablet ? 'Agregar' : 'Agregar'}
       </Button>
       <Modal
         open={open}
@@ -279,6 +280,11 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             }}
             onChange={value => setPriceQuantity(value)}
           />
+          {Number(productQuantity) > stock && (
+            <Typography.Paragraph type="warning" className="!mx-0 !mt-2 !mb-0">
+              <WarningOutlined /> La cantidad ingresada supera el stock
+            </Typography.Paragraph>
+          )}
           <Space height="10px" />
         </div>
       </Modal>

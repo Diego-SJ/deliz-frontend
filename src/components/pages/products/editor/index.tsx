@@ -25,7 +25,6 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
 import ExistencesTable from './existences-table';
 import PricesTable from './prices-table';
-import { branchesActions } from '@/redux/reducers/branches';
 
 import { BUCKETS } from '@/constants/buckets';
 import { QuickCategoryCreationForm } from '../../settings/categories/editor';
@@ -57,15 +56,16 @@ const ProductEditor = () => {
   const { modal } = App.useApp();
 
   useEffect(() => {
-    if (!firstRender.current) {
+    if (!firstRender.current && !!product_id && product_id !== 'new') {
       firstRender.current = true;
-      dispatch(productActions.fetchCategories({ refetch: true }));
-      dispatch(productActions.sizes.get({ refetch: true }));
-      dispatch(productActions.units.get({ refetch: true }));
-      dispatch(branchesActions.getPrices());
-      dispatch(branchesActions.getBranches());
+      // dispatch(productActions.fetchCategories({ refetch: true }));
+      // dispatch(productActions.sizes.get({ refetch: true }));
+      // dispatch(productActions.units.get({ refetch: true }));
+      // dispatch(branchesActions.getPrices());
+      // dispatch(branchesActions.getBranches());
+      dispatch(productActions.getProductById(Number(product_id)));
     }
-  }, [categories, sizes, dispatch]);
+  }, [product_id, dispatch]);
 
   useEffect(() => {
     if (!!current_product?.image_url) {
@@ -222,6 +222,9 @@ const ProductEditor = () => {
                       showSearch
                       optionFilterProp="children"
                       virtual={false}
+                      onClick={() => {
+                        if (!categories?.length) dispatch(productActions.fetchCategories({ refetch: true }));
+                      }}
                       filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                       options={categories?.map(i => ({ value: i.category_id, label: i.name }))}
                     />
@@ -260,6 +263,9 @@ const ProductEditor = () => {
                         size="large"
                         placeholder="Unidad de venta"
                         virtual={false}
+                        onClick={() => {
+                          if (!units?.data?.length) dispatch(productActions.units.get({ refetch: true }));
+                        }}
                         options={units?.data?.map(size => ({ value: size.unit_id, label: size?.name }))}
                       />
                     </Form.Item>
@@ -268,6 +274,9 @@ const ProductEditor = () => {
                         size="large"
                         placeholder="Grande"
                         virtual={false}
+                        onClick={() => {
+                          if (!sizes?.data?.length) dispatch(productActions.sizes.get({ refetch: true }));
+                        }}
                         options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
                       />
                     </Form.Item>
@@ -329,23 +338,22 @@ const ProductEditor = () => {
           )}
         </div>
       </div>
-      {!!permissions?.products?.add_product ||
-        (!!permissions?.products?.edit_product && (
-          <Card
-            className="rounded-none box-border absolute bottom-0 left-0 w-full"
-            classNames={{ body: 'w-full flex items-center' }}
-            styles={{ body: { padding: '0px', height: '80px' } }}
-          >
-            <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
-              <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
-                Cancelar
-              </Button>
-              <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
-                {UI_TEXTS.saveBtn[action]}
-              </Button>
-            </div>
-          </Card>
-        ))}
+      {(!!permissions?.products?.add_product || !!permissions?.products?.edit_product) && (
+        <Card
+          className="rounded-none box-border absolute bottom-0 left-0 w-full"
+          classNames={{ body: 'w-full flex items-center' }}
+          styles={{ body: { padding: '0px', height: '80px' } }}
+        >
+          <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
+            <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
+              Cancelar
+            </Button>
+            <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
+              {UI_TEXTS.saveBtn[action]}
+            </Button>
+          </div>
+        </Card>
+      )}
     </>
   );
 };

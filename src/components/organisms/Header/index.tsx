@@ -16,7 +16,7 @@ const Header = ({ onClick }: HeaderProps) => {
   return (
     <HeaderRoot className="border-b border-gray-200">
       {isTablet ? (
-        <Button onClick={onClick} size="large" type="dashed" icon={<MenuOutlined />}></Button>
+        <Button onClick={onClick} size="large" icon={<MenuOutlined />}></Button>
       ) : (
         <PageTitleProvider>
           <HeaderTitlte />

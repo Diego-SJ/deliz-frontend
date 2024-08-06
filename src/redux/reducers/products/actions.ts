@@ -24,11 +24,11 @@ const customActions = {
           .select(`*, categories(category_id,name), units(*), sizes(*)`)
           .eq('company_id', company_id)
           .order('name', { ascending: true });
+
         products =
           result?.data?.map(item => {
             return {
               ...item,
-              key: item.product_id as number,
             } as Product;
           }) ?? [];
         dispatch(productActions.setProducts(products));
@@ -38,6 +38,20 @@ const customActions = {
       dispatch(productActions.setLoading(false));
       return false;
     }
+  },
+  getProductById: (product_id: number) => async (dispatch: AppDispatch, getState: AppState) => {
+    const { data, error } = await supabase
+      .from('products')
+      .select(`*, categories(category_id,name), units(*), sizes(*)`)
+      .eq('product_id', product_id)
+      .single();
+
+    if (error) {
+      message.error('No se pudo obtener la información del producto');
+      return;
+    }
+
+    dispatch(productActions.setCurrentProduct(data));
   },
   saveImage: async (image: RcFile): Promise<string | null> => {
     const filename = image.uid;

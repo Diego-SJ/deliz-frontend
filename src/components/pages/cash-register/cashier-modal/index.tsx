@@ -26,7 +26,8 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
   const quantityInput = useRef<HTMLInputElement>(null);
   const [useCustomPrice, setUseCustomPrice] = useState(false);
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
-  const stock = casherItem?.product?.stock || 0;
+  const { currentBranch } = useAppSelector(({ branches }) => branches);
+  const { stock } = (casherItem?.product?.inventory || {})[currentBranch?.branch_id || ''] || 0;
   const currentProduct = casherItem?.product;
 
   useEffect(() => {
@@ -93,7 +94,7 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
       ]}
     >
       <ModalBody>
-        <ProductAvatar product={currentProduct} stock={stock} enableEdit={true} />
+        <ProductAvatar product={currentProduct} enableEdit={true} />
 
         <Space height="10px" />
         <div className="flex flex-col w-full gap-4">
@@ -118,6 +119,11 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
               }}
               onChange={value => setQuantity(value as number)}
             />
+            {Number(quantity) > stock && (
+              <Typography.Paragraph type="warning" className="!m-0 !mt-2">
+                La cantidad supera el stock
+              </Typography.Paragraph>
+            )}
           </div>
           {permissions?.pos?.add_custom_price && (
             <div>

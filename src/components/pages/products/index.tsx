@@ -16,60 +16,64 @@ import { productHelpers } from '@/utils/products';
 
 type DataType = Product;
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: 'Nombre',
-    dataIndex: 'name',
-    width: 180,
-    render: (text, record) => (
-      <div className="flex items-center gap-4 pl-4">
-        <Avatar
-          {...(!!record?.image_url
-            ? { src: record.image_url }
-            : { icon: <FileImageOutlined className="text-slate-600 text-base" /> })}
-          className={`bg-slate-600/10 p-1 w-10 min-w-10`}
-          size="large"
-        />
-        <p>{text}</p>
-      </div>
-    ),
-  },
-  {
-    title: 'Stock',
-    dataIndex: 'stock',
-    width: 50,
-    align: 'center',
-    render: (_: number, record) => {
-      const { stock, hasStock } = productHelpers.calculateProductStock(record.inventory || {});
-      return <Tag color={hasStock ? '' : 'volcano'}>{stock || 'Sin stock'}</Tag>;
+const columns = (branch_id: string) =>
+  [
+    {
+      title: 'Nombre',
+      dataIndex: 'name',
+      width: 180,
+      render: (text, record) => (
+        <div className="flex items-center gap-4 pl-4">
+          <Avatar
+            {...(!!record?.image_url
+              ? { src: record.image_url }
+              : { icon: <FileImageOutlined className="text-slate-600 text-base" /> })}
+            className={`bg-slate-600/10 p-1 w-10 min-w-10`}
+            size="large"
+          />
+          <p>{text}</p>
+        </div>
+      ),
     },
-  },
+    {
+      title: 'Stock',
+      dataIndex: 'stock',
+      width: 50,
+      align: 'center',
+      render: (_: number, record) => {
+        const stock = productHelpers.getProductStock(record || null, branch_id);
+        return <Tag color={stock >= 0 ? '' : 'volcano'}>{`${stock} unidades` || 'Sin stock'}</Tag>;
+      },
+    },
 
-  {
-    title: 'Precio',
-    dataIndex: 'retail_price',
-    render: (value: number, record) => {
-      let price = Object.values(record.price_list || {})?.find(item => !!item?.is_default)?.unit_price || value;
-      return <span>{functions.money(price)}</span>;
+    {
+      title: 'Precio',
+      dataIndex: 'retail_price',
+      render: (value: number, record) => {
+        let price = Object.values(record.price_list || {})?.find(item => !!item?.is_default)?.unit_price || value;
+        return <span>{functions.money(price)}</span>;
+      },
+      width: 70,
+      align: 'center',
     },
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: 'Categoría',
-    dataIndex: 'category_id',
-    width: 70,
-    align: 'center',
-    render: (_, record: any) => (
-      <Tag color={functions.getTagColor(record?.categories?.name || 'empty')}>{record?.categories?.name || 'Sin categoría'}</Tag>
-    ),
-  },
-];
+    {
+      title: 'Categoría',
+      dataIndex: 'category_id',
+      width: 70,
+      align: 'center',
+      render: (_, record: any) => (
+        <Tag color={functions.getTagColor(record?.categories?.name || 'empty')}>
+          {record?.categories?.name || 'Sin categoría'}
+        </Tag>
+      ),
+    },
+  ] as ColumnsType<DataType>;
 
 const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { products, categories } = useAppSelector(({ products }) => products);
+  const { currentBranch } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Product[]>([]);
   const { isTablet } = useMediaQuery();
@@ -175,7 +179,7 @@ const Products = () => {
                 }}
                 size="small"
                 scroll={{ y: 'calc(100vh - 300px)', x: 700 }}
-                columns={columns}
+                columns={columns(currentBranch?.branch_id || '')}
                 dataSource={options}
                 onRefresh={onRefresh}
                 totalItems={products?.length || 0}

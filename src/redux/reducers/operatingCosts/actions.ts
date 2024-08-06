@@ -39,10 +39,6 @@ export const customOperatingCostsActions = {
       supabaseQuery.eq('status_id', filters.status_id);
     }
 
-    if (filters.operation_type) {
-      supabaseQuery.eq('operation_type', filters.operation_type);
-    }
-
     if (filters.branch_id && filters.branch_id !== 'ALL') {
       supabaseQuery.eq('branch_id', filters.branch_id);
     }
@@ -85,5 +81,21 @@ export const customOperatingCostsActions = {
     });
 
     return filtered;
+  },
+  deleteOperation: (operation_id: string) => async (_: AppDispatch, getState: AppState) => {
+    const { company_id } = getState().app.company;
+    const { error } = await supabase
+      .from('operating_costs')
+      .delete()
+      .eq('operating_cost_id', operation_id)
+      .eq('company_id', company_id);
+
+    if (error) {
+      message.error('Error al eliminar la operación');
+      return null;
+    }
+
+    message.success('Operación eliminada correctamente');
+    return true;
   },
 };

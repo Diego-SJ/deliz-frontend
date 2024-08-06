@@ -65,6 +65,7 @@ export type SaleItem = {
   wholesale?: boolean | null;
   products?: Product & { categories: Category };
   sale_id?: number;
+  branch_id?: string;
   metadata?: {
     price_type?: 'DEFAULT' | 'PERSONALIZED';
     product_name?: string;

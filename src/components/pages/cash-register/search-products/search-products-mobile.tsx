@@ -1,16 +1,16 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { Product } from '@/redux/reducers/products/types';
 import { productHelpers } from '@/utils/products';
-import { Button, Col, Drawer, Empty, Input, Row } from 'antd';
+import { Button, Drawer, Empty, Input, InputRef } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { ItemProduct } from './product-item';
 import { salesActions } from '@/redux/reducers/sales';
 import { userActions } from '@/redux/reducers/users';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { productActions } from '@/redux/reducers/products';
 import { APP_ROUTES } from '@/routes/routes';
 import { useNavigate } from 'react-router-dom';
+import { ItemProductMobile } from './product-item-mobile';
 
 type Props = {
   visible: boolean;
@@ -24,47 +24,29 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
   const { products } = useAppSelector(({ products }) => products);
   const { profile } = useAppSelector(({ users }) => users.user_auth);
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
-  const touchStartY = useRef<number | null>(null);
-  const touchEndY = useRef<number | null>(null);
+  const inputSearchRef = useRef<InputRef>(null);
+  const { favorite_products = [] } = profile!;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleTouchStart = (event: TouchEvent) => {
-      touchEndY.current = null; // Reset touch end
-      touchStartY.current = event.touches[0].clientY;
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      touchEndY.current = event.touches[0].clientY;
-    };
-
-    const handleTouchEnd = () => {
-      if (touchStartY.current !== null && touchEndY.current !== null) {
-        const deltaY = touchStartY.current - touchEndY.current;
-        // Detect if swipe down (swipe down will have deltaY < 0)
-        if (deltaY < -50) {
-          onClose();
-        }
-      }
-    };
-
-    window.addEventListener('touchstart', handleTouchStart);
-    window.addEventListener('touchmove', handleTouchMove);
-    window.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [onClose]);
+    let _products = productHelpers.searchProducts(searchText, products);
+    setCurrentProducts(
+      _products?.sort((a, b) => {
+        if (favorite_products.includes(a.product_id) && !favorite_products.includes(b.product_id)) return -1;
+        if (!favorite_products.includes(a.product_id) && favorite_products.includes(b.product_id)) return 1;
+        return 0;
+      }),
+    );
+  }, [products, searchText, favorite_products]);
 
   useEffect(() => {
-    let _products = productHelpers.searchProducts(searchText, products);
-    setCurrentProducts(_products?.slice(0, 16) || []);
-  }, [products, searchText]);
+    if (visible) {
+      inputSearchRef.current?.focus();
+    }
+  }, [visible]);
 
   const handleClose = () => {
+    setSearchText('');
     onClose();
   };
 
@@ -92,14 +74,22 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
       onClose={handleClose}
       placement="bottom"
       height={'95dvh'}
+      closeIcon={null}
+      extra={
+        <Button type="text" size="large" onClick={handleClose}>
+          <CloseOutlined className="text-xl" />
+        </Button>
+      }
       styles={{ body: { padding: 0 } }}
       title="Buscar producto"
     >
       <div className="px-5 pt-5">
         <Input.Search
+          ref={inputSearchRef}
           allowClear
           size="large"
           autoFocus
+          value={searchText}
           className="search-products-input m-0 !border-gray-300"
           placeholder="Buscar producto"
           onFocus={event => {
@@ -110,15 +100,14 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
           }}
         />
 
-        <div className=" min-h-[calc(100dvh-155px)] max-h-[calc(100dvh-155px)] overflow-scroll py-5">
+        <div className=" min-h-[calc(100dvh-175px)] max-h-[calc(100dvh-175px)] overflow-y-scroll py-0">
           {currentProducts.length > 0 ? (
-            <Row gutter={[20, 20]}>
-              {currentProducts.map((product, index) => {
+            <div className="flex flex-col">
+              {currentProducts.map(product => {
                 const price = productHelpers.getProductPrice(product, price_id || null);
                 return (
-                  <Col key={product.product_id} lg={12} md={24} xs={24}>
-                    <ItemProduct
-                      key={product.product_id}
+                  <div className="w-full" key={product.product_id}>
+                    <ItemProductMobile
                       imageSrc={product.image_url}
                       title={product.name}
                       price={price}
@@ -130,12 +119,12 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
                       isFavorite={profile?.favorite_products?.includes(product.product_id)}
                       onFavorite={() => handleFavorite(product.product_id)}
                     />
-                  </Col>
+                  </div>
                 );
               })}
-            </Row>
+            </div>
           ) : (
-            <div className="w-full min-h-96 flex flex-col justify-center items-center">
+            <div className="w-full min-h-40 flex flex-col justify-center items-center">
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No se encontraron coincidencias">
                 <Button onClick={onAddNew} icon={<PlusCircleOutlined />}>
                   Registrar producto {searchText}

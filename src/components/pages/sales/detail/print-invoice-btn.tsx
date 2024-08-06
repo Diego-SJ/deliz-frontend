@@ -128,6 +128,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
             </Col>
           </Row>
           <CustomTable
+            rowKey={(record: SaleItem) => record.sale_detail_id?.toString() || ''}
             columns={[
               {
                 title: 'Producto',

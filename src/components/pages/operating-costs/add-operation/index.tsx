@@ -75,7 +75,8 @@ const AddOperationPurchaseExpense = () => {
 
   const confirmDelete = async () => {
     setLoading(true);
-    const success = await dispatch(productActions.deleteProduct(current_product));
+    if (!operating_cost_id) return;
+    const success = await dispatch(operatingCostsActions.deleteOperation(operating_cost_id));
     if (success) {
       clearFields();
       navigate(-1);
@@ -141,7 +142,7 @@ const AddOperationPurchaseExpense = () => {
                     <Input />
                   </Form.Item>
                   <Form.Item name="reason" label="Motivo" rules={[{ required: true }]}>
-                    <Input placeholder="E.g: Pago de luz" onPressEnter={onFinish} />
+                    <Input placeholder="E.g: Pago de luz" autoComplete="off" onPressEnter={onFinish} />
                   </Form.Item>
                   <Form.Item name="amount" label="Monto" rules={[{ required: true }]}>
                     <InputNumber

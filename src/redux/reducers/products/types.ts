@@ -11,8 +11,6 @@ export type ProductsSlice = {
 };
 
 export type Product = {
-  key?: number;
-
   product_id: number;
   name: string;
   description?: string;

@@ -62,16 +62,23 @@ const customActions = {
 
       if (!sale.items?.length || args?.refetch) {
         dispatch(salesActions.setLoading(args?.startLoading ?? true));
-        const { data, error } = await supabase
-          .from('sale_detail')
-          .select('*, products (*, categories (*))')
-          .eq('sale_id', args?.sale_id)
-          .order('created_at', { ascending: false });
 
-        const { data: metadata } = await supabase
-          .from('sales')
-          .select('*, customers (*), status (status_id, name), branches (*), cash_registers (*)')
-          .eq('sale_id', args?.sale_id);
+        const [query1, query2] = await Promise.all([
+          supabase
+            .from('sale_detail')
+            .select(
+              '*, products (name, inventory, category_id, image_url, price_list, product_id, raw_price, categories (name, category_id))',
+            )
+            .eq('sale_id', args?.sale_id)
+            .order('created_at', { ascending: false }),
+          supabase
+            .from('sales')
+            .select('*, customers (*), status (status_id, name), branches (*), cash_registers (*)')
+            .eq('sale_id', args?.sale_id),
+        ]);
+
+        const { data, error } = query1;
+        const { data: metadata } = query2;
 
         let items: SaleItem[] =
           data?.map(item => {
@@ -101,14 +108,15 @@ const customActions = {
       return false;
     }
   },
-  addItemToSale: (item: SaleItem) => async (dispatch: AppDispatch) => {
+  addItemToSale: (item: SaleItem) => async (dispatch: AppDispatch, getState: AppState) => {
+    const branch_id = getState().branches.currentBranch?.branch_id;
     const { error } = await supabase.rpc('add_sale_item', {
       p_metadata: item.metadata || {},
       p_price: item?.price,
       p_product_id: item.product_id || null,
       p_quantity: item.quantity,
       p_sale_id: item.sale_id,
-      p_wholesale: !!item.wholesale,
+      p_branch_id: branch_id,
     });
 
     if (error) {
@@ -215,6 +223,7 @@ const customActions = {
     async (dispatch: AppDispatch, getState: AppState): Promise<boolean> => {
       try {
         const state = getState().sales.cash_register.items || [];
+        const branch_id = getState().branches.currentBranch?.branch_id;
 
         let saleItems: SaleItem[] = state.map(item => {
           return {
@@ -223,6 +232,7 @@ const customActions = {
             product_id: item.product?.product_id || null,
             quantity: item.quantity,
             wholesale: null,
+            branch_id,
             metadata: {
               price_type: item.price_type,
               product_name: item.product?.name,
@@ -232,9 +242,9 @@ const customActions = {
 
         const { error } = await supabase.from('sale_detail').upsert(saleItems);
 
-        if (!error) {
-          await salesActions.restProductsStock(saleItems);
-        }
+        // if (!error) {
+        //   await salesActions.restProductsStock(saleItems);
+        // }
 
         if (error) {
           message.error('No se pudo registrar los productos de la venta');

@@ -31,6 +31,7 @@ const ManageUserProfile = () => {
   const [form] = Form.useForm();
   const { profile_id } = useParams();
   const { branches, cash_registers } = useAppSelector(({ branches }) => branches);
+  const [isDefaultUserAdmin, setIsDefaultUserAdmin] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ const ManageUserProfile = () => {
     const data = await dispatch(userActions.fetchUser(profile_id!));
     const role = data?.role || 'ADMIN';
     form.setFieldsValue({ ...data, role });
+    setIsDefaultUserAdmin(!!data?.is_default);
     setSelectedRole(role);
     setPermissions(data?.permissions || {});
     setSelectedBranches(data?.branches || []);
@@ -174,55 +176,57 @@ const ManageUserProfile = () => {
             </div>
           </Card>
 
-          <Card title="Permisos" className="shadow-md rounded-xl" loading={loading}>
-            <Form.Item className="w-full" name="role" label="Tipo de usuario" tooltip="Selecciona el tipo de usuario">
-              <Select
-                placeholder="Selecciona la sucursal"
-                options={[
-                  { label: 'Administrador', value: 'ADMIN' },
-                  { label: 'Cajero', value: 'CASHIER' },
-                ]}
-                onChange={value => setSelectedRole(value)}
-              />
-            </Form.Item>
-            {selectedRole !== 'ADMIN' && (
-              <>
-                <Form.Item
-                  className="w-full"
-                  name="branches"
-                  label="Sucursales"
-                  tooltip="Selecciona las sucursales a las que el usuario tendrá acceso"
-                  rules={[{ required: true, message: 'Selecciona al menos una sucursal' }]}
-                >
-                  <Select
-                    mode="tags"
-                    aria-autocomplete="none"
-                    placeholder="Selecciona la sucursal"
-                    options={branches.map(branch => ({ label: branch.name, value: branch.branch_id }))}
-                    onChange={onBranchesChange}
-                  />
-                </Form.Item>
-                <Form.Item
-                  className="w-full"
-                  name="cash_registers"
-                  label="Cajas"
-                  tooltip="Selecciona las cajas a las que el usuario tendrá acceso"
-                  rules={[{ required: true, message: 'Selecciona al menos una caja' }]}
-                >
-                  <Select
-                    mode="tags"
-                    placeholder="Selecciona la sucursal"
-                    value={selectedCashRegisters}
-                    aria-autocomplete="none"
-                    options={getCashRegisters(branches, cash_registers, selectedBranches)}
-                    onChange={value => setSelectedCashRegisters(value)}
-                  />
-                </Form.Item>
+          {!isDefaultUserAdmin && (
+            <Card title="Permisos" className="shadow-md rounded-xl" loading={loading}>
+              <Form.Item className="w-full" name="role" label="Tipo de usuario" tooltip="Selecciona el tipo de usuario">
+                <Select
+                  placeholder="Selecciona la sucursal"
+                  options={[
+                    { label: 'Administrador', value: 'ADMIN' },
+                    { label: 'Cajero', value: 'CASHIER' },
+                  ]}
+                  onChange={value => setSelectedRole(value)}
+                />
+              </Form.Item>
+              {selectedRole !== 'ADMIN' && (
+                <>
+                  <Form.Item
+                    className="w-full"
+                    name="branches"
+                    label="Sucursales"
+                    tooltip="Selecciona las sucursales a las que el usuario tendrá acceso"
+                    rules={[{ required: true, message: 'Selecciona al menos una sucursal' }]}
+                  >
+                    <Select
+                      mode="tags"
+                      aria-autocomplete="none"
+                      placeholder="Selecciona la sucursal"
+                      options={branches.map(branch => ({ label: branch.name, value: branch.branch_id }))}
+                      onChange={onBranchesChange}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    className="w-full"
+                    name="cash_registers"
+                    label="Cajas"
+                    tooltip="Selecciona las cajas a las que el usuario tendrá acceso"
+                    rules={[{ required: true, message: 'Selecciona al menos una caja' }]}
+                  >
+                    <Select
+                      mode="tags"
+                      placeholder="Selecciona la sucursal"
+                      value={selectedCashRegisters}
+                      aria-autocomplete="none"
+                      options={getCashRegisters(branches, cash_registers, selectedBranches)}
+                      onChange={value => setSelectedCashRegisters(value)}
+                    />
+                  </Form.Item>
 
-                <Permissions value={permissions} onPermissionsChange={setPermissions} />
-              </>
-            )}
-          </Card>
+                  <Permissions value={permissions} onPermissionsChange={setPermissions} />
+                </>
+              )}
+            </Card>
+          )}
         </Form>
 
         {profile_id && !currentProfile?.is_default && (

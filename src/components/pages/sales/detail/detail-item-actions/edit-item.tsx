@@ -23,11 +23,11 @@ const EditSaleItemModal = ({ open, onClose, currentItem }: Props) => {
   const [currentInput, setCurrentInput] = useState<'price' | 'quantity'>('price');
 
   useEffect(() => {
-    if (currentItem) {
+    if (currentItem && open) {
       setNewQuantity(currentItem.quantity || 0);
       setNewPrice(currentItem.price || 0);
     }
-  }, [currentItem]);
+  }, [currentItem, open]);
 
   const closeModal = () => {
     if (onClose) onClose();
@@ -46,6 +46,8 @@ const EditSaleItemModal = ({ open, onClose, currentItem }: Props) => {
     if (result) closeModal();
     setLoading(false);
   };
+
+  if (!currentItem) return null;
 
   return (
     <Modal
@@ -71,7 +73,6 @@ const EditSaleItemModal = ({ open, onClose, currentItem }: Props) => {
       <div>
         <ProductAvatar
           isManualEntry={currentItem?.metadata?.price_type === 'PERSONALIZED'}
-          stock={productHelpers.getProductStock(currentItem?.products || null, currentBranch?.branch_id || null)}
           product={{ ...currentItem?.products, name: currentItem?.products?.name || currentItem?.metadata?.product_name }}
         />
 

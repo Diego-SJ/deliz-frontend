@@ -82,6 +82,90 @@ export const PERMISSIONS = {
   },
 };
 
+export const PERMISSIONS_DENIED = {
+  pos: {
+    switch_prices: false,
+    apply_discount: false,
+    apply_shipping: false,
+    add_manual_item: false,
+    add_custom_price: false,
+  },
+  products: {
+    view_catalog: false,
+    add_product: false,
+    edit_product: false,
+    delete_product: false,
+    show_in_catalog: false,
+    update_stock: false,
+    update_price: false,
+    update_image: false,
+  },
+  customers: {
+    view_customers: false,
+    add_customer: false,
+    edit_customer: false,
+    delete_customer: false,
+  },
+  sales: {
+    view_sales: false,
+    add_sale: false,
+    edit_sale: false,
+    delete_sale: false,
+    download_receipt: false,
+  },
+  company: {
+    view_company: false,
+    edit_company: false,
+  },
+  branches: {
+    view_branches: false,
+    add_branch: false,
+    edit_branch: false,
+    delete_branch: false,
+  },
+  cash_registers: {
+    view_current_cash_cut: false,
+    view_history_cash_cuts: false,
+    open_cash_cut: false,
+    make_cash_cut: false,
+    make_cash_cut_operation: false,
+    view_cash_registers: false,
+    add_cash_register: false,
+    edit_cash_register: false,
+    delete_cash_register: false,
+  },
+  price_list: {
+    view_price_list: false,
+    add_price: false,
+    edit_price: false,
+    delete_price: false,
+  },
+  categories: {
+    view_categories: false,
+    add_category: false,
+    edit_category: false,
+    delete_category: false,
+  },
+  sizes: {
+    view_sizes: false,
+    add_size: false,
+    edit_size: false,
+    delete_size: false,
+  },
+  units: {
+    view_units: false,
+    add_unit: false,
+    edit_unit: false,
+    delete_unit: false,
+  },
+  expenses: {
+    view_expenses: false,
+    add_expense: false,
+    edit_expense: false,
+    delete_expense: false,
+  },
+};
+
 export const PERMISSION_NAMES = {
   pos: 'Punto de venta',
   products: 'Productos',

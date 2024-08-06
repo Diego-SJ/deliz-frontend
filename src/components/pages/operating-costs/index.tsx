@@ -200,14 +200,14 @@ const PurchasesExpenses = () => {
                 }}
               >
                 <Button
-                  type={filters?.branch_id !== 'ALL' ? 'primary' : 'default'}
+                  type={!!filters?.branch_id && filters?.branch_id !== 'ALL' ? 'primary' : 'default'}
                   block
-                  className={`${filters?.branch_id !== 'ALL' ? '!bg-white' : ''}`}
-                  ghost={filters?.branch_id !== 'ALL'}
+                  className={`${!!filters?.branch_id && filters?.branch_id !== 'ALL' ? '!bg-white' : ''}`}
+                  ghost={!!filters?.branch_id && filters?.branch_id !== 'ALL'}
                   size={isTablet ? 'large' : 'middle'}
                   icon={<ShopOutlined className="text-base" />}
                 >
-                  {filters?.branch_id === 'ALL'
+                  {!filters?.branch_id || filters?.branch_id === 'ALL'
                     ? 'Sucursal'
                     : branches?.find(branch => branch.branch_id === filters?.branch_id)?.name}
                 </Button>

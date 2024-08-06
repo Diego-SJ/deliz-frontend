@@ -10,7 +10,7 @@ import { message } from 'antd';
 import { orderActions } from '../orders';
 import { cashiersActions } from '../cashiers';
 import { Profile } from './types';
-import { PERMISSIONS } from '@/components/pages/settings/users/permissions/data-and-types';
+import { PERMISSIONS, PERMISSIONS_DENIED } from '@/components/pages/settings/users/permissions/data-and-types';
 
 const customActions = {
   fetchAppData: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -34,7 +34,7 @@ const customActions = {
     await dispatch(userActions.setUserAuth({ authenticated: true }));
   },
   loginSuccess: (profile_id: string) => async (dispatch: AppDispatch) => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
+    let { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
 
     if (error) {
       message.error(error.message);
@@ -116,7 +116,11 @@ const customActions = {
       role: profile.role || 'ADMIN',
       branches: profile.branches,
       cash_registers: profile.cash_registers,
-      permissions: profile.permissions,
+      permissions: !!Object.keys(profile.permissions || {})?.length
+        ? profile.permissions
+        : profile?.role === 'ADMIN'
+        ? PERMISSIONS
+        : PERMISSIONS_DENIED,
     } as Profile;
 
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
@@ -154,7 +158,11 @@ const customActions = {
       role: profile.role || 'ADMIN',
       branches: profile.branches,
       cash_registers: profile.cash_registers,
-      permissions: profile.permissions,
+      permissions: !!Object.keys(profile.permissions || {})?.length
+        ? profile.permissions
+        : profile?.role === 'ADMIN'
+        ? PERMISSIONS
+        : PERMISSIONS_DENIED,
     } as Profile;
 
     const { error } = await supabaseAdmin.auth.admin.updateUserById(profile.profile_id!, {

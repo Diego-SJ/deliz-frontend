@@ -59,8 +59,8 @@ const ProductAvatar = ({ product, stock = 0, enableEdit = false, icon, onButtonC
             />
           )}
         </div>
-        <Tag color={isManualEntry ? 'purple' : `${productStock > 0 ? `` : 'volcano'}`} className="w-fit">
-          {isManualEntry ? 'Producto personalizado' : productStock > 0 ? `${stock} unidades` : 'Sin stock'}
+        <Tag color={isManualEntry ? 'purple' : `${productStock <= 0 ? 'volcano' : ''}`} className="w-fit">
+          {isManualEntry ? 'Producto personalizado' : productStock === 0 ? 'Sin stock' : `${productStock} unidades`}
         </Tag>
       </div>
     </div>
