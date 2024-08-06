@@ -110,7 +110,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   return (
     <>
       <Button size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} block onClick={openModal}>
-        Agregar item
+        {isTablet ? 'Agregar' : 'Agregar producto'}
       </Button>
       <Modal
         open={open}

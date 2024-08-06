@@ -82,7 +82,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         onClick={showDrawer}
         loading={loading}
       >
-        Ver nota
+        {isTablet ? 'Nota' : 'Ver nota'}
       </Button>
 
       <Drawer
@@ -135,7 +135,9 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
                 render: (_, record: SaleItem) => {
                   return (
                     <div>
-                      <p className="text-sm text-slate-600">{record?.products?.name ?? '- - -'}</p>
+                      <p className="text-sm text-slate-600">
+                        {record.products?.name || record?.metadata?.product_name || '- - -'}
+                      </p>
                       <span className="block text-xs text-slate-400">
                         {record?.products?.categories?.name || 'Sin categoría'}
                       </span>

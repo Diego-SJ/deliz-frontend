@@ -34,6 +34,8 @@ import CashRegistersPage from '@/components/pages/settings/cash-registers';
 import UsersSettingsPage from '@/components/pages/settings/users';
 import ManageUserProfile from '@/components/pages/settings/users/add-user-form';
 import { useAppSelector } from '@/hooks/useStore';
+import PurchasesExpenses from '@/components/pages/operating-costs';
+import AddOperationPurchaseExpense from '@/components/pages/operating-costs/add-operation';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -182,6 +184,28 @@ const AppRouter = () => {
             />
           </>
         )}
+
+        {/* PURCHASES EXPENSES ROUTES - START */}
+
+        {permissions?.expenses?.view_expenses && (
+          <>
+            <Route
+              path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path}
+              element={
+                <PaddingLayout>
+                  <PurchasesExpenses />
+                </PaddingLayout>
+              }
+            />
+            <Route
+              path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.ADD_NEW.path}
+              element={<AddOperationPurchaseExpense />}
+            />
+            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
+          </>
+        )}
+
+        {/* PURCHASES EXPENSES ROUTES - END */}
 
         {/* SETTINGS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsPage />}>

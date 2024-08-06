@@ -74,15 +74,12 @@ export const PERMISSIONS = {
     edit_unit: true,
     delete_unit: true,
   },
-  // users: {
-  //   title: 'Usuarios',
-  //   permissions: {
-  //     view_users: true,
-  //     add_user: true,
-  //     edit_user: true,
-  //     delete_user: true,
-  //   },
-  // },
+  expenses: {
+    view_expenses: true,
+    add_expense: true,
+    edit_expense: true,
+    delete_expense: true,
+  },
 };
 
 export const PERMISSION_NAMES = {
@@ -97,6 +94,7 @@ export const PERMISSION_NAMES = {
   categories: 'Categorías',
   sizes: 'Tamaños',
   units: 'Unidades',
+  expenses: 'Gastos',
 
   switch_prices: 'Cambiar precios',
   apply_discount: 'Aplicar descuento',
@@ -155,6 +153,10 @@ export const PERMISSION_NAMES = {
   add_user: 'Agregar usuario',
   edit_user: 'Editar usuario',
   delete_user: 'Eliminar usuario',
+  view_expenses: 'Ver gastos',
+  add_expense: 'Agregar gasto',
+  edit_expense: 'Editar gasto',
+  delete_expense: 'Eliminar gasto',
 };
 
 export type PermissionsType = {

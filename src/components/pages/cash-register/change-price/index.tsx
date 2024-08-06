@@ -44,7 +44,7 @@ const ChangePrice = () => {
         onClick={onAddNew}
         className={`flex gap-2 items-center justify-between h-[45px] ${
           !!permissions?.pos?.switch_prices ? 'cursor-pointer hover:bg-gray-50' : ''
-        } px-3 rounded-lg bg-white border border-neutral-200 w-full`}
+        } px-3 rounded-lg bg-white border border-gray-300 w-full`}
       >
         <div className="flex gap-2 md:gap-5 items-center">
           <Avatar

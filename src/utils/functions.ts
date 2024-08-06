@@ -47,10 +47,12 @@ const functions = {
 
     return localDate.format('D [de] MMMM [del] YYYY, h:mma');
   },
-  date: (date: Date | string) => {
-    // let [year, month, day] = (date + '')?.split('-');
-    // let _date = `${month}/${day}/${year}`;
-    return format(new Date(date), 'PP', { locale: es });
+  date: (dateStr: Date | string) => {
+    if (!dateStr) return '- - -';
+    const date = dayjs.utc(dateStr?.toString());
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const localDate = date.tz(timeZone);
+    return localDate.format('D MMMM, YYYY');
   },
   date1: (date: Date | string) => {
     let [_date] = new Date(date).toLocaleString()?.split(',');

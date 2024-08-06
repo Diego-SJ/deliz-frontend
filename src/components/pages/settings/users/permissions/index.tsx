@@ -18,11 +18,11 @@ const Permissions = ({ onPermissionsChange = () => null, value: permissions }: P
             label: (PERMISSION_NAMES as any)[pkey],
             children: (
               <div className="flex flex-col gap-2">
-                {Object.entries(currentPermission || {})?.map(([key, value]) => (
+                {Object.entries((PERMISSIONS as any)[pkey] || {})?.map(([key, value]) => (
                   <div key={key} className="flex items-center justify-between">
                     <Typography.Text>{(PERMISSION_NAMES as any)[key]}</Typography.Text>
                     <Switch
-                      value={!!value}
+                      value={currentPermission?.[key]}
                       onChange={newValue => {
                         onPermissionsChange(prev => {
                           return {

@@ -15,6 +15,7 @@ import { salesActions } from '@/redux/reducers/sales';
 import CashRegisterItemsList from '../cart-items-list';
 import CashierActions from '../cashier-actions';
 import { useDebouncedCallback } from 'use-debounce';
+import SearchProductsMobile from './search-products-mobile';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ const SearchProducts = () => {
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [inputIsFocused, setInputIsFocused] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
+  const [openMobileSearhDrawer, setOpenMobileSearhDrawer] = useState(false);
   const searchInputRef = useRef<InputRef>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isPhablet, isTablet } = useMediaQuery();
@@ -117,17 +119,22 @@ const SearchProducts = () => {
 
   return (
     <>
-      <div className="px-3">
+      <div className="flex gap-4 px-3">
         <Input.Search
           ref={searchInputRef}
           allowClear
           size="large"
-          className="search-products-input m-0 !border-neutral-200"
+          className="search-products-input m-0 !border-gray-300"
           placeholder="Buscar producto"
           onFocus={() => {
             setInputIsFocused(!isTablet);
             setCurrentProducts(products?.slice(0, 16) || []);
             searchInputRef.current?.select();
+          }}
+          onClick={() => {
+            if (isTablet) {
+              setOpenMobileSearhDrawer(true);
+            }
           }}
           onChange={({ target }) => {
             handleInputTextChange(target.value);
@@ -200,6 +207,7 @@ const SearchProducts = () => {
           </div>
         )}
       </div>
+      <SearchProductsMobile visible={openMobileSearhDrawer} onClose={() => setOpenMobileSearhDrawer(false)} />
     </>
   );
 };

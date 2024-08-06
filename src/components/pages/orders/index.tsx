@@ -1,7 +1,7 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { Breadcrumb, Card, Col, Row, Typography, Calendar, Avatar, List, CalendarProps, Badge, Tag, Tooltip } from 'antd';
+import { Breadcrumb, Card, Col, Row, Typography, Calendar, Avatar, List, CalendarProps, Tag, Tooltip } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_DATA } from '@/constants/status';
@@ -9,7 +9,6 @@ import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails, SaleMetadata } from '@/redux/reducers/sales/types';
 import dayjs, { Dayjs } from 'dayjs';
 import { ClockCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { theme } from '@/styles/theme/config';
 import CardRoot from '@/components/atoms/Card';
 import { orderActions } from '@/redux/reducers/orders';
 import { Order } from '@/redux/reducers/orders/types';

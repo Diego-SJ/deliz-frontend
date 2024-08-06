@@ -159,87 +159,109 @@ const SaleDetail = () => {
                 </Col>
               </Row>
             )}
+
+            {isTablet && (
+              <Row gutter={[20, 20]} className="!mt-5">
+                <Col xs={8}>
+                  <PrintInvoiceButton amounts={amounts} />
+                </Col>
+                {permissions?.sales?.edit_sale && (
+                  <Col xs={8}>
+                    <AddNewItem />
+                  </Col>
+                )}
+                {permissions?.sales?.delete_sale && (
+                  <Col xs={8}>
+                    <DeleteSaleButton />
+                  </Col>
+                )}
+              </Row>
+            )}
           </CardRoot>
 
           {/* CUSTOMER CARD DETAILS */}
-          <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
-            <div className="w-full ">
-              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                Cliente
-              </Typography.Title>
-              <div className="flex items-center justify-between">
-                <Typography.Paragraph className="w-full !m-0" type="secondary">
-                  {current_sale?.metadata?.customers?.name || 'Público general'}
-                </Typography.Paragraph>
+          {!isTablet && (
+            <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Cliente
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {current_sale?.metadata?.customers?.name || 'Público general'}
+                  </Typography.Paragraph>
 
-                {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
+                  {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
+                </div>
               </div>
-            </div>
-            <Divider className="!my-3" />
-            <div className="w-full ">
-              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                Fecha
-              </Typography.Title>
-              <div className="flex items-center justify-between">
-                <Typography.Paragraph className="w-full !m-0" type="secondary">
-                  {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
-                </Typography.Paragraph>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Fecha
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
+                  </Typography.Paragraph>
+                </div>
               </div>
-            </div>
-            <Divider className="!my-3" />
-            <div className="w-full ">
-              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                Método de pago
-              </Typography.Title>
-              <div className="flex items-center justify-between">
-                <Typography.Paragraph className="w-full !m-0" type="secondary">
-                  {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
-                </Typography.Paragraph>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Método de pago
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
+                  </Typography.Paragraph>
+                </div>
               </div>
-            </div>
-            <Divider className="!my-3" />
-            <div className="w-full ">
-              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                Caja
-              </Typography.Title>
-              <div className="flex items-center justify-between">
-                <Typography.Paragraph className="w-full !m-0" type="secondary">
-                  Caja {(metadata as any)?.cash_registers?.name || '- - -'}
-                </Typography.Paragraph>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Caja
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    Caja {(metadata as any)?.cash_registers?.name || '- - -'}
+                  </Typography.Paragraph>
+                </div>
               </div>
-            </div>
-            <Divider className="!my-3" />
+              <Divider className="!my-3" />
 
-            <div className="w-full ">
-              <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                Sucursal
-              </Typography.Title>
-              <div className="flex items-center justify-between">
-                <Typography.Paragraph className="w-full !m-0" type="secondary">
-                  Sucursal {(metadata as any)?.branches?.name || '- - -'}
-                </Typography.Paragraph>
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Sucursal
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    Sucursal {(metadata as any)?.branches?.name || '- - -'}
+                  </Typography.Paragraph>
+                </div>
               </div>
-            </div>
-          </CardRoot>
+            </CardRoot>
+          )}
         </Col>
         <Col xl={{ span: 16 }} xs={24} md={24}>
-          <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
-            <Row gutter={[20, 20]}>
-              <Col xs={12} md={6}>
-                <PrintInvoiceButton amounts={amounts} />
-              </Col>
-              {permissions?.sales?.edit_sale && (
+          {!isTablet && (
+            <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
+              <Row gutter={[20, 20]}>
                 <Col xs={12} md={6}>
-                  <AddNewItem />
+                  <PrintInvoiceButton amounts={amounts} />
                 </Col>
-              )}
-              {permissions?.sales?.delete_sale && (
-                <Col xs={12} md={6}>
-                  <DeleteSaleButton />
-                </Col>
-              )}
-            </Row>
-          </CardRoot>
+                {permissions?.sales?.edit_sale && (
+                  <Col xs={12} md={6}>
+                    <AddNewItem />
+                  </Col>
+                )}
+                {permissions?.sales?.delete_sale && (
+                  <Col xs={12} md={6}>
+                    <DeleteSaleButton />
+                  </Col>
+                )}
+              </Row>
+            </CardRoot>
+          )}
           {!isTablet ? (
             <CardRoot styles={{ body: { padding: '0 0 2px 0', overflow: 'hidden' } }}>
               <Table
@@ -345,10 +367,9 @@ const SaleDetail = () => {
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-44px)]"
-              $bodyHeight="calc(100dvh - 300px)"
-              pagination={{ position: 'bottom', align: 'center' }}
+              $bodyHeight="80dvh"
+              pagination={false}
               dataSource={items}
-              rootClassName="sadasd"
               renderItem={item => {
                 return (
                   <div key={item.product_id} className="flex py-3 pl-4 pr-4 border-b border-gray-200 cursor-pointer items-center">
@@ -368,7 +389,6 @@ const SaleDetail = () => {
                         {item.quantity} x {functions.money(item.price)}
                       </Typography.Text>
                     </div>
-
                     <div className="flex flex-col text-end justify-center self-end ml-auto my-auto gap-4">
                       <Dropdown
                         className="!-mt-3"
@@ -377,13 +397,15 @@ const SaleDetail = () => {
                             {
                               key: 'edit',
                               label: 'Editar',
-                              icon: <EditOutlined />,
+                              icon: <EditOutlined className="!text-lg !mr-3" />,
+                              className: '!text-lg',
                               onClick: () => onRowClick(item),
                             },
                             {
                               key: 'delete',
                               label: 'Eliminar',
-                              icon: <DeleteOutlined />,
+                              icon: <DeleteOutlined className="!text-lg !mr-3" />,
+                              className: '!text-lg',
                               onClick: () => {
                                 modal.confirm({
                                   title: 'Eliminar producto',
@@ -410,6 +432,69 @@ const SaleDetail = () => {
                 );
               }}
             />
+          )}
+
+          {/* CUSTOMER CARD DETAILS */}
+          {isTablet && (
+            <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Cliente
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {current_sale?.metadata?.customers?.name || 'Público general'}
+                  </Typography.Paragraph>
+
+                  {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
+                </div>
+              </div>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Fecha
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
+                  </Typography.Paragraph>
+                </div>
+              </div>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Método de pago
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
+                  </Typography.Paragraph>
+                </div>
+              </div>
+              <Divider className="!my-3" />
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Caja
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    Caja {(metadata as any)?.cash_registers?.name || '- - -'}
+                  </Typography.Paragraph>
+                </div>
+              </div>
+              <Divider className="!my-3" />
+
+              <div className="w-full ">
+                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
+                  Sucursal
+                </Typography.Title>
+                <div className="flex items-center justify-between">
+                  <Typography.Paragraph className="w-full !m-0" type="secondary">
+                    Sucursal {(metadata as any)?.branches?.name || '- - -'}
+                  </Typography.Paragraph>
+                </div>
+              </div>
+            </CardRoot>
           )}
         </Col>
       </Row>

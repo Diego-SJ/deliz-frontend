@@ -83,7 +83,11 @@ const CashierDetail = () => {
               </div>
             </CardRoot>
 
-            <CardRoot className="!p-0" styles={{ body: { padding: 0 } }} loading={!currentCashCut?.cash_cut_id}>
+            <CardRoot
+              className="!p-0"
+              styles={{ body: { padding: !!currentCashCut?.cash_cut_id ? 0 : 20 } }}
+              loading={!currentCashCut?.cash_cut_id}
+            >
               <Typography.Title level={5} className="m-0 py-3 px-6" style={{ marginBottom: 0 }}>
                 Administración del dinero
               </Typography.Title>
@@ -144,7 +148,7 @@ const CashierDetail = () => {
           <Col xs={24} md={24} lg={14}>
             <CardRoot
               className="max-h-[30rem] overflow-auto"
-              styles={{ body: { padding: 0 } }}
+              styles={{ body: { padding: !!currentCashCut?.cash_cut_id ? 0 : 20 } }}
               loading={!currentCashCut?.cash_cut_id}
             >
               <List

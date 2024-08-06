@@ -56,6 +56,22 @@ export const APP_ROUTES = {
         OPERATING_EXPENSES: { path: '/app/transactions/operating-expenses' },
         CASHIERS: { path: '/app/transactions/cashiers' },
       },
+      PURCHASES_EXPENSES: {
+        path: '/app/purchases-expenses',
+        title: 'Gastos',
+        ADD_NEW: {
+          path: '/app/purchases-expenses/:action/:operation_type',
+          title: 'Agregar operación',
+          hash: (_: TemplateStringsArray, operation_type: 'expense' | 'purchase') =>
+            `/app/purchases-expenses/add/${operation_type}`,
+        },
+        EDIT: {
+          path: '/app/purchases-expenses/:action/:operation_type/:operating_cost_id',
+          title: 'Editar operación',
+          hash: (_: TemplateStringsArray, operation_type: string, id: string) =>
+            `/app/purchases-expenses/edit/${operation_type}/${id}`,
+        },
+      },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes', PRODUCTS: { path: '/app/reports/products' } },
       SETTINGS: {

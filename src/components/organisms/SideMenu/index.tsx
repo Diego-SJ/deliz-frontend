@@ -7,6 +7,8 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
   PlusCircleOutlined,
+  BarChartOutlined,
+  ReconciliationOutlined,
 } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -79,23 +81,14 @@ const ITEM_LIST = (permissions: Profile['permissions']) => [
         ].filter(Boolean),
       }
     : null,
-  // {
-  //   key: 'expenses',
-  //   icon: BarChartOutlined,
-  //   label: 'Compras y Gastos',
-  //   children: [
-  //     {
-  //       key: 'expenses.expenses',
-  //       label: 'Gastos',
-  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
-  //     },
-  //     {
-  //       key: 'expenses.purchases',
-  //       label: 'Compras',
-  //       path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
-  //     },
-  //   ],
-  // },
+  permissions?.expenses?.view_expenses
+    ? {
+        key: 'expenses',
+        icon: ReconciliationOutlined,
+        label: 'Gastos',
+        path: APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path,
+      }
+    : null,
   {
     key: 'settings',
     icon: SettingOutlined,

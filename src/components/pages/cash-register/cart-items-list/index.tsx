@@ -59,10 +59,10 @@ const CashRegisterItemsList = () => {
               key={record.id}
               className="relative flex my-1 md:my-0 rounded-lg md:rounded-none bg-white max-md:border max-md:border-x-gray-300 border-b border-gray-200 min-h-[5.2rem] sm:hover:bg-gray-50/80 cursor-pointer"
             >
-              <div className="w-full flex py-1 pl-3 sm:gap-3" onClick={() => openModal(record)}>
+              <div className="w-full flex py-1 pl-3 gap-4" onClick={() => openModal(record)}>
                 <Avatar
                   {...avatarProps}
-                  className="w-11 h-11 min-w-11 bg-slate-100 p-1 my-auto select-none  max-sm:hidden sm:grid sm:place-content-center"
+                  className="w-11 h-11 min-w-11 bg-slate-100 p-1 my-auto select-none sm:grid sm:place-content-center"
                 />
 
                 <div className="max-sm:flex-col md:flex-col lg:flex-row flex flex-row w-full items-center py-1 xl:gap-8">
@@ -71,7 +71,7 @@ const CashRegisterItemsList = () => {
                       ellipsis={{ rows: 2, tooltip: record.product?.name }}
                       className="text-start !font-medium !m-0 !mb-0 sm:!mb-1 w-full leading-4 select-none"
                     >
-                      {record?.product?.name || 'Sin nombre'}
+                      {(record?.product?.name || 'Sin nombre')?.toLowerCase()}
                     </Typography.Paragraph>
                     <p className="text-slate-400 font-light select-none leading-4">
                       {record?.price_type === 'PERSONALIZED' ? (
@@ -94,14 +94,14 @@ const CashRegisterItemsList = () => {
                         min={1}
                         size={isTablet ? 'large' : 'middle'}
                         value={record.quantity}
-                        className="w-28 md:w-20 lg:w-24  h-min"
+                        className="w-24 md:w-20 lg:w-24  h-min"
                         onFocus={({ target }) => target.select()}
                         onChange={value => dispatch(salesActions.cashRegister.update({ ...record, quantity: Number(value) }))}
                       />
                     </div>
                   </div>
                 </div>
-                <span className=" text-sm text-center font-normal my-auto min-w-28 select-none">
+                <span className=" text-sm text-center font-normal my-auto select-none">
                   {functions.money(record.price * record.quantity)}
                 </span>
               </div>

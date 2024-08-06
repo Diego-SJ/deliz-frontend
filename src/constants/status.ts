@@ -28,7 +28,7 @@ export const STATUS_DATA = {
   },
   COMPLETED: {
     id: 4,
-    name: 'Completado',
+    name: 'Pagado',
     color: '#87d068',
     scopes: {
       sales: true,

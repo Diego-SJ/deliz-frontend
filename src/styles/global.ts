@@ -63,7 +63,7 @@ export default createGlobalStyle`
   .ant-input-wrapper.ant-input-group .ant-input-affix-wrapper.ant-input-affix-wrapper-lg,
   .search-products-input.ant-input-group-wrapper.ant-input-group-wrapper-lg.ant-input-group-wrapper-outlined 
   .ant-input-wrapper.ant-input-group .ant-input-group-addon .ant-btn {
-    border-color: rgb(229 229 229 / var(--tw-border-opacity));
+    border-color: rgb(209 213 219 / var(--tw-border-opacity));
   }
 
   .search-products-input.ant-input-group-wrapper.ant-input-group-wrapper-lg.ant-input-group-wrapper-outlined

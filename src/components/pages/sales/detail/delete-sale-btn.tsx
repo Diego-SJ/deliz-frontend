@@ -48,7 +48,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
   return (
     <>
       <Button danger type="primary" size={isTablet ? 'large' : 'middle'} block onClick={onClick} icon={<DeleteOutlined />}>
-        Eliminar venta
+        {isTablet ? 'Eliminar' : 'Eliminar venta'}
       </Button>
       <Modal
         title={'Eliminar venta'}
