@@ -1,78 +1,115 @@
-import HeaderHome from '@/components/organisms/HeaderHome';
-import { Avatar, Typography } from 'antd';
-import { useEffect } from 'react';
-import { CardCategory, CardPopularproduct, CategoryContainer, HeaderTitleContainer } from './styles';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { CATEGORIES } from '@/constants/categories';
-import { Product } from '@/redux/reducers/products/types';
-import { COLORS } from '@/constants/colors';
 import FallbackImage from '@/assets/logo-color.svg';
-import AnimatedBackground from '@/components/atoms/AnimatedBackground';
-import useMediaQuery from '@/hooks/useMediaQueries';
-import BottomMenu from '@/components/organisms/BottomMenu';
-import { productActions } from '@/redux/reducers/products';
-
-const getPopularProducts = (products: Product[]) => {
-  return products?.slice(0, 10);
-};
+import { Avatar, Button } from 'antd';
+import DevicesWebp from '@/assets/webp/devices.webp';
+import { DotChartOutlined, ReconciliationOutlined, TeamOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '@/routes/routes';
 
 const Home = () => {
-  const dispatch = useAppDispatch();
-  const { isTablet } = useMediaQuery();
-  const { products } = useAppSelector(({ products }) => products);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!products.length) dispatch(productActions.fetchProducts({ refetch: true }));
-  }, [products, dispatch]);
+  const goToLogin = () => {
+    navigate(APP_ROUTES.AUTH.SIGN_IN_ADMIN.path);
+  };
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', maxHeight: '100vh' }}>
-      <AnimatedBackground style="light" />
-      <HeaderHome hideLogo={!isTablet} />
-      <HeaderTitleContainer>
-        {!isTablet && <Avatar size={90} src={FallbackImage} style={{ marginBottom: 5 }} className="!p-1" />}
-        <Typography.Title level={isTablet ? 3 : 2} style={{ margin: isTablet ? '20px 0 0' : '0 20px 5px' }}>
-          ¡Bienvenido a <span>Posiffy</span>!
-        </Typography.Title>
-      </HeaderTitleContainer>
+    <div className="min-h-[100dvh] max-h-[100dvh] w-full">
+      <nav className="w-full flex px-4 h-16">
+        <div className="flex items-center">
+          <img src={FallbackImage} alt="Logo" className="h-8 w-8 aspect-square mt-3" />
+          <h3 className="font-black -ml-[0.2rem] text-2xl">
+            <span className="text-primary">OS</span>IFFY
+          </h3>
+        </div>
 
-      <Typography.Title level={3} style={{ padding: '20px 20px 0', margin: 0 }}>
-        Categorías
-      </Typography.Title>
-      <CategoryContainer>
-        {CATEGORIES.filter(i => i.public).map(cat => {
-          const product = products.find(p => p.category_id === cat.id && !!p.image_url);
+        <div className="flex items-center justify-end w-full">
+          <div className="flex items-center gap-4">
+            <Button size="large" className="" type="text" onClick={goToLogin}>
+              Iniciar sesión
+            </Button>
+            <Button size="large" type="primary" className="rounded-full hidden md:inline-block">
+              Registrarse
+            </Button>
+          </div>
+        </div>
+      </nav>
 
-          return (
-            <CardCategory key={cat.id} style={{ background: cat.gradient.radial }}>
-              <img src={product?.image_url || ''} alt={product?.name} className="!w-[18rem] !h-auto aspect-square" />
-              <Typography.Text>{cat.name}</Typography.Text>
-            </CardCategory>
-          );
-        })}
-      </CategoryContainer>
+      <div className="w-full flex items-center justify-center px-6 mb-20">
+        <div className="w-full max-w-[80rem] text-center">
+          <h1 className="text-3xl sm:text-4xl font-black text-center mt-20 uppercase">
+            Las <span className="text-primary">ventas</span> de ayer, La <span className="text-primary">estrategía</span> de hoy
+          </h1>
+          <p className="text-center text-lg mt-4 font-extralight mb-6">
+            La plataforma de ventas perfecta para pequeños y medianos negocios
+          </p>
+          <div className="w-full flex gap-2 sm:gap-6 justify-center mb-10">
+            <Button size="large" className="rounded-full" ghost type="primary">
+              Solicita una demo
+            </Button>
+            <Button size="large" type="primary" className="rounded-full">
+              Registrarse gratis
+            </Button>
+          </div>
 
-      <Typography.Title level={3} style={{ padding: '0 20px 0', margin: 0 }}>
-        Productos más populares
-      </Typography.Title>
-      <CategoryContainer>
-        {getPopularProducts(products).map((p, index) => {
-          return (
-            <CardPopularproduct key={p.product_id} style={{ background: Object.values(COLORS)[index].light }}>
-              <div
-                className="pp-image"
-                style={{
-                  backgroundColor: Object.values(COLORS)[index].solid,
-                  backgroundImage: `url('${p?.image_url}')`,
-                  filter: 'drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5))',
-                }}
-              />
-              <span className="pp-name">{p.name}</span>
-            </CardPopularproduct>
-          );
-        })}
-      </CategoryContainer>
-      {/* <BottomMenu /> */}
+          <img src={DevicesWebp} alt="devices" className="w-full sm:w-[400px] mx-auto md:w-[500px] drop-shadow-lg" />
+        </div>
+      </div>
+
+      <div className="w-full bg-primary text-white text-center py-20">
+        <div className="w-full max-w-[80rem] mx-auto h-full">
+          <h1 className="text-3xl sm:text-4xl font-black text-center uppercase px-6">Ya no solo vendas, crece tu negocio</h1>
+          <p className="text-center text-lg mt-4 font-extralight px-10">
+            Con Posiffy podrás llevar el control de tus ventas, inventario, clientes y mucho más en un solo lugar
+          </p>
+        </div>
+      </div>
+
+      <div className="w-full bg-white text-black text-center py-8 pb-28">
+        <div className="w-full mx-auto max-w-[900px] mb-10">
+          <h1 className="text-2xl sm:text-4xl font-black text-center mt-20 uppercase px-4 sm:px-6">
+            Te brindamos herramientas acorde a tus necesidades
+          </h1>
+          <p className="text-center text-lg mt-4 font-extralight mb-6 px-4 sm:px-6">
+            Posiffy cuenta con herramientas que se adaptan a las necesidades de tu negocio
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-[900px] mx-auto gap-10 px-4">
+          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+            <Avatar
+              shape="square"
+              size={64}
+              icon={<ReconciliationOutlined className="text-teal-600" />}
+              className="bg-teal-600/10 !rounded-3xl"
+            />
+            <h3 className="text-xl font-semibold mt-4 mb-2">Control de inventario</h3>
+            <p className="font-extralight">Lleva el control de tus productos, categorías y unidades de medida</p>
+          </div>
+          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+            <Avatar
+              shape="square"
+              size={64}
+              icon={<TeamOutlined className="text-pink-600" />}
+              className="bg-pink-600/10 !rounded-3xl"
+            />
+            <h3 className="text-xl font-semibold mt-4 mb-2">Ventas y clientes</h3>
+            <p className="font-extralight">Administra tus ventas, clientes y pedidos de forma sencilla</p>
+          </div>
+          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+            <Avatar
+              shape="square"
+              size={64}
+              icon={<DotChartOutlined className="text-indigo-600" />}
+              className="bg-indigo-600/10 !rounded-3xl"
+            />
+            <h3 className="text-xl font-semibold mt-4 mb-2">Reportes y análisis</h3>
+            <p className="font-extralight">Obtén reportes y análisis de tus ventas y productos</p>
+          </div>
+        </div>
+      </div>
+
+      <footer className="h-12 flex justify-center items-center">
+        <span>© 2024 Posiffy. Todos los derechos reservados.</span>
+      </footer>
     </div>
   );
 };

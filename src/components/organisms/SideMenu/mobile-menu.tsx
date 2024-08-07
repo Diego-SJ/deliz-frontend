@@ -1,13 +1,10 @@
 import { LogoutOutlined, ExclamationCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
-import { MenuRoot } from './styles';
-import Logo from '@/components/molecules/Logo';
 import LogoAppWhite from '@/assets/logo-color.svg';
-import { Avatar, Button, Modal, Tooltip } from 'antd';
+import { Avatar, Modal } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
-import useMediaQuery from '@/hooks/useMediaQueries';
 import { createElement } from 'react';
 import { ITEM_LIST } from '.';
 
