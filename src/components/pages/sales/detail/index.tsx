@@ -272,14 +272,11 @@ const SaleDetail = () => {
                     title: 'Producto',
                     dataIndex: 'products',
                     render: (_, record) => {
-                      let imageUrl = !!record?.products?.image_url
-                        ? BUCKETS.PRODUCTS.IMAGES`${record?.products?.image_url}`
-                        : null;
                       return (
                         <div className="flex gap-4 items-center pl-3">
                           <Avatar
-                            src={imageUrl}
-                            icon={<FileImageOutlined className="text-slate-600" />}
+                            src={record.products?.image_url}
+                            icon={<FileImageOutlined className="text-slate-600 text-2xl" />}
                             className="bg-slate-600/10 p-1 w-10 h-10 min-w-10"
                           />
                           <div>
@@ -339,7 +336,7 @@ const SaleDetail = () => {
                                     title: 'Eliminar producto',
                                     content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
                                     onOk: async () => {
-                                      await dispatch(salesActions.deleteItemById(record.products?.product_id || 0));
+                                      await dispatch(salesActions.deleteItemById(record.sale_detail_id || 0));
                                     },
                                     okText: 'Eliminar',
                                     okType: 'danger',

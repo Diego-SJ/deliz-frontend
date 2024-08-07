@@ -261,7 +261,8 @@ const customActions = {
   updateSaleItem: (item: SaleItem) => async (dispatch: AppDispatch) => {
     try {
       let newItem = { ...item };
-      delete newItem.products;
+
+      console.log({ newItem });
 
       const result = await supabase.rpc('update_product_in_sale', {
         p_new_price: newItem?.price,

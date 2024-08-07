@@ -1,9 +1,8 @@
 import ProductAvatar from '@/components/atoms/ProductAvatar';
 import Space from '@/components/atoms/Space';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleItem } from '@/redux/reducers/sales/types';
-import { productHelpers } from '@/utils/products';
 import { DollarOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Button, Col, InputNumber, Modal, Row, Typography } from 'antd';
 import { useEffect, useState } from 'react';
@@ -16,7 +15,6 @@ type Props = {
 
 const EditSaleItemModal = ({ open, onClose, currentItem }: Props) => {
   const dispatch = useAppDispatch();
-  const { currentBranch } = useAppSelector(({ branches }) => branches);
   const [newQuantity, setNewQuantity] = useState<number>(0);
   const [newPrice, setNewPrice] = useState(0);
   const [loading, setLoading] = useState(false);

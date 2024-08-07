@@ -1,21 +1,19 @@
 import HeaderHome from '@/components/organisms/HeaderHome';
-import { Avatar, Col, Row, Typography } from 'antd';
-import React, { useEffect } from 'react';
+import { Avatar, Typography } from 'antd';
+import { useEffect } from 'react';
 import { CardCategory, CardPopularproduct, CategoryContainer, HeaderTitleContainer } from './styles';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { CATEGORIES } from '@/constants/categories';
 import { Product } from '@/redux/reducers/products/types';
 import { COLORS } from '@/constants/colors';
-import FallbackImage from '@/assets/img/webp/ice-cream.webp';
+import FallbackImage from '@/assets/logo-color.svg';
 import AnimatedBackground from '@/components/atoms/AnimatedBackground';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import BottomMenu from '@/components/organisms/BottomMenu';
 import { productActions } from '@/redux/reducers/products';
 
 const getPopularProducts = (products: Product[]) => {
-  let topProducts = products.sort((a, b) => a?.stock - b?.stock);
-
-  return topProducts.slice(0, 10);
+  return products?.slice(0, 10);
 };
 
 const Home = () => {
@@ -32,9 +30,9 @@ const Home = () => {
       <AnimatedBackground style="light" />
       <HeaderHome hideLogo={!isTablet} />
       <HeaderTitleContainer>
-        {!isTablet && <Avatar size={90} src={FallbackImage} style={{ marginBottom: 5 }} />}
+        {!isTablet && <Avatar size={90} src={FallbackImage} style={{ marginBottom: 5 }} className="!p-1" />}
         <Typography.Title level={isTablet ? 3 : 2} style={{ margin: isTablet ? '20px 0 0' : '0 20px 5px' }}>
-          ¡Bienvenido al <span>e-commerce</span> de <br /> <span>Paletería D'eliz</span>!
+          ¡Bienvenido a <span>Posiffy</span>!
         </Typography.Title>
       </HeaderTitleContainer>
 
@@ -47,7 +45,7 @@ const Home = () => {
 
           return (
             <CardCategory key={cat.id} style={{ background: cat.gradient.radial }}>
-              <img src={product?.image_url || ''} alt={product?.name} />
+              <img src={product?.image_url || ''} alt={product?.name} className="!w-[18rem] !h-auto aspect-square" />
               <Typography.Text>{cat.name}</Typography.Text>
             </CardCategory>
           );
@@ -74,7 +72,7 @@ const Home = () => {
           );
         })}
       </CategoryContainer>
-      <BottomMenu />
+      {/* <BottomMenu /> */}
     </div>
   );
 };

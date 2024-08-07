@@ -1,10 +1,10 @@
-import { Avatar, Button, Col, Divider, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
+import { Avatar, Button, Col, Form, InputNumber, Modal, Row, Select, Space, Tooltip, Typography } from 'antd';
 import { HeaderActions, HeaderRoot } from './styles';
-import { InstagramOutlined, ShoppingCartOutlined, UserOutlined, WhatsAppOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useState } from 'react';
-import FallbackImage from '@/assets/img/webp/ice-cream.webp';
+import FallbackImage from '@/assets/logo-color.svg';
 
 type CashierHeaderProps = {
   hideLogo?: boolean;
@@ -22,21 +22,17 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
     setOpen(prev => !prev);
   };
 
-  const openInstagram = () => window.open('https://www.instagram.com/paleteria_deliz/', '_blank');
-
-  const openWhatsapp = () => window.open('https://api.whatsapp.com/send?phone=527711763694', '_blank');
-
   return (
     <HeaderRoot>
       {!hideLogo ? (
         <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
-          <Avatar size={50} src={FallbackImage} style={{ marginBottom: 5 }} />
+          <Avatar size={50} src={FallbackImage} className="!p-4" style={{ marginBottom: 5 }} />
         </Space>
       ) : (
         <span />
       )}
       <HeaderActions>
-        <Space>
+        {/* <Space>
           <Tooltip title="Instagram">
             <Button icon={<InstagramOutlined />} type="dashed" size="large" shape="circle" onClick={openInstagram} />
           </Tooltip>
@@ -52,15 +48,14 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
               // onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
             />
           </Tooltip>
-        </Space>
-        <Divider type="vertical" />
+        // </Space> */}
+
         <Tooltip title="Iniciar sesión">
           <Button
             icon={<UserOutlined />}
-            type="primary"
             size="large"
             shape="circle"
-            // onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
+            onClick={() => onNavigate(APP_ROUTES.AUTH.SIGN_IN_ADMIN.path)}
           />
         </Tooltip>
       </HeaderActions>

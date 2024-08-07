@@ -78,7 +78,7 @@ const CashRegisterItemsList = () => {
                         {(record?.product?.name || 'Sin nombre')?.toLowerCase()}
                       </Typography.Paragraph>
                       <p className="text-slate-400 font-light select-none leading-4">
-                        {record?.price_type === 'PERSONALIZED' ? (
+                        {record?.price_type === 'PERSONALIZED' || !record?.product?.product_id ? (
                           <Tag
                             icon={<DollarCircleOutlined className="text-primary" />}
                             bordered={false}
@@ -123,7 +123,7 @@ const CashRegisterItemsList = () => {
                   />
                 </div>
               </div>
-              {Number(record.quantity) > stock && (
+              {Number(record.quantity) > stock && !!record?.product?.product_id && (
                 <Typography.Paragraph type="warning" className="!mx-0 !mt-0 !mb-0 bg-yellow-50 pl-3">
                   <WarningOutlined /> La cantidad ingresada supera el stock
                 </Typography.Paragraph>

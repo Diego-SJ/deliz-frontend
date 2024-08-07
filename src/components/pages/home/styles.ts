@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const HeaderTitleContainer = styled.div`
   display: flex;
-  margin: -20px 20px 0px;
+  margin: -20px 0px 0px;
   align-items: center;
 
   & .ant-typography span {

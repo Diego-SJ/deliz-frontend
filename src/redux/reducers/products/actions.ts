@@ -15,7 +15,7 @@ const customActions = {
   fetchProducts: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
       let products = getState().products.products || [];
-      const company_id = getState().app.company.company_id;
+      const company_id = getState().app?.company?.company_id;
 
       if (!products.length || args?.refetch) {
         dispatch(productActions.setLoading(true));
