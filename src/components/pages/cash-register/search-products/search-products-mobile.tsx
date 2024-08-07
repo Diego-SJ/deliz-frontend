@@ -3,7 +3,6 @@ import { Product } from '@/redux/reducers/products/types';
 import { productHelpers } from '@/utils/products';
 import { Button, Drawer, Empty, Input, InputRef } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
 import { salesActions } from '@/redux/reducers/sales';
 import { userActions } from '@/redux/reducers/users';
 import { CloseOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -50,10 +49,6 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
     onClose();
   };
 
-  const handleInputTextChange = useDebouncedCallback(value => {
-    setSearchText(value);
-  }, 250);
-
   const handleItemInteract = (item: Product) => {
     dispatch(salesActions.cashRegister.add({ product: item }));
     onClose();
@@ -96,7 +91,7 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
             event.target?.select();
           }}
           onChange={({ target }) => {
-            handleInputTextChange(target.value);
+            setSearchText(target.value);
           }}
         />
 
