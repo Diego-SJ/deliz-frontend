@@ -4,10 +4,12 @@ import Header from '../Header';
 import { MainLayoutProps } from './types';
 import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './styles';
 import useMediaQuery from '@/hooks/useMediaQueries';
-import { Drawer } from 'antd';
+import { Button, Drawer } from 'antd';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
+import SideMobileMenu from '../SideMenu/mobile-menu';
+import { CloseOutlined } from '@ant-design/icons';
 
 const SIDER_WIDTH = 250;
 
@@ -36,14 +38,17 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
         </LayoutSider>
       )}
       <Drawer
-        placement="left"
-        width={300}
+        placement="bottom"
+        height={'100dvh'}
         open={open}
+        closeIcon={<></>}
+        extra={
+          <Button onClick={handleDrawer} type="text" icon={<CloseOutlined className="text-slate-900 !text-2xl" />} size="large" />
+        }
         onClose={handleDrawer}
-        styles={{ body: { padding: 0, background: '#001628' }, header: { background: '#001628' } }}
-        className="bg-[#001628]"
+        classNames={{ body: '!bg-neutral-100 !px-5 !pt-0', header: '!bg-neutral-100 !border-b-transparent' }}
       >
-        <SideMenu onClick={handleDrawer} />
+        <SideMobileMenu onClick={handleDrawer} />
       </Drawer>
       <LayoutContainer>
         <Header onClick={handleDrawer} />

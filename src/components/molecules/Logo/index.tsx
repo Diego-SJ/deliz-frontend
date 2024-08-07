@@ -1,7 +1,5 @@
 import { APP_ROUTES } from '@/routes/routes';
-// import { Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { LogoImg, LogoRoot } from './styles';
 import { LogoProps } from './types';
 
 const Logo = ({ src, title }: LogoProps) => {
@@ -10,13 +8,11 @@ const Logo = ({ src, title }: LogoProps) => {
   const handleOnClick = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path);
   };
+
   return (
-    <>
-      <LogoRoot onClick={handleOnClick}>
-        <LogoImg src={src} alt={title} />
-        {/* <Typography.Title level={5}>{title}</Typography.Title> */}
-      </LogoRoot>
-    </>
+    <div className="flex items-center pt-14" onClick={handleOnClick}>
+      <img className="max-md:w-16 max-md:h-16 w-10 h-10  lg:w-16 lg:h-16 aspect-square mx-auto" src={src} alt={title} />
+    </div>
   );
 };
 

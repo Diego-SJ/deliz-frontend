@@ -40,7 +40,7 @@ const Dashboard = () => {
             title="Nueva venta"
             description="Accede al punto de venta"
             icon={<ShoppingBasket strokeWidth={1.5} className="text-purple-600 !w-8 !h-8" />}
-            className="bg-purple-600/10 shadow-md shadow-purple-600/40"
+            className="bg-purple-600/10"
             onClick={newSale}
           />
         )}
@@ -50,7 +50,7 @@ const Dashboard = () => {
             title="Nuevo producto"
             description="Agregar un producto al catalogo"
             icon={<PackagePlus strokeWidth={1.5} className="text-green-600 !w-8 !h-8" />}
-            className="bg-green-600/10 shadow-md shadow-green-600/40 "
+            className="bg-green-600/10"
             onClick={addProduct}
           />
         )}
@@ -60,7 +60,7 @@ const Dashboard = () => {
             title="Nuevo cliente"
             description="Crea un nuevo cliente"
             icon={<UserRoundPlus strokeWidth={1.8} className="text-orange-600 !w-7 !h-7 -mr-1" />}
-            className="bg-orange-600/10 shadow-md shadow-orange-600/40"
+            className="bg-orange-600/10"
             onClick={addCustomer}
           />
         )}

@@ -102,7 +102,7 @@ const LogoManagement: React.FC = () => {
       {previewImage ? (
         <Image
           wrapperStyle={{ display: 'none' }}
-          className="w-60 h-60 bg-black"
+          className="w-60 h-60"
           preview={{
             visible: previewOpen,
             onVisibleChange: visible => setPreviewOpen(visible),

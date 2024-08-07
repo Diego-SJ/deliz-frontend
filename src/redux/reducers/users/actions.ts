@@ -33,6 +33,21 @@ const customActions = {
     await dispatch(cashiersActions.cash_cuts.fetchCashCutData());
     await dispatch(userActions.setUserAuth({ authenticated: true }));
   },
+  fetchProfile: (profile_id: string) => async (dispatch: AppDispatch) => {
+    const { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
+    if (error) {
+      message.error(error.message);
+      return null;
+    }
+
+    const profileData = {
+      ...data,
+      permissions: data?.role === 'ADMIN' ? PERMISSIONS : data.permissions || null,
+    };
+
+    await dispatch(userActions.setUserAuth({ profile: profileData, isAdmin: data.role === 'ADMIN' }));
+    return data;
+  },
   loginSuccess: (profile_id: string) => async (dispatch: AppDispatch) => {
     let { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
 

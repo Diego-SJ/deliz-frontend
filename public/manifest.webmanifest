@@ -1,7 +1,7 @@
 {
-  "name": "Punto de venta",
-  "short_name": "POS App",
-  "description": "Aplicación de punto de venta con React 18",
+  "name": "Posiffy App",
+  "short_name": "Posiffy",
+  "description": "Aplicación de punto de venta pymes",
   "theme_color": "#ffffff",
   "display": "standalone",
   "scope": "/",

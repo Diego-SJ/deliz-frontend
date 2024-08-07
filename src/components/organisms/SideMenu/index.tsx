@@ -7,27 +7,28 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
   PlusCircleOutlined,
-  BarChartOutlined,
   ReconciliationOutlined,
+  InboxOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
-import DelizLogo from '@/assets/img/webp/deliz-logo-bn.webp';
+import LogoAppWhite from '@/assets/logo-white.svg';
 import { Button, Modal, Tooltip } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CashRegisterSvg from '@/assets/img/jsx/cashier-menu';
 import { Profile } from '@/redux/reducers/users/types';
+import { createElement } from 'react';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
 };
 
-const ITEM_LIST = (permissions: Profile['permissions']) => [
+export const ITEM_LIST = (permissions: Profile['permissions']) => [
   {
     key: 'dashboard',
     icon: HomeOutlined,
@@ -69,6 +70,7 @@ const ITEM_LIST = (permissions: Profile['permissions']) => [
                 key: 'transactions.current_cashier',
                 label: 'Caja actual',
                 path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+                icon: InboxOutlined,
               }
             : null,
           permissions?.cash_registers?.view_history_cash_cuts
@@ -76,6 +78,7 @@ const ITEM_LIST = (permissions: Profile['permissions']) => [
                 key: 'transactions.cashiers',
                 label: 'Historial de cajas',
                 path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+                icon: ClockCircleOutlined,
               }
             : null,
         ].filter(Boolean),
@@ -103,7 +106,6 @@ const SideMenu = (props: SideMenuProps) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
-  const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
 
   const handleLogout = () => {
@@ -126,7 +128,7 @@ const SideMenu = (props: SideMenuProps) => {
 
   return (
     <>
-      <Logo src={!!company?.logo_url ? company.logo_url : DelizLogo} title="D'eliz" />
+      <Logo src={LogoAppWhite} title="D'eliz" />
 
       <div className="flex px-4 mt-10 mb-6">
         <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
@@ -152,7 +154,7 @@ const SideMenu = (props: SideMenuProps) => {
           ?.filter(Boolean)
           .map((item: any, key: any) => ({
             key,
-            icon: React.createElement(item?.icon),
+            icon: createElement(item?.icon),
             label: isPhablet && !isTablet ? '' : item?.label,
             className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
             onClick: () => handlePathChange(item?.path),
@@ -174,7 +176,7 @@ const SideMenu = (props: SideMenuProps) => {
         items={[
           {
             key: 1,
-            icon: React.createElement(LogoutOutlined),
+            icon: createElement(LogoutOutlined),
             label: 'Cerrar sesión',
             onClick: handleLogout,
           },

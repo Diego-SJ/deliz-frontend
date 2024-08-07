@@ -1,10 +1,10 @@
 import { FileProtectOutlined, PrinterOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Drawer, Row, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import FallbackImage from '@/assets/img/webp/logo-deliz.webp';
+import FallbackImage from '@/assets/logo-color.svg';
 import functions from '@/utils/functions';
 import { useAppSelector } from '@/hooks/useStore';
-import { CustomTable, DrawerBody, FooterReceipt, ImageLogo } from './styles';
+import { CustomTable, DrawerBody, FooterReceipt } from './styles';
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { toPng, toBlob } from 'html-to-image';
 import useWhatsappApi from '@/hooks/useWhatsappAPI';
@@ -124,7 +124,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
               </Typography.Paragraph>
             </Col>
             <Col span={8} style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-              <Avatar src={company?.logo_url || FallbackImage} className="w-20 h-20 min-w-20 bg-slate-100 p-2" shape="circle" />
+              <Avatar src={company?.logo_url || FallbackImage} className="w-20 h-20 min-w-20 bg-slate-100 p-3" shape="circle" />
             </Col>
           </Row>
           <CustomTable
