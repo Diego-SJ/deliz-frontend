@@ -43,7 +43,7 @@ const AppRouter = () => {
   const { isTablet } = useMediaQuery();
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const { isAdmin, authenticated } = useAppSelector(({ users }) => users.user_auth);
-  const { status_id } = useAppSelector(({ app }) => app.onboarding);
+  const { status_id } = useAppSelector(({ app }) => app?.onboarding || { status_id: null });
 
   return (
     <Routes>
