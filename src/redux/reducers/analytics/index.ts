@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AnalyticsSlice, LineChartData, ProductAnalytics, SalesAnalytics } from './types';
+import { AnalyticsSlice, CustomerAnalytics, LineChartData, ProductAnalytics, SalesAnalytics } from './types';
 import { analyticsCustomActions } from './actions';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -31,6 +31,10 @@ const initialState: AnalyticsSlice = {
     top_products: [],
     loading: false,
   },
+  customers: {
+    top_customers: [],
+    loading: false,
+  },
 };
 
 const analytics = createSlice({
@@ -43,6 +47,9 @@ const analytics = createSlice({
     },
     setProducts: (state, action: PayloadAction<Partial<ProductAnalytics>>) => {
       state.products = { ...state.products, ...action.payload };
+    },
+    setCustomers: (state, action: PayloadAction<Partial<CustomerAnalytics>>) => {
+      state.customers = { ...state.customers, ...action.payload };
     },
   },
 });

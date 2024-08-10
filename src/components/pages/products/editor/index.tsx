@@ -14,6 +14,7 @@ import {
   Input,
   Row,
   Select,
+  Space,
   Switch,
   Typography,
   UploadFile,
@@ -21,13 +22,14 @@ import {
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, BarcodeOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
 import ExistencesTable from './existences-table';
 import PricesTable from './prices-table';
 
 import { BUCKETS } from '@/constants/buckets';
 import { QuickCategoryCreationForm } from '../../settings/categories/editor';
+import BarcodeScanner from '@/components/organisms/bar-code-reader';
 
 type Params = {
   action: 'edit' | 'add';
@@ -53,6 +55,7 @@ const ProductEditor = () => {
   const firstRender = useRef<boolean>(false);
   const [inventory, setInventory] = useState<Inventory>({});
   const [priceList, setPriceList] = useState<PriceList>({});
+  const [openBarCode, setOpenBarCode] = useState(false);
   const { modal } = App.useApp();
 
   useEffect(() => {
@@ -181,6 +184,7 @@ const ProductEditor = () => {
             form={form}
             wrapperCol={{ span: 24 }}
             layout="vertical"
+            requiredMark={false}
             onFinish={onFinish}
             initialValues={{ ...current_product, status: current_product?.status ?? 1 }}
             validateMessages={{
@@ -230,8 +234,25 @@ const ProductEditor = () => {
                     />
                   </Form.Item>
                   <div className="flex gap-4">
-                    <Form.Item name="code" label="Código de barras" className="mb-0 w-full">
-                      <Input size="large" placeholder="Opcional" />
+                    {openBarCode && (
+                      <BarcodeScanner
+                        paused={!openBarCode}
+                        onScan={value => {
+                          message.info(JSON.stringify(value));
+                          setOpenBarCode(false);
+                        }}
+                      />
+                    )}
+                    <Form.Item
+                      name="code"
+                      label="Código de barras"
+                      className="mb-0 w-full"
+                      tooltip="Escanea el código de barras del producto"
+                    >
+                      <Space.Compact style={{ width: '100%' }}>
+                        <Input size="large" placeholder="Opcional" />
+                        <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
+                      </Space.Compact>
                     </Form.Item>
                     <Form.Item name="sku" label="SKU" className="w-full">
                       <Input size="large" placeholder="Opcional" />

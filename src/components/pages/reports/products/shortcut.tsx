@@ -26,7 +26,7 @@ const TopProductsThumbnail = () => {
           {top_products?.length || 0}
         </Typography.Title>
 
-        <Typography.Text className="!text-sm mt-2">{formattedDateRange}</Typography.Text>
+        {/* <Typography.Text className="!text-sm mt-2">{formattedDateRange}</Typography.Text> */}
       </div>
       <div className="flex flex-col max-h-[20rem] overflow-y-auto over">
         {top_products?.map((product, index) => {
@@ -40,7 +40,7 @@ const TopProductsThumbnail = () => {
               <Avatar
                 src={product?.image_url}
                 icon={<FileImageOutlined className="text-slate-400" />}
-                className="!w-10 !min-w-10 !h-10 p-1 rounded-xl bg-slate-600/10"
+                className="!w-10 !min-w-10 !h-10 p-1 rounded-xl bg-slate-400/10"
               />
               <Typography.Text className="!text-sm !m-0 text-start w-full">{product.name}</Typography.Text>
               <Typography.Text className="!text-sm !m-0 !w-fit min-w-40 text-end">

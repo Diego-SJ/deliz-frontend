@@ -1,6 +1,7 @@
 export type AnalyticsSlice = {
   sales: SalesAnalytics;
   products: ProductAnalytics;
+  customers: CustomerAnalytics;
 };
 
 export type SalesAnalytics = {
@@ -32,4 +33,15 @@ export type ProductTop = {
   name: string;
   total_quantity: number;
   total_price: number;
+};
+
+export type CustomerAnalytics = {
+  top_customers: CustomerTop[];
+  loading: boolean;
+};
+
+export type CustomerTop = {
+  name: string;
+  total_amount: number;
+  customer_id: number;
 };

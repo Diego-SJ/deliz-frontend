@@ -5,7 +5,7 @@ import { STATUS_DATA } from '@/constants/status';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { user_auth } = useAppSelector(({ users }) => users);
-  const { status_id } = useAppSelector(({ app }) => app.onboarding);
+  const { status_id } = useAppSelector(({ app }) => app?.onboarding || { status_id: null });
 
   if (!user_auth?.authenticated) return <Navigate to={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path} replace />;
   else if (user_auth?.authenticated && status_id === STATUS_DATA.PENDING.id)

@@ -30,7 +30,7 @@ const initialState: AppSlice = {
     business_niche: '',
     no_branches: 0,
     is_ecommerce: false,
-    status_id: STATUS_DATA.PENDING.id,
+    status_id: null,
     owner_name: '',
     owner_last_name: '',
     accepted_terms: false,

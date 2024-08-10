@@ -63,6 +63,15 @@ const AppRouter = () => {
       {status_id !== STATUS_DATA.COMPLETED.id && !!authenticated && (
         <Route path={APP_ROUTES.AUTH.SIGN_UP.ONBOARDING.path} element={<SignUpSteps />} />
       )}
+
+      <Route
+        path={APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path}
+        element={
+          <PrivateRoute>
+            <CashRegister />
+          </PrivateRoute>
+        }
+      />
       <Route
         path={APP_ROUTES.PRIVATE.MAIN}
         element={
@@ -239,7 +248,7 @@ const AppRouter = () => {
           }
         />
       </Route>
-      <Route path={APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path} element={<CashRegister />} />
+
       <Route path="*" element={<Navigate to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} replace />} />
     </Routes>
   );

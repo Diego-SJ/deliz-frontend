@@ -47,7 +47,6 @@ export const analyticsCustomActions = {
   },
   getTopProducts: () => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = getState().app.company.company_id;
-
     dispatch(analyticsActions.setProducts({ loading: true }));
 
     let { data, error } = await supabase.rpc('get_top_selling_products', {
@@ -65,5 +64,24 @@ export const analyticsCustomActions = {
     }
 
     dispatch(analyticsActions.setProducts({ top_products: data, loading: false }));
+  },
+  getTopCustomers: () => async (dispatch: AppDispatch, getState: AppState) => {
+    const company_id = getState().app.company.company_id;
+    dispatch(analyticsActions.setCustomers({ loading: true }));
+    let { data, error } = await supabase.rpc('get_top_customers', {
+      company_uuid: company_id,
+      limit_num: 10,
+      order_direction: 'desc',
+      end_date: null,
+      start_date: null,
+    });
+
+    if (error) {
+      dispatch(analyticsActions.setCustomers({ loading: false }));
+      message.error(error.message);
+      return;
+    }
+
+    dispatch(analyticsActions.setCustomers({ top_customers: data, loading: false }));
   },
 };
