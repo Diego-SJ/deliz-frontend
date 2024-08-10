@@ -9,7 +9,16 @@ export const APP_ROUTES = {
     },
     SIGN_IN: { path: '/login-deprecated', title: 'Inicio de sesión' },
     SIGN_IN_ADMIN: { path: '/login', title: 'Inicio de sesión' },
-    SIGN_UP: { path: '/sign-up', title: 'Registro' },
+    SIGN_UP: {
+      path: '/sign-up',
+      title: 'Registro',
+
+      ONBOARDING: {
+        path: '/sign-up/onboarding',
+        hash: (_: TemplateStringsArray, step: number) => `/sign-up/step/${step}`,
+        title: 'Registro',
+      },
+    },
   },
   PRIVATE: {
     MAIN: '/app',

@@ -6,7 +6,7 @@ const initialState: UsersSlice = {
   user_auth: {
     profile: {
       permissions: {} as any,
-      role: '',
+      role: null,
     },
     isAdmin: false,
     authenticated: false,

@@ -43,6 +43,9 @@ export const PageTitleProvider: React.FC<PageTitleProviderProps> = ({ children }
     if (location.pathname.includes(APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path)) {
       setTitle(APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.title);
     }
+    if (location.pathname.includes(APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path)) {
+      setTitle(APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.title);
+    }
   }, [location.pathname]);
 
   return <PageTitleContext.Provider value={{ title }}>{children}</PageTitleContext.Provider>;

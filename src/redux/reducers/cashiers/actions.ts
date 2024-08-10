@@ -204,7 +204,7 @@ const customActions = {
           .from('sales')
           .select('sale_id, total, customers ( name ), created_at, payment_method, branch_id')
           .eq('cash_cut_id', cashCutData?.cash_cut_id)
-          .eq('status_id', STATUS_DATA.COMPLETED.id),
+          .eq('status_id', STATUS_DATA.PAID.id),
         supabase.from('cash_operations').select('*').eq('cash_cut_id', cashCutData?.cash_cut_id),
       ]);
 
@@ -308,7 +308,7 @@ const customActions = {
             .from('sales')
             .select('sale_id, total, customers ( name ), created_at, payment_method, branch_id')
             .eq('cash_cut_id', cash_cut_id)
-            .eq('status_id', STATUS_DATA.COMPLETED.id),
+            .eq('status_id', STATUS_DATA.PAID.id),
           supabase.from('cash_operations').select('*').eq('cash_cut_id', cash_cut_id),
         ]);
 

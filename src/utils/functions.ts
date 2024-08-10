@@ -3,7 +3,7 @@ import { addDays, format, formatDistance, isValid, subDays, subHours } from 'dat
 import { es } from 'date-fns/locale';
 import numeral from 'numeral';
 
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import localeData from 'dayjs/plugin/localeData';
@@ -32,6 +32,15 @@ const functions = {
   },
   moneySimple: (number: string | number) => {
     return numeral(number).format('$0.0');
+  },
+  number: (number?: string | number) => {
+    return numeral(number).format('0,0');
+  },
+  formatToLocal: (dateStr: string | Dayjs): Dayjs => {
+    const date = dayjs.utc(dateStr);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const localDate = date.tz(timeZone);
+    return localDate;
   },
   formatToLocalTimezone(dateStr: string): string {
     const date = dayjs.utc(dateStr);

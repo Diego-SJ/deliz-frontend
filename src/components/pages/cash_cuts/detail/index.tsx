@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
 import { cashiersActions } from '@/redux/reducers/cashiers';
-import { OPERATION_TYPE_NAME, getColorName, getImageType } from '../current-cashier/active-cashier';
+import { OPERATION_TYPE_NAME, getColorName, getImageType } from '../current-cash-cut/active-cashier';
 import CardRoot from '@/components/atoms/Card';
 import { PAYMENT_METHOD_NAME } from '@/constants/payment_methods';
 import CashRegisterSvg from '@/assets/img/jsx/cash-register';

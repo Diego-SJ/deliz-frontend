@@ -153,7 +153,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                             disabled={receivedMoney < total}
                             loading={loading}
                             onClick={() => {
-                              saveSale(STATUS_DATA.COMPLETED.id);
+                              saveSale(STATUS_DATA.PAID.id);
                             }}
                           >
                             {receivedMoney < total ? 'Monto menor al total' : `Recibir ${functions.money(receivedMoney)}`}
@@ -210,7 +210,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                         size="large"
                         loading={loading}
                         onClick={() => {
-                          saveSale(STATUS_DATA.COMPLETED.id);
+                          saveSale(STATUS_DATA.PAID.id);
                         }}
                       >
                         Cobrar {functions.money(total)}
@@ -238,7 +238,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                         size="large"
                         loading={loading}
                         onClick={() => {
-                          saveSale(STATUS_DATA.COMPLETED.id);
+                          saveSale(STATUS_DATA.PAID.id);
                         }}
                       >
                         Cobrar {functions.money(total)}
@@ -266,7 +266,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                         size="large"
                         loading={loading}
                         onClick={() => {
-                          saveSale(STATUS_DATA.COMPLETED.id);
+                          saveSale(STATUS_DATA.PAID.id);
                         }}
                       >
                         Cobrar {functions.money(total)}

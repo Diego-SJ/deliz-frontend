@@ -20,6 +20,7 @@ import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
 import { productHelpers } from '@/utils/products';
 import { STATUS_DATA } from '@/constants/status';
+import dayjs from 'dayjs';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -33,7 +34,7 @@ const customActions = {
       const supabaseQuery = supabase
         .from('sales')
         .select(`*,customers ( * ), status ( status_id, name )`)
-        .in('status_id', [STATUS_DATA.COMPLETED.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
+        .in('status_id', [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
         .eq('company_id', company_id)
         .order('created_at', { ascending: false });
 
@@ -145,6 +146,7 @@ const customActions = {
           branch_id: currentBranch?.branch_id!,
           company_id,
           cash_cut_id: activeCashCut?.cash_cut_id || null,
+          created_at: dayjs().toDate(),
         };
 
         const { data, error } = await supabase.from('sales').insert(newSale).select()?.single();
@@ -161,11 +163,11 @@ const customActions = {
         return null;
       }
     },
-  upsertSale: (item: Partial<Sale>) => async (dispatch: AppDispatch, getState: AppState) => {
+  upsertSale: (item: Partial<Sale>) => async (dispatch: AppDispatch) => {
     try {
       const { error } = await supabase
         .from('sales')
-        .upsert({ ...item, updated_at: new Date() })
+        .upsert({ ...item, updated_at: dayjs().toISOString() })
         .eq('sale_id', item.sale_id)
         .single();
 
@@ -184,7 +186,7 @@ const customActions = {
   },
   updateSale: (item: Sale) => async (dispatch: AppDispatch, getState: AppState) => {
     try {
-      let newItem = { ...item, updated_at: new Date() };
+      let newItem = { ...item, updated_at: dayjs().toISOString() };
 
       const result = await supabase.from('sales').update(newItem).eq('sale_id', item?.sale_id).select();
 

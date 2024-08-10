@@ -19,7 +19,7 @@ export type Profile = {
   phone: string;
   first_name: string;
   last_name: string;
-  role: string;
+  role: string | null;
   branches: string[];
   cash_registers: string[];
   company_id: string;

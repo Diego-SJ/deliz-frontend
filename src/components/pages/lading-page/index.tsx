@@ -12,6 +12,10 @@ const Home = () => {
     navigate(APP_ROUTES.AUTH.SIGN_IN_ADMIN.path);
   };
 
+  const goToSignUp = () => {
+    navigate(APP_ROUTES.AUTH.SIGN_UP.path);
+  };
+
   return (
     <div className="min-h-[100dvh] max-h-[100dvh] w-full">
       <nav className="w-full flex px-4 h-16">
@@ -27,7 +31,7 @@ const Home = () => {
             <Button size="large" className="" type="text" onClick={goToLogin}>
               Iniciar sesión
             </Button>
-            <Button size="large" type="primary" className="rounded-full hidden md:inline-block">
+            <Button size="large" type="primary" className="rounded-full hidden md:inline-block" onClick={goToSignUp}>
               Registrarse
             </Button>
           </div>
@@ -46,7 +50,7 @@ const Home = () => {
             <Button size="large" className="rounded-full" ghost type="primary">
               Solicita una demo
             </Button>
-            <Button size="large" type="primary" className="rounded-full">
+            <Button size="large" type="primary" className="rounded-full" onClick={goToSignUp}>
               Registrarse gratis
             </Button>
           </div>

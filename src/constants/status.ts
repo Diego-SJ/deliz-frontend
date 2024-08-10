@@ -26,7 +26,7 @@ export const STATUS_DATA = {
       products: true,
     },
   },
-  COMPLETED: {
+  PAID: {
     id: 4,
     name: 'Pagado',
     color: '#87d068',
@@ -62,6 +62,15 @@ export const STATUS_DATA = {
       products: false,
     },
   },
+  COMPLETED: {
+    id: 8,
+    name: 'Completado',
+    color: '#87d068',
+    scopes: {
+      sales: true,
+      products: false,
+    },
+  },
 };
 
 export const STATUS_OBJ: { [key: number]: { name: string; color: string } } = {
@@ -72,14 +81,16 @@ export const STATUS_OBJ: { [key: number]: { name: string; color: string } } = {
   5: { name: 'Pendiente', color: 'gold' },
   6: { name: 'Cancelada', color: 'orange' },
   7: { name: 'Pedido', color: 'geekblue' },
+  8: { name: 'Completado', color: 'green' },
 };
 
 export const STATUS = [
   { id: 1, name: 'Activo', color: '#2db7f5' },
   { id: 2, name: 'Oculto', color: '#e7bc6c' },
   { id: 3, name: 'Eliminado', color: '#f50' },
-  { id: 4, name: 'Completado', color: '#87d068' },
+  { id: 4, name: 'Pagado', color: '#87d068' },
   { id: 5, name: 'Pendiente', color: '#e7bc6c' },
   { id: 6, name: 'Cancelado', color: '#f50' },
   { id: 7, name: 'Pedido', color: '#e7bc6c' },
+  { id: 8, name: 'Completado', color: '#87d068' },
 ];

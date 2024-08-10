@@ -10,6 +10,7 @@ import {
   ReconciliationOutlined,
   InboxOutlined,
   ClockCircleOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -93,6 +94,12 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
       }
     : null,
   {
+    key: 'reports',
+    icon: BarChartOutlined,
+    label: 'Reportes',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path,
+  },
+  {
     key: 'settings',
     icon: SettingOutlined,
     label: 'Configuración',
@@ -159,10 +166,13 @@ const SideMenu = (props: SideMenuProps) => {
             className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
-              ? item.children.map((subItem: any) => ({
-                  ...subItem,
-                  onClick: () => navigate(subItem.path),
-                }))
+              ? item.children.map((subItem: any) => {
+                  return {
+                    key: subItem.key,
+                    label: subItem.label,
+                    onClick: () => navigate(subItem.path),
+                  };
+                })
               : null,
           }))}
         style={{ borderInlineEnd: 'none' }}

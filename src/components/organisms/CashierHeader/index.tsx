@@ -3,6 +3,7 @@ import { HeaderActions, HeaderRoot } from './styles';
 import {
   DollarCircleOutlined,
   HomeOutlined,
+  InboxOutlined,
   MenuOutlined,
   SettingOutlined,
   ShopOutlined,
@@ -81,6 +82,18 @@ const CashierHeader = () => {
                       </div>
                     ),
                     onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
+                  }
+                : null,
+              permissions?.cash_registers?.view_current_cash_cut
+                ? {
+                    key: 'current_cash_cut',
+                    label: (
+                      <div className="flex gap-4 w-40 items-center py-1">
+                        <InboxOutlined className="text-lg" />
+                        <Typography.Text className="!text-base">Caja actual</Typography.Text>
+                      </div>
+                    ),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path),
                   }
                 : null,
               {

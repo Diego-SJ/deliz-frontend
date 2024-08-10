@@ -3,15 +3,31 @@ import { AppDispatch, AppState } from '@/redux/store';
 import { UploadFile } from 'antd/es/upload';
 import { appActions } from '.';
 import { message } from 'antd';
-import { Company } from './types';
+import { Company, Onboarding } from './types';
 import { BUCKETS } from '@/constants/buckets';
+import { userActions } from '../users';
+import { DB_ERRORS } from '@/constants/db-errors';
+import { branchesActions } from '../branches';
 
 const customActions = {
   company: {
     getCompany: (id?: string) => async (dispatch: AppDispatch, getState: AppState) => {
       const company_id = id || getState().users?.user_auth?.profile?.company_id;
+
+      if (!company_id) {
+        dispatch(userActions.signOut());
+        message.error('No se encontró la empresa');
+        return;
+      }
+
       const { data, error } = await supabase.from('companies').select().eq('company_id', company_id).single();
+
       if (error) {
+        if (error?.details === 'The result contains 0 rows') {
+          message.error('No se encontró la empresa');
+          dispatch(userActions.signOut());
+          return;
+        }
         message.error('Error al obtener los datos');
         return;
       }
@@ -53,6 +69,66 @@ const customActions = {
       await dispatch(appActions.setCompany({ ...oldData, ...data[0] }));
       message.success('Datos guardados correctamente');
     },
+  },
+  updateOnboarding: (onboarding: Partial<Onboarding>) => async (dispatch: AppDispatch, getState: AppState) => {
+    const oldData = getState().app.onboarding;
+    dispatch(appActions.setLoading(true));
+    const { data, error } = await supabase
+      .from('onboarding')
+      .update(onboarding)
+      .eq('company_id', oldData.company_id)
+      .select()
+      .single();
+    dispatch(appActions.setLoading(false));
+    if (error) {
+      message.error('Error al guardar los datos');
+      return;
+    }
+
+    await dispatch(appActions.setOnboarding({ ...oldData, ...data }));
+  },
+  fetchOnboarding: () => async (dispatch: AppDispatch, getState: AppState) => {
+    const company_id = getState().app.company.company_id;
+    const { data, error } = await supabase.from('onboarding').select().eq('company_id', company_id).single();
+    if (error) {
+      if (error?.details === DB_ERRORS.ZERO_RECORDS) {
+        dispatch(userActions.signOut());
+        return;
+      }
+      message.error('Error al obtener los datos');
+      return;
+    }
+    await dispatch(appActions.setOnboarding(data));
+  },
+  finishOnboarding: () => async (dispatch: AppDispatch, getState: AppState) => {
+    dispatch(appActions.setLoading(true));
+    const { profile_id } = getState().users?.user_auth?.profile!;
+    const { company_id } = getState().app.company;
+    const { data, error } = await supabase.rpc('create_initial_records', {
+      p_company_id: company_id,
+      p_profile_id: profile_id,
+    });
+    dispatch(appActions.setLoading(false));
+
+    if (error || !data) {
+      message.error('Error al finalizar el proceso');
+      return;
+    }
+
+    await dispatch(userActions.fetchProfile(profile_id!));
+
+    const branches = await dispatch(branchesActions.getBranches());
+    const branch = branches?.find(item => item.main_branch);
+    dispatch(branchesActions.setCurrentBranch(branch));
+
+    await Promise.all([
+      await dispatch(branchesActions.getCashRegistersByCompanyId()),
+      await dispatch(branchesActions.getCurrentCashRegister()),
+    ]);
+
+    await dispatch(appActions.fetchOnboarding());
+
+    message.success('Bienvenido');
   },
 };
 

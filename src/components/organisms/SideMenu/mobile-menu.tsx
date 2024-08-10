@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import { createElement } from 'react';
 import { ITEM_LIST } from '.';
+import { APP_VERSION } from '@/constants/versions';
 
 type SideMobileMenuProps = {
   onClick?: (args?: any) => void;
@@ -131,7 +132,7 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
         }}
       >
         <p>Posiffy App</p>
-        <span>v1.0.0</span>
+        <span>v{APP_VERSION}</span>
       </div>
       {contextHolder}
     </div>

@@ -72,12 +72,12 @@ const SignInAdmin = () => {
                 Ingresar
               </Button>
             </Form.Item>
-            {/* <Typography.Paragraph type="secondary" className="caption">
+            <Typography.Paragraph type="secondary" className="caption">
               ¿No tienes una cuenta?{' '}
-              <Button type="link" href={APP_ROUTES.AUTH.SIGN_UP.path}>
+              <span className="text-primary cursor-pointer" onClick={() => navigate(APP_ROUTES.AUTH.SIGN_UP.path)}>
                 Registrate
-              </Button>
-            </Typography.Paragraph> */}
+              </span>
+            </Typography.Paragraph>
           </Form>
         </div>
 

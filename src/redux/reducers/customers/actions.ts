@@ -6,32 +6,28 @@ import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 
 const customActions = {
-  fetchCustomers: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    try {
-      dispatch(customerActions.setLoading(true));
-      let customers = getState().customers.customers || [];
+  fetchCustomers: (_?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    let customers = getState().customers.customers || [];
+    const company_id = getState().app.company.company_id;
+    dispatch(customerActions.setLoading(true));
+    const { data, error } = await supabase.from('customers').select('*').eq('company_id', company_id);
 
-      if (!customers.length || args?.refetch) {
-        const result = await supabase.from('customers').select('*');
-
-        customers =
-          result?.data
-            ?.map((item, key) => {
-              return {
-                ...item,
-                key,
-              } as Customer;
-            })
-            ?.sort((a, b) => a?.name?.localeCompare(b?.name)) ?? [];
-        dispatch(customerActions.setCustomers(customers));
-      }
-
-      dispatch(customerActions.setLoading(false));
-    } catch (error) {
-      message.error('No se pudo obtener la lista de clientes');
-      dispatch(customerActions.setLoading(false));
-      return false;
+    dispatch(customerActions.setLoading(false));
+    if (error) {
+      message.error('No se pudo obtener la información.', 4);
+      return;
     }
+
+    customers =
+      data
+        ?.map((item, key) => {
+          return {
+            ...item,
+            key,
+          } as Customer;
+        })
+        ?.sort((a, b) => a?.name?.localeCompare(b?.name)) ?? [];
+    dispatch(customerActions.setCustomers(customers));
   },
   saveCustomer: (customer: Customer) => async (dispatch: AppDispatch, getState: AppState) => {
     try {

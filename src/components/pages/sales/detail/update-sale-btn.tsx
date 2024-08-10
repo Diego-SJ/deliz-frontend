@@ -42,7 +42,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
     setLoading(true);
 
     const newSale: Sale = {
-      status_id: STATUS_DATA.COMPLETED.id,
+      status_id: STATUS_DATA.PAID.id,
       amount_paid: receivedMoney + amount_paid >= total ? total : receivedMoney + amount_paid,
       sale_id: current_sale?.metadata?.sale_id,
       cashback: cashback >= 0 ? 0 : Math.abs(cashback),

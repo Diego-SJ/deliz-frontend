@@ -1,6 +1,5 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { productActions } from '@/redux/reducers/products';
 import { App, Breadcrumb, Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -53,24 +52,19 @@ const AddOperationPurchaseExpense = () => {
   };
 
   const onFinish = async () => {
-    form
-      .validateFields()
-      .then(async values => {
-        setLoading(true);
-        let operation = { ...values, operation_type: operation_type?.toUpperCase() };
+    form.validateFields().then(async values => {
+      setLoading(true);
+      let operation = { ...values, operation_type: operation_type?.toUpperCase() };
 
-        const result = await dispatch(operatingCostsActions.upsertOperation(operation));
+      const result = await dispatch(operatingCostsActions.upsertOperation(operation));
 
-        if (result) {
-          clearFields();
-          navigate(-1);
-        }
+      if (result) {
+        clearFields();
+        navigate(-1);
+      }
 
-        setLoading(false);
-      })
-      .catch(() => {
-        message.error('Campos obligatorios sin completar.');
-      });
+      setLoading(false);
+    });
   };
 
   const confirmDelete = async () => {
@@ -120,12 +114,13 @@ const AddOperationPurchaseExpense = () => {
           </div>
 
           <Form
+            requiredMark={false}
             form={form}
             wrapperCol={{ span: 24 }}
             layout="vertical"
             onFinish={onFinish}
             initialValues={{
-              status_id: STATUS_DATA.COMPLETED.id,
+              status_id: STATUS_DATA.PAID.id,
               operation_date: dayjs(),
             }}
             validateMessages={{
@@ -139,13 +134,14 @@ const AddOperationPurchaseExpense = () => {
               <Col md={12} xs={24}>
                 <CardRoot loading={isLoading}>
                   <Form.Item name="operating_cost_id" hidden>
-                    <Input />
+                    <Input size="large" />
                   </Form.Item>
                   <Form.Item name="reason" label="Motivo" rules={[{ required: true }]}>
-                    <Input placeholder="E.g: Pago de luz" autoComplete="off" onPressEnter={onFinish} />
+                    <Input size="large" placeholder="E.g: Pago de luz" autoComplete="off" onPressEnter={onFinish} />
                   </Form.Item>
                   <Form.Item name="amount" label="Monto" rules={[{ required: true }]}>
                     <InputNumber
+                      size="large"
                       className="!w-full"
                       min={0}
                       inputMode="numeric"
@@ -159,10 +155,11 @@ const AddOperationPurchaseExpense = () => {
               <Col md={12} xs={24}>
                 <CardRoot loading={isLoading}>
                   <Form.Item hidden name="supplier_id" label="Proveedor">
-                    <Input placeholder="Proveedor" onPressEnter={onFinish} />
+                    <Input size="large" placeholder="Proveedor" onPressEnter={onFinish} />
                   </Form.Item>
                   <Form.Item name="operation_date" label="Fecha del gasto">
                     <DatePicker
+                      size="large"
                       format={'D [de] MMMM, YYYY'}
                       defaultValue={dayjs()}
                       placeholder="Fecha de operación"
@@ -170,22 +167,23 @@ const AddOperationPurchaseExpense = () => {
                         if (date > dayjs()) {
                           form.setFieldsValue({ status_id: STATUS_DATA.PENDING.id });
                         } else if (date <= dayjs()) {
-                          form.setFieldsValue({ status_id: STATUS_DATA.COMPLETED.id });
+                          form.setFieldsValue({ status_id: STATUS_DATA.PAID.id });
                         }
                       }}
                     />
                   </Form.Item>
                   <Form.Item name="status_id" label="Estado">
                     <Select
+                      size="large"
                       placeholder="Estado"
                       options={[
-                        { label: STATUS_DATA.COMPLETED.name, value: STATUS_DATA.COMPLETED.id },
+                        { label: STATUS_DATA.PAID.name, value: STATUS_DATA.PAID.id },
                         { label: STATUS_DATA.PENDING.name, value: STATUS_DATA.PENDING.id },
                       ]}
                     />
                   </Form.Item>
                   <Form.Item name="notes" label="Notas">
-                    <TextArea rows={2} placeholder="Notas" />
+                    <TextArea size="large" rows={2} placeholder="Notas" />
                   </Form.Item>
                 </CardRoot>
               </Col>

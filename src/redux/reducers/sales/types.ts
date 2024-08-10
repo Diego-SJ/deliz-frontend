@@ -1,7 +1,6 @@
 import { Pagination } from '@supabase/supabase-js';
 import { Customer } from '../customers/types';
 import { Category, Product } from '../products/types';
-import { PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
 
 export type SalesSlice = {
   sales: SaleDetails[];

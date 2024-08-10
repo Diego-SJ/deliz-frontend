@@ -1,6 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppSlice, Company } from './types';
 import customActions from './actions';
+import { STATUS_DATA } from '@/constants/status';
+import { ONBOARDING_STEPS } from '@/constants/onboarding';
 
 const initialState: AppSlice = {
   company: {
@@ -19,6 +21,23 @@ const initialState: AppSlice = {
       activeTitle: '',
     },
   },
+  onboarding: {
+    onboarding_id: null,
+    step: ONBOARDING_STEPS.ONE,
+    created_at: '',
+    company_id: '',
+    no_employees: 0,
+    business_niche: '',
+    no_branches: 0,
+    is_ecommerce: false,
+    status_id: STATUS_DATA.PENDING.id,
+    owner_name: '',
+    owner_last_name: '',
+    accepted_terms: false,
+    business_name: '',
+    important_features: [],
+  },
+  loading: false,
 };
 
 const app = createSlice({
@@ -31,6 +50,12 @@ const app = createSlice({
     },
     setNavigation: (state, action: PayloadAction<Partial<AppSlice['navigation']>>) => {
       state.navigation = { ...state.navigation, ...action.payload };
+    },
+    setOnboarding: (state, action: PayloadAction<Partial<AppSlice['onboarding']>>) => {
+      state.onboarding = { ...state.onboarding, ...action.payload };
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
   },
 });

@@ -1,5 +1,4 @@
 import MainLayout, { PaddingLayout } from '@/components/organisms/MainLayout';
-import SignIn from '@/components/pages/auth/signIn';
 import SignUp from '@/components/pages/auth/signup';
 import Dashboard from '@/components/pages/dashboard';
 import Products from '@/components/pages/products';
@@ -10,18 +9,16 @@ import SaleDetail from '@/components/pages/sales/detail';
 import CashRegister from '@/components/pages/cash-register';
 import { APP_ROUTES } from '@/routes/routes';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import SignInAdmin from '@/components/pages/auth/signInAdmin';
-import AdminAuth from './AdminAuth';
-import Home from '@/components/pages/home';
+import Login from '@/components/pages/auth/login';
+import Home from '@/components/pages/lading-page';
 import ProductsCatalog from '@/components/pages/products/catalog';
-import TransactionsCashiers from '@/components/pages/transactions/cashiers';
+import TransactionsCashiers from '@/components/pages/cash_cuts';
 import DebtorsClients from '@/components/pages/debtors';
 import ProductSizes from '@/components/pages/settings/sizes';
 import ProductUnits from '@/components/pages/settings/units';
 import Orders from '@/components/pages/orders';
-import ProductsReport from '@/components/pages/reports/products';
-import CurrentCashier from '@/components/pages/transactions/cashiers/current-cashier';
-import CashierDetail from '@/components/pages/transactions/cashiers/detail';
+import CurrentCashier from '@/components/pages/cash_cuts/current-cash-cut';
+import CashierDetail from '@/components/pages/cash_cuts/detail';
 import SettingsPage from '@/components/pages/settings';
 import BranchesPage from '@/components/pages/settings/branches';
 import AddBranchForm from '@/components/pages/settings/branches/add-branch-form';
@@ -36,32 +33,42 @@ import ManageUserProfile from '@/components/pages/settings/users/add-user-form';
 import { useAppSelector } from '@/hooks/useStore';
 import PurchasesExpenses from '@/components/pages/operating-costs';
 import AddOperationPurchaseExpense from '@/components/pages/operating-costs/add-operation';
+import SignUpSteps from '@/components/pages/auth/signup/steps';
+import PrivateRoute from './private-route';
+import { STATUS_DATA } from '@/constants/status';
+import ReportsHomePage from '@/components/pages/reports';
+import ReportsLayout from '@/components/pages/reports/layout';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
-  const { permissions, role } = useAppSelector(({ users }) => users.user_auth.profile!);
-  const isAdmin = role === 'ADMIN';
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { isAdmin, authenticated } = useAppSelector(({ users }) => users.user_auth);
+  const { status_id } = useAppSelector(({ app }) => app.onboarding);
 
   return (
     <Routes>
+      {/* landing page */}
       <Route path={APP_ROUTES.AUTH.MAIN.path} element={<Home />} />
+
+      {/* Online store */}
       <Route path={APP_ROUTES.PUBLIC.PRODUCTS.path} element={<ProductsCatalog />} />
-      <Route path={APP_ROUTES.AUTH.SIGN_IN.path} element={<SignIn />} />
-      <Route
-        path={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path}
-        element={
-          <AdminAuth>
-            <SignInAdmin />
-          </AdminAuth>
-        }
-      />
-      <Route path={APP_ROUTES.AUTH.SIGN_UP.path} element={<SignUp />} />
+
+      {!authenticated && (
+        <>
+          <Route path={APP_ROUTES.AUTH.SIGN_IN_ADMIN.path} element={<Login />} />
+          <Route path={APP_ROUTES.AUTH.SIGN_UP.path} element={<SignUp />} />
+        </>
+      )}
+
+      {status_id !== STATUS_DATA.COMPLETED.id && !!authenticated && (
+        <Route path={APP_ROUTES.AUTH.SIGN_UP.ONBOARDING.path} element={<SignUpSteps />} />
+      )}
       <Route
         path={APP_ROUTES.PRIVATE.MAIN}
         element={
-          <AdminAuth>
+          <PrivateRoute>
             <MainLayout />
-          </AdminAuth>
+          </PrivateRoute>
         }
       >
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} element={<Dashboard />} />
@@ -80,22 +87,6 @@ const AppRouter = () => {
             <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
           </>
         )}
-        <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.SIZES.path}
-          element={
-            <PaddingLayout>
-              <ProductSizes />
-            </PaddingLayout>
-          }
-        />
-        <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.UNITS.path}
-          element={
-            <PaddingLayout>
-              <ProductUnits />
-            </PaddingLayout>
-          }
-        />
 
         {/* PRODUCTS ROUTES - END */}
 
@@ -142,17 +133,6 @@ const AppRouter = () => {
           />
         )}
         {/* TRANSACTIONS ROUTES - END */}
-
-        {/* REPORTS ROUTES - START */}
-        <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.PRODUCTS.path}
-          element={
-            <PaddingLayout>
-              <ProductsReport />
-            </PaddingLayout>
-          }
-        />
-        {/* REPORTS ROUTES - END */}
 
         {permissions?.customers?.view_customers && (
           <Route
@@ -220,6 +200,14 @@ const AppRouter = () => {
             </>
           )}
 
+          {permissions?.sizes?.view_sizes && (
+            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path} element={<ProductSizes />} />
+          )}
+
+          {permissions?.units?.view_units && (
+            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path} element={<ProductUnits />} />
+          )}
+
           {permissions?.cash_registers?.view_cash_registers && (
             <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path} element={<PricesListPage />} />
           )}
@@ -242,7 +230,14 @@ const AppRouter = () => {
         {/* SETTINGS ROUTES - END */}
 
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path} element={<DebtorsClients />} />
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path} element={<div>REPORTS</div>} />
+        <Route
+          path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path}
+          element={
+            <ReportsLayout>
+              <ReportsHomePage />
+            </ReportsLayout>
+          }
+        />
       </Route>
       <Route path={APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path} element={<CashRegister />} />
       <Route path="*" element={<Navigate to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} replace />} />

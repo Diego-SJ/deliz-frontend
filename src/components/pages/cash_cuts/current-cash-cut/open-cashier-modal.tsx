@@ -34,7 +34,7 @@ const OpenCashierModal = () => {
       <Empty description="Aún no tienes una caja abierta">
         {permissions?.cash_registers?.open_cash_cut && (
           <Button onClick={() => setVisible(true)} loading={loading}>
-            Abrir Caja {currentCashRegister?.name}
+            Empezar a vender
           </Button>
         )}
       </Empty>

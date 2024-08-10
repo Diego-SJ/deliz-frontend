@@ -11,6 +11,7 @@ import branchesReducer from './reducers/branches';
 import appReducer from './reducers/app';
 import ordersReducer from './reducers/orders';
 import operatingCostsReducer from './reducers/operatingCosts';
+import analyticsReducer from './reducers/analytics';
 
 const rootReducer = combineReducers({
   app: appReducer,
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   users: usersReducer,
   cashiers: cashiersReducer,
   branches: branchesReducer,
+  analytics: analyticsReducer,
 });
 
 const persistConfig = { key: 'deliz.app', version: 1, storage };

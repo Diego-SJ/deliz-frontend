@@ -3,6 +3,7 @@ import { useAppDispatch } from '@/hooks/useStore';
 import { cashiersActions } from '@/redux/reducers/cashiers';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Drawer, Form, Input, InputNumber, Radio, Row, Typography } from 'antd';
+import { CircleDollarSign, NotebookPenIcon } from 'lucide-react';
 import { useState } from 'react';
 
 const AddOperationDrawer = () => {
@@ -87,10 +88,17 @@ const AddOperationDrawer = () => {
           </Row>
         }
       >
-        <Form layout="vertical" onFinish={addOperation} form={addOperationForm} initialValues={{ payment_method: 'CASH' }}>
+        <Form
+          requiredMark={false}
+          layout="vertical"
+          onFinish={addOperation}
+          form={addOperationForm}
+          initialValues={{ payment_method: 'CASH' }}
+        >
           <Form.Item name="name" label="Motivo" rules={[{ required: true, message: 'Campo obligatorio' }]}>
             <Input
               size="large"
+              prefix={<NotebookPenIcon className="text-neutral-400 w-5" />}
               placeholder="Ejemplo: pago de proveedores"
               onFocus={({ target }) => target.select()}
               onPressEnter={addOperation}
@@ -100,6 +108,7 @@ const AddOperationDrawer = () => {
             <InputNumber
               size="large"
               inputMode="decimal"
+              prefix={<CircleDollarSign className="text-neutral-400 w-5" />}
               min={0}
               autoFocus
               onFocus={({ target }) => target.select()}

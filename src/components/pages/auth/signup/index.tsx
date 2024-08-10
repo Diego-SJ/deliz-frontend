@@ -1,77 +1,100 @@
 import { APP_ROUTES } from '@/routes/routes';
-import { GoogleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Layout, Typography } from 'antd';
-import { FormContainer, FormFigure, FormFigureImg, LayoutContent } from './styles';
-import { supabase } from '@/config/supabase';
+import { Button, Form, Input, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import AnimatedBackground from '@/components/atoms/AnimatedBackground';
+import { useState } from 'react';
+import { userActions } from '@/redux/reducers/users';
+import { useAppDispatch } from '@/hooks/useStore';
+import PosiffyWebp from '@/assets/logo-color.svg';
+import DevicesWebp from '@/assets/webp/devices.webp';
 
-const SignUp = () => {
+const SignInAdmin = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
 
-  const createUser = async (values: any) => {
-    await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
+  const handleOnFinish = async () => {
+    form.validateFields().then(async values => {
+      setLoading(true);
+      await dispatch(userActions.signUp(values));
+      setLoading(false);
     });
   };
 
-  return (
-    <Layout>
-      <LayoutContent>
-        <FormContainer className="form-container">
-          <Form
-            form={form}
-            name="basic"
-            initialValues={{ remember: true }}
-            autoComplete="off"
-            layout="vertical"
-            onFinish={createUser}
-            requiredMark={false}
-          >
-            <Typography.Title level={2}>Bienvenido a Ecommerce</Typography.Title>
-            <Form.Item>
-              <Button size="large" icon={<GoogleOutlined />}>
-                Registrate con Google
-              </Button>
-            </Form.Item>
-            <Typography.Paragraph type="secondary" className="caption">
-              o registrate con tu correo
-            </Typography.Paragraph>
-            <Form.Item label="Nombre(s)" name="name" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
-              <Input size="large" placeholder="Nombre(s)" />
-            </Form.Item>
-            <Form.Item
-              label="Apellidos"
-              name="last_name"
-              rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}
-            >
-              <Input size="large" placeholder="Apellidos" />
-            </Form.Item>
-            <Form.Item label="Correo" name="email" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
-              <Input size="large" placeholder="correo@ejemplo.com" />
-            </Form.Item>
-            <Form.Item label="Contraseña" name="password" rules={[{ required: true, message: 'Ingresa una contraseña válida' }]}>
-              <Input.Password size="large" placeholder="Contraseña" />
-            </Form.Item>
-            <Form.Item style={{ marginTop: 10 }}>
-              <Button type="primary" htmlType="submit" size="large">
-                Registrarme
-              </Button>
-            </Form.Item>
-            <Typography.Paragraph type="secondary" className="caption">
-              ¿Ya tienes una cuenta?{' '}
-              <Button type="link" href={APP_ROUTES.AUTH.SIGN_IN.path}>
-                Inicia sesión
-              </Button>
-            </Typography.Paragraph>
-          </Form>
+  const handleChange = (value: string) => {
+    if (!isNaN(Number(value)) || value === '') {
+      setWhatsappNumber(value);
+    }
+  };
 
-          <FormFigure>
-            <FormFigureImg src="src/assets/img/svg/ecommerce-web.svg" alt="ecoomerce web" />
-          </FormFigure>
-        </FormContainer>
-      </LayoutContent>
-    </Layout>
+  return (
+    <div className="min-h-[100dvh] max-h-[100dvh] flex">
+      <AnimatedBackground />
+      <div className="flex flex-col justify-center items-center w-full md:w-[50%] lg:w-[40%] p-10 bg-white z-10 shadow-lg">
+        <Form
+          form={form}
+          name="basic"
+          autoComplete="off"
+          layout="vertical"
+          requiredMark={false}
+          onFinish={handleOnFinish}
+          className="w-full max-w-[400px] mx-auto"
+        >
+          <img src={PosiffyWebp} alt="posiffy" className="w-14 -mt-20" onClick={() => navigate('/')} />
+          <Typography.Title level={2} className="!mb-1 !mt-10">
+            ¡Registrate!
+          </Typography.Title>
+          <Typography.Paragraph type="secondary" className="caption !mb-10">
+            ¿Ya tienes una cuenta?{' '}
+            <span className="text-primary cursor-pointer" onClick={() => navigate(APP_ROUTES.AUTH.SIGN_IN_ADMIN.path)}>
+              Inicia sesión
+            </span>
+          </Typography.Paragraph>
+          <Form.Item label="Correo" name="email" rules={[{ required: true, message: 'Ingresa un correo válido' }]}>
+            <Input size="large" placeholder="email@ejemplo.com" />
+          </Form.Item>
+
+          <Form.Item
+            label="Número de WhatsApp"
+            name="phone"
+            rules={[{ required: true, message: 'Por favor ingresa un número válido', pattern: /^[0-9]{10}$/, min: 10, max: 10 }]}
+          >
+            <Input
+              className="w-full"
+              prefix="+52"
+              value={whatsappNumber}
+              onChange={({ target }) => handleChange(target.value)}
+              size="large"
+              inputMode="tel"
+              placeholder="Whatsapp"
+              min={0}
+              minLength={10}
+              maxLength={10}
+            />
+          </Form.Item>
+          <Form.Item
+            className="!mb-9"
+            label="Contraseña"
+            name="password"
+            rules={[{ required: true, message: 'Ingresa una contraseña válida', min: 6 }]}
+          >
+            <Input.Password size="large" placeholder="contraseña" />
+          </Form.Item>
+          <Form.Item>
+            <Button block type="primary" htmlType="submit" size="large" loading={loading}>
+              Registrarme
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+
+      <div className="md:w-[50%] lg:w-[60%]  items-center justify-center hidden md:inline-flex ">
+        <img src={DevicesWebp} alt="ecoomerce web" className="w-[80%] z-10 drop-shadow-2xl" />
+      </div>
+    </div>
   );
 };
 
-export default SignUp;
+export default SignInAdmin;

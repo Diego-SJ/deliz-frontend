@@ -3,6 +3,7 @@ import { message } from 'antd';
 import { branchesActions } from '.';
 import { Branch, CashRegister, Price } from './type';
 import { AppDispatch, AppState } from '@/redux/store';
+import { ROLES } from '@/constants/roles';
 
 export const customActions = {
   upsertBranch: (branch: Partial<Branch>) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -35,7 +36,7 @@ export const customActions = {
       .order('created_at', { ascending: true })
       .eq('company_id', company_id);
 
-    if (profile?.role !== 'ADMIN') {
+    if (profile?.role !== ROLES.ADMIN) {
       supabaseQuery.in('branch_id', profile?.branches || []);
     }
 
@@ -43,10 +44,11 @@ export const customActions = {
 
     if (error) {
       message.error('Error al obtener los datos');
-      return;
+      return null;
     }
 
     dispatch(branchesActions.setBranches(data));
+    return data;
   },
   getBranchById: (branch_id: string) => async (dispatch: AppDispatch) => {
     const { data, error } = await supabase.from('branches').select('*').eq('branch_id', branch_id).single();
@@ -126,7 +128,7 @@ export const customActions = {
       .eq('company_id', company_id)
       .order('created_at', { ascending: true });
 
-    if (profile?.role !== 'ADMIN') {
+    if (profile?.role !== ROLES.ADMIN) {
       supabaseQuery.in('cash_register_id', profile?.cash_registers || []);
     }
 

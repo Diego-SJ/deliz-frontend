@@ -31,8 +31,8 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
     let _products = productHelpers.searchProducts(searchText, products);
     setCurrentProducts(
       _products?.sort((a, b) => {
-        if (favorite_products.includes(a.product_id) && !favorite_products.includes(b.product_id)) return -1;
-        if (!favorite_products.includes(a.product_id) && favorite_products.includes(b.product_id)) return 1;
+        if (favorite_products?.includes(a.product_id) && !favorite_products?.includes(b?.product_id)) return -1;
+        if (!favorite_products?.includes(a.product_id) && favorite_products?.includes(b?.product_id)) return 1;
         return 0;
       }),
     );
