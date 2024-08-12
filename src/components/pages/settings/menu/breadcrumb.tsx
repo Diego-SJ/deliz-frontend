@@ -1,7 +1,7 @@
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { APP_ROUTES } from '@/routes/routes';
 import { Breadcrumb, Col, Row } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   items?: {

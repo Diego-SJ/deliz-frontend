@@ -15,7 +15,12 @@ export const productHelpers = {
     const regex = new RegExp(normalizedSearchText, 'i');
 
     return products?.filter(product => {
-      return regex?.test(this.normalizeText(product?.name)) || regex?.test(this.normalizeText(product?.description));
+      return (
+        regex?.test(this.normalizeText(product?.name)) ||
+        regex?.test(this.normalizeText(product?.description)) ||
+        regex?.test(this.normalizeText(product?.code)) ||
+        regex?.test(this.normalizeText(product?.sku))
+      );
     });
   },
   getProductPrice: (product: Product | null, price_id: string | null): number => {

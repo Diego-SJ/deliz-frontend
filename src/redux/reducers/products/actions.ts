@@ -86,43 +86,48 @@ const customActions = {
     message.info('Imagen eliminada');
   },
   saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch, getState: AppState) => {
-    try {
-      dispatch(productActions.setLoading(true));
-      const company_id = getState().app.company.company_id;
+    dispatch(productActions.setLoading(true));
+    const company_id = getState().app.company.company_id;
 
-      const result = await supabase.from('products').insert({ ...product, company_id });
+    const result = await supabase.from('products').insert({ ...product, company_id });
 
-      dispatch(productActions.setLoading(false));
+    dispatch(productActions.setLoading(false));
 
-      if (result.error) {
-        message.error('No se pudo guardar el producto.', 4);
-        return false;
+    if (result.error) {
+      let errorMessage = 'No se pudo guardar el producto';
+      if (result.error.details.includes('Key (code)=')) {
+        errorMessage = 'El código de barras ya existe';
       }
-
-      message.success('¡Producto agregado con éxito!', 4);
-      return true;
-    } catch (error) {
-      dispatch(productActions.setLoading(false));
+      if (result.error.details.includes('Key (sku)=')) {
+        errorMessage = 'El SKU ya existe';
+      }
+      message.error(errorMessage, 4);
       return false;
     }
+
+    message.success('¡Producto agregado con éxito!', 4);
+    return true;
   },
   updateProduct: (product: Partial<Product>) => async (dispatch: AppDispatch) => {
-    try {
-      dispatch(productActions.setLoading(true));
-      const result = await supabase.from('products').update(product).eq('product_id', product.product_id).select().single();
-      dispatch(productActions.setLoading(false));
+    dispatch(productActions.setLoading(true));
+    const result = await supabase.from('products').update(product).eq('product_id', product.product_id).select().single();
+    dispatch(productActions.setLoading(false));
 
-      if (result.error) {
-        message.error('No se pudo actualizar la información.', 4);
-        return false;
+    if (result.error) {
+      let errorMessage = 'No se pudo actualizar el producto';
+      if (result.error.details.includes('Key (code)=')) {
+        errorMessage = 'El código de barras ya existe';
       }
-      dispatch(productActions.setCurrentProduct(result.data));
-      message.success('¡Producto actualizado con éxito!', 4);
-      return true;
-    } catch (error) {
-      dispatch(productActions.setLoading(false));
+      if (result.error.details.includes('Key (sku)=')) {
+        errorMessage = 'El SKU ya existe';
+      }
+      message.error(errorMessage, 4);
       return false;
     }
+
+    dispatch(productActions.setCurrentProduct(result.data));
+    message.success('¡Producto actualizado con éxito!', 4);
+    return true;
   },
   deleteProduct: (product: Product) => async (dispatch: AppDispatch) => {
     const { error } = await supabase.from('products').delete().eq('product_id', product.product_id);

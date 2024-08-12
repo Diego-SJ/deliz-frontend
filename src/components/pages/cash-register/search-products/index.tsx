@@ -1,10 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { Product } from '@/redux/reducers/products/types';
 import { productHelpers } from '@/utils/products';
-import { Button, Col, Empty, Input, InputRef, Row } from 'antd';
+import { App, Button, Col, Empty, Input, InputRef, Row, Space } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ItemProduct } from './product-item';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { BarcodeOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { userActions } from '@/redux/reducers/users';
 import FavoriteProducts from './favorite-products';
@@ -16,6 +16,7 @@ import CashRegisterItemsList from '../cart-items-list';
 import CashierActions from '../cashier-actions';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchProductsMobile from './search-products-mobile';
+import BarcodeScanner from '@/components/organisms/bar-code-reader';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -31,6 +32,8 @@ const SearchProducts = () => {
   const searchInputRef = useRef<InputRef>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isPhablet, isTablet } = useMediaQuery();
+  const [openBarCode, setOpenBarCode] = useState(false);
+  const { message } = App.useApp();
   const listReft = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -113,33 +116,56 @@ const SearchProducts = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
+  const onSuccessScan = (barcode: string) => {
+    let productFound = products?.find(product => product.code === barcode);
+
+    if (!productFound?.product_id) {
+      message.error('Producto no encontrado', 5);
+      return null;
+    }
+
+    handleItemInteract(productFound);
+  };
+
   const handleInputTextChange = useDebouncedCallback(value => {
     setSearchText(value);
   }, 250);
 
   return (
     <>
-      <div className="flex gap-4 px-3">
-        <Input.Search
-          ref={searchInputRef}
-          allowClear
-          size="large"
-          className="search-products-input m-0 !border-gray-300"
-          placeholder="Buscar producto"
-          onFocus={() => {
-            setInputIsFocused(!isTablet);
-            setCurrentProducts(products?.slice(0, 16) || []);
-            searchInputRef.current?.select();
-          }}
-          onClick={() => {
-            if (isTablet) {
-              setOpenMobileSearhDrawer(true);
-            }
-          }}
-          onChange={({ target }) => {
-            handleInputTextChange(target.value);
-          }}
-        />
+      <div className="flex gap-4 px-3 w-full">
+        {openBarCode && (
+          <BarcodeScanner
+            paused={!openBarCode}
+            onCancel={() => setOpenBarCode(false)}
+            onScan={value => {
+              onSuccessScan(value[0].rawValue);
+            }}
+          />
+        )}
+        <Space.Compact className="!w-full">
+          <Input.Search
+            ref={searchInputRef}
+            allowClear
+            size="large"
+            className="search-products-input m-0 !border-gray-300 !w-full"
+            placeholder="Buscar producto"
+            onFocus={() => {
+              setInputIsFocused(!isTablet);
+              setCurrentProducts(products?.slice(0, 16) || []);
+              searchInputRef.current?.select();
+            }}
+            onClick={() => {
+              if (isTablet) {
+                setOpenMobileSearhDrawer(true);
+              }
+            }}
+            onChange={({ target }) => {
+              handleInputTextChange(target.value);
+            }}
+          />
+          <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
+        </Space.Compact>
       </div>
 
       <div className="min-h-[calc(100dvh-169px)] max-h-[calc(100dvh-169px)] overflow-x-auto pt-0 pb-0 md:pt-4 md:pb-4">

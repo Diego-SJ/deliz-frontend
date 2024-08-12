@@ -24,6 +24,7 @@ export type Product = {
   unit_id?: number;
   size_id?: number;
   code?: string;
+  sku?: string;
 
   // relations
   categories?: Category;

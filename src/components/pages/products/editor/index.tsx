@@ -30,6 +30,7 @@ import PricesTable from './prices-table';
 import { BUCKETS } from '@/constants/buckets';
 import { QuickCategoryCreationForm } from '../../settings/categories/editor';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
+import { branchesActions } from '@/redux/reducers/branches';
 
 type Params = {
   action: 'edit' | 'add';
@@ -56,17 +57,18 @@ const ProductEditor = () => {
   const [inventory, setInventory] = useState<Inventory>({});
   const [priceList, setPriceList] = useState<PriceList>({});
   const [openBarCode, setOpenBarCode] = useState(false);
+  const [barCode, setBarCode] = useState<string | undefined>(undefined);
   const { modal } = App.useApp();
 
   useEffect(() => {
-    if (!firstRender.current && !!product_id && product_id !== 'new') {
+    if (!firstRender.current) {
       firstRender.current = true;
-      // dispatch(productActions.fetchCategories({ refetch: true }));
-      // dispatch(productActions.sizes.get({ refetch: true }));
-      // dispatch(productActions.units.get({ refetch: true }));
-      // dispatch(branchesActions.getPrices());
-      // dispatch(branchesActions.getBranches());
-      dispatch(productActions.getProductById(Number(product_id)));
+
+      dispatch(branchesActions.getPrices());
+
+      if (!!product_id && product_id !== 'new') {
+        dispatch(productActions.getProductById(Number(product_id)));
+      }
     }
   }, [product_id, dispatch]);
 
@@ -88,6 +90,7 @@ const ProductEditor = () => {
   useEffect(() => {
     setInventory(current_product?.inventory ?? {});
     setPriceList(current_product?.price_list ?? {});
+    setBarCode(current_product?.code);
   }, [current_product]);
 
   const clearFields = () => {
@@ -95,6 +98,7 @@ const ProductEditor = () => {
     setFileList([]);
     setInventory({});
     setPriceList({});
+    setBarCode(undefined);
   };
 
   const saveImage = async (): Promise<string | null> => {
@@ -110,8 +114,8 @@ const ProductEditor = () => {
   const saveNewProduct = async (values: Product) => {
     let image_url: string | null = await saveImage();
 
-    await dispatch(productActions.saveProduct({ ...values, image_url }));
-    clearFields();
+    const success = await dispatch(productActions.saveProduct({ ...values, image_url }));
+    if (success) clearFields();
   };
 
   const saveEditionProduct = async (values: Product) => {
@@ -125,7 +129,7 @@ const ProductEditor = () => {
       .validateFields()
       .then(async values => {
         setLoading(true);
-        let product = { ...values, inventory, price_list: priceList };
+        let product = { ...values, inventory, price_list: priceList, code: barCode };
 
         if (action === 'add' && !!permissions?.products?.add_product) await saveNewProduct(product);
         else if (action === 'edit' && !!permissions?.products?.edit_product) await saveEditionProduct(product);
@@ -237,8 +241,10 @@ const ProductEditor = () => {
                     {openBarCode && (
                       <BarcodeScanner
                         paused={!openBarCode}
+                        onCancel={() => setOpenBarCode(false)}
                         onScan={value => {
-                          message.info(JSON.stringify(value));
+                          form.setFieldsValue({ code: value[0].rawValue });
+                          setBarCode(value[0].rawValue);
                           setOpenBarCode(false);
                         }}
                       />
@@ -250,7 +256,7 @@ const ProductEditor = () => {
                       tooltip="Escanea el código de barras del producto"
                     >
                       <Space.Compact style={{ width: '100%' }}>
-                        <Input size="large" placeholder="Opcional" />
+                        <Input size="large" placeholder="Opcional" value={barCode as string} />
                         <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
                       </Space.Compact>
                     </Form.Item>
