@@ -3,8 +3,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
-import { FileImageOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Input, Row, Select, Tag, Typography } from 'antd';
+import { AppstoreOutlined, FileImageOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Button, Col, Dropdown, Input, Row, Select, Tag, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -69,10 +69,15 @@ const columns = (branch_id: string) =>
     },
   ] as ColumnsType<DataType>;
 
+const categoriesSelected = (categories: number[]) => {
+  console.log(categories);
+  return !!categories.length ? categories?.map(cat => cat + '') : ['ALL'];
+};
+
 const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { products, categories } = useAppSelector(({ products }) => products);
+  const { products, categories, filters } = useAppSelector(({ products }) => products);
   const { currentBranch } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Product[]>([]);
@@ -101,18 +106,30 @@ const Products = () => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'edit'}${record.product_id}`);
   };
 
-  const getPanelValue = ({ searchText, categoryId }: { searchText?: string; categoryId?: number[] }) => {
+  const getPanelValue = ({ searchText }: { searchText?: string; categoryId?: number[] }) => {
     let _options = products?.filter(item => {
-      return (
-        (functions.includes(item?.name, searchText) || functions.includes(item?.description, searchText)) &&
-        (!!categoryId?.length ? categoryId.includes(item.category_id) : true)
-      );
+      return functions.includes(item?.name, searchText) || functions.includes(item?.description, searchText);
     });
     setOptions(_options);
   };
 
   const onRefresh = () => {
     dispatch(productActions.fetchProducts({ refetch: true }));
+  };
+
+  const onCategoryChange = async (key: string) => {
+    if (key === 'ALL') {
+      await dispatch(productActions.setProductFilters({ categories: [] }));
+    } else {
+      let categories = [...(filters?.products?.categories || [])];
+      if (categories?.includes(+key)) {
+        categories = categories.filter(item => item !== +key);
+      } else {
+        categories.push(+key);
+      }
+      await dispatch(productActions.setProductFilters({ categories }));
+    }
+    await onRefresh();
   };
 
   return (
@@ -144,7 +161,35 @@ const Products = () => {
               />
             </Col>
             <Col lg={6} xs={12}>
-              <Select
+              <Dropdown
+                menu={{
+                  selectedKeys: categoriesSelected(filters?.products?.categories || []),
+                  items: [
+                    { label: 'Todas las categorías', key: 'ALL' },
+                    ...(categories?.map(cat => ({ label: cat.name, key: cat.category_id + '' })) || []),
+                  ],
+                  multiple: true,
+                  selectable: true,
+                  onClick: async ({ key }) => onCategoryChange(key),
+                }}
+              >
+                <Button
+                  type={!filters?.products?.categories?.length ? 'default' : 'primary'}
+                  block
+                  className={`${!!filters?.products?.categories?.length ? '!bg-white' : ''}`}
+                  ghost={!!filters?.products?.categories?.length}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<AppstoreOutlined className="text-base" />}
+                  onMouseEnter={() => {
+                    if (!categories?.length) {
+                      dispatch(productActions.fetchCategories({ refetch: true }));
+                    }
+                  }}
+                >
+                  Categorias
+                </Button>
+              </Dropdown>
+              {/* <Select
                 placeholder="Categorías"
                 style={{ width: '100%' }}
                 mode="multiple"
@@ -153,7 +198,7 @@ const Products = () => {
                 options={categories?.map(item => ({ value: item.category_id, label: item.name }))}
                 listHeight={1000}
                 onChange={value => getPanelValue({ categoryId: value })}
-              />
+              /> */}
             </Col>
             {permissions?.products?.add_product && (
               <Col lg={{ span: 4, offset: 8 }} xs={{ offset: 0, span: 12 }}>
@@ -198,22 +243,22 @@ const Products = () => {
                   <div
                     key={item.product_id}
                     onClick={() => onRowClick(item)}
-                    className="flex py-3 pl-2 pr-4 border-b border-gray-200 cursor-pointer items-center"
+                    className="flex py-2 pl-2 pr-4 border-b border-gray-200 cursor-pointer items-center"
                   >
                     <Avatar
                       src={item.image_url}
-                      icon={<FileImageOutlined className="text-slate-600 text-2xl" />}
-                      className={`bg-slate-600/10 p-1 w-14 min-w-14 h-14 min-h-14`}
+                      icon={<FileImageOutlined className="text-slate-400 text-xl" />}
+                      className={`bg-slate-600/10 p-1 w-11 min-w-11 h-11 min-h-11`}
                       size="large"
                       shape="square"
                     />
-                    <div className="flex items-start flex-col gap-2 pl-4">
+                    <div className="flex items-start flex-col gap-1 pl-4">
                       <Typography.Paragraph className="!mb-0">{item.name}</Typography.Paragraph>
                       <Typography.Text type="secondary">{functions.money(item.raw_price)}</Typography.Text>
                     </div>
 
-                    <div className="flex flex-col text-end justify-center h-full items-end self-end ml-auto">
-                      <Typography.Text className="!mb-2" type="secondary">
+                    <div className="flex flex-col text-end justify-center h-full items-end self-end ml-auto ">
+                      <Typography.Text className="!mb-1" type="secondary">
                         {hasStock ? `${stock} existencias` : 'Sin stock'}
                       </Typography.Text>
                       <Tag className="ml-auto w-fit mx-0" color={functions.getTagColor(item?.categories?.name || 'empty')}>

@@ -124,6 +124,7 @@ const SearchProducts = () => {
       return null;
     }
 
+    message.success('1 producto agregado', 2);
     handleItemInteract(productFound);
   };
 

@@ -18,11 +18,11 @@ function App() {
     if (!firstRender.current && authenticated && !!profile?.profile_id) {
       firstRender.current = true;
 
-      if (!!profile.role && onboarding.status_id === STATUS_DATA.COMPLETED.id) {
+      if (!!profile?.role && onboarding?.status_id === STATUS_DATA.COMPLETED.id) {
         dispatch(userActions.fetchAppData());
       }
 
-      if (profile.role === ROLES.ONBOARDING_PENDING && onboarding.step <= ONBOARDING_STEPS.FOUR) {
+      if (profile?.role === ROLES.ONBOARDING_PENDING && onboarding.step <= ONBOARDING_STEPS.FOUR) {
         dispatch(appActions.fetchOnboarding());
         dispatch(appActions.company.getCompany());
       }

@@ -27,7 +27,6 @@ export const productHelpers = {
     return (product?.price_list || {})[price_id || '']?.unit_price || product?.raw_price || product?.retail_price || 0;
   },
   getProductStock: (product: Product | null, branch_id: string | null): number => {
-    console.log('stock', (product?.inventory || {})[branch_id || '']?.stock || 0);
     return (product?.inventory || {})[branch_id || '']?.stock || 0;
   },
   calculateProductStock: (inventory: Inventory): { stock: number; hasStock: boolean } => {

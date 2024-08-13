@@ -13,30 +13,37 @@ export interface FetchFunction {
 
 const customActions = {
   fetchProducts: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    try {
-      let products = getState().products.products || [];
-      const company_id = getState().app?.company?.company_id;
+    let products = getState().products.products || [];
+    const company_id = getState().app?.company?.company_id;
+    const { categories } = getState().products.filters.products || {};
 
-      if (!products.length || args?.refetch) {
-        dispatch(productActions.setLoading(true));
-        const result = await supabase
-          .from('products')
-          .select(`*, categories(category_id,name), units(*), sizes(*)`)
-          .eq('company_id', company_id)
-          .order('name', { ascending: true });
-
-        products =
-          result?.data?.map(item => {
-            return {
-              ...item,
-            } as Product;
-          }) ?? [];
-        dispatch(productActions.setProducts(products));
-      }
-    } catch (error) {
-      message.error('No se pudo obtener la lista de productos');
+    if (!products.length || args?.refetch) {
+      dispatch(productActions.setLoading(true));
+      const supabaseQuery = supabase
+        .from('products')
+        .select(`*, categories(category_id,name), units(*), sizes(*)`)
+        .eq('company_id', company_id)
+        .order('name', { ascending: true });
       dispatch(productActions.setLoading(false));
-      return false;
+
+      if (categories?.length) {
+        supabaseQuery.in('category_id', categories);
+      }
+
+      const { data, error } = await supabaseQuery;
+
+      if (error) {
+        message.error('No se pudo obtener la información de los productos');
+        return;
+      }
+
+      products =
+        data?.map(item => {
+          return {
+            ...item,
+          } as Product;
+        }) ?? [];
+      dispatch(productActions.setProducts(products));
     }
   },
   getProductById: (product_id: number) => async (dispatch: AppDispatch, getState: AppState) => {

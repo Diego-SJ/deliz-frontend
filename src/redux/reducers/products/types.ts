@@ -2,12 +2,27 @@ import { Pagination } from '@supabase/supabase-js';
 
 export type ProductsSlice = {
   products: Product[];
+  filters: {
+    products: Partial<ProductFilters> | null;
+  };
   categories: Category[];
   current_product: Product;
   current_category: Category;
   sizes?: Sizes;
   units?: Units;
   loading: boolean;
+};
+
+export type ProductFilters = {
+  categories: number[];
+  search: string;
+  size_id: number;
+  unit_id: number;
+  status: number;
+  page: number;
+  per_page: number;
+  order_by: string;
+  order_type: string;
 };
 
 export type Product = {

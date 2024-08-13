@@ -264,8 +264,6 @@ const customActions = {
     try {
       let newItem = { ...item };
 
-      console.log({ newItem });
-
       const result = await supabase.rpc('update_product_in_sale', {
         p_new_price: newItem?.price,
         p_new_quantity: newItem?.quantity,

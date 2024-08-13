@@ -1,9 +1,12 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { Category, Product, ProductsSlice, Size, Sizes, Unit, Units } from './types';
+import { Category, Product, ProductFilters, ProductsSlice, Size, Sizes, Unit, Units } from './types';
 import customActions from './actions';
 
 const initialState: ProductsSlice = {
   products: [],
+  filters: {
+    products: null,
+  },
   categories: [],
   current_category: {} as Category,
   current_product: {} as Product,
@@ -47,6 +50,9 @@ const products = createSlice({
     },
     setUnit(state, action: PayloadAction<Units>) {
       state.units = { ...state.units, ...action.payload };
+    },
+    setProductFilters(state, action: PayloadAction<Partial<ProductFilters>>) {
+      state.filters.products = action.payload;
     },
   },
 });

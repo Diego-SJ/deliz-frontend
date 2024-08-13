@@ -44,7 +44,6 @@ const CashierCustomer = () => {
   };
 
   const onChange = (customerId: number | null) => {
-    console.log(customerId);
     dispatch(salesActions.cashRegister.setCustomerId(customerId));
     onClose();
   };
