@@ -38,10 +38,11 @@ import PrivateRoute from './private-route';
 import { STATUS_DATA } from '@/constants/status';
 import ReportsHomePage from '@/components/pages/reports';
 import ReportsLayout from '@/components/pages/reports/layout';
+import OnlineStorePage from '@/components/pages/online-store';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth.profile! || {});
   const { isAdmin, authenticated } = useAppSelector(({ users }) => users.user_auth);
   const { status_id } = useAppSelector(({ app }) => app?.onboarding || { status_id: null });
 
@@ -195,6 +196,8 @@ const AppRouter = () => {
         )}
 
         {/* PURCHASES EXPENSES ROUTES - END */}
+
+        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.ONLINE_STORE.path} element={<OnlineStorePage />} />
 
         {/* SETTINGS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsPage />}>

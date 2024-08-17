@@ -16,6 +16,7 @@ import { Company } from '../app/types';
 import { ROLES } from '@/constants/roles';
 import { operatingCostsActions } from '../operatingCosts';
 import { analyticsActions } from '../analytics';
+import { storesActions } from '../stores';
 
 const customActions = {
   fetchAppData: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -118,6 +119,7 @@ const customActions = {
     dispatch(userActions.resetSlice());
     dispatch(operatingCostsActions.resetSlice());
     dispatch(appActions.resetSlice());
+    dispatch(storesActions.resetSlice());
   },
   toggleFavoriteProduct: (product_id: number) => async (dispatch: AppDispatch, getState: any) => {
     const { profile } = getState().users.user_auth;

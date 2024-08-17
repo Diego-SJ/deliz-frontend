@@ -7,6 +7,7 @@ import { supabase } from '@/config/supabase';
 import { userActions } from '@/redux/reducers/users';
 import { useAppDispatch } from '@/hooks/useStore';
 import PosiffyWebp from '@/assets/logo-color.svg';
+import EcommerceWeb from '@/assets/img/svg/ecommerce-web.svg';
 
 const SignInAdmin = () => {
   const [form] = Form.useForm();
@@ -42,8 +43,8 @@ const SignInAdmin = () => {
     <div className="min-h-[100dvh] max-h-[100dvh] flex justify-center items-center">
       <AnimatedBackground />
 
-      <div className="flex w-full min-h-[100dvh] max-h-[100dvh] bg-white sm:bg-primary items-center sm:min-h-[auto] sm:max-h-[auto] sm:max-w-[400px]  md:max-w-[800px] mx-auto my-auto rounded-3xl z-10 shadow-lg overflow-hidden">
-        <div className="flex flex-col w-full p-10 bg-white">
+      <div className="flex w-full min-h-[100dvh] max-h-[100dvh] bg-white items-center sm:min-h-[auto] sm:max-h-[auto] sm:max-w-[400px]  md:max-w-[800px] mx-auto my-auto rounded-3xl z-10 shadow-lg overflow-hidden">
+        <div className="flex flex-col w-full p-10 z-10">
           <Form
             form={form}
             name="basic"
@@ -81,8 +82,8 @@ const SignInAdmin = () => {
           </Form>
         </div>
 
-        <div className="w-full  items-center justify-center hidden md:inline-flex ">
-          <img src="src/assets/img/svg/ecommerce-web.svg" alt="ecoomerce web" className="w-[80%]" />
+        <div className="w-full  items-center justify-center hidden md:inline-flex scale-150 -mr-20 z-0 -mt-10">
+          <img src={EcommerceWeb} alt="ecoomerce web" className="w-[100%]" />
         </div>
       </div>
     </div>

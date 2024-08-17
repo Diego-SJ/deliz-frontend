@@ -33,7 +33,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
   return (
     <LayoutRoot hasSider={!isTablet}>
       {!isTablet && (
-        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet} className="bg-[#001628]">
+        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet} className="!border-r" theme={'light' as any}>
           <SideMenu />
         </LayoutSider>
       )}

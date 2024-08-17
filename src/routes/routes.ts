@@ -83,6 +83,7 @@ export const APP_ROUTES = {
       },
       DEBTORS: { path: '/app/debtor-clients', title: 'Clientes deudores' },
       REPORTS: { path: '/app/reports', title: 'Reportes', PRODUCTS: { path: '/app/reports/products' } },
+      ONLINE_STORE: { path: '/app/online-store', title: 'Catálogo en linea' },
       SETTINGS: {
         path: '/app/settings',
         title: 'Configuración',

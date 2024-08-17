@@ -4,10 +4,10 @@ import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
-import { Avatar, Card, Col, Drawer, Row } from 'antd';
+import { Avatar, Col, Drawer, Row } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CustomerEditor from '../customers/editor';
-import { PackagePlus, ShoppingBasket, UserRoundPlus } from 'lucide-react';
+import { CircleDollarSign, PackagePlus, ShoppingBasket, UserRoundPlus } from 'lucide-react';
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +32,10 @@ const Dashboard = () => {
     dispatch(customerActions.setCurrentCustomer({} as Customer));
   };
 
+  const addExpense = () => {
+    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`);
+  };
+
   return (
     <div className="p-3">
       <Row gutter={[10, 10]}>
@@ -42,6 +46,16 @@ const Dashboard = () => {
             icon={<ShoppingBasket strokeWidth={1.5} className="text-purple-600 !w-8 !h-8" />}
             className="bg-purple-600/10"
             onClick={newSale}
+          />
+        )}
+
+        {permissions?.expenses?.add_expense && (
+          <CardButton
+            title="Registrar gasto"
+            description="Registra un gasto"
+            icon={<CircleDollarSign strokeWidth={1.8} className="text-orange-600 !w-7 !h-7" />}
+            className="bg-orange-600/10"
+            onClick={addExpense}
           />
         )}
 
@@ -59,8 +73,8 @@ const Dashboard = () => {
           <CardButton
             title="Nuevo cliente"
             description="Crea un nuevo cliente"
-            icon={<UserRoundPlus strokeWidth={1.8} className="text-orange-600 !w-7 !h-7 -mr-1" />}
-            className="bg-orange-600/10"
+            icon={<UserRoundPlus strokeWidth={1.8} className="text-sky-600 !w-7 !h-7 -mr-1" />}
+            className="bg-sky-600/10"
             onClick={addCustomer}
           />
         )}
@@ -89,10 +103,17 @@ type CardButtonProps = {
 
 export const CardButton = ({ description, icon, title, onClick, className }: CardButtonProps) => {
   return (
-    <Col lg={8} sm={12} xs={24} xxl={6}>
-      <Card hoverable onClick={onClick}>
-        <Card.Meta avatar={<Avatar icon={icon} className={className} size={60} />} title={title} description={description} />
-      </Card>
+    <Col lg={8} sm={12} xs={12} xxl={6}>
+      <div
+        className="flex flex-col border sm:flex-row gap-2 sm:gap-4 items-center w-full rounded-lg px-4 h-auto py-3 sm:py-1 sm:h-20 bg-white cursor-pointer hover:shadow-md"
+        onClick={onClick}
+      >
+        <Avatar icon={icon} className={`${className} h-14 w-14 min-w-14 min-h-14`} />
+        <div className="flex flex-col">
+          <h5 className="font-semibold">{title}</h5>
+          <p className="text-xs font-light text-slate-400 leading-[1.3] hidden sm:inline-flex">{description}</p>
+        </div>
+      </div>
     </Col>
   );
 };

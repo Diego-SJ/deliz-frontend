@@ -17,15 +17,18 @@ function App() {
   useEffect(() => {
     if (!firstRender.current && authenticated && !!profile?.profile_id) {
       firstRender.current = true;
+      (async () => {
+        await dispatch(userActions.fetchProfile(profile?.profile_id!));
 
-      if (!!profile?.role && onboarding?.status_id === STATUS_DATA.COMPLETED.id) {
-        dispatch(userActions.fetchAppData());
-      }
+        if (!!profile?.role && onboarding?.status_id === STATUS_DATA.COMPLETED.id) {
+          dispatch(userActions.fetchAppData());
+        }
 
-      if (profile?.role === ROLES.ONBOARDING_PENDING && onboarding.step <= ONBOARDING_STEPS.FOUR) {
-        dispatch(appActions.fetchOnboarding());
-        dispatch(appActions.company.getCompany());
-      }
+        if (profile?.role === ROLES.ONBOARDING_PENDING && onboarding.step <= ONBOARDING_STEPS.FOUR) {
+          dispatch(appActions.fetchOnboarding());
+          dispatch(appActions.company.getCompany());
+        }
+      })();
     }
   }, []);
 

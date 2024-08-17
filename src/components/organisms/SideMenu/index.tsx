@@ -11,12 +11,13 @@ import {
   InboxOutlined,
   ClockCircleOutlined,
   BarChartOutlined,
+  ReadOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { MenuRoot } from './styles';
 import Logo from '@/components/molecules/Logo';
-import LogoAppWhite from '@/assets/logo-white.svg';
+import LogoAppWhite from '@/assets/logo-color.svg';
 import { Button, Modal, Tooltip } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
@@ -93,11 +94,18 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path,
       }
     : null,
+
   {
     key: 'reports',
     icon: BarChartOutlined,
     label: 'Reportes',
     path: APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path,
+  },
+  {
+    key: 'online_catalog',
+    icon: ReadOutlined,
+    label: 'Catálogo en línea',
+    path: APP_ROUTES.PRIVATE.DASHBOARD.ONLINE_STORE.path,
   },
   {
     key: 'settings',
@@ -141,7 +149,8 @@ const SideMenu = (props: SideMenuProps) => {
         <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
           <Button
             size="large"
-            className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
+            className="w-full"
+            // className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
             icon={<PlusCircleOutlined />}
             onClick={() => {
               handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -153,7 +162,7 @@ const SideMenu = (props: SideMenuProps) => {
       </div>
 
       <MenuRoot
-        theme={'dark' as any}
+        // theme={'dark' as any}
         mode="inline"
         className="mb-10"
         inlineCollapsed={isPhablet && !isTablet}
@@ -180,7 +189,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         className="bottom"
         mode="inline"
-        theme={'dark' as any}
+        // theme={'dark' as any}
         style={{ borderInlineEnd: 'none' }}
         inlineCollapsed={isPhablet && !isTablet}
         items={[
