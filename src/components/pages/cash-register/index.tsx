@@ -30,7 +30,6 @@ const CashRegister = () => {
     if (!firstRender.current) {
       firstRender.current = true;
       dispatch(productActions.fetchProducts({ refetch: true }));
-      dispatch(customerActions.fetchCustomers({ refetch: true }));
       dispatch(branchesActions.getPrices());
       dispatch(branchesActions.getCurrentCashRegister());
       dispatch(cashiersActions.cash_cuts.fetchCashCutData());

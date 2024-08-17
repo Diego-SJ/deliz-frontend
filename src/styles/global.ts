@@ -14,7 +14,6 @@ export default createGlobalStyle`
     box-sizing: border-box;
 		font-family: 'Manrope', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 		'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-		scroll-behavior: smooth;
 
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;

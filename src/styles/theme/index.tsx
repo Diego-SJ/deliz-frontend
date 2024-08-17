@@ -33,6 +33,12 @@ const AppThemeProvider = ({ children }: Props) => {
               Table: {
                 colorText: 'rgba(0, 0, 0, 0.45)',
               },
+              Drawer: {
+                motion: false,
+                motionBase: 0.1,
+                motionDurationMid: '0.1s',
+                motionEaseInBack: 'unset',
+              },
             },
           }}
         >

@@ -156,6 +156,7 @@ const SearchProducts = () => {
               setCurrentProducts(products?.slice(0, 16) || []);
               searchInputRef.current?.select();
             }}
+            onBlur={() => setInputIsFocused(false)}
             onClick={() => {
               if (isTablet) {
                 setOpenMobileSearhDrawer(true);
@@ -168,7 +169,7 @@ const SearchProducts = () => {
           <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
         </Space.Compact>
       </div>
-
+      <SearchProductsMobile visible={openMobileSearhDrawer} onClose={() => setOpenMobileSearhDrawer(false)} />
       <div className="min-h-[calc(100dvh-169px)] max-h-[calc(100dvh-169px)] overflow-x-auto pt-0 pb-0 md:pt-4 md:pb-4">
         {!!searchText || inputIsFocused ? (
           <div className="px-3 pt-2 md:pt-0">
@@ -234,7 +235,6 @@ const SearchProducts = () => {
           </div>
         )}
       </div>
-      <SearchProductsMobile visible={openMobileSearhDrawer} onClose={() => setOpenMobileSearhDrawer(false)} />
     </>
   );
 };

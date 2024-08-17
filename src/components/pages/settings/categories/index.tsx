@@ -2,8 +2,8 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Category } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
-import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Col, Drawer, Input, List, Row, Typography } from 'antd';
+import { FileImageOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Avatar, Button, Col, Drawer, Input, List, Row, Typography } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CategoryEditor from './editor';
@@ -111,6 +111,12 @@ const CategoriesPage = () => {
                   ]}
                 >
                   <div className="pl-4 md:pl-6 flex gap-4">
+                    <Avatar
+                      className="bg-slate-600/10 text-xl"
+                      icon={item?.image_url ? null : <FileImageOutlined className="text-slate-400 text-base" />}
+                    >
+                      {item?.image_url || ''}
+                    </Avatar>
                     <Typography.Text>{item.name}</Typography.Text>
                   </div>
                 </List.Item>

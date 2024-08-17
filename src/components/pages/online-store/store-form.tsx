@@ -43,20 +43,21 @@ const StoreForm = () => {
   const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const [deliveryOptions, setDeliveryOptions] = useState<string[]>([]);
   const [scheduleChecks, setScheduleChecks] = useState<string[]>([]);
+  const { schedule, delivery_types } = store || {};
 
   useEffect(() => {
-    setDeliveryOptions(Object.entries(store?.delivery_types || {})?.map(([key, value]) => (value ? key : '')) || []);
-    setScheduleChecks(Object.entries(store?.schedule || {})?.map(([key, value]) => (value?.closed ? `${key}_closed` : '')) || []);
+    setDeliveryOptions(Object.entries(delivery_types || {})?.map(([key, value]) => (value ? key : '')) || []);
+    setScheduleChecks(Object.entries(schedule || {})?.map(([key, value]) => (value?.closed ? `${key}_closed` : '')) || []);
     form.setFieldsValue({
-      monday_time: [transformTime(store?.schedule?.monday?.from), transformTime(store?.schedule?.monday?.to)],
-      tuesday_time: [transformTime(store?.schedule?.tuesday?.from), transformTime(store?.schedule?.tuesday?.to)],
-      wednesday_time: [transformTime(store?.schedule?.wednesday?.from), transformTime(store?.schedule?.wednesday?.to)],
-      thursday_time: [transformTime(store?.schedule?.thursday?.from), transformTime(store?.schedule?.thursday?.to)],
-      friday_time: [transformTime(store?.schedule?.friday?.from), transformTime(store?.schedule?.friday?.to)],
-      saturday_time: [transformTime(store?.schedule?.saturday?.from), transformTime(store?.schedule?.saturday?.to)],
-      sunday_time: [transformTime(store?.schedule?.sunday?.from), transformTime(store?.schedule?.sunday?.to)],
+      monday_time: [transformTime(schedule?.monday?.from), transformTime(schedule?.monday?.to)],
+      tuesday_time: [transformTime(schedule?.tuesday?.from), transformTime(schedule?.tuesday?.to)],
+      wednesday_time: [transformTime(schedule?.wednesday?.from), transformTime(schedule?.wednesday?.to)],
+      thursday_time: [transformTime(schedule?.thursday?.from), transformTime(schedule?.thursday?.to)],
+      friday_time: [transformTime(schedule?.friday?.from), transformTime(schedule?.friday?.to)],
+      saturday_time: [transformTime(schedule?.saturday?.from), transformTime(schedule?.saturday?.to)],
+      sunday_time: [transformTime(schedule?.sunday?.from), transformTime(schedule?.sunday?.to)],
     });
-  }, [store]);
+  }, [delivery_types, schedule]);
 
   const openStore = () => {
     window.open(`${storeUrl}/${store?.slug}`, '_blank');
@@ -135,6 +136,7 @@ const StoreForm = () => {
             phone: store?.phone || company?.phone,
             facebook: store?.social_media?.facebook,
             instagram: store?.social_media?.instagram,
+            whatsapp: store?.social_media?.whatsapp,
           }}
           requiredMark={false}
           layout="vertical"
@@ -242,6 +244,19 @@ const StoreForm = () => {
                 <Input type="url" inputMode="url" placeholder="https://www.instagram.com/minegocio" />
               </Form.Item>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-5">
+              <Form.Item
+                label="Número de WhatsApp"
+                name="whatsapp"
+                className="w-full"
+                rules={[{ pattern: /^[0-9]*$/, message: 'Solo se permiten números' }]}
+              >
+                <Input inputMode="tel" placeholder="Ingresa tu número de WhatsApp" />
+              </Form.Item>
+              <Form.Item label="Permitir pedidos a través de WhatsApp" name="allow_orders_by_whatsapp" className="w-full">
+                <Switch />
+              </Form.Item>
+            </div>
           </CardRoot>
 
           <CardRoot title="Atención Al Cliente" className="mb-5">
@@ -268,97 +283,134 @@ const StoreForm = () => {
             </div>
             <div className="grid grid-cols-[1fr_1fr_2fr] place-items-center gap-y-5">
               <Typography.Paragraph className="!m-0 !w-full text-start">Lunes</Typography.Paragraph>
-              <FormItem name="monday_closed" className="!m-0 w-full">
+              <FormItem name="monday_closed" className="!m-0 w-full ">
                 <Switch
                   className="mr-auto"
                   size="small"
-                  value={form.getFieldValue('monday_closed')}
-                  onChange={value => onDayChange('monday_closed')}
+                  checked={!!scheduleChecks.includes('monday_closed')}
+                  onChange={() => onDayChange('monday_closed')}
                 />
               </FormItem>
               <FormItem name="monday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
-                  disabled={form.getFieldValue('monday_closed')}
+                  disabled={!!scheduleChecks.includes('monday_closed')}
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Martes</Typography.Paragraph>
               <FormItem name="tuesday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('tuesday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('tuesday_closed')}
+                  onChange={() => onDayChange('tuesday_closed')}
+                />
               </FormItem>
               <FormItem name="tuesday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('tuesday_closed')}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Miércoles</Typography.Paragraph>
               <FormItem name="wednesday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('wednesday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('wednesday_closed')}
+                  onChange={() => onDayChange('wednesday_closed')}
+                />
               </FormItem>
               <FormItem name="wednesday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('wednesday_closed')}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Jueves</Typography.Paragraph>
               <FormItem name="thursday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('thursday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('thursday_closed')}
+                  onChange={() => onDayChange('thursday_closed')}
+                />
               </FormItem>
               <FormItem name="thursday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('thursday_closed')}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Viernes</Typography.Paragraph>
               <FormItem name="friday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('friday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('friday_closed')}
+                  onChange={() => onDayChange('friday_closed')}
+                />
               </FormItem>
               <FormItem name="friday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('friday_closed')}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Sábado</Typography.Paragraph>
               <FormItem name="saturday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('saturday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('saturday_closed')}
+                  onChange={() => onDayChange('saturday_closed')}
+                />
               </FormItem>
               <FormItem name="saturday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('saturday_closed')}
                 />
               </FormItem>
 
               <Typography.Paragraph className="!m-0 !w-full text-start">Domingo</Typography.Paragraph>
               <FormItem name="sunday_closed" className="!m-0 w-full">
-                <Switch className="mr-auto" size="small" onChange={value => onDayChange('sunday_closed')} />
+                <Switch
+                  className="mr-auto"
+                  size="small"
+                  checked={scheduleChecks.includes('sunday_closed')}
+                  onChange={() => onDayChange('sunday_closed')}
+                />
               </FormItem>
               <FormItem name="sunday_time" className="!m-0 w-full">
                 <TimePicker.RangePicker
                   format={timeFormat}
                   placeholder={['Desde', 'Hasta']}
                   className="w-full"
+                  needConfirm={true}
                   disabled={scheduleChecks.includes('sunday_closed')}
                 />
               </FormItem>

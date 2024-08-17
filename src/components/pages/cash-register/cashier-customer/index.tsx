@@ -85,6 +85,11 @@ const CashierCustomer = () => {
                 );
               }}
               options={customerList}
+              onClick={() => {
+                if (!customerList.length) {
+                  dispatch(customerActions.fetchCustomers({ refetch: true }));
+                }
+              }}
               optionRender={option => {
                 if (option.value === '') return null;
                 return (

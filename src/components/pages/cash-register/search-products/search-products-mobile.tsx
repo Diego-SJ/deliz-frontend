@@ -45,13 +45,13 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
   }, [visible]);
 
   const handleClose = () => {
-    setSearchText('');
     onClose();
+    setSearchText('');
   };
 
   const handleItemInteract = (item: Product) => {
+    handleClose();
     dispatch(salesActions.cashRegister.add({ product: item }));
-    onClose();
   };
 
   const handleFavorite = (product_id: number) => {
@@ -69,6 +69,8 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
       onClose={handleClose}
       placement="bottom"
       height={'95dvh'}
+      push={false}
+      className="!duration-0"
       closeIcon={null}
       extra={
         <Button type="text" size="large" onClick={handleClose}>

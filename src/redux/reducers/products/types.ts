@@ -75,6 +75,7 @@ export type Category = {
   name?: string;
   description?: string;
   status?: number;
+  image_url?: string;
 };
 
 export type Size = {

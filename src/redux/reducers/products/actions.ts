@@ -225,7 +225,12 @@ const customActions = {
         dispatch(productActions.setLoading(true));
         const { error } = await supabase
           .from('categories')
-          .update({ name: category.name, description: category.description, status: category.status })
+          .update({
+            name: category.name,
+            description: category.description,
+            status: category.status,
+            image_url: category.image_url,
+          })
           .eq('category_id', category.category_id)
           .select();
 

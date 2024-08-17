@@ -11,6 +11,7 @@ export const getStoreRecord = (values: any): Partial<CompanyStore> => {
     status_id: STATUS_DATA.ACTIVE.id,
     slug: values?.slug || null,
     logo_url: values?.logo_url || null,
+    allow_orders_by_whatsapp: values?.allow_orders_by_whatsapp || false,
     delivery_types: {
       on_site: !!values?.deliveryOptions.includes('on_site'),
       take_away: !!values?.deliveryOptions.includes('take_away'),
@@ -56,6 +57,7 @@ export const getStoreRecord = (values: any): Partial<CompanyStore> => {
     social_media: {
       facebook: values?.facebook || null,
       instagram: values?.instagram || null,
+      whatsapp: values?.whatsapp || null,
     },
     description: values?.description || null,
     email: values?.email || null,

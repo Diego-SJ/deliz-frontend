@@ -21,6 +21,7 @@ export type CompanyStore = {
   products: string;
   company_id: string;
   status_id: number;
+  allow_orders_by_whatsapp: boolean;
 };
 
 export type WifiCredentials = {
@@ -37,6 +38,7 @@ export type DeliveryTypesStore = {
 export type SocialMedia = {
   facebook: string;
   instagram: string;
+  whatsapp: string;
 };
 
 export type ScheduleStore = {
