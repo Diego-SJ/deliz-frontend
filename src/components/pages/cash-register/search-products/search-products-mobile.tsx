@@ -1,31 +1,31 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { Product } from '@/redux/reducers/products/types';
 import { productHelpers } from '@/utils/products';
-import { Button, Empty, Input, InputRef, Drawer } from 'antd';
+import { Button, Empty, Input, Drawer, Space } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import { userActions } from '@/redux/reducers/users';
-import { CloseOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { BarcodeOutlined, CloseOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { productActions } from '@/redux/reducers/products';
 import { APP_ROUTES } from '@/routes/routes';
 import { useNavigate } from 'react-router-dom';
 import { ItemProductMobile } from './product-item-mobile';
 
 type Props = {
-  visible: boolean;
-  onClose: () => void;
+  onOpenBarCode: () => void;
 };
 
-const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
+const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchText, setSearchText] = useState<string>('');
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const { products } = useAppSelector(({ products }) => products);
   const { profile } = useAppSelector(({ users }) => users.user_auth);
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
-  const inputSearchRef = useRef<InputRef>(null);
   const { favorite_products = [] } = profile!;
-  const navigate = useNavigate();
+  const inputSearchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let _products = productHelpers.searchProducts(searchText, products);
@@ -38,14 +38,8 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
     );
   }, [products, searchText, favorite_products]);
 
-  useEffect(() => {
-    if (visible) {
-      inputSearchRef.current?.focus();
-    }
-  }, [visible]);
-
   const handleClose = () => {
-    onClose();
+    setDrawerVisible(false);
     setSearchText('');
   };
 
@@ -63,14 +57,32 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
     navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
+  const openDrawer = () => {
+    setDrawerVisible(true);
+    setTimeout(() => {
+      inputSearchRef.current?.focus();
+    }, 100);
+  };
+
   return (
     <>
+      <Space.Compact className="!w-full">
+        <Button
+          size="large"
+          className="w-full !text-start flex justify-start text-slate-300"
+          icon={<SearchOutlined className="text-slate-400" />}
+          onClick={openDrawer}
+        >
+          Buscar producto
+        </Button>
+        <Button size="large" icon={<BarcodeOutlined />} onClick={onOpenBarCode} />
+      </Space.Compact>
+
       <Drawer
-        open={visible}
+        open={drawerVisible}
         onClose={handleClose}
         placement="bottom"
         height={'95dvh'}
-        push={false}
         className="!duration-0"
         closeIcon={null}
         extra={
@@ -82,21 +94,40 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
         title="Buscar producto"
       >
         <div className="px-5 pt-5">
-          <Input.Search
-            ref={inputSearchRef}
-            allowClear
-            size="large"
-            autoFocus
-            value={searchText}
-            className="search-products-input m-0 !border-gray-300"
-            placeholder="Buscar producto"
-            onFocus={event => {
-              event.target?.select();
-            }}
-            onChange={({ target }) => {
-              setSearchText(target.value);
-            }}
-          />
+          <Space.Compact className="!w-full">
+            <Input
+              ref={inputSearchRef as any}
+              size="large"
+              prefix={<SearchOutlined className="text-slate-400" />}
+              value={searchText}
+              className="search-products-input m-0 !border-gray-300"
+              placeholder="Buscar producto"
+              onFocus={event => {
+                event.target?.select();
+              }}
+              onChange={({ target }) => {
+                setSearchText(target.value);
+              }}
+            />
+            {!!searchText && (
+              <Button
+                size="large"
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  setSearchText('');
+                  inputSearchRef.current?.focus();
+                }}
+              />
+            )}
+            <Button
+              size="large"
+              icon={<BarcodeOutlined />}
+              onClick={() => {
+                handleClose();
+                onOpenBarCode();
+              }}
+            />
+          </Space.Compact>
           <div className=" min-h-[calc(100dvh-175px)] max-h-[calc(100dvh-175px)] overflow-y-scroll py-0">
             {currentProducts.length > 0 ? (
               <div className="flex flex-col">

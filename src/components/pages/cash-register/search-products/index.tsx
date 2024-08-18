@@ -4,7 +4,7 @@ import { productHelpers } from '@/utils/products';
 import { App, Button, Col, Empty, Input, InputRef, Row, Space } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { ItemProduct } from './product-item';
-import { BarcodeOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { BarcodeOutlined, CloseOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { userActions } from '@/redux/reducers/users';
 import FavoriteProducts from './favorite-products';
@@ -29,7 +29,6 @@ const SearchProducts = () => {
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [inputIsFocused, setInputIsFocused] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
-  const [openMobileSearhDrawer, setOpenMobileSearhDrawer] = useState(false);
   const searchInputRef = useRef<InputRef>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isPhablet, isTablet } = useMediaQuery();
@@ -133,6 +132,10 @@ const SearchProducts = () => {
     setSearchText(value);
   }, 250);
 
+  const openBarCodeClick = () => {
+    setOpenBarCode(true);
+  };
+
   return (
     <>
       <div className="flex gap-4 px-3 w-full">
@@ -145,32 +148,40 @@ const SearchProducts = () => {
             }}
           />
         )}
-        <Space.Compact className="!w-full">
-          <Input.Search
-            ref={searchInputRef}
-            allowClear
-            size="large"
-            className="search-products-input m-0 !border-gray-300 !w-full"
-            placeholder="Buscar producto"
-            onFocus={() => {
-              setInputIsFocused(!isTablet);
-              setCurrentProducts(products?.slice(0, 16) || []);
-              searchInputRef.current?.select();
-            }}
-            onBlur={() => setInputIsFocused(false)}
-            onClick={() => {
-              if (isTablet) {
-                setOpenMobileSearhDrawer(true);
-              }
-            }}
-            onChange={({ target }) => {
-              handleInputTextChange(target.value);
-            }}
-          />
-          <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
-        </Space.Compact>
+        {!isTablet ? (
+          <Space.Compact className="!w-full">
+            <Input
+              prefix={<SearchOutlined className="text-slate-400" />}
+              ref={searchInputRef}
+              size="large"
+              className="search-products-input m-0 !border-gray-300 !w-full"
+              placeholder="Buscar producto"
+              onFocus={() => {
+                setInputIsFocused(!isTablet);
+                setCurrentProducts(products?.slice(0, 16) || []);
+                searchInputRef.current?.select();
+              }}
+              onBlur={() => setInputIsFocused(false)}
+              onChange={({ target }) => {
+                handleInputTextChange(target.value);
+              }}
+            />
+            {!!searchText && (
+              <Button
+                size="large"
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  setSearchText('');
+                }}
+              />
+            )}
+            <Button size="large" icon={<BarcodeOutlined />} onClick={openBarCodeClick} />
+          </Space.Compact>
+        ) : (
+          <SearchProductsMobile onOpenBarCode={openBarCodeClick} />
+        )}
       </div>
-      <SearchProductsMobile visible={openMobileSearhDrawer} onClose={() => setOpenMobileSearhDrawer(false)} />
+
       <div className="min-h-[calc(100dvh-169px)] max-h-[calc(100dvh-169px)] overflow-x-auto pt-0 pb-0 md:pt-4 md:pb-4">
         {!!searchText || inputIsFocused ? (
           <div className="px-3 pt-2 md:pt-0">
