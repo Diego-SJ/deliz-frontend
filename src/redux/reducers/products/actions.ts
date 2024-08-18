@@ -13,9 +13,9 @@ export interface FetchFunction {
 
 const customActions = {
   fetchProducts: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    let products = getState().products.products || [];
+    let products = getState()?.products?.products || [];
     const company_id = getState().app?.company?.company_id;
-    const { categories } = getState().products.filters.products || {};
+    const { categories } = getState()?.products?.filters?.products || {};
 
     if (!products.length || args?.refetch) {
       dispatch(productActions.setLoading(true));
@@ -46,7 +46,7 @@ const customActions = {
       dispatch(productActions.setProducts(products));
     }
   },
-  getProductById: (product_id: number) => async (dispatch: AppDispatch, getState: AppState) => {
+  getProductById: (product_id: number) => async (dispatch: AppDispatch, _: AppState) => {
     const { data, error } = await supabase
       .from('products')
       .select(`*, categories(category_id,name), units(*), sizes(*)`)

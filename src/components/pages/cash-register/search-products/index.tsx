@@ -17,6 +17,7 @@ import CashierActions from '../cashier-actions';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchProductsMobile from './search-products-mobile';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
+import { Drawer } from 'vaul';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -234,6 +235,22 @@ const SearchProducts = () => {
             </div>
           </div>
         )}
+
+        <Drawer.Root fixed modal disablePreventScroll>
+          <Drawer.Trigger>
+            <Button>abrir</Button>
+          </Drawer.Trigger>
+          <Drawer.Portal>
+            <Drawer.Title>Buscar producto</Drawer.Title>
+            <Drawer.Description>Buscar producto</Drawer.Description>
+
+            <Drawer.Content className="bg-white z-[20]">
+              <Drawer.Handle />
+              wefwefe
+            </Drawer.Content>
+            <Drawer.Overlay />
+          </Drawer.Portal>
+        </Drawer.Root>
       </div>
     </>
   );

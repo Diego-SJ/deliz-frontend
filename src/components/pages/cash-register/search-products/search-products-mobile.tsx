@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { Product } from '@/redux/reducers/products/types';
 import { productHelpers } from '@/utils/products';
-import { Button, Drawer, Empty, Input, InputRef } from 'antd';
+import { Button, Empty, Input, InputRef, Drawer } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import { userActions } from '@/redux/reducers/users';
@@ -64,74 +64,75 @@ const SearchProductsMobile = ({ visible = false, onClose }: Props) => {
   };
 
   return (
-    <Drawer
-      open={visible}
-      onClose={handleClose}
-      placement="bottom"
-      height={'95dvh'}
-      push={false}
-      className="!duration-0"
-      closeIcon={null}
-      extra={
-        <Button type="text" size="large" onClick={handleClose}>
-          <CloseOutlined className="text-xl" />
-        </Button>
-      }
-      styles={{ body: { padding: 0 } }}
-      title="Buscar producto"
-    >
-      <div className="px-5 pt-5">
-        <Input.Search
-          ref={inputSearchRef}
-          allowClear
-          size="large"
-          autoFocus
-          value={searchText}
-          className="search-products-input m-0 !border-gray-300"
-          placeholder="Buscar producto"
-          onFocus={event => {
-            event.target?.select();
-          }}
-          onChange={({ target }) => {
-            setSearchText(target.value);
-          }}
-        />
-
-        <div className=" min-h-[calc(100dvh-175px)] max-h-[calc(100dvh-175px)] overflow-y-scroll py-0">
-          {currentProducts.length > 0 ? (
-            <div className="flex flex-col">
-              {currentProducts.map(product => {
-                const price = productHelpers.getProductPrice(product, price_id || null);
-                return (
-                  <div className="w-full" key={product.product_id}>
-                    <ItemProductMobile
-                      imageSrc={product.image_url}
-                      title={product.name}
-                      price={price}
-                      category={(product as any)?.categories?.name}
-                      size={(product as any)?.sizes?.name}
-                      onClick={() => {
-                        handleItemInteract(product);
-                      }}
-                      isFavorite={profile?.favorite_products?.includes(product.product_id)}
-                      onFavorite={() => handleFavorite(product.product_id)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="w-full min-h-40 flex flex-col justify-center items-center">
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No se encontraron coincidencias">
-                <Button onClick={onAddNew} icon={<PlusCircleOutlined />}>
-                  Registrar producto {searchText}
-                </Button>
-              </Empty>
-            </div>
-          )}
+    <>
+      <Drawer
+        open={visible}
+        onClose={handleClose}
+        placement="bottom"
+        height={'95dvh'}
+        push={false}
+        className="!duration-0"
+        closeIcon={null}
+        extra={
+          <Button type="text" size="large" onClick={handleClose}>
+            <CloseOutlined className="text-xl" />
+          </Button>
+        }
+        styles={{ body: { padding: 0 } }}
+        title="Buscar producto"
+      >
+        <div className="px-5 pt-5">
+          <Input.Search
+            ref={inputSearchRef}
+            allowClear
+            size="large"
+            autoFocus
+            value={searchText}
+            className="search-products-input m-0 !border-gray-300"
+            placeholder="Buscar producto"
+            onFocus={event => {
+              event.target?.select();
+            }}
+            onChange={({ target }) => {
+              setSearchText(target.value);
+            }}
+          />
+          <div className=" min-h-[calc(100dvh-175px)] max-h-[calc(100dvh-175px)] overflow-y-scroll py-0">
+            {currentProducts.length > 0 ? (
+              <div className="flex flex-col">
+                {currentProducts.map(product => {
+                  const price = productHelpers.getProductPrice(product, price_id || null);
+                  return (
+                    <div className="w-full" key={product.product_id}>
+                      <ItemProductMobile
+                        imageSrc={product.image_url}
+                        title={product.name}
+                        price={price}
+                        category={(product as any)?.categories?.name}
+                        size={(product as any)?.sizes?.name}
+                        onClick={() => {
+                          handleItemInteract(product);
+                        }}
+                        isFavorite={profile?.favorite_products?.includes(product.product_id)}
+                        onFavorite={() => handleFavorite(product.product_id)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="w-full min-h-40 flex flex-col justify-center items-center">
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No se encontraron coincidencias">
+                  <Button onClick={onAddNew} icon={<PlusCircleOutlined />}>
+                    Registrar producto {searchText}
+                  </Button>
+                </Empty>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </Drawer>
+      </Drawer>
+    </>
   );
 };
 
