@@ -228,23 +228,6 @@ const customActions = {
         return false;
       }
 
-      // if (!cashCut) {
-      //   const { data, error: cashCutError } = await supabase
-      //     .from('cash_cuts')
-      //     .select('*')
-      //     .eq('cash_register_id', cash_register_id)
-      //     .eq('is_open', true)
-      //     .single();
-
-      //   if (cashCutError) {
-      //     dispatch(cashiersActions.setActiveCashCut(initialState));
-      //     // message.error('No se pudo cargar la información de la caja', 4);
-      //     return false;
-      //   }
-
-      //   cashCutData = data as CashCut;
-      // }
-
       // Fetch data in parallel
       const [salesData, operationsData] = await Promise.all([
         supabase
@@ -308,9 +291,9 @@ const customActions = {
         expenses_amount,
         final_amount,
       } as CashCut;
-
+      console.log('currentCashCutData', currentCashCutData);
       // Dispatch the action with the fetched data
-      dispatch(cashiersActions.setActiveCashCut(cashCutData?.cash_cut_id ? currentCashCutData : initialState));
+      dispatch(cashiersActions.setActiveCashCut(currentCashCutData));
       return true;
     },
     fetchCashCutsByCashRegister:

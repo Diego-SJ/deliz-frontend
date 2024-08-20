@@ -19,6 +19,7 @@ const CashCutForm = ({ visible, onClose }: Props) => {
   const [receivedMoney, setReceivedMoney] = useState(0);
   const { isTablet } = useMediaQuery();
   const mounted = useRef(false);
+  const dataFetched = useRef(false);
 
   useEffect(() => {
     if (
@@ -32,9 +33,21 @@ const CashCutForm = ({ visible, onClose }: Props) => {
     }
   }, [dispatch, profile]);
 
+  useEffect(() => {
+    if (!!active_cash_cut?.cash_cut_id && visible && !dataFetched.current) {
+      dataFetched.current = true;
+      dispatch(cashiersActions.cash_cuts.fetchCashCutData());
+    }
+
+    return () => {
+      dataFetched.current = false;
+    };
+  }, [visible, dispatch, dataFetched]);
+
   const handleDrawerVisible = () => {
-    if (onClose) onClose();
     closeDayForm.resetFields();
+    setReceivedMoney(0);
+    if (onClose) onClose();
   };
 
   const closeCashier = () => {
