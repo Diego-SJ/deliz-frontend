@@ -349,11 +349,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
               >
                 Cerrar
               </Button>
-              <a
-                className="w-full"
-                href={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(saleCreated?.sale_id)}`}
-                target="_blank"
-              >
+              <a className="w-full" href={APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(saleCreated?.sale_id)}`} target="_blank">
                 <Button
                   className="w-full"
                   size="large"

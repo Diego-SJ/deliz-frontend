@@ -20,7 +20,7 @@ export type CompanyStore = {
   is_active: boolean;
   products: string;
   company_id: string;
-  status_id: number;
+  status_id: number | null;
   allow_orders_by_whatsapp: boolean;
 };
 

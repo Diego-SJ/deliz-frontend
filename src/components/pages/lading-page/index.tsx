@@ -4,6 +4,7 @@ import DevicesWebp from '@/assets/webp/devices.webp';
 import { DotChartOutlined, ReconciliationOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
+import MembershipPage from '../membership';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ const Home = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-[900px] mx-auto gap-10 px-4">
-          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+          <div className="flex flex-col text-start bg-white shadow-md px-6 py-7 rounded-3xl">
             <Avatar
               shape="square"
               size={64}
@@ -88,7 +89,7 @@ const Home = () => {
             <h3 className="text-xl font-semibold mt-4 mb-2">Control de inventario</h3>
             <p className="font-extralight">Lleva el control de tus productos, categorías y unidades de medida</p>
           </div>
-          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+          <div className="flex flex-col text-start bg-white shadow-md px-6 py-7 rounded-3xl">
             <Avatar
               shape="square"
               size={64}
@@ -98,7 +99,7 @@ const Home = () => {
             <h3 className="text-xl font-semibold mt-4 mb-2">Ventas y clientes</h3>
             <p className="font-extralight">Administra tus ventas, clientes y pedidos de forma sencilla</p>
           </div>
-          <div className="flex flex-col text-start bg-white shadow-2xl px-6 py-7 rounded-3xl">
+          <div className="flex flex-col text-start bg-white shadow-md px-6 py-7 rounded-3xl">
             <Avatar
               shape="square"
               size={64}
@@ -111,7 +112,9 @@ const Home = () => {
         </div>
       </div>
 
-      <footer className="h-12 flex justify-center items-center">
+      <MembershipPage />
+
+      <footer className="h-12 flex justify-center items-center bg-white border-t">
         <span>© 2024 Posiffy. Todos los derechos reservados.</span>
       </footer>
     </div>

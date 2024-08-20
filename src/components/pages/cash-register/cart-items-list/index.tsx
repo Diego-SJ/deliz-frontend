@@ -66,7 +66,7 @@ const CashRegisterItemsList = () => {
                 <div className="w-full flex py-1 pl-3 gap-4" onClick={() => openModal(record)}>
                   <Avatar
                     {...avatarProps}
-                    className="w-11 h-11 min-w-11 bg-slate-100 p-1 my-auto select-none sm:grid sm:place-content-center"
+                    className="w-11 h-11 min-w-11 bg-slate-300/10 p-1 my-auto select-none sm:grid sm:place-content-center"
                   />
 
                   <div className="max-sm:flex-col md:flex-col lg:flex-row flex flex-row w-full items-center py-1 xl:gap-8">

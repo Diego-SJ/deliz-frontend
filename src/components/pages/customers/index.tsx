@@ -109,7 +109,7 @@ const Customers = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Dashboard</Link>,
                 key: 'dashboard',
               },
               { title: 'Clientes' },

@@ -54,7 +54,7 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
 
   const onAddNew = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
   const openDrawer = () => {

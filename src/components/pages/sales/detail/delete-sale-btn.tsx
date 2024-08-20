@@ -32,7 +32,7 @@ const DeleteSaleButton: React.FC<Props> = () => {
     setConfirmLoading(true);
     const result = await dispatch(salesActions.deleteSaleById(current_sale?.metadata?.sale_id));
     if (result) {
-      navigation(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path);
+      navigation(APP_ROUTES.PRIVATE.SALES.path);
     }
     setConfirmLoading(false);
   };

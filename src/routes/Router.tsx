@@ -39,6 +39,7 @@ import { STATUS_DATA } from '@/constants/status';
 import ReportsHomePage from '@/components/pages/reports';
 import ReportsLayout from '@/components/pages/reports/layout';
 import OnlineStorePage from '@/components/pages/online-store';
+import Membership from '@/components/pages/membership';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -81,20 +82,20 @@ const AppRouter = () => {
           </PrivateRoute>
         }
       >
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} element={<Dashboard />} />
+        <Route path={APP_ROUTES.PRIVATE.HOME.path} element={<Dashboard />} />
 
         {/* PRODUCTS ROUTES - START */}
         {permissions?.products?.view_catalog && (
           <>
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path}
+              path={APP_ROUTES.PRIVATE.PRODUCTS.path}
               element={
                 <PaddingLayout>
                   <Products />
                 </PaddingLayout>
               }
             />
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.path} element={<ProductEditor />} />
+            <Route path={APP_ROUTES.PRIVATE.PRODUCT_EDITOR.path} element={<ProductEditor />} />
           </>
         )}
 
@@ -102,7 +103,7 @@ const AppRouter = () => {
 
         {/* ORDERS ROUTES - START */}
         <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.ORDERS.path}
+          path={APP_ROUTES.PRIVATE.ORDERS.path}
           element={
             <PaddingLayout>
               <Orders />
@@ -115,7 +116,7 @@ const AppRouter = () => {
         {permissions?.cash_registers?.view_history_cash_cuts && (
           <>
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path}
+              path={APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIERS.path}
               element={
                 <PaddingLayout>
                   <TransactionsCashiers />
@@ -123,7 +124,7 @@ const AppRouter = () => {
               }
             />
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIER_DETAIL.path}
+              path={APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIER_DETAIL.path}
               element={
                 <PaddingLayout>
                   <CashierDetail />
@@ -134,7 +135,7 @@ const AppRouter = () => {
         )}
         {permissions?.cash_registers?.view_current_cash_cut && (
           <Route
-            path={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path}
+            path={APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path}
             element={
               <PaddingLayout>
                 <CurrentCashier />
@@ -146,7 +147,7 @@ const AppRouter = () => {
 
         {permissions?.customers?.view_customers && (
           <Route
-            path={APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path}
+            path={APP_ROUTES.PRIVATE.CUSTOMERS.path}
             element={
               <PaddingLayout>
                 <Customers />
@@ -157,7 +158,7 @@ const AppRouter = () => {
         {permissions?.sales?.view_sales && (
           <>
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path}
+              path={APP_ROUTES.PRIVATE.SALES.path}
               element={
                 <PaddingLayout>
                   <Sales />
@@ -165,7 +166,7 @@ const AppRouter = () => {
               }
             />
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.path}
+              path={APP_ROUTES.PRIVATE.SALE_DETAIL.path}
               element={
                 <PaddingLayout>
                   <SaleDetail />
@@ -180,79 +181,74 @@ const AppRouter = () => {
         {permissions?.expenses?.view_expenses && (
           <>
             <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path}
+              path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path}
               element={
                 <PaddingLayout>
                   <PurchasesExpenses />
                 </PaddingLayout>
               }
             />
-            <Route
-              path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.ADD_NEW.path}
-              element={<AddOperationPurchaseExpense />}
-            />
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
+            <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.path} element={<AddOperationPurchaseExpense />} />
+            <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
           </>
         )}
 
         {/* PURCHASES EXPENSES ROUTES - END */}
 
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.ONLINE_STORE.path} element={<OnlineStorePage />} />
+        <Route path={APP_ROUTES.PRIVATE.ONLINE_STORE.path} element={<OnlineStorePage />} />
 
         {/* SETTINGS ROUTES - START */}
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsPage />}>
-          {isTablet && <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path} element={<SettingsMenu />} />}
-          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path + '/general'} element={<GeneralSettingsPage />} />
-          <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path} element={<GeneralSettingsPage />} />
+        <Route path={APP_ROUTES.PRIVATE.SETTINGS.path} element={<SettingsPage />}>
+          {isTablet && <Route path={APP_ROUTES.PRIVATE.SETTINGS.path} element={<SettingsMenu />} />}
+          <Route path={APP_ROUTES.PRIVATE.SETTINGS.path + '/general'} element={<GeneralSettingsPage />} />
+          <Route path={APP_ROUTES.PRIVATE.SETTINGS.GENERAL.path} element={<GeneralSettingsPage />} />
           {permissions?.branches?.view_branches && (
             <>
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.path} element={<BranchesPage />} />
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.ADD.path} element={<AddBranchForm />} />
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.EDIT.path} element={<AddBranchForm />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.path} element={<BranchesPage />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.ADD.path} element={<AddBranchForm />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.EDIT.path} element={<AddBranchForm />} />
             </>
           )}
 
-          {permissions?.sizes?.view_sizes && (
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path} element={<ProductSizes />} />
-          )}
+          {permissions?.sizes?.view_sizes && <Route path={APP_ROUTES.PRIVATE.SETTINGS.SIZES.path} element={<ProductSizes />} />}
 
-          {permissions?.units?.view_units && (
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path} element={<ProductUnits />} />
-          )}
+          {permissions?.units?.view_units && <Route path={APP_ROUTES.PRIVATE.SETTINGS.UNITS.path} element={<ProductUnits />} />}
 
           {permissions?.cash_registers?.view_cash_registers && (
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path} element={<PricesListPage />} />
+            <Route path={APP_ROUTES.PRIVATE.SETTINGS.PRICES_LIST.path} element={<PricesListPage />} />
           )}
           {permissions?.categories?.view_categories && (
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CATEGORIES.path} element={<CategoriesPage />} />
+            <Route path={APP_ROUTES.PRIVATE.SETTINGS.CATEGORIES.path} element={<CategoriesPage />} />
           )}
 
           {permissions?.cash_registers?.view_cash_registers && (
-            <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CASH_REGISTERS.path} element={<CashRegistersPage />} />
+            <Route path={APP_ROUTES.PRIVATE.SETTINGS.CASH_REGISTERS.path} element={<CashRegistersPage />} />
           )}
 
           {isAdmin && (
             <>
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path} element={<UsersSettingsPage />} />
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.ADD.path} element={<ManageUserProfile />} />
-              <Route path={APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.EDIT.path} element={<ManageUserProfile />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.USERS.path} element={<UsersSettingsPage />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.USERS.ADD.path} element={<ManageUserProfile />} />
+              <Route path={APP_ROUTES.PRIVATE.SETTINGS.USERS.EDIT.path} element={<ManageUserProfile />} />
             </>
           )}
         </Route>
         {/* SETTINGS ROUTES - END */}
 
-        <Route path={APP_ROUTES.PRIVATE.DASHBOARD.DEBTORS.path} element={<DebtorsClients />} />
+        <Route path={APP_ROUTES.PRIVATE.DEBTORS.path} element={<DebtorsClients />} />
         <Route
-          path={APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path}
+          path={APP_ROUTES.PRIVATE.REPORTS.path}
           element={
             <ReportsLayout>
               <ReportsHomePage />
             </ReportsLayout>
           }
         />
+
+        <Route path={APP_ROUTES.PRIVATE.MEMBERSHIP.path} element={<Membership />} />
       </Route>
 
-      <Route path="*" element={<Navigate to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path} replace />} />
+      <Route path="*" element={<Navigate to={APP_ROUTES.PRIVATE.HOME.path} replace />} />
     </Routes>
   );
 };

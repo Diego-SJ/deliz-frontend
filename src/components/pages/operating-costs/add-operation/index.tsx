@@ -87,14 +87,12 @@ const AddOperationPurchaseExpense = () => {
               <Breadcrumb
                 items={[
                   {
-                    title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>{APP_ROUTES.PRIVATE.DASHBOARD.HOME.title}</Link>,
+                    title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>{APP_ROUTES.PRIVATE.HOME.title}</Link>,
                     key: 'dashboard',
                   },
                   {
                     title: (
-                      <Link to={APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path}>
-                        {APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.title}
-                      </Link>
+                      <Link to={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path}>{APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.title}</Link>
                     ),
                     key: 'expenses',
                   },

@@ -21,7 +21,7 @@ const ProductAvatar = ({ product, stock = 0, enableEdit = false, icon, onButtonC
   const handleClick = () => {
     if (onButtonClick) onButtonClick();
     else if (enableEdit) {
-      window.open(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'edit'}/${product?.product_id}`, '_blank');
+      window.open(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'edit'}/${product?.product_id}`, '_blank');
     }
   };
 

@@ -17,6 +17,7 @@ type UpdateSaleButton = {
 const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
   const dispatch = useAppDispatch();
   const { current_sale } = useAppSelector(({ sales }) => sales);
+  const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
   const [receivedMoney, setReceivedMoney] = useState(0);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -47,6 +48,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
       sale_id: current_sale?.metadata?.sale_id,
       cashback: cashback >= 0 ? 0 : Math.abs(cashback),
       payment_method: paymentMethod,
+      cash_cut_id: active_cash_cut?.cash_cut_id || current_sale?.metadata?.cash_cut_id,
     } as Sale;
 
     const success = await dispatch(salesActions.upsertSale(newSale));

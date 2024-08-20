@@ -3,7 +3,10 @@ import { CompanyStore, StoresSlice } from './types';
 import { customStoreActions } from './actions';
 
 const initialState: StoresSlice = {
-  store: null,
+  store: {
+    is_active: false,
+    status_id: null,
+  },
   loading: false,
 };
 

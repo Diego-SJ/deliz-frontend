@@ -4,20 +4,28 @@ import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
-import { Avatar, Col, Drawer, Row } from 'antd';
+import { Avatar, Col, Drawer, Row, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CustomerEditor from '../customers/editor';
-import { CircleDollarSign, PackagePlus, ShoppingBasket, UserRoundPlus } from 'lucide-react';
+import { CircleDollarSign, MonitorCheck, MonitorX, PackagePlus, ShoppingBasket, UserRoundPlus } from 'lucide-react';
+import useMediaQuery from '@/hooks/useMediaQueries';
+import CashCutForm from '../cash_cuts/current-cash-cut/cash-cut-form';
+import { useState } from 'react';
+import OpenCashierModal from '../cash_cuts/current-cash-cut/open-cashier-modal/modal';
 
 const Dashboard = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { isTablet } = useMediaQuery();
   const { current_customer } = useAppSelector(({ customers }) => customers);
+  const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const [openCloseCashier, setOpenCloseCashier] = useState(false);
+  const [openCashierVisible, setOpenCashierVisible] = useState(false);
 
   const addProduct = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
   const newSale = () => {
@@ -33,11 +41,22 @@ const Dashboard = () => {
   };
 
   const addExpense = () => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`);
+    navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`);
+  };
+
+  const handleDrawerVisible = () => {
+    setOpenCloseCashier(prev => !prev);
+  };
+
+  const handleOpenCashier = () => {
+    setOpenCashierVisible(prev => !prev);
   };
 
   return (
     <div className="p-3">
+      <Typography.Title level={5} className="mb-3">
+        Movimientos
+      </Typography.Title>
       <Row gutter={[10, 10]}>
         {permissions?.sales?.add_sale && (
           <CardButton
@@ -53,12 +72,39 @@ const Dashboard = () => {
           <CardButton
             title="Registrar gasto"
             description="Registra un gasto"
-            icon={<CircleDollarSign strokeWidth={1.8} className="text-orange-600 !w-7 !h-7" />}
-            className="bg-orange-600/10"
+            icon={<CircleDollarSign strokeWidth={1.8} className="text-pink-600 !w-7 !h-7" />}
+            className="bg-pink-600/10"
             onClick={addExpense}
           />
         )}
 
+        {(permissions?.cash_registers?.make_cash_cut || permissions?.cash_registers?.open_cash_cut) && (
+          <CardButton
+            title={active_cash_cut?.cash_cut_id ? (isTablet ? 'Hacer corte de caja' : 'Corte de caja') : 'Abrir caja'}
+            description={active_cash_cut?.cash_cut_id ? 'Realiza el corte de caja' : 'Abre la caja registradora'}
+            icon={
+              active_cash_cut?.cash_cut_id ? (
+                <MonitorX strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
+              ) : (
+                <MonitorCheck strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
+              )
+            }
+            className="bg-teal-600/10"
+            onClick={() => {
+              if (active_cash_cut?.cash_cut_id) {
+                handleDrawerVisible();
+              } else {
+                handleOpenCashier();
+              }
+            }}
+          />
+        )}
+      </Row>
+
+      <Typography.Title level={5} className="mt-5 mb-3">
+        Agregar nuevo
+      </Typography.Title>
+      <Row gutter={[10, 10]}>
         {permissions?.products?.add_product && (
           <CardButton
             title="Nuevo producto"
@@ -88,6 +134,9 @@ const Dashboard = () => {
         >
           <CustomerEditor />
         </Drawer>
+
+        <CashCutForm visible={openCloseCashier} onClose={handleDrawerVisible} />
+        <OpenCashierModal visible={openCashierVisible} onClose={handleOpenCashier} />
       </Row>
     </div>
   );

@@ -24,7 +24,7 @@ const CurrentCashier = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Cajas</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Cajas</Link>,
                 key: 'transactions',
               },
               { title: 'Caja actual' },

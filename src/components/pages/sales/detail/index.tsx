@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleItem } from '@/redux/reducers/sales/types';
 import { STATUS, STATUS_DATA } from '@/constants/status';
-import { BUCKETS } from '@/constants/buckets';
 import UpdateSaleButton from './update-sale-btn';
 import PrintInvoiceButton from './print-invoice-btn';
 import AddNewItem from './detail-item-actions/add-new-item';
@@ -92,11 +91,11 @@ const SaleDetail = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>{APP_ROUTES.PRIVATE.DASHBOARD.HOME.title}</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>{APP_ROUTES.PRIVATE.HOME.title}</Link>,
                 key: 'dashboard',
               },
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.SALES.path}>{APP_ROUTES.PRIVATE.DASHBOARD.SALES.title}</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.SALES.path}>{APP_ROUTES.PRIVATE.SALES.title}</Link>,
                 key: 'Ventas',
               },
               {

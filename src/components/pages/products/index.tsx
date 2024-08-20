@@ -98,12 +98,12 @@ const Products = () => {
 
   const onAddNew = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
   const onRowClick = (record: DataType) => {
     dispatch(productActions.setCurrentProduct(record));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'edit'}${record.product_id}`);
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'edit'}${record.product_id}`);
   };
 
   const getPanelValue = ({ searchText }: { searchText?: string; categoryId?: number[] }) => {
@@ -139,7 +139,7 @@ const Products = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Dashboard</Link>,
                 key: 'dashboard',
               },
               { title: 'Productos' },

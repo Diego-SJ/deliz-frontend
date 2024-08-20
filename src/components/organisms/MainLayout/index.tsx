@@ -33,7 +33,12 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
   return (
     <LayoutRoot hasSider={!isTablet}>
       {!isTablet && (
-        <LayoutSider width={SIDER_WIDTH} collapsed={isPhablet} className="!border-r" theme={'light' as any}>
+        <LayoutSider
+          width={SIDER_WIDTH}
+          collapsed={isPhablet}
+          className="!border-r !min-h-[100dvh] !max-h-[100dvh] overflow-y-auto"
+          theme={'light' as any}
+        >
           <SideMenu />
         </LayoutSider>
       )}

@@ -119,13 +119,11 @@ const ProductQuickEditor = () => {
               <Breadcrumb
                 items={[
                   {
-                    title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>{APP_ROUTES.PRIVATE.DASHBOARD.HOME.title}</Link>,
+                    title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>{APP_ROUTES.PRIVATE.HOME.title}</Link>,
                     key: 'dashboard',
                   },
                   {
-                    title: (
-                      <Link to={APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path}>{APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.title}</Link>
-                    ),
+                    title: <Link to={APP_ROUTES.PRIVATE.PRODUCTS.path}>{APP_ROUTES.PRIVATE.PRODUCTS.title}</Link>,
                     key: 'products',
                   },
                   {

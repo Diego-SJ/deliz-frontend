@@ -8,6 +8,7 @@ import { BUCKETS } from '@/constants/buckets';
 import { userActions } from '../users';
 import { DB_ERRORS } from '@/constants/db-errors';
 import { branchesActions } from '../branches';
+import { STATUS_DATA } from '@/constants/status';
 
 const customActions = {
   company: {
@@ -71,6 +72,14 @@ const customActions = {
     },
   },
   updateOnboarding: (onboarding: Partial<Onboarding>) => async (dispatch: AppDispatch, getState: AppState) => {
+    const company_id = getState().users?.user_auth?.profile?.company_id;
+    const { data: oldOnboarding } = await supabase.from('onboarding').select().eq('company_id', company_id).single();
+
+    if (oldOnboarding?.status_id === STATUS_DATA.COMPLETED.id) {
+      dispatch(appActions.finishOnboarding());
+      return null;
+    }
+
     const oldData = getState().app.onboarding;
     dispatch(appActions.setLoading(true));
     const { data, error } = await supabase
@@ -104,15 +113,29 @@ const customActions = {
     dispatch(appActions.setLoading(true));
     const { profile_id } = getState().users?.user_auth?.profile!;
     const { company_id } = getState().app.company;
-    const { data, error } = await supabase.rpc('create_initial_records', {
-      p_company_id: company_id,
-      p_profile_id: profile_id,
-    });
-    dispatch(appActions.setLoading(false));
 
-    if (error || !data) {
+    const { data: onboarding, error: onboardingError } = await supabase
+      .from('onboarding')
+      .select()
+      .eq('company_id', company_id)
+      .single();
+
+    if (onboardingError) {
       message.error('Error al finalizar el proceso');
-      return;
+      return false;
+    }
+
+    if (onboarding?.status_id !== STATUS_DATA.COMPLETED.id) {
+      const { data, error } = await supabase.rpc('create_initial_records', {
+        p_company_id: company_id,
+        p_profile_id: profile_id,
+      });
+
+      if (error || !data) {
+        dispatch(appActions.setLoading(false));
+        message.error('Error al finalizar el proceso');
+        return false;
+      }
     }
 
     await dispatch(userActions.fetchProfile(profile_id!));
@@ -127,6 +150,7 @@ const customActions = {
     ]);
 
     await dispatch(appActions.fetchOnboarding());
+    dispatch(appActions.setLoading(false));
 
     message.success('Bienvenido');
   },

@@ -25,6 +25,8 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import CashRegisterSvg from '@/assets/img/jsx/cashier-menu';
 import { Profile } from '@/redux/reducers/users/types';
 import { createElement } from 'react';
+import { APP_VERSION } from '@/constants/versions';
+import MyMembershipCard from '../membership';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
@@ -35,14 +37,14 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
     key: 'dashboard',
     icon: HomeOutlined,
     label: 'Inicio',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.HOME.path,
+    path: APP_ROUTES.PRIVATE.HOME.path,
   },
   permissions?.products?.view_catalog
     ? {
         key: 'products',
         icon: ShoppingOutlined,
         label: 'Productos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path,
+        path: APP_ROUTES.PRIVATE.PRODUCTS.path,
       }
     : null,
   permissions?.customers?.view_customers
@@ -50,7 +52,7 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
         key: 'customers',
         icon: TeamOutlined,
         label: 'Clientes',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path,
+        path: APP_ROUTES.PRIVATE.CUSTOMERS.path,
       }
     : null,
   permissions?.sales?.view_sales
@@ -58,7 +60,7 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
         key: 'sales',
         icon: DollarOutlined,
         label: 'Ventas',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.SALES.path,
+        path: APP_ROUTES.PRIVATE.SALES.path,
       }
     : null,
   permissions?.cash_registers?.view_current_cash_cut || permissions?.cash_registers?.view_history_cash_cuts
@@ -71,7 +73,7 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
             ? {
                 key: 'transactions.current_cashier',
                 label: 'Caja actual',
-                path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path,
+                path: APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path,
                 icon: InboxOutlined,
               }
             : null,
@@ -79,7 +81,7 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
             ? {
                 key: 'transactions.cashiers',
                 label: 'Historial de cajas',
-                path: APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path,
+                path: APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIERS.path,
                 icon: ClockCircleOutlined,
               }
             : null,
@@ -91,7 +93,7 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
         key: 'expenses',
         icon: ReconciliationOutlined,
         label: 'Gastos',
-        path: APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.path,
+        path: APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path,
       }
     : null,
 
@@ -99,19 +101,19 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
     key: 'reports',
     icon: BarChartOutlined,
     label: 'Reportes',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.REPORTS.path,
+    path: APP_ROUTES.PRIVATE.REPORTS.path,
   },
   {
     key: 'online_catalog',
     icon: ReadOutlined,
     label: 'Catálogo en línea',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.ONLINE_STORE.path,
+    path: APP_ROUTES.PRIVATE.ONLINE_STORE.path,
   },
   {
     key: 'settings',
     icon: SettingOutlined,
     label: 'Configuración',
-    path: APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path,
+    path: APP_ROUTES.PRIVATE.SETTINGS.GENERAL.path,
   },
 ];
 
@@ -145,10 +147,10 @@ const SideMenu = (props: SideMenuProps) => {
     <>
       <Logo src={LogoAppWhite} title="D'eliz" />
 
-      <div className="flex px-4 mt-10 mb-6">
+      <div className="flex lg:px-4 mb-2 mt-5 w-full justify-center">
         <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
           <Button
-            size="large"
+            // size="large"
             className="w-full"
             // className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
             icon={<PlusCircleOutlined />}
@@ -164,7 +166,7 @@ const SideMenu = (props: SideMenuProps) => {
       <MenuRoot
         // theme={'dark' as any}
         mode="inline"
-        className="mb-10"
+        className=""
         inlineCollapsed={isPhablet && !isTablet}
         items={ITEM_LIST(permissions!)
           ?.filter(Boolean)
@@ -186,21 +188,34 @@ const SideMenu = (props: SideMenuProps) => {
           }))}
         style={{ borderInlineEnd: 'none' }}
       />
-      <MenuRoot
-        className="bottom"
-        mode="inline"
-        // theme={'dark' as any}
-        style={{ borderInlineEnd: 'none' }}
-        inlineCollapsed={isPhablet && !isTablet}
-        items={[
-          {
-            key: 1,
-            icon: createElement(LogoutOutlined),
-            label: 'Cerrar sesión',
-            onClick: handleLogout,
-          },
-        ]}
-      />
+
+      <div className="absolute bottom-0 w-full">
+        <div className="px-5">
+          <MyMembershipCard />
+        </div>
+        <MenuRoot
+          className=""
+          mode="inline"
+          // theme={'dark' as any}
+          style={{ borderInlineEnd: 'none' }}
+          inlineCollapsed={isPhablet && !isTablet}
+          items={[
+            {
+              key: 1,
+              icon: createElement(LogoutOutlined),
+              label: 'Cerrar sesión',
+              onClick: handleLogout,
+            },
+          ]}
+        />
+
+        {!isTablet && !isPhablet && (
+          <div className="w-full flex justify-center text-xs text-slate-400 font-light py-2">
+            <p>Posiffy App</p>
+            <span className="">v{APP_VERSION}</span>
+          </div>
+        )}
+      </div>
       {contextHolder}
     </>
   );

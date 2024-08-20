@@ -1,13 +1,23 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { cashiersActions } from '@/redux/reducers/cashiers';
-import { Button, Form, Input, InputNumber, Modal, Typography } from 'antd';
+import { Button, Form, Input, InputNumber, Modal } from 'antd';
 import { useState } from 'react';
 
-const OpenCashCut = () => {
-  const dispatch = useAppDispatch();
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+};
+
+const OpenCashierModal = ({ visible, onClose }: Props) => {
   const [form] = Form.useForm();
-  const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const { currentCashRegister } = useAppSelector(({ branches }) => branches);
+
+  const handleOnClocks = () => {
+    if (onClose) onClose();
+    form.resetFields();
+  };
 
   const onFinish = async () => {
     form.validateFields().then(async values => {
@@ -15,16 +25,13 @@ const OpenCashCut = () => {
       let success = await dispatch(cashiersActions.cash_cuts.openCashier(values));
       setLoading(false);
       if (success) {
-        form.resetFields();
+        handleOnClocks();
       }
     });
   };
 
   return (
-    <Modal width={400} title={`¡Empieza a vender!`} open={!active_cash_cut?.is_open} footer={null} closeIcon={null}>
-      <Typography.Paragraph type="secondary">
-        Abre una caja para comenzar a registrar tus ventas y movimientos de efectivo.
-      </Typography.Paragraph>
+    <Modal width={400} title={`Abrir Caja ${currentCashRegister?.name}`} open={visible} onCancel={handleOnClocks} footer={null}>
       <Form requiredMark={false} form={form} layout="vertical" initialValues={{ notes: '', initial_amount: 0 }}>
         <Form.Item name="initial_amount" label="Monto inicial" rules={[{ required: true, message: 'Campo obligatorio' }]}>
           <InputNumber
@@ -34,12 +41,11 @@ const OpenCashCut = () => {
             min={0}
             type="number"
             inputMode="decimal"
-            onPressEnter={onFinish}
             onFocus={({ target }) => target.select()}
           />
         </Form.Item>
         <Form.Item name="notes" label="Comentarios">
-          <Input.TextArea rows={2} size="large" placeholder="Opcional" />
+          <Input.TextArea rows={2} size="large" placeholder="Caja 1" />
         </Form.Item>
         <Button size="large" type="primary" onClick={onFinish} block loading={loading}>
           Abrir caja
@@ -49,4 +55,4 @@ const OpenCashCut = () => {
   );
 };
 
-export default OpenCashCut;
+export default OpenCashierModal;

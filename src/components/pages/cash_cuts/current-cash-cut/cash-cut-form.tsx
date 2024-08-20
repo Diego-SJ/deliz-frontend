@@ -1,22 +1,39 @@
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { cashiersActions } from '@/redux/reducers/cashiers';
-import { salesActions } from '@/redux/reducers/sales';
 import functions from '@/utils/functions';
-import { App, Button, Col, Drawer, Form, InputNumber, Row, Tag, Typography } from 'antd';
-import React, { useState } from 'react';
+import { Button, Col, Drawer, Form, InputNumber, Row, Tag, Typography } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 
-const CashCutForm = () => {
+type Props = {
+  onClose: () => void;
+  visible: boolean;
+};
+
+const CashCutForm = ({ visible, onClose }: Props) => {
   const [closeDayForm] = Form.useForm();
   const dispatch = useAppDispatch();
-  const [openCloseCashier, setOpenCloseCashier] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isTablet } = useMediaQuery();
   const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
+  const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const [receivedMoney, setReceivedMoney] = useState(0);
+  const { isTablet } = useMediaQuery();
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (
+      !mounted.current &&
+      profile?.profile_id &&
+      profile?.permissions &&
+      (profile?.permissions?.cash_registers?.make_cash_cut || profile?.permissions?.cash_registers?.open_cash_cut)
+    ) {
+      mounted.current = true;
+      dispatch(cashiersActions.cash_cuts.fetchCashCutOpened());
+    }
+  }, [dispatch, profile]);
 
   const handleDrawerVisible = () => {
-    setOpenCloseCashier(prev => !prev);
+    if (onClose) onClose();
     closeDayForm.resetFields();
   };
 
@@ -31,10 +48,6 @@ const CashCutForm = () => {
 
   return (
     <>
-      <Button className="w-full md:w-fit" size={isTablet ? 'large' : 'middle'} type="primary" onClick={handleDrawerVisible}>
-        Hacer corte de caja
-      </Button>
-
       {/* Close cashier */}
       <Drawer
         title="Cerrar caja"
@@ -42,7 +55,7 @@ const CashCutForm = () => {
         onClose={handleDrawerVisible}
         height={'80dvh'}
         width={isTablet ? '100%' : '450px'}
-        open={openCloseCashier}
+        open={visible}
         destroyOnClose
         footer={
           <Row gutter={[10, 10]}>

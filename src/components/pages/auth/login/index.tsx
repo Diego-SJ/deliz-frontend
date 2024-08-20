@@ -33,7 +33,7 @@ const SignInAdmin = () => {
       if (profileSuccess === true) {
         setLoading(false);
         message.success('¡Bienvenido!');
-        navigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path, { replace: true });
+        navigate(APP_ROUTES.PRIVATE.HOME.path, { replace: true });
       }
     }
     setLoading(false);

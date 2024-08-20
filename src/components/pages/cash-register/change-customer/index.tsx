@@ -105,7 +105,7 @@ const CashierCustomer = () => {
             />
             <div
               onClick={() => onChange(null)}
-              className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg my-2"
+              className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg my-2"
             >
               <Avatar shape="square" size="large" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
               <div className="flex flex-col">Público General</div>
@@ -113,7 +113,7 @@ const CashierCustomer = () => {
             {permissions?.customers?.add_customer && (
               <div
                 onClick={onRegister}
-                className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg mb-3"
+                className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg mb-3"
               >
                 <Avatar
                   shape="square"

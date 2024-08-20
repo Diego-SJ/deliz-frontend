@@ -33,14 +33,14 @@ const SettingsMenu = () => {
             key: 1,
             icon: createElement(SettingOutlined, { className: 'max-md:!text-lg' }),
             label: 'General',
-            onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path + '/general'),
+            onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.path + '/general'),
           },
           permissions?.branches?.view_branches
             ? {
                 key: 7,
                 icon: createElement(BankOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Sucursales',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.path),
               }
             : null,
           permissions?.cash_registers?.view_cash_registers
@@ -48,7 +48,7 @@ const SettingsMenu = () => {
                 key: 2,
                 icon: createElement(InboxOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Cajas',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CASH_REGISTERS.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.CASH_REGISTERS.path),
               }
             : null,
           permissions?.price_list?.view_price_list
@@ -56,7 +56,7 @@ const SettingsMenu = () => {
                 key: 3,
                 icon: createElement(DollarOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Lista de precios',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.PRICES_LIST.path),
               }
             : null,
           permissions?.categories?.view_categories
@@ -64,7 +64,7 @@ const SettingsMenu = () => {
                 key: 4,
                 icon: createElement(ProductOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Categorías',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.CATEGORIES.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.CATEGORIES.path),
               }
             : null,
           permissions?.sizes?.view_sizes
@@ -72,7 +72,7 @@ const SettingsMenu = () => {
                 key: 5,
                 icon: createElement(LineHeightOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Tamaños',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.SIZES.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.SIZES.path),
               }
             : null,
           permissions?.units?.view_units
@@ -80,7 +80,7 @@ const SettingsMenu = () => {
                 key: 6,
                 icon: createElement(GoldOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Unidades',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.UNITS.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.UNITS.path),
               }
             : null,
           isAdmin
@@ -88,7 +88,7 @@ const SettingsMenu = () => {
                 key: 8,
                 icon: createElement(TeamOutlined, { className: 'max-md:!text-lg' }),
                 label: 'Usuarios y permisos',
-                onClick: () => handleRoute(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.path),
+                onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.USERS.path),
               }
             : null,
         ].filter(Boolean)}

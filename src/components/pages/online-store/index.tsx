@@ -19,7 +19,7 @@ const OnlineStorePage = () => {
 
   return (
     <div className="w-full flex flex-col items-center relative min-h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)]">
-      {!store?.is_active || (store?.status_id !== STATUS_DATA.ACTIVE.id && <ActivateStore />)}
+      {!store?.is_active || store?.status_id !== STATUS_DATA.ACTIVE.id ? <ActivateStore /> : null}
       {store?.status_id === STATUS_DATA.ACTIVE.id && <StoreForm />}
     </div>
   );

@@ -24,11 +24,11 @@ const BranchesPage = () => {
   }, [dispatch]);
 
   const onAddBranch = () => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.ADD.path);
+    navigate(APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.ADD.path);
   };
 
   const onEditBranch = (branch_id: string) => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.BRANCHES.EDIT.hash`${branch_id}`);
+    navigate(APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.EDIT.hash`${branch_id}`);
   };
 
   return (

@@ -22,11 +22,11 @@ const UsersSettingsPage = () => {
   }, [dispatch, firstRender]);
 
   const onAddUser = () => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.ADD.path);
+    navigate(APP_ROUTES.PRIVATE.SETTINGS.USERS.ADD.path);
   };
 
   const onEditUser = (profile_id: string) => {
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.USERS.EDIT.hash`${profile_id}`);
+    navigate(APP_ROUTES.PRIVATE.SETTINGS.USERS.EDIT.hash`${profile_id}`);
   };
 
   return (

@@ -93,11 +93,7 @@ const PurchasesExpenses = () => {
   }, 300);
 
   const onRowClick = (record: OperatingCost) => {
-    navigate(
-      APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.EDIT.hash`${record.operation_type?.toLowerCase()}${
-        record.operating_cost_id
-      }`,
-    );
+    navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.hash`${record.operation_type?.toLowerCase()}${record.operating_cost_id}`);
   };
 
   const onRefresh = async () => {
@@ -112,7 +108,7 @@ const PurchasesExpenses = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Dashboard</Link>,
                 key: 'dashboard',
               },
               { title: 'Gastos' },
@@ -234,7 +230,7 @@ const PurchasesExpenses = () => {
                   type="primary"
                   size={isTablet ? 'large' : 'middle'}
                   icon={<PlusCircleOutlined />}
-                  onClick={() => navigate(APP_ROUTES.PRIVATE.DASHBOARD.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`)}
+                  onClick={() => navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`)}
                 >
                   Agregar
                 </Button>

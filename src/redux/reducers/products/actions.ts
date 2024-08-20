@@ -37,12 +37,8 @@ const customActions = {
         return;
       }
 
-      products =
-        data?.map(item => {
-          return {
-            ...item,
-          } as Product;
-        }) ?? [];
+      products = data || [];
+
       dispatch(productActions.setProducts(products));
     }
   },

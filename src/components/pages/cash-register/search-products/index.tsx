@@ -17,7 +17,6 @@ import CashierActions from '../cashier-actions';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchProductsMobile from './search-products-mobile';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
-import { Drawer } from 'vaul';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -36,9 +35,13 @@ const SearchProducts = () => {
   const { message } = App.useApp();
   const listReft = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const handleInputTextChange = useDebouncedCallback(() => {
     let _products = productHelpers.searchProducts(searchText, products);
     setCurrentProducts(_products?.slice(0, 16) || []);
+  }, 250);
+
+  useEffect(() => {
+    handleInputTextChange();
   }, [products, searchText]);
 
   useEffect(() => {
@@ -113,7 +116,7 @@ const SearchProducts = () => {
 
   const onAddNew = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCT_EDITOR.hash`${'add'}`);
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'add'}`);
   };
 
   const onSuccessScan = (barcode: string) => {
@@ -127,10 +130,6 @@ const SearchProducts = () => {
     message.success('1 producto agregado', 2);
     handleItemInteract(productFound);
   };
-
-  const handleInputTextChange = useDebouncedCallback(value => {
-    setSearchText(value);
-  }, 250);
 
   const openBarCodeClick = () => {
     setOpenBarCode(true);
@@ -156,14 +155,19 @@ const SearchProducts = () => {
               size="large"
               className="search-products-input m-0 !border-gray-300 !w-full"
               placeholder="Buscar producto"
+              value={searchText}
               onFocus={() => {
                 setInputIsFocused(!isTablet);
                 setCurrentProducts(products?.slice(0, 16) || []);
                 searchInputRef.current?.select();
               }}
-              onBlur={() => setInputIsFocused(false)}
+              onBlur={() => {
+                setTimeout(() => {
+                  setInputIsFocused(false);
+                }, 100);
+              }}
               onChange={({ target }) => {
-                handleInputTextChange(target.value);
+                setSearchText(target.value);
               }}
             />
             {!!searchText && (
@@ -172,6 +176,7 @@ const SearchProducts = () => {
                 icon={<CloseOutlined />}
                 onClick={() => {
                   setSearchText('');
+                  setInputIsFocused(false);
                 }}
               />
             )}
@@ -246,22 +251,6 @@ const SearchProducts = () => {
             </div>
           </div>
         )}
-
-        <Drawer.Root fixed modal disablePreventScroll>
-          <Drawer.Trigger>
-            <Button>abrir</Button>
-          </Drawer.Trigger>
-          <Drawer.Portal>
-            <Drawer.Title>Buscar producto</Drawer.Title>
-            <Drawer.Description>Buscar producto</Drawer.Description>
-
-            <Drawer.Content className="bg-white z-[20]">
-              <Drawer.Handle />
-              wefwefe
-            </Drawer.Content>
-            <Drawer.Overlay />
-          </Drawer.Portal>
-        </Drawer.Root>
       </div>
     </>
   );

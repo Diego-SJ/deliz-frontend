@@ -36,7 +36,24 @@ const customActions = {
       cash_register = cash_registers[0] || null;
     }
     await dispatch(branchesActions.setCurrentCashRegister(cash_register));
-    await dispatch(cashiersActions.cash_cuts.fetchCashCutData());
+  },
+  fetchAppDataOnLogin: () => async (dispatch: AppDispatch, getState: AppState) => {
+    const { profile } = getState().users.user_auth;
+
+    await dispatch(appActions.company.getCompany(profile?.company_id));
+    await dispatch(branchesActions.getBranches());
+    await dispatch(branchesActions.getCashRegistersByCompanyId());
+
+    const branches = getState().branches.branches;
+    const branch = branches?.find(item => item.main_branch) || branches[0] || null;
+    await dispatch(branchesActions.setCurrentBranch(branch));
+
+    const cash_registers = getState().branches.cash_registers;
+    let cash_register = cash_registers?.find(item => item.is_default && item.branch_id === branch?.branch_id) || null;
+    if (!cash_register) {
+      cash_register = cash_registers[0] || null;
+    }
+    await dispatch(branchesActions.setCurrentCashRegister(cash_register));
     await dispatch(userActions.setUserAuth({ authenticated: true }));
   },
   fetchProfile: (profile_id: string) => async (dispatch: AppDispatch) => {
@@ -101,7 +118,7 @@ const customActions = {
         isAdmin: data.role === ROLES.ADMIN,
       }),
     );
-    await dispatch(customActions.fetchAppData());
+    await dispatch(customActions.fetchAppDataOnLogin());
 
     return true;
   },

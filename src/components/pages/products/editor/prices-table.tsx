@@ -105,7 +105,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
               <Button
                 icon={<PlusCircleOutlined />}
                 className="w-fit"
-                onClick={() => navigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.PRICES_LIST.path)}
+                onClick={() => navigate(APP_ROUTES.PRIVATE.SETTINGS.PRICES_LIST.path)}
               >
                 Agregar precio
               </Button>

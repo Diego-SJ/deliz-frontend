@@ -25,7 +25,7 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
   return (
     <HeaderRoot>
       {!hideLogo ? (
-        <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}>
+        <Space style={{ cursor: 'pointer' }} onClick={() => onNavigate(APP_ROUTES.PRIVATE.HOME.path)}>
           <Avatar size={50} src={FallbackImage} className="!p-4" style={{ marginBottom: 5 }} />
         </Space>
       ) : (
@@ -45,7 +45,7 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
               type="dashed"
               size="large"
               shape="circle"
-              // onClick={() => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path)}
+              // onClick={() => onNavigate(APP_ROUTES.PRIVATE.HOME.path)}
             />
           </Tooltip>
         // </Space> */}

@@ -122,7 +122,7 @@ const DebtorsClients = () => {
 
   const onRowClick = (record: SaleDetails) => {
     dispatch(salesActions.setCurrentSale({ metadata: record }));
-    navigate(APP_ROUTES.PRIVATE.DASHBOARD.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
+    navigate(APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
   const onRefresh = async () => {
@@ -137,7 +137,7 @@ const DebtorsClients = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Dashboard</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Dashboard</Link>,
                 key: 'dashboard',
               },
               { title: 'Ventas' },

@@ -27,7 +27,7 @@ export const ItemProduct = (props: ItemProductsProps) => {
     <>
       <div
         onClick={handleClick}
-        className="bg-white !min-h-[6.2rem] rounded-lg box-border flex p-3 justify-between border border-neutral-200 items-center cursor-pointer hover:border-neutral-300 relative overflow-hidden"
+        className="bg-white !min-h-[6.2rem] rounded-lg box-border flex p-3 justify-between border border-gray-300 items-center cursor-pointer hover:border-gray-400 relative overflow-hidden"
       >
         <div
           className="absolute top-0 right-0 p-3 cursor-pointer group"
@@ -43,7 +43,7 @@ export const ItemProduct = (props: ItemProductsProps) => {
         </div>
         <div className="flex gap-4 pr-14">
           <Avatar
-            className="w-16 h-16 min-w-16 aspect-square bg-slate-100 p-1 my-auto select-none"
+            className="w-16 h-16 min-w-16 aspect-square bg-slate-400/10 p-1 my-auto select-none"
             src={props?.imageSrc}
             shape="square"
             icon={<FileImageOutlined className="text-2xl text-slate-400" />}

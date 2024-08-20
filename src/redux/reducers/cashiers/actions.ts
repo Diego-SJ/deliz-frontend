@@ -7,8 +7,38 @@ import { CashCut, CashOperation, FetchCashCutArgs } from './types';
 import { salesActions } from '../sales';
 import { Cashier, SaleDetails } from '../sales/types';
 import { STATUS_DATA } from '@/constants/status';
+import { userActions } from '../users';
+import { branchesActions } from '../branches';
+import { productActions } from '../products';
 
 const customActions = {
+  fetchDataForCashRegister: () => async (dispatch: AppDispatch, getState: AppState) => {
+    const company_id = getState().users?.user_auth?.profile?.company_id;
+    const branch_id = getState().branches?.currentBranch?.branch_id;
+    const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
+
+    if (!company_id) {
+      message.error('Tu cuenta no existe o no tiene permisos para acceder a esta información', 4);
+      dispatch(userActions.signOut());
+      return;
+    }
+
+    const [products, cashRegister, currentCashCut, priceList] = await Promise.all([
+      supabase
+        .from('products')
+        .select(`*, categories(category_id,name)`)
+        .eq('company_id', company_id)
+        .order('name', { ascending: true }),
+      supabase.from('cash_registers').select('*').eq('is_default', true).eq('branch_id', branch_id).single(),
+      supabase.from('cash_cuts').select('*').eq('cash_register_id', cash_register_id).eq('is_open', true).single(),
+      supabase.from('prices_list').select('*').order('created_at', { ascending: true }).eq('company_id', company_id),
+    ]);
+
+    dispatch(productActions.setProducts(products?.data || []));
+    dispatch(branchesActions.setCurrentCashRegister(cashRegister?.data || []));
+    dispatch(cashiersActions.setActiveCashCut(currentCashCut?.data || null));
+    dispatch(branchesActions.setPricesList(priceList?.data || []));
+  },
   cash_operations: {
     get: () => async (dispatch: AppDispatch, getState: AppState) => {
       try {
@@ -154,10 +184,28 @@ const customActions = {
       message.success('Caja abierta');
       return true;
     },
+    fetchCashCutOpened: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
+      const { data, error } = await supabase
+        .from('cash_cuts')
+        .select('*')
+        .eq('cash_register_id', cash_register_id)
+        .eq('is_open', true)
+        .single();
+
+      if (error) {
+        return false;
+      }
+
+      dispatch(cashiersActions.setActiveCashCut(data as CashCut));
+      return data;
+    },
     fetchCashCutData: (args?: FetchCashCutArgs) => async (dispatch: AppDispatch, getState: AppState) => {
-      const { cashCut, fetchOperations = false, fetchSales = false } = args || {};
+      const { cashCut } = args || {};
       const state = getState();
       const cash_register_id = state?.branches?.currentCashRegister?.cash_register_id;
+      const currentCashCut = state?.cashiers?.active_cash_cut;
+      let cashCutData = cashCut || currentCashCut;
       const initialState = {
         cash_register_id,
         branch_id: state?.branches?.currentBranch?.branch_id,
@@ -175,28 +223,27 @@ const customActions = {
         closing_date: null,
       } as CashCut;
 
-      if (!cash_register_id) {
+      if (!cash_register_id && !cashCutData?.cash_cut_id) {
         message.error('No se pudo cargar la información de la caja', 4);
+        return false;
       }
 
-      let cashCutData = cashCut;
+      // if (!cashCut) {
+      //   const { data, error: cashCutError } = await supabase
+      //     .from('cash_cuts')
+      //     .select('*')
+      //     .eq('cash_register_id', cash_register_id)
+      //     .eq('is_open', true)
+      //     .single();
 
-      if (!cashCut) {
-        const { data, error: cashCutError } = await supabase
-          .from('cash_cuts')
-          .select('*')
-          .eq('cash_register_id', cash_register_id)
-          .eq('is_open', true)
-          .single();
+      //   if (cashCutError) {
+      //     dispatch(cashiersActions.setActiveCashCut(initialState));
+      //     // message.error('No se pudo cargar la información de la caja', 4);
+      //     return false;
+      //   }
 
-        if (cashCutError) {
-          dispatch(cashiersActions.setActiveCashCut(initialState));
-          // message.error('No se pudo cargar la información de la caja', 4);
-          return false;
-        }
-
-        cashCutData = data as CashCut;
-      }
+      //   cashCutData = data as CashCut;
+      // }
 
       // Fetch data in parallel
       const [salesData, operationsData] = await Promise.all([

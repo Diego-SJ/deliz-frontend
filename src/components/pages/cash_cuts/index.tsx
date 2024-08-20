@@ -98,7 +98,7 @@ const CloseSales = () => {
   }, [filters]);
 
   const onRowClick = (record: CashCut) => {
-    navigation(APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIER_DETAIL.hash`${record!.cash_cut_id!}`);
+    navigation(APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIER_DETAIL.hash`${record!.cash_cut_id!}`);
   };
 
   const onRefresh = async () => {
@@ -117,7 +117,7 @@ const CloseSales = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Cajas</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Cajas</Link>,
                 key: 'transactions',
               },
               { title: 'Historico de cortes de caja' },

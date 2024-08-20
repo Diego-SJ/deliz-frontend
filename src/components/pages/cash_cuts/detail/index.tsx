@@ -36,11 +36,11 @@ const CashierDetail = () => {
         className="mb-3"
         items={[
           {
-            title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.HOME.path}>Cajas</Link>,
+            title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Cajas</Link>,
             key: 'Cajas',
           },
           {
-            title: <Link to={APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CASHIERS.path}>Historico de cortes de caja</Link>,
+            title: <Link to={APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIERS.path}>Historico de cortes de caja</Link>,
             key: 'Historico de cortes de caja',
           },
           { title: 'Detalle de caja' },

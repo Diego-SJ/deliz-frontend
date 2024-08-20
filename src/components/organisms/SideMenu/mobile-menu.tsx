@@ -1,4 +1,4 @@
-import { LogoutOutlined, ExclamationCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { LogoutOutlined, ExclamationCircleOutlined, PlusCircleOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import LogoAppWhite from '@/assets/logo-color.svg';
@@ -38,31 +38,29 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
     if (props?.onClick) props.onClick();
   };
 
+  const goToMembership = () => {
+    navigate(APP_ROUTES.PRIVATE.MEMBERSHIP.path);
+    if (props?.onClick) props.onClick();
+  };
+
   return (
     <div className="px-0">
       <div className="flex gap-6 pb-10">
         <img src={LogoAppWhite} alt="posiffy" className="w-16 h-1/6 aspect-square" />
         <div className="flex flex-col">
           <h5 className="text-xl font-semibold">{company?.name || 'Posiffy'}</h5>
-          <p className="text-lg text-slate-400">{company?.email || '- - -'}</p>
+          <p className="text-lg text-slate-400 font-light">{company?.email || '- - -'}</p>
         </div>
       </div>
 
       <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-6">
-        <div
-          className="w-full flex items-center gap-5 px-4 py-3"
+        <LisItem
           onClick={() => {
             handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
           }}
-        >
-          <Avatar
-            size={40}
-            shape="square"
-            className="bg-slate-600/10 text-slate-600 !rounded-xl flex items-center justify-center"
-            icon={<PlusCircleOutlined className="text-xl text-slate-900" />}
-          />
-          <p className="text-lg font-medium">Nueva venta</p>
-        </div>
+          label="Nueva venta"
+          icon={<PlusCircleOutlined className="text-xl text-slate-900" />}
+        />
       </div>
 
       <div className="flex flex-col bg-white rounded-lg gap-2 py-2 mb-6 shadow-sm">
@@ -74,43 +72,40 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
           if (children?.length) {
             return children.map((subItem: any) => {
               return (
-                <div
+                <LisItem
                   key={subItem.key}
-                  className="w-full flex items-center gap-5 px-4 py-2"
                   onClick={() => {
                     if (subItem.path) handlePathChange(subItem.path);
                   }}
-                >
-                  <Avatar
-                    size={40}
-                    shape="square"
-                    className="bg-slate-600/10 text-slate-600 !rounded-xl flex items-center justify-center"
-                    icon={subItem?.icon ? createElement(subItem?.icon as any, { className: 'text-xl text-slate-900' }) : null}
-                  />
-                  <p className="text-lg font-medium">{subItem.label}</p>
-                </div>
+                  label={subItem.label}
+                  icon={subItem?.icon ? createElement(subItem?.icon as any, { className: 'text-xl text-slate-900' }) : null}
+                />
               );
             });
           }
 
           return (
-            <div
+            <LisItem
               key={key}
-              className="w-full flex items-center gap-5 px-4 py-2"
               onClick={() => {
                 if (path) handlePathChange(path);
               }}
-            >
-              <Avatar
-                size={40}
-                shape="square"
-                className="bg-slate-600/10 text-slate-600 !rounded-xl flex items-center justify-center"
-                icon={createElement(icon as any, { className: 'text-xl text-slate-900' })}
-              />
-              <p className="text-lg font-medium">{label}</p>
-            </div>
+              label={label}
+              icon={createElement(icon as any, { className: 'text-xl text-slate-900' })}
+            />
           );
         })}
+      </div>
+      <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5">
+        <div className="w-full flex items-center gap-5 px-4 py-3" onClick={goToMembership}>
+          <Avatar
+            size={40}
+            shape="square"
+            className="bg-teal-600/10 text-teal-600 !rounded-xl flex items-center justify-center"
+            icon={createElement(IdcardOutlined, { className: 'text-xl text-teal-600' })}
+          />
+          <p className="text-lg font-medium text-teal-600">Mi Membersía</p>
+        </div>
       </div>
 
       <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm">
@@ -135,6 +130,26 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
         <span>v{APP_VERSION}</span>
       </div>
       {contextHolder}
+    </div>
+  );
+};
+
+type LisItemProps = {
+  onClick?: (args?: any) => void;
+  icon?: JSX.Element | null;
+  label: string;
+};
+
+const LisItem = ({ onClick, icon, label }: LisItemProps) => {
+  return (
+    <div className="w-full flex items-center gap-5 px-4 py-3" onClick={onClick}>
+      <Avatar
+        size={35}
+        shape="square"
+        className="bg-slate-600/10 text-slate-600 !rounded-xl flex items-center justify-center"
+        icon={icon}
+      />
+      <p className="text-base font-medium">{label}</p>
     </div>
   );
 };

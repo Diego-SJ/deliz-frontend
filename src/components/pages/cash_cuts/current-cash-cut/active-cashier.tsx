@@ -3,13 +3,15 @@ import functions from '@/utils/functions';
 import IncomeBlueSvg from '@/assets/img/svg/income-blue.svg';
 import ExpenseSvg from '@/assets/img/svg/expense.svg';
 import SaleCashSvg from '@/assets/img/svg/sale-cash.svg';
-import { Avatar, Badge, Card, Col, Divider, List, Row, Typography } from 'antd';
+import { Avatar, Badge, Button, Card, Col, Divider, List, Row, Typography } from 'antd';
 import CardRoot from '@/components/atoms/Card';
 import { PAYMENT_METHOD_NAME } from '@/constants/payment_methods';
 import CashRegisterSvg from '@/assets/img/jsx/cash-register';
 import OpenCashierModal from './open-cashier-modal';
 import AddOperationDrawer from './add-operation';
 import CashCutForm from './cash-cut-form';
+import { useState } from 'react';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 export const OPERATION_TYPE_NAME = {
   INCOME: 'Ingreso',
@@ -33,6 +35,12 @@ const OpenCashier = () => {
   const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const [openCloseCashier, setOpenCloseCashier] = useState(false);
+  const { isTablet } = useMediaQuery();
+
+  const handleDrawerVisible = () => {
+    setOpenCloseCashier(prev => !prev);
+  };
 
   return (
     <div className="max-w-[900px] mx-auto">
@@ -57,7 +65,19 @@ const OpenCashier = () => {
                     }
                     description={<Typography.Text className="text-neutral-400">Sucursal {currentBranch?.name}</Typography.Text>}
                   />
-                  {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut && <CashCutForm />}
+                  {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut && (
+                    <>
+                      <Button
+                        className="w-full md:w-fit"
+                        size={isTablet ? 'large' : 'middle'}
+                        type="primary"
+                        onClick={handleDrawerVisible}
+                      >
+                        Hacer corte de caja
+                      </Button>
+                      <CashCutForm visible={openCloseCashier} onClose={handleDrawerVisible} />
+                    </>
+                  )}
                 </div>
               </CardRoot>
             </Col>

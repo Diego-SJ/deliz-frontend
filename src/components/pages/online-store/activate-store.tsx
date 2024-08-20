@@ -2,6 +2,7 @@ import OnlineStoreWeb from '@/assets/webp/store-example.webp';
 import { STATUS_DATA } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { storesActions } from '@/redux/reducers/stores';
+import { CompanyStore } from '@/redux/reducers/stores/types';
 import { Button } from 'antd';
 
 const ActivateStore = () => {
@@ -11,14 +12,20 @@ const ActivateStore = () => {
 
   const activeStore = () => {
     let companySlug = company?.name?.toLowerCase()?.trim().replace(/ /g, '-');
-    dispatch(
-      storesActions.updateStore({
-        is_active: true,
-        status_id: STATUS_DATA.ACTIVE.id,
-        slug: companySlug,
-        store_id: store?.store_id || null,
-      }),
-    );
+    let storeData: Partial<CompanyStore> = {
+      is_active: true,
+      status_id: STATUS_DATA.ACTIVE.id,
+      slug: companySlug,
+    };
+
+    if (!!store?.status_id) {
+      storeData = {
+        ...storeData,
+        store_id: store.store_id,
+      };
+    }
+
+    dispatch(storesActions.updateStore(storeData));
   };
 
   return (
@@ -39,7 +46,7 @@ const ActivateStore = () => {
           </ul>
 
           <Button type="primary" className="mx-auto " size="large" loading={loading} onClick={activeStore}>
-            {loading ? 'Activando...' : store?.status_id !== STATUS_DATA.ACTIVE.id ? 'Activar de nuevo' : '¡Activar ahora!'}
+            {loading ? 'Activando...' : !store?.status_id ? '¡Activar ahora!' : 'Activar de nuevo'}
           </Button>
         </div>
       </div>

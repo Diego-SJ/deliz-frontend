@@ -45,7 +45,7 @@ const CashierHeader = () => {
                     <Typography.Text className="!text-base">Inicio</Typography.Text>
                   </div>
                 ),
-                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.HOME.path),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.HOME.path),
               },
 
               !!permissions?.products?.show_in_catalog
@@ -57,7 +57,7 @@ const CashierHeader = () => {
                         <Typography.Text className="!text-base">Productos</Typography.Text>
                       </div>
                     ),
-                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.PRODUCTS.path),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.PRODUCTS.path),
                   }
                 : null,
               permissions?.sales?.view_sales
@@ -69,7 +69,7 @@ const CashierHeader = () => {
                         <Typography.Text className="!text-base">Ventas</Typography.Text>
                       </div>
                     ),
-                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SALES.path),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.SALES.path),
                   }
                 : null,
               permissions?.customers?.view_customers
@@ -81,7 +81,7 @@ const CashierHeader = () => {
                         <Typography.Text className="!text-base">Clientes</Typography.Text>
                       </div>
                     ),
-                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.CUSTOMERS.path),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.CUSTOMERS.path),
                   }
                 : null,
               permissions?.cash_registers?.view_current_cash_cut
@@ -93,7 +93,7 @@ const CashierHeader = () => {
                         <Typography.Text className="!text-base">Caja actual</Typography.Text>
                       </div>
                     ),
-                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.TRANSACTIONS.CURRENT_CASHIER.path),
+                    onClick: () => onNavigate(APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path),
                   }
                 : null,
               {
@@ -104,7 +104,7 @@ const CashierHeader = () => {
                     <Typography.Text className="!text-base">Configuración</Typography.Text>
                   </div>
                 ),
-                onClick: () => onNavigate(APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path),
+                onClick: () => onNavigate(APP_ROUTES.PRIVATE.SETTINGS.path),
               },
             ],
           }}

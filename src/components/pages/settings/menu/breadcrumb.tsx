@@ -15,7 +15,7 @@ const BreadcrumbSettings = ({ items = [] }: Props) => {
   const { isTablet } = useMediaQuery();
 
   const handleClick = () => {
-    const path = !isTablet ? APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.GENERAL.path : APP_ROUTES.PRIVATE.DASHBOARD.SETTINGS.path;
+    const path = !isTablet ? APP_ROUTES.PRIVATE.SETTINGS.GENERAL.path : APP_ROUTES.PRIVATE.SETTINGS.path;
     navigate(path);
   };
 
