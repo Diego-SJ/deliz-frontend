@@ -206,24 +206,8 @@ const customActions = {
       const cash_register_id = state?.branches?.currentCashRegister?.cash_register_id;
       const currentCashCut = state?.cashiers?.active_cash_cut;
       let cashCutData = cashCut || currentCashCut;
-      const initialState = {
-        cash_register_id,
-        branch_id: state?.branches?.currentBranch?.branch_id,
-        is_open: false,
-        initial_amount: 0,
-        sales_amount: 0,
-        incomes_amount: 0,
-        expenses_amount: 0,
-        cash_cut_id: null,
-        final_amount: 0,
-        received_amount: 0,
-        notes: '',
-        opening_date: '',
-        operations: [],
-        closing_date: null,
-      } as CashCut;
 
-      if (!cash_register_id && !cashCutData?.cash_cut_id) {
+      if (!cash_register_id || !cashCutData?.cash_cut_id) {
         message.error('No se pudo cargar la información de la caja', 4);
         return false;
       }
@@ -291,7 +275,6 @@ const customActions = {
         expenses_amount,
         final_amount,
       } as CashCut;
-      console.log('currentCashCutData', currentCashCutData);
       // Dispatch the action with the fetched data
       dispatch(cashiersActions.setActiveCashCut(currentCashCutData));
       return true;
