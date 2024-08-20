@@ -91,6 +91,8 @@ const StoreForm = () => {
   };
 
   const onSubmit = () => {
+    if (!profile?.permissions?.online_store?.edit_online_store) return;
+
     form
       .validateFields()
       .then(async values => {
@@ -112,7 +114,11 @@ const StoreForm = () => {
 
   return (
     <>
-      <section className="p-4 w-full max-w-[700px] mx-auto flex flex-col gap-5 min-h-[calc(100dvh-144px)] max-h-[calc(100dvh-144px)] overflow-auto">
+      <section
+        className={`p-4 w-full max-w-[700px] mx-auto flex flex-col gap-5 ${
+          profile?.permissions?.online_store?.edit_online_store ? 'min-h-[calc(100dvh-144px)]' : ''
+        } ${profile?.permissions?.online_store?.edit_online_store ? 'max-h-[calc(100dvh-144px)]' : ''} overflow-auto`}
+      >
         <CardRoot>
           <div className="flex justify-between w-full items-center">
             <div className="flex gap-2 items-center">
@@ -418,19 +424,21 @@ const StoreForm = () => {
           </CardRoot>
         </Form>
 
-        <CardRoot title="Desactivar Tienda" className="mb-10">
-          <Typography.Paragraph>
-            Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en línea. Puedes activarla nuevamente en cualquier
-            momento.
-          </Typography.Paragraph>
+        {profile?.permissions?.online_store?.edit_online_store && (
+          <CardRoot title="Desactivar Tienda" className="mb-10">
+            <Typography.Paragraph>
+              Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en línea. Puedes activarla nuevamente en cualquier
+              momento.
+            </Typography.Paragraph>
 
-          <Button type="primary" danger onClick={inactiveStore}>
-            Desactivar Tienda
-          </Button>
-        </CardRoot>
+            <Button type="primary" danger onClick={inactiveStore}>
+              Desactivar Tienda
+            </Button>
+          </CardRoot>
+        )}
       </section>
 
-      {profile?.permissions?.products?.show_in_catalog && (
+      {profile?.permissions?.online_store?.edit_online_store && (
         <Card
           className="rounded-none box-border w-full border-none !border-t border-slate-200"
           classNames={{ body: 'w-full flex items-center' }}

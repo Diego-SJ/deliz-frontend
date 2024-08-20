@@ -59,11 +59,15 @@ const GeneralSettingsPage = () => {
               </Form.Item>
 
               <Form.Item className="w-full" name="name" label="Nombre">
-                <Input placeholder="Nombre de tu negocio" />
+                <Input placeholder="Nombre de tu negocio" readOnly={!permissions?.company?.edit_company} />
               </Form.Item>
               <div className="flex gap-6">
                 <Form.Item className="w-full" name="phone" label="Teléfono">
-                  <Input placeholder="Teléfono de tu negocio" onPressEnter={onFinish} />
+                  <Input
+                    placeholder="Teléfono de tu negocio"
+                    onPressEnter={onFinish}
+                    readOnly={!permissions?.company?.edit_company}
+                  />
                 </Form.Item>
                 <Form.Item
                   className="w-full"
@@ -71,11 +75,19 @@ const GeneralSettingsPage = () => {
                   label="Correo electrónico"
                   rules={[{ pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }]}
                 >
-                  <Input placeholder="Correo electrónico de tu negocio" onPressEnter={onFinish} />
+                  <Input
+                    placeholder="Correo electrónico de tu negocio"
+                    onPressEnter={onFinish}
+                    readOnly={!permissions?.company?.edit_company}
+                  />
                 </Form.Item>
               </div>
               <Form.Item className="mb-0 w-full" name="address" label="Dirección">
-                <Input placeholder="Dirección de tu negocio" onPressEnter={onFinish} />
+                <Input
+                  placeholder="Dirección de tu negocio"
+                  onPressEnter={onFinish}
+                  readOnly={!permissions?.company?.edit_company}
+                />
               </Form.Item>
             </Form>
           </Card>

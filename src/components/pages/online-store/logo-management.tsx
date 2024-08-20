@@ -1,11 +1,12 @@
+import { App } from 'antd';
 import React, { useEffect, useState, useTransition } from 'react';
 import { CloseCircleOutlined, FileImageOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Avatar, Image, Upload } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
-import { App } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import '../settings/general/styles.css';
 import { storesActions } from '@/redux/reducers/stores';
+import LogoFallback from '@/assets/logo-color.svg';
+import '../settings/general/styles.css';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -91,16 +92,18 @@ const LogoManagement: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
-      <Upload
-        listType="picture-circle"
-        fileList={fileList}
-        multiple={false}
-        style={{ width: 128, height: 128 }}
-        onPreview={handlePreview}
-        onChange={handleChange}
-      >
-        {permissions?.company?.edit_company ? (fileList.length >= 1 ? null : uploadButton) : null}
-      </Upload>
+      {permissions?.online_store?.edit_online_store ? (
+        <Upload
+          listType="picture-circle"
+          fileList={fileList}
+          multiple={false}
+          style={{ width: 128, height: 128 }}
+          onPreview={handlePreview}
+          onChange={handleChange}
+        >
+          {permissions?.online_store?.edit_online_store ? (fileList.length >= 1 ? null : uploadButton) : null}
+        </Upload>
+      ) : null}
       {previewImage ? (
         <Image
           wrapperStyle={{ display: 'none' }}
@@ -113,7 +116,11 @@ const LogoManagement: React.FC = () => {
           src={previewImage}
         />
       ) : (
-        <>{!permissions?.company?.edit_company ? <Avatar className="w-48 h-48 bg-gray-100" src={previewImage} /> : null}</>
+        <>
+          {!permissions?.online_store?.edit_online_store ? (
+            <Avatar className="w-48 h-48 bg-gray-100 p-3" src={previewImage || store?.logo_url || LogoFallback} />
+          ) : null}
+        </>
       )}
     </div>
   );

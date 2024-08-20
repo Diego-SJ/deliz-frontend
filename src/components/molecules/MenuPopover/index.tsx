@@ -4,7 +4,6 @@ import { Modal, Typography } from 'antd';
 import { useTheme } from 'styled-components';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
-import useMediaQuery from '@/hooks/useMediaQueries';
 import Avatar from '../Avatar';
 import { useState } from 'react';
 import ChangeBranchModal from '@/components/organisms/CashierHeader/change-branch-modal';
@@ -16,7 +15,6 @@ const MenuPopover = () => {
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
   const [modal, contextHolder] = Modal.useModal();
   const [open, setOpen] = useState(false);
-  const { isMobile } = useMediaQuery();
 
   const handleLogout = () => {
     modal.confirm({
@@ -39,13 +37,9 @@ const MenuPopover = () => {
     <>
       <Popover
         triggerComponent={
-          <div className="flex sm:gap-3 items-center border border-transparent cursor-pointer max-sm:-mr-2 px-2 py-1 rounded-lg hover:border-slate-200">
-            <Avatar
-              title={isMobile ? '' : `Sucursal ${currentBranch?.name}`}
-              subtitle={isMobile ? '' : `Caja ${currentCashRegister?.name}`}
-              bordered
-            />
-            {!isMobile && <CaretDownOutlined style={{ fontSize: 14, color: theme.colors.primary }} />}
+          <div className="flex gap-3 items-center border border-transparent cursor-pointer px-2 py-1 rounded-lg hover:border-slate-200">
+            <Avatar title={`Sucursal ${currentBranch?.name}`} subtitle={`Caja ${currentCashRegister?.name}`} bordered />
+            <CaretDownOutlined style={{ fontSize: 14, color: theme.colors.primary }} />
           </div>
         }
         placement="bottomRight"
@@ -53,7 +47,7 @@ const MenuPopover = () => {
         nopadding
       >
         <div className="pb-1 overflow-hidden rounded-t-lg min-w-[200px]">
-          <div className="flex gap-3 px-4 py-2 bg-slate-100">
+          <div className="flex gap-3 px-4 py-2 bg-gray-100">
             <Typography.Text className="!text-sm text"> {user_auth?.profile?.email}</Typography.Text>
           </div>
 

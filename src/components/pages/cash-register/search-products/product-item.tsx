@@ -1,6 +1,7 @@
-import { Avatar, Tag, Typography } from 'antd';
+import { Avatar, Button, Tag, Typography } from 'antd';
 import { FileImageOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import functions from '@/utils/functions';
 
 type ItemProductsProps = {
   title?: string;
@@ -29,19 +30,7 @@ export const ItemProduct = (props: ItemProductsProps) => {
         onClick={handleClick}
         className="bg-white !min-h-[6.2rem] rounded-lg box-border flex p-3 justify-between border border-gray-300 items-center cursor-pointer hover:border-gray-400 relative overflow-hidden"
       >
-        <div
-          className="absolute top-0 right-0 p-3 cursor-pointer group"
-          onClick={props.onFavorite}
-          onMouseEnter={() => setHoveredButton(true)}
-          onMouseLeave={() => setHoveredButton(false)}
-        >
-          {props.isFavorite ? (
-            <StarFilled className="text-amber-200 text-xl hover:text-amber-200/40" />
-          ) : (
-            <StarOutlined className="text-slate-300 text-xl group-hover:text-slate-400" />
-          )}
-        </div>
-        <div className="flex gap-4 pr-14">
+        <div className="flex gap-4 w-full">
           <Avatar
             className="w-16 h-16 min-w-16 aspect-square bg-slate-400/10 p-1 my-auto select-none"
             src={props?.imageSrc}
@@ -55,8 +44,21 @@ export const ItemProduct = (props: ItemProductsProps) => {
             >
               {props?.title ?? 'Producto sin nombre'}
             </Typography.Paragraph>
-            <Tag className="select-none border !border-gray-300 !bg-transparent text-gray-400">{category}</Tag>
+            <div className="flex gap-2 w-full items-center">
+              <Tag className="select-none border !border-gray-300 !bg-transparent text-gray-400 max-h-fit">{category}</Tag>
+              <Typography.Text className="text-gray-400 font-light !m-0 !text-sm max-h-fit">
+                {functions.money(props.price)}
+              </Typography.Text>
+            </div>
           </div>
+        </div>
+        <div className="w-auto ml-2">
+          <Button
+            onClick={props.onFavorite}
+            onMouseEnter={() => setHoveredButton(true)}
+            onMouseLeave={() => setHoveredButton(false)}
+            icon={props?.isFavorite ? <StarFilled className="text-primary text-2xl hover:text-primary/40" /> : <StarOutlined />}
+          />
         </div>
       </div>
     </>

@@ -48,7 +48,7 @@ const CashierHeader = () => {
                 onClick: () => onNavigate(APP_ROUTES.PRIVATE.HOME.path),
               },
 
-              !!permissions?.products?.show_in_catalog
+              !!permissions?.products?.view_catalog
                 ? {
                     key: 'products',
                     label: (

@@ -32,7 +32,7 @@ type SideMenuProps = {
   onClick?: (args?: any) => void;
 };
 
-export const ITEM_LIST = (permissions: Profile['permissions']) => [
+export const ITEM_LIST = (permissions?: Profile['permissions']) => [
   {
     key: 'dashboard',
     icon: HomeOutlined,
@@ -96,19 +96,22 @@ export const ITEM_LIST = (permissions: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path,
       }
     : null,
-
-  {
-    key: 'reports',
-    icon: BarChartOutlined,
-    label: 'Reportes',
-    path: APP_ROUTES.PRIVATE.REPORTS.path,
-  },
-  {
-    key: 'online_catalog',
-    icon: ReadOutlined,
-    label: 'Catálogo en línea',
-    path: APP_ROUTES.PRIVATE.ONLINE_STORE.path,
-  },
+  !!Object.values(permissions?.reports || {}).some(item => item)
+    ? {
+        key: 'reports',
+        icon: BarChartOutlined,
+        label: 'Reportes',
+        path: APP_ROUTES.PRIVATE.REPORTS.path,
+      }
+    : null,
+  permissions?.online_store?.view_online_store
+    ? {
+        key: 'online_catalog',
+        icon: ReadOutlined,
+        label: 'Catálogo en línea',
+        path: APP_ROUTES.PRIVATE.ONLINE_STORE.path,
+      }
+    : null,
   {
     key: 'settings',
     icon: SettingOutlined,
@@ -122,7 +125,8 @@ const SideMenu = (props: SideMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
 
   const handleLogout = () => {
@@ -145,14 +149,12 @@ const SideMenu = (props: SideMenuProps) => {
 
   return (
     <>
-      <Logo src={LogoAppWhite} title="D'eliz" />
+      <Logo src={company?.logo_url || LogoAppWhite} title="D'eliz" />
 
       <div className="flex lg:px-4 mb-2 mt-5 w-full justify-center">
         <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
           <Button
-            // size="large"
             className="w-full"
-            // className="w-full mx-auto bg-primary/40 border border-primary text-white/90 hover:!bg-primary/60 hover:!text-white"
             icon={<PlusCircleOutlined />}
             onClick={() => {
               handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -168,7 +170,7 @@ const SideMenu = (props: SideMenuProps) => {
         mode="inline"
         className=""
         inlineCollapsed={isPhablet && !isTablet}
-        items={ITEM_LIST(permissions!)
+        items={ITEM_LIST(permissions)
           ?.filter(Boolean)
           .map((item: any, key: any) => ({
             key,
@@ -196,7 +198,6 @@ const SideMenu = (props: SideMenuProps) => {
         <MenuRoot
           className=""
           mode="inline"
-          // theme={'dark' as any}
           style={{ borderInlineEnd: 'none' }}
           inlineCollapsed={isPhablet && !isTablet}
           items={[

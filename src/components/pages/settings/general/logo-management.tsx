@@ -5,6 +5,7 @@ import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { App } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { appActions } from '@/redux/reducers/app';
+import LogoFallback from '@/assets/logo-color.svg';
 import './styles.css';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -89,16 +90,18 @@ const LogoManagement: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
-      <Upload
-        listType="picture-circle"
-        fileList={fileList}
-        multiple={false}
-        style={{ width: 128, height: 128 }}
-        onPreview={handlePreview}
-        onChange={handleChange}
-      >
-        {permissions?.company?.edit_company ? (fileList.length >= 1 ? null : uploadButton) : null}
-      </Upload>
+      {permissions?.company?.edit_company ? (
+        <Upload
+          listType="picture-circle"
+          fileList={fileList}
+          multiple={false}
+          style={{ width: 128, height: 128 }}
+          onPreview={handlePreview}
+          onChange={handleChange}
+        >
+          {permissions?.company?.edit_company ? (fileList.length >= 1 ? null : uploadButton) : null}
+        </Upload>
+      ) : null}
       {previewImage ? (
         <Image
           wrapperStyle={{ display: 'none' }}
@@ -111,7 +114,11 @@ const LogoManagement: React.FC = () => {
           src={previewImage}
         />
       ) : (
-        <>{!permissions?.company?.edit_company ? <Avatar className="w-48 h-48 bg-gray-100" src={previewImage} /> : null}</>
+        <>
+          {!permissions?.company?.edit_company ? (
+            <Avatar className="w-48 h-48 bg-gray-100 p-4" src={previewImage || company?.logo_url || LogoFallback} />
+          ) : null}
+        </>
       )}
     </div>
   );

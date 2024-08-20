@@ -1,5 +1,6 @@
-import { Avatar, Tag, Typography } from 'antd';
-import { FileImageOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
+import { Avatar, Button, Tag, Typography } from 'antd';
+import { CalculatorOutlined, FileImageOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
+import functions from '@/utils/functions';
 
 type ItemProductMobileProps = {
   title?: string;
@@ -11,6 +12,7 @@ type ItemProductMobileProps = {
   focuseable?: boolean;
   isFavorite?: boolean;
   onFavorite?: () => void;
+  onCalculatorClick?: () => void;
 };
 
 export const ItemProductMobile = (props: ItemProductMobileProps) => {
@@ -23,15 +25,8 @@ export const ItemProductMobile = (props: ItemProductMobileProps) => {
   };
   return (
     <>
-      <div className="box-border flex py-3 justify-between border-b border-slate-100 items-center cursor-pointer hover:bg-slate-50/10 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-3 cursor-pointer group" onClick={props.onFavorite}>
-          {props.isFavorite ? (
-            <StarFilled className="text-primary text-2xl hover:text-primary/40" />
-          ) : (
-            <StarOutlined className="text-slate-300 text-2xl group-hover:text-slate-400" />
-          )}
-        </div>
-        <div className="flex gap-4 pr-14 w-[88%]" onClick={handleClick}>
+      <div className="box-border flex justify-between border-b border-slate-100 items-center  hover:bg-slate-50/10 relative overflow-hidden">
+        <div className="flex gap-4 py-3 w-full cursor-pointer" onClick={handleClick}>
           <Avatar
             className="w-16 h-16 min-w-16 aspect-square bg-slate-100 p-1 my-auto select-none"
             src={props?.imageSrc}
@@ -45,8 +40,21 @@ export const ItemProductMobile = (props: ItemProductMobileProps) => {
             >
               {props?.title ?? 'Producto sin nombre'}
             </Typography.Paragraph>
-            <Tag className="select-none border !border-gray-300 !bg-transparent text-gray-400">{category}</Tag>
+            <div className="flex gap-4 items-center">
+              <Typography.Text className="text-gray-400 font-light !m-0 !text-sm">
+                {functions.money(props?.price)}
+              </Typography.Text>
+              <Tag className="select-none border !border-gray-300 !bg-transparent text-gray-400">{category}</Tag>
+            </div>
           </div>
+        </div>
+        <div className="w-auto flex gap-4 ml-2">
+          <Button onClick={props.onCalculatorClick} size="large" icon={<CalculatorOutlined />} />
+          <Button
+            onClick={props.onFavorite}
+            size="large"
+            icon={props?.isFavorite ? <StarFilled className="text-primary text-2xl hover:text-primary/40" /> : <StarOutlined />}
+          />
         </div>
       </div>
     </>

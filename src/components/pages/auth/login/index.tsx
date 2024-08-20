@@ -57,7 +57,7 @@ const SignInAdmin = () => {
             <img src={PosiffyWebp} alt="posiffy" className="w-20 mb-6 mx-auto" onClick={() => navigate('/')} />
             <Typography.Title level={2}>Inicio de sesión</Typography.Title>
             <Form.Item label="Correo" name="email" rules={[{ required: true, message: 'Por favor ingresa un correo válido' }]}>
-              <Input size="large" placeholder="email@ejemplo.com" />
+              <Input size="large" placeholder="email@ejemplo.com" type="email" inputMode="email" />
             </Form.Item>
             <Form.Item
               className="!mb-9"

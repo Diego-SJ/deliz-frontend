@@ -5,7 +5,7 @@ import { Store } from 'lucide-react';
 
 const Avatar = ({ avatar, title, subtitle }: AvatarProps) => {
   return (
-    <div className="flex items-center sm:gap-3">
+    <div className="flex items-center gap-3">
       <AvatarShape
         {...avatar}
         size={avatar?.size ?? 40}

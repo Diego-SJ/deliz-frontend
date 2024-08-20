@@ -16,6 +16,10 @@ export const PERMISSIONS = {
     // update_price: true,
     update_image: true,
   },
+  online_store: {
+    view_online_store: true,
+    edit_online_store: true,
+  },
   customers: {
     view_customers: true,
     add_customer: true,
@@ -49,6 +53,12 @@ export const PERMISSIONS = {
     add_cash_register: true,
     edit_cash_register: true,
     delete_cash_register: true,
+  },
+  reports: {
+    // view_reports: true,
+    view_sales_report: true,
+    view_products_report: true,
+    view_customers_report: true,
   },
   price_list: {
     view_price_list: true,
@@ -100,6 +110,10 @@ export const PERMISSIONS_DENIED = {
     update_price: false,
     update_image: false,
   },
+  online_store: {
+    view_online_store: false,
+    edit_online_store: false,
+  },
   customers: {
     view_customers: false,
     add_customer: false,
@@ -122,6 +136,12 @@ export const PERMISSIONS_DENIED = {
     add_branch: false,
     edit_branch: false,
     delete_branch: false,
+  },
+  reports: {
+    // view_reports: false,
+    view_sales_report: false,
+    view_products_report: false,
+    view_customers_report: false,
   },
   cash_registers: {
     view_current_cash_cut: false,
@@ -179,6 +199,16 @@ export const PERMISSION_NAMES = {
   sizes: 'Tamaños',
   units: 'Unidades',
   expenses: 'Gastos',
+  reports: 'Reportes',
+
+  online_store: 'Tienda en línea',
+  view_online_store: 'Ver tienda en línea',
+  edit_online_store: 'Editar tienda en línea',
+
+  view_reports: 'Ver reportes',
+  view_sales_report: 'Ver reporte de ventas',
+  view_products_report: 'Ver reporte de productos',
+  view_customers_report: 'Ver reporte de clientes',
 
   switch_prices: 'Cambiar precios',
   apply_discount: 'Aplicar descuento',
@@ -210,7 +240,7 @@ export const PERMISSION_NAMES = {
   delete_branch: 'Eliminar sucursal',
   view_current_cash_cut: 'Ver corte de caja actual',
   view_history_cash_cuts: 'Ver historial de cortes de caja',
-  open_cash_cut: 'Abrir corte de caja',
+  open_cash_cut: 'Abrir caja',
   make_cash_cut: 'Realizar corte de caja',
   make_cash_cut_operation: 'Realizar operación de corte de caja',
   view_cash_registers: 'Ver cajas',

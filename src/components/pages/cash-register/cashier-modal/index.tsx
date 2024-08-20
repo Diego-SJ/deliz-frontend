@@ -13,7 +13,7 @@ import ProductAvatar from '@/components/atoms/ProductAvatar';
 type CashierModalProps = {
   open?: boolean;
   currentProduct?: Product;
-  casherItem?: CashRegisterItem;
+  casherItem?: Partial<CashRegisterItem>;
   onCancel?: () => void;
 };
 
@@ -39,7 +39,6 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
       setTimeout(() => {
         quantityInput.current?.focus();
         quantityInput.current?.select();
-        quantityInput.current?.click();
       }, 200);
     }
   }, [open, casherItem]);

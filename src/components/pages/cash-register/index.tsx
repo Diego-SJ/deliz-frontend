@@ -50,7 +50,7 @@ const CashRegister = () => {
       <Layout className="bg-[#f5f5f5]">
         <Content>
           <Row gutter={[0, 10]} style={{ minHeight: '100%' }}>
-            <Col lg={13} xl={14} sm={24} md={12} xs={24}>
+            <Col lg={14} xl={14} sm={24} md={12} xs={24}>
               <div className="flex gap-4 px-3 my-3">
                 <CashierCustomer />
                 <ChangePrice />
@@ -58,7 +58,7 @@ const CashRegister = () => {
               <SearchProducts />
             </Col>
 
-            <Col lg={11} xl={10} sm={0} md={12} xs={0}>
+            <Col lg={10} xl={10} sm={0} md={12} xs={0}>
               <ProductsCheckout
                 style={{ padding: 0 }}
                 styles={{ body: { padding: 0 } }}

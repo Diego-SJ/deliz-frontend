@@ -16,7 +16,7 @@ type SideMobileMenuProps = {
 const SideMobileMenu = (props: SideMobileMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
 
@@ -45,11 +45,13 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
 
   return (
     <div className="px-0">
-      <div className="flex gap-6 pb-10">
-        <img src={LogoAppWhite} alt="posiffy" className="w-16 h-1/6 aspect-square" />
+      <div className="flex gap-4 pb-8 items-center">
+        <div className="bg-white rounded-full w-20 h-20 flex justify-center items-center">
+          <img src={company?.logo_url || LogoAppWhite} alt="posiffy" className="w-14 h-14 object-contain aspect-square" />
+        </div>
         <div className="flex flex-col">
           <h5 className="text-xl font-semibold">{company?.name || 'Posiffy'}</h5>
-          <p className="text-lg text-slate-400 font-light">{company?.email || '- - -'}</p>
+          <p className="text-base text-slate-400 font-light">{profile?.email || '- - -'}</p>
         </div>
       </div>
 
@@ -64,7 +66,7 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
       </div>
 
       <div className="flex flex-col bg-white rounded-lg gap-2 py-2 mb-6 shadow-sm">
-        {ITEM_LIST(permissions!).map(item => {
+        {ITEM_LIST(profile?.permissions).map(item => {
           if (!item) return null;
 
           const { key, icon, label, path, children } = item;

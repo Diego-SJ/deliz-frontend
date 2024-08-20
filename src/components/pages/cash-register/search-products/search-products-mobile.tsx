@@ -10,6 +10,9 @@ import { productActions } from '@/redux/reducers/products';
 import { APP_ROUTES } from '@/routes/routes';
 import { useNavigate } from 'react-router-dom';
 import { ItemProductMobile } from './product-item-mobile';
+import CashierModal from '../cashier-modal';
+import { CashRegisterItem } from '@/redux/reducers/sales/types';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
   onOpenBarCode: () => void;
@@ -25,6 +28,8 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
   const { profile } = useAppSelector(({ users }) => users.user_auth);
   const { price_id } = useAppSelector(({ sales }) => sales.cash_register);
   const { favorite_products = [] } = profile!;
+  const [openModal, setOpenModal] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState<Partial<CashRegisterItem> | undefined>(undefined);
   const inputSearchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -62,6 +67,10 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
     setTimeout(() => {
       inputSearchRef.current?.focus();
     }, 100);
+  };
+
+  const closeModal = () => {
+    setOpenModal(false);
   };
 
   return (
@@ -144,6 +153,15 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
                         onClick={() => {
                           handleItemInteract(product);
                         }}
+                        onCalculatorClick={() => {
+                          setCurrentProduct({
+                            quantity: 1,
+                            price: price,
+                            price_type: 'DEFAULT',
+                            product,
+                          });
+                          setOpenModal(true);
+                        }}
                         isFavorite={profile?.favorite_products?.includes(product.product_id)}
                         onFavorite={() => handleFavorite(product.product_id)}
                       />
@@ -163,6 +181,7 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
           </div>
         </div>
       </Drawer>
+      <CashierModal open={openModal} casherItem={currentProduct} onCancel={closeModal} />
     </>
   );
 };

@@ -54,9 +54,14 @@ const Dashboard = () => {
 
   return (
     <div className="p-3">
-      <Typography.Title level={5} className="mb-3">
-        Movimientos
-      </Typography.Title>
+      {permissions?.sales?.add_sale ||
+      permissions?.expenses?.add_expense ||
+      permissions?.cash_registers?.make_cash_cut ||
+      permissions?.cash_registers?.open_cash_cut ? (
+        <Typography.Title level={5} className="mb-3">
+          Movimientos
+        </Typography.Title>
+      ) : null}
       <Row gutter={[10, 10]}>
         {permissions?.sales?.add_sale && (
           <CardButton
@@ -101,9 +106,11 @@ const Dashboard = () => {
         )}
       </Row>
 
-      <Typography.Title level={5} className="mt-5 mb-3">
-        Agregar nuevo
-      </Typography.Title>
+      {permissions?.products?.add_product || permissions?.customers?.add_customer ? (
+        <Typography.Title level={5} className="mt-5 mb-3">
+          Agregar nuevo
+        </Typography.Title>
+      ) : null}
       <Row gutter={[10, 10]}>
         {permissions?.products?.add_product && (
           <CardButton

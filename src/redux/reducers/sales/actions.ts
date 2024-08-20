@@ -371,10 +371,14 @@ const customActions = {
       dispatch(salesActions.updateCashRegister({ items }));
     },
     update: (newItem: Partial<CashRegisterItem>) => async (dispatch: AppDispatch, getState: AppState) => {
-      let items = [...(getState().sales.cash_register?.items ?? [])];
-      let index = items.findIndex(item => item.id === newItem.id);
-      items.splice(index, 1, { ...(newItem as CashRegisterItem) });
-      dispatch(salesActions.updateCashRegister({ items }));
+      if (!newItem?.id) {
+        dispatch(salesActions.cashRegister.add(newItem));
+      } else {
+        let items = [...(getState().sales.cash_register?.items ?? [])];
+        let index = items.findIndex(item => item.id === newItem.id);
+        items.splice(index, 1, { ...(newItem as CashRegisterItem) });
+        dispatch(salesActions.updateCashRegister({ items }));
+      }
     },
     changePrice: (price_id: string | null) => async (dispatch: AppDispatch, getState: AppState) => {
       let items = [...(getState().sales.cash_register?.items ?? [])];

@@ -1,4 +1,4 @@
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import ReportMarginShortcut from './margin/shortcut';
 import ReportSaleThumbnail from './sales/shortcut';
 import { useEffect, useRef } from 'react';
@@ -8,23 +8,31 @@ import TopCustomersThumbnail from './customers/shortcut';
 
 const ReportsHomePage = () => {
   const dispatch = useAppDispatch();
+  const { profile } = useAppSelector(({ users }) => users.user_auth);
   const firstLoad = useRef(false);
 
   useEffect(() => {
-    if (!firstLoad.current) {
+    if (!firstLoad.current && !!Object.values(profile?.permissions?.reports || {}).some(Boolean)) {
       firstLoad.current = true;
-      dispatch(analyticsActions.getSales());
-      dispatch(analyticsActions.getTopProducts());
-      dispatch(analyticsActions.getTopCustomers());
+      if (profile?.permissions?.reports?.view_sales_report) {
+        dispatch(analyticsActions.getSales());
+      }
+      if (profile?.permissions?.reports?.view_products_report) {
+        dispatch(analyticsActions.getTopProducts());
+      }
+
+      if (profile?.permissions?.reports?.view_customers_report) {
+        dispatch(analyticsActions.getTopCustomers());
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, profile?.permissions]);
 
   return (
     <div className="grid grid-cols-1  lg:grid-cols-2 gap-5">
-      <ReportSaleThumbnail />
-      <ReportMarginShortcut />
-      <TopProductsThumbnail />
-      <TopCustomersThumbnail />
+      {profile?.permissions?.reports?.view_sales_report ? <ReportSaleThumbnail /> : null}
+      {profile?.permissions?.reports?.view_sales_report ? <ReportMarginShortcut /> : null}
+      {profile?.permissions?.reports?.view_products_report ? <TopProductsThumbnail /> : null}
+      {profile?.permissions?.reports?.view_customers_report ? <TopCustomersThumbnail /> : null}
     </div>
   );
 };

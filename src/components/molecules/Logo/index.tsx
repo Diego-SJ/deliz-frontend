@@ -5,6 +5,7 @@ import { useAppSelector } from '@/hooks/useStore';
 
 const Logo = ({ src, title }: LogoProps) => {
   const navigate = useNavigate();
+  const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const { company } = useAppSelector(({ app }) => app);
 
   const handleOnClick = () => {
@@ -12,12 +13,14 @@ const Logo = ({ src, title }: LogoProps) => {
   };
 
   return (
-    <div className="flex pt-5 items-center justify-start px-5 flex-col w-full" onClick={handleOnClick}>
-      <div className="flex w-full">
-        <img className="max-md:w-16 max-md:h-16 w-10 h-10  lg:w-6 lg:h-6 aspect-square" src={src} alt={title} />
-        <span className="ml-2 text-base font-bold max-lg:hidden">{company?.name || 'Posiffy'}</span>
+    <div className="flex gap-2 pt-5 items-center justify-start px-5 w-full" onClick={handleOnClick}>
+      <div className="min-h-11 max-h-11 min-w-11 max-w-11 flex justify-center items-center rounded-full p-1 bg-gray-100">
+        <img className="w-full object-contain" src={src} alt={title} />
       </div>
-      <span className="text-xs text-slate-400 font-light w-full max-lg:hidden">{company?.email || 'Posiffy'}</span>
+      <div className="flex w-full flex-col">
+        <span className="text-base font-bold max-lg:hidden">{company?.name || 'Posiffy'}</span>
+        <span className="text-xs text-slate-400 font-light w-full max-lg:hidden">{profile?.email || 'Posiffy'}</span>
+      </div>
     </div>
   );
 };

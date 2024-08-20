@@ -320,11 +320,13 @@ const ProductEditor = () => {
               </Col>
             </Row>
 
-            <Row gutter={[20, 20]}>
-              <Col span={24}>
-                <PricesTable setPriceList={setPriceList} priceList={priceList} />
-              </Col>
-            </Row>
+            {permissions?.products?.edit_product && (
+              <Row gutter={[20, 20]}>
+                <Col span={24}>
+                  <PricesTable setPriceList={setPriceList} priceList={priceList} />
+                </Col>
+              </Row>
+            )}
           </Form>
 
           {action === 'edit' && permissions?.products?.delete_product && (

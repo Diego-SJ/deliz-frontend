@@ -246,18 +246,31 @@ const customActions = {
       phone_confirm: true,
       user_metadata: metadata,
     });
+
     if (error) {
       message.error(error.message);
       return null;
     }
 
-    if (profile_id === profile.profile_id) {
-      let newProfile = { ...getState().users.user_auth.profile, ...metadata };
+    const { data, error: profileError } = await supabase
+      .from('profiles')
+      .update(metadata)
+      .eq('profile_id', profile.profile_id)
+      .select()
+      .single();
+
+    if (profileError) {
+      message.error(profileError.message);
+      return null;
+    }
+
+    let newProfile = { ...getState()?.users?.user_auth?.profile, ...data };
+    if (profile_id === data?.profile_id) {
       await dispatch(userActions.setUserAuth({ profile: newProfile, authenticated: true }));
     }
 
     message.success('Perfil actualizado correctamente');
-    return { ...getState().users.user_auth.profile, ...metadata };
+    return newProfile;
   },
   deleteUser: (profile_id: string) => async () => {
     const { data, error } = await supabaseAdmin.auth.admin.deleteUser(profile_id!);

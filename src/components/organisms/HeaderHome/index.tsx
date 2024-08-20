@@ -32,24 +32,6 @@ const CashierHeader = ({ hideLogo = false }: CashierHeaderProps) => {
         <span />
       )}
       <HeaderActions>
-        {/* <Space>
-          <Tooltip title="Instagram">
-            <Button icon={<InstagramOutlined />} type="dashed" size="large" shape="circle" onClick={openInstagram} />
-          </Tooltip>
-          <Tooltip title="Whatsapp">
-            <Button icon={<WhatsAppOutlined />} type="dashed" size="large" shape="circle" onClick={openWhatsapp} />
-          </Tooltip>
-          <Tooltip title="Carrito">
-            <Button
-              icon={<ShoppingCartOutlined />}
-              type="dashed"
-              size="large"
-              shape="circle"
-              // onClick={() => onNavigate(APP_ROUTES.PRIVATE.HOME.path)}
-            />
-          </Tooltip>
-        // </Space> */}
-
         <Tooltip title="Iniciar sesión">
           <Button
             icon={<UserOutlined />}
