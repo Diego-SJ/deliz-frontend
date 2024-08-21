@@ -185,7 +185,9 @@ const customActions = {
       return true;
     },
     fetchCashCutOpened: () => async (dispatch: AppDispatch, getState: AppState) => {
-      const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
+      const branch_id = getState()?.branches?.currentBranch?.branch_id || '';
+      const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id || '';
+      console.log('cash_register_id', cash_register_id);
       const { data, error } = await supabase
         .from('cash_cuts')
         .select('*')
@@ -194,6 +196,24 @@ const customActions = {
         .single();
 
       if (error) {
+        dispatch(
+          cashiersActions.setActiveCashCut({
+            branch_id,
+            cash_register_id,
+            cash_cut_id: null,
+            notes: '',
+            is_open: false,
+            opening_date: '',
+            closing_date: null,
+            initial_amount: 0,
+            sales_amount: 0,
+            incomes_amount: 0,
+            expenses_amount: 0,
+            final_amount: 0,
+            received_amount: 0,
+            operations: [],
+          }),
+        );
         return false;
       }
 
@@ -275,7 +295,7 @@ const customActions = {
         expenses_amount,
         final_amount,
       } as CashCut;
-      // Dispatch the action with the fetched data
+
       dispatch(cashiersActions.setActiveCashCut(currentCashCutData));
       return true;
     },

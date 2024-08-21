@@ -48,6 +48,7 @@ const AddOperationPurchaseExpense = () => {
   let { action = 'add', operation_type = 'expense', operating_cost_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
   const { loading: isLoading } = useAppSelector(({ operatingCosts }) => operatingCosts);
+  const { currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const firstRender = useRef<boolean>(false);
   const [payWithCashRegister, setPayWithCashRegister] = useState(false);
@@ -171,17 +172,22 @@ const AddOperationPurchaseExpense = () => {
                     />
                   </Form.Item>
                   {action === 'add' && (
-                    <Form.Item name="pay_from_cash_register" className="!m-0">
-                      <Tooltip title="El monto será descontado y registrado en la caja actual">
-                        <div className="!relative z-0 mt-5">
-                          <Checkbox
-                            className="w-full px-3 h-[40px] rounded-lg border border-gray-300 checked:bg-primary z-[1]"
-                            onChange={({ target }) => setPayWithCashRegister(target.checked)}
-                            value={payWithCashRegister}
-                          />
-                          <span className="absolute left-10 z-[-1] top-1/2 -translate-y-1/2">Usar efectivo de la caja</span>
-                        </div>
-                      </Tooltip>
+                    <Form.Item
+                      name="pay_from_cash_register"
+                      className="!m-0"
+                      label="Usar efectivo de la caja"
+                      tooltip="El monto será descontado y registrado en la caja actual"
+                    >
+                      <div className="!relative z-0">
+                        <Checkbox
+                          className="w-full px-3 h-[40px] rounded-lg border border-gray-300 checked:bg-primary z-[1]"
+                          onChange={({ target }) => setPayWithCashRegister(target.checked)}
+                          value={payWithCashRegister}
+                        />
+                        <span className="absolute left-10 z-[-1] top-1/2 -translate-y-1/2">
+                          Caja actual: {currentCashRegister?.name || 'Principal'}
+                        </span>
+                      </div>
                     </Form.Item>
                   )}
                 </CardRoot>

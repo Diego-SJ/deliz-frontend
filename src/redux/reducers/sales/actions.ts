@@ -28,22 +28,40 @@ const customActions = {
     const company_id = getState().app.company.company_id;
     const isAdmin = getState().users.user_auth.profile?.role === 'ADMIN';
     const { currentBranch, currentCashRegister } = getState().branches;
+    const { orderBy, branch_id = null, ...filters } = getState()?.sales?.filters?.sales || {};
 
     if (!salesList.length || args?.refetch) {
       dispatch(salesActions.setLoading(true));
       const supabaseQuery = supabase
         .from('sales')
-        .select(`*,customers ( * ), status ( status_id, name )`)
-        .in('status_id', [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id])
+        .select(`*,customers ( * ), status ( status_id, name )`, { count: 'exact' })
+        .in(
+          'status_id',
+          !filters?.status_id ? [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id] : [filters?.status_id],
+        )
         .eq('company_id', company_id)
         .order('created_at', { ascending: false });
 
-      if (!isAdmin) {
-        supabaseQuery.eq('branch_id', currentBranch?.branch_id);
-        supabaseQuery.eq('cash_register_id', currentCashRegister?.cash_register_id);
+      if (!isAdmin || !!branch_id) {
+        supabaseQuery.eq('branch_id', branch_id || currentBranch?.branch_id);
+
+        if (!isAdmin) {
+          supabaseQuery.eq('cash_register_id', currentCashRegister?.cash_register_id);
+        }
       }
 
-      const { data, error } = await supabaseQuery;
+      if (orderBy) {
+        const [field, order] = orderBy.split(',');
+        supabaseQuery.order(field, { ascending: order === 'asc' });
+      }
+
+      // pagination
+      const page = filters?.page || 0;
+      const pageSize = filters?.pageSize || 10;
+      let offset = page * pageSize;
+      let limit = (page + 1) * pageSize - 1;
+
+      const { data, error, count } = await supabaseQuery.range(offset, limit);
       dispatch(salesActions.setLoading(false));
 
       if (error) {
@@ -53,6 +71,7 @@ const customActions = {
 
       salesList = data as SaleDetails[];
 
+      dispatch(salesActions.setSaleFilters({ page: page, pageSize: pageSize, totalRecords: count || 0 }));
       dispatch(salesActions.setSales(salesList));
       return true;
     }

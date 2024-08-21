@@ -7,12 +7,14 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useEffect, useRef } from 'react';
 import CardRoot from '@/components/atoms/Card';
 import { userActions } from '@/redux/reducers/users';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 const UsersSettingsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { users } = useAppSelector(({ users }) => users);
   const firstRender = useRef(false);
+  const { isTablet } = useMediaQuery();
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -41,7 +43,7 @@ const UsersSettingsPage = () => {
           </Typography.Text>
 
           {users?.length < 3 && (
-            <Button icon={<PlusCircleOutlined />} onClick={onAddUser}>
+            <Button icon={<PlusCircleOutlined />} onClick={onAddUser} size={isTablet ? 'large' : 'middle'}>
               Agregar usuario
             </Button>
           )}

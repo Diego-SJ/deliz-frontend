@@ -142,7 +142,7 @@ const Dashboard = () => {
           <CustomerEditor />
         </Drawer>
 
-        <CashCutForm visible={openCloseCashier} onClose={handleDrawerVisible} />
+        <CashCutForm visible={openCloseCashier} onClose={handleDrawerVisible} fetchOnOpen />
         <OpenCashierModal visible={openCashierVisible} onClose={handleOpenCashier} />
       </Row>
     </div>

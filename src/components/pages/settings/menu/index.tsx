@@ -24,9 +24,9 @@ const SettingsMenu = () => {
   };
 
   return (
-    <div className="w-full max-md:!bg-neutral-100 md:!bg-white py-3 px-4 md:px-2 flex shadow-md h-[calc(100vh-64px)] md:items-center">
+    <div className="w-full max-md:!bg-neutral-100 md:!bg-white py-3 px-4 md:px-2 flex shadow-sm h-[calc(100vh-64px)] md:items-center">
       <Menu
-        className="w-full md:h-full bg-transparent shadow-md max-md:!text-lg max-md:rounded-xl max-md:py-3 max-md:h-fit max-md:bg-white max-md:!shadow-lg"
+        className="w-full md:h-full bg-transparent shadow-sm max-md:!text-base max-md:rounded-xl max-md:py-3 max-md:h-fit max-md:bg-white"
         style={{ borderInlineEnd: 'none' }}
         items={[
           {
@@ -46,7 +46,7 @@ const SettingsMenu = () => {
           permissions?.cash_registers?.view_cash_registers
             ? {
                 key: 2,
-                icon: createElement(InboxOutlined, { className: 'max-md:!text-lg' }),
+                icon: createElement(InboxOutlined, { className: 'max-md:!text-xl md:!text-base' }),
                 label: 'Cajas',
                 onClick: () => handleRoute(APP_ROUTES.PRIVATE.SETTINGS.CASH_REGISTERS.path),
               }

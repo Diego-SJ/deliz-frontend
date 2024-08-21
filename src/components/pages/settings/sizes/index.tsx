@@ -49,7 +49,7 @@ const ProductSizesPage = () => {
           <Typography.Text type="secondary">Administra los tamaños de productos que deseas ofrecer</Typography.Text>
 
           {permissions?.sizes?.add_size && (
-            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew} size={isTablet ? 'large' : 'middle'}>
               Agregar nuevo
             </Button>
           )}

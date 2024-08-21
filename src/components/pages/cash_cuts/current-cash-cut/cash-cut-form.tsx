@@ -8,9 +8,10 @@ import { useEffect, useRef, useState } from 'react';
 type Props = {
   onClose: () => void;
   visible: boolean;
+  fetchOnOpen?: boolean;
 };
 
-const CashCutForm = ({ visible, onClose }: Props) => {
+const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
   const [closeDayForm] = Form.useForm();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ const CashCutForm = ({ visible, onClose }: Props) => {
 
   useEffect(() => {
     if (
+      fetchOnOpen &&
       !mounted.current &&
       profile?.profile_id &&
       profile?.permissions &&
@@ -31,7 +33,7 @@ const CashCutForm = ({ visible, onClose }: Props) => {
       mounted.current = true;
       dispatch(cashiersActions.cash_cuts.fetchCashCutOpened());
     }
-  }, [dispatch, profile]);
+  }, [dispatch, profile, fetchOnOpen]);
 
   useEffect(() => {
     if (!!active_cash_cut?.cash_cut_id && visible && !dataFetched.current) {

@@ -5,6 +5,7 @@ import BreadcrumbSettings from '../menu/breadcrumb';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { branchesActions } from '@/redux/reducers/branches';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 const PricesListPage = () => {
   const mounted = useRef(false);
@@ -15,6 +16,7 @@ const PricesListPage = () => {
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
+  const { isTablet } = useMediaQuery();
 
   useEffect(() => {
     if (!mounted.current) {
@@ -81,7 +83,7 @@ const PricesListPage = () => {
           </Typography.Text>
 
           {permissions?.price_list?.add_price && (
-            <Button icon={<PlusCircleOutlined />} onClick={openModal}>
+            <Button icon={<PlusCircleOutlined />} onClick={openModal} size={isTablet ? 'large' : 'middle'}>
               Agregar nuevo
             </Button>
           )}
@@ -118,7 +120,7 @@ const PricesListPage = () => {
                     Eliminar
                   </Button>
                 ),
-              ]}
+              ].filter(Boolean)}
             >
               <div className="pl-4 md:pl-6 flex gap-2">
                 <Typography.Text>{item.name}</Typography.Text>

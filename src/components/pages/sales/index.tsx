@@ -2,14 +2,13 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, message, Input, Typography } from 'antd';
+import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, Input, Typography, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS_OBJ } from '@/constants/status';
+import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
 import { SaleDetails } from '@/redux/reducers/sales/types';
-import Table from '@/components/molecules/Table';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
@@ -42,7 +41,7 @@ const columns: ColumnsType<SaleDetails> = [
   },
   {
     title: 'Método de pago',
-    width: 130,
+    width: 150,
     align: 'center',
     dataIndex: 'payment_method',
     render: (value = 'CASH') => PAYMENT_METHOD[value],
@@ -69,7 +68,7 @@ const columns: ColumnsType<SaleDetails> = [
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { sales, cashiers } = useAppSelector(({ sales }) => sales);
+  const { sales, cashiers, filters: salesFilters, loading } = useAppSelector(({ sales }) => sales);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
@@ -133,11 +132,6 @@ const Sales = () => {
     navigate(APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
-  const onRefresh = async () => {
-    const result = await dispatch(salesActions.fetchSales({ refetch: true }));
-    if (result) message.info('Información actualizada');
-  };
-
   return (
     <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle" className="mb-3">
@@ -173,15 +167,17 @@ const Sales = () => {
                 allowClear
                 virtual={false}
                 size={isTablet ? 'large' : 'middle'}
-                onChange={status => setFilters(p => ({ ...p, status }))}
-              >
-                <Select.Option key={4} value={4}>
-                  {STATUS_OBJ[4].name}
-                </Select.Option>
-                <Select.Option key={5} value={5}>
-                  {STATUS_OBJ[5].name}
-                </Select.Option>
-              </Select>
+                value={salesFilters?.sales?.status_id}
+                options={[
+                  { label: 'Todos', value: 0 },
+                  { label: STATUS_DATA.PAID.name, value: STATUS_DATA.PAID.id },
+                  { label: STATUS_DATA.PENDING.name, value: STATUS_DATA.PENDING.id },
+                ]}
+                onChange={status_id => {
+                  dispatch(salesActions.setSaleFilters({ status_id }));
+                  dispatch(salesActions.fetchSales({ refetch: true }));
+                }}
+              />
             </Col>
             <Col lg={4} xs={12}>
               <DatePicker
@@ -216,26 +212,56 @@ const Sales = () => {
           </Row>
 
           {!isTablet ? (
-            <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }} className={`!mt-6`}>
+            <CardRoot styles={{ body: { padding: 0 } }} className={`!mt-6`}>
               <Table
+                loading={loading}
                 onRow={record => {
                   return {
                     onClick: () => onRowClick(record), // click row
                   };
                 }}
-                rowKey={record => record.sale_id}
+                rowKey={record => `${record.sale_id}`}
                 columns={columns}
                 dataSource={auxSales}
-                scroll={{ x: 700, y: 'calc(100dvh - 350px)' }}
-                onRefresh={onRefresh}
-                totalItems={sales?.length || 0}
+                pagination={{
+                  defaultCurrent: 1,
+                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showSizeChanger: true,
+                  size: 'small',
+                  onChange: (page, pageSize) => {
+                    dispatch(salesActions.setSaleFilters({ page: page - 1, pageSize }));
+                    dispatch(salesActions.fetchSales({ refetch: true }));
+                  },
+                  pageSize: salesFilters?.sales?.pageSize,
+                  position: ['bottomRight'],
+                  total: salesFilters?.sales?.totalRecords,
+                  current: (salesFilters?.sales?.page || 0) + 1,
+                  className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
+                }}
+                scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
               />
             </CardRoot>
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-284px)]"
               $bodyHeight="calc(100dvh - 340px)"
-              pagination={{ position: 'bottom', align: 'center' }}
+              loading={loading}
+              pagination={{
+                defaultCurrent: 1,
+                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
+                showSizeChanger: true,
+                size: 'small',
+                onChange: (page, pageSize) => {
+                  dispatch(salesActions.setSaleFilters({ page: page - 1, pageSize }));
+                  dispatch(salesActions.fetchSales({ refetch: true }));
+                },
+                pageSize: salesFilters?.sales?.pageSize,
+                position: 'bottom',
+                align: 'center',
+                total: salesFilters?.sales?.totalRecords,
+                current: (salesFilters?.sales?.page || 0) + 1,
+                className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+              }}
               dataSource={auxSales}
               rootClassName="sadasd"
               renderItem={item => {

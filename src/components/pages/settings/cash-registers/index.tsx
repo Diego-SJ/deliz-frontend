@@ -6,6 +6,7 @@ import BreadcrumbSettings from '../../settings/menu/breadcrumb';
 import CardRoot from '@/components/atoms/Card';
 import { branchesActions } from '@/redux/reducers/branches';
 import { Branch, CashRegister } from '@/redux/reducers/branches/type';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 const CashRegistersPage = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +17,7 @@ const CashRegistersPage = () => {
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [options, setOptions] = useState<CashRegister[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -78,23 +80,28 @@ const CashRegistersPage = () => {
         <div className="flex gap-4 mb-6">
           <Select
             value={selectedBranch?.branch_id}
-            options={branches.map(item => ({ label: item.name, value: item.branch_id }))}
+            options={branches.map(item => ({ label: `Sucursal ${item.name}`, value: item.branch_id }))}
             onChange={branch_id => {
               const branch = branches.find(item => item.branch_id === branch_id);
               setSelectedBranch(branch || null);
             }}
+            size={isTablet ? 'large' : 'middle'}
             placeholder="Selecciona una sucursal"
           />
 
           {permissions?.branches?.add_branch && (
-            <Button icon={<PlusCircleOutlined />} onClick={openModal}>
+            <Button icon={<PlusCircleOutlined />} onClick={openModal} size={isTablet ? 'large' : 'middle'}>
               Agregar nueva
             </Button>
           )}
         </div>
       </div>
 
-      <CardRoot style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Cajas">
+      <CardRoot
+        style={{ width: '100%' }}
+        styles={{ body: { padding: 0 } }}
+        title={`Cajas de la sucursal ${selectedBranch?.name || 'Principal'}`}
+      >
         <List
           itemLayout="horizontal"
           footer={
@@ -124,7 +131,7 @@ const CashRegistersPage = () => {
                     Eliminar
                   </Button>
                 ),
-              ]}
+              ].filter(Boolean)}
             >
               <div className="pl-4 md:pl-6 flex gap-4">
                 <Typography.Text>Caja {item.name}</Typography.Text>

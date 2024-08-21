@@ -7,13 +7,14 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useEffect, useRef } from 'react';
 import { branchesActions } from '@/redux/reducers/branches';
 import CardRoot from '@/components/atoms/Card';
+import useMediaQuery from '@/hooks/useMediaQueries';
 
 const BranchesPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { branches } = useAppSelector(state => state.branches);
-
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const { isTablet } = useMediaQuery();
   const firstRender = useRef(false);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ const BranchesPage = () => {
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text className="text-gray-500">Administra tus sucursales aquí</Typography.Text>
           {permissions?.branches?.add_branch && (
-            <Button icon={<PlusCircleOutlined />} onClick={onAddBranch}>
+            <Button icon={<PlusCircleOutlined />} onClick={onAddBranch} size={isTablet ? 'large' : 'middle'}>
               Agregar sucursal
             </Button>
           )}
@@ -54,7 +55,13 @@ const BranchesPage = () => {
             footer={
               permissions?.branches?.add_branch ? (
                 <div className="px-2">
-                  <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddBranch}>
+                  <Button
+                    type="text"
+                    size={isTablet ? 'large' : 'middle'}
+                    icon={<PlusCircleOutlined />}
+                    className="text-primary"
+                    onClick={onAddBranch}
+                  >
                     Agregar nuevo
                   </Button>
                 </div>

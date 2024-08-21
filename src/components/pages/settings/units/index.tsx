@@ -48,7 +48,7 @@ const ProductUnitsPage = () => {
           <Typography.Text type="secondary">Administra las unidades de medida que tendrán tus productos</Typography.Text>
 
           {permissions?.units?.add_unit && (
-            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew} size={isTablet ? 'large' : 'middle'}>
               Agregar nuevo
             </Button>
           )}

@@ -58,11 +58,11 @@ const CategoriesPage = () => {
       <div className="flex flex-col mb-0 w-full">
         <Typography.Title level={4}>Categorías de productos</Typography.Title>
 
-        <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
+        <div className="flex justify-between md:items-center mb-4 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra las categorías de productos que deseas ofrecer</Typography.Text>
 
           {permissions?.categories?.add_category && (
-            <Button icon={<PlusCircleOutlined />} onClick={onAddNew}>
+            <Button icon={<PlusCircleOutlined />} onClick={onAddNew} size={isTablet ? 'large' : 'middle'}>
               Agregar nueva
             </Button>
           )}
@@ -77,6 +77,7 @@ const CategoriesPage = () => {
                 placeholder="Buscar categoría"
                 style={{ width: '100%' }}
                 allowClear
+                size={isTablet ? 'large' : 'middle'}
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
                 prefix={<SearchOutlined />}
               />

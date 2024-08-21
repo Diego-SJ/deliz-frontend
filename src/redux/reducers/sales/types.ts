@@ -4,12 +4,24 @@ import { Category, Product } from '../products/types';
 
 export type SalesSlice = {
   sales: SaleDetails[];
+  filters?: {
+    sales?: SaleFilters;
+  };
   current_sale: CurrentSale;
   cash_register: Partial<CashRegister>;
   operating_expenses?: OperatingExpenses;
   cashiers?: Cashiers;
   loading: boolean;
   closing_days: ClosingDays;
+};
+
+export type SaleFilters = {
+  page?: number;
+  pageSize?: number;
+  totalRecords?: number;
+  orderBy?: string;
+  branch_id?: string | null;
+  status_id?: number | null;
 };
 
 export const PAYMENT_METHOD_NAME = {

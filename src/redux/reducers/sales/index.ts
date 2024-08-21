@@ -8,6 +8,7 @@ import {
   OperatingExpense,
   OperatingExpenses,
   SaleDetails,
+  SaleFilters,
   SalesSlice,
 } from './types';
 import customActions from './actions';
@@ -15,6 +16,16 @@ import { Pagination } from '@supabase/supabase-js';
 
 const initialState: SalesSlice = {
   sales: [],
+  filters: {
+    sales: {
+      page: 1,
+      pageSize: 10,
+      totalRecords: 0,
+      orderBy: 'created_at,desc',
+      branch_id: null,
+      status_id: 0,
+    },
+  },
   current_sale: {} as CurrentSale,
   cash_register: {
     items: [],
@@ -58,6 +69,9 @@ const sales = createSlice({
     },
     setCashiers(state, action: PayloadAction<Cashiers>) {
       state.cashiers = { ...state.cashiers, ...action.payload };
+    },
+    setSaleFilters(state, action: PayloadAction<SaleFilters>) {
+      state.filters = { ...state.filters, sales: { ...state.filters?.sales, ...action.payload } };
     },
   },
 });

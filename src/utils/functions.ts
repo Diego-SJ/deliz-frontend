@@ -152,6 +152,9 @@ const functions = {
 
     return [x, roundedToBase50, roundedToBase100];
   },
+  sleep: async (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
 };
 
 export default functions;
