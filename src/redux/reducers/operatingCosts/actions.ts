@@ -1,13 +1,14 @@
 import { AppDispatch, AppState } from '@/redux/store';
-import { FetchOperationsFilters, OperatingCost } from './types';
+import { OperatingCost } from './types';
 import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { operatingCostsActions } from '.';
 import functions from '@/utils/functions';
 
 export const customOperatingCostsActions = {
-  upsertOperation: (operation: Partial<OperatingCost>) => async (_: AppDispatch, getState: AppState) => {
+  upsertOperation: (operatingCost: Partial<OperatingCost>) => async (_: AppDispatch, getState: AppState) => {
     const state = getState();
+    const { pay_from_cash_register, ...operation } = operatingCost as OperatingCost & { pay_from_cash_register: boolean };
 
     const newOperation = {
       ...operation,
@@ -25,15 +26,33 @@ export const customOperatingCostsActions = {
       return false;
     }
 
+    if (!!pay_from_cash_register) {
+      await supabase.from('cash_operations').insert({
+        name: operation?.reason || '',
+        operation_type: 'EXPENSE',
+        amount: operation?.amount || 0,
+        payment_method: 'CASH',
+        cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
+        branch_id: state.branches.currentBranch?.branch_id || null,
+        cash_cut_id: state?.cashiers?.active_cash_cut?.cash_cut_id || null,
+        operating_cost_id: data?.operating_cost_id,
+      });
+    }
+
     message.success(`Información ${operation?.operating_cost_id ? 'actualizada' : 'guardada'} correctamente`);
     return data;
   },
   fetchOperations: () => async (dispatch: AppDispatch, getState: AppState) => {
     const { filters } = getState().operatingCosts;
     const { company_id } = getState().app.company;
+    const { profile } = getState().users?.user_auth;
     dispatch(operatingCostsActions.setLoading(true));
 
-    const supabaseQuery = supabase.from('operating_costs').select('*, status(*)').eq('company_id', company_id);
+    const supabaseQuery = supabase
+      .from('operating_costs')
+      .select('*, status(*)')
+      .eq('company_id', company_id)
+      .order('created_at', { ascending: false });
 
     if (filters.status_id && filters.status_id !== 0) {
       supabaseQuery.eq('status_id', filters.status_id);
@@ -41,6 +60,10 @@ export const customOperatingCostsActions = {
 
     if (filters.branch_id && filters.branch_id !== 'ALL') {
       supabaseQuery.eq('branch_id', filters.branch_id);
+    }
+
+    if (profile?.role !== 'ADMIN' && filters.branch_id === 'ALL') {
+      supabaseQuery.in('branch_id', profile?.branches || []);
     }
 
     const { data, error } = await supabaseQuery;

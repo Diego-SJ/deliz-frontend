@@ -1,6 +1,21 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { App, Breadcrumb, Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Typography, message } from 'antd';
+import {
+  App,
+  Breadcrumb,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -19,7 +34,7 @@ type Params = {
 const UI_TEXTS = {
   BREADCRUMB: {
     add: { expense: 'Agregar gasto', purchase: 'Agregar compra' },
-    edit: { expense: 'Editar gasto', purchase: 'Editar compra' },
+    edit: { expense: 'Detalles del gasto', purchase: 'Editar compra' },
   },
   saveBtn: { edit: 'Guardar cambios', add: 'Guardar' },
 };
@@ -32,10 +47,10 @@ const AddOperationPurchaseExpense = () => {
   const dispatch = useAppDispatch();
   let { action = 'add', operation_type = 'expense', operating_cost_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
-  const { current_product } = useAppSelector(({ products }) => products);
   const { loading: isLoading } = useAppSelector(({ operatingCosts }) => operatingCosts);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const firstRender = useRef<boolean>(false);
+  const [payWithCashRegister, setPayWithCashRegister] = useState(false);
   const { modal } = App.useApp();
 
   useEffect(() => {
@@ -54,13 +69,12 @@ const AddOperationPurchaseExpense = () => {
   const onFinish = async () => {
     form.validateFields().then(async values => {
       setLoading(true);
-      let operation = { ...values, operation_type: operation_type?.toUpperCase() };
+      let operation = { ...values, operation_type: operation_type?.toUpperCase(), pay_from_cash_register: payWithCashRegister };
 
       const result = await dispatch(operatingCostsActions.upsertOperation(operation));
 
       if (result) {
         clearFields();
-        navigate(-1);
       }
 
       setLoading(false);
@@ -120,6 +134,7 @@ const AddOperationPurchaseExpense = () => {
             initialValues={{
               status_id: STATUS_DATA.PAID.id,
               operation_date: dayjs(),
+              pay_from_cash_register: false,
             }}
             validateMessages={{
               required: '${label} es obligatorio.',
@@ -135,7 +150,13 @@ const AddOperationPurchaseExpense = () => {
                     <Input size="large" />
                   </Form.Item>
                   <Form.Item name="reason" label="Motivo" rules={[{ required: true }]}>
-                    <Input size="large" placeholder="E.g: Pago de luz" autoComplete="off" onPressEnter={onFinish} />
+                    <Input
+                      size="large"
+                      placeholder="E.g: Pago de luz"
+                      autoComplete="off"
+                      onPressEnter={onFinish}
+                      readOnly={action !== 'add'}
+                    />
                   </Form.Item>
                   <Form.Item name="amount" label="Monto" rules={[{ required: true }]}>
                     <InputNumber
@@ -146,14 +167,29 @@ const AddOperationPurchaseExpense = () => {
                       type="number"
                       placeholder="$0"
                       onPressEnter={onFinish}
+                      readOnly={action !== 'add'}
                     />
                   </Form.Item>
+                  {action === 'add' && (
+                    <Form.Item name="pay_from_cash_register" className="!m-0">
+                      <Tooltip title="El monto será descontado y registrado en la caja actual">
+                        <div className="!relative z-0 mt-5">
+                          <Checkbox
+                            className="w-full px-3 h-[40px] rounded-lg border border-gray-300 checked:bg-primary z-[1]"
+                            onChange={({ target }) => setPayWithCashRegister(target.checked)}
+                            value={payWithCashRegister}
+                          />
+                          <span className="absolute left-10 z-[-1] top-1/2 -translate-y-1/2">Usar efectivo de la caja</span>
+                        </div>
+                      </Tooltip>
+                    </Form.Item>
+                  )}
                 </CardRoot>
               </Col>
               <Col md={12} xs={24}>
                 <CardRoot loading={isLoading}>
                   <Form.Item hidden name="supplier_id" label="Proveedor">
-                    <Input size="large" placeholder="Proveedor" onPressEnter={onFinish} />
+                    <Input size="large" placeholder="Proveedor" onPressEnter={onFinish} readOnly={action !== 'add'} />
                   </Form.Item>
                   <Form.Item name="operation_date" label="Fecha del gasto">
                     <DatePicker
@@ -168,6 +204,7 @@ const AddOperationPurchaseExpense = () => {
                           form.setFieldsValue({ status_id: STATUS_DATA.PAID.id });
                         }
                       }}
+                      readOnly={action !== 'add'}
                     />
                   </Form.Item>
                   <Form.Item name="status_id" label="Estado">
@@ -178,17 +215,18 @@ const AddOperationPurchaseExpense = () => {
                         { label: STATUS_DATA.PAID.name, value: STATUS_DATA.PAID.id },
                         { label: STATUS_DATA.PENDING.name, value: STATUS_DATA.PENDING.id },
                       ]}
+                      disabled={action !== 'add'}
                     />
                   </Form.Item>
-                  <Form.Item name="notes" label="Notas">
-                    <TextArea size="large" rows={2} placeholder="Notas" />
+                  <Form.Item name="notes" label="Notas" className="!m-0">
+                    <TextArea size="large" rows={2} placeholder="Notas" readOnly={action !== 'add'} />
                   </Form.Item>
                 </CardRoot>
               </Col>
             </Row>
           </Form>
 
-          {action === 'edit' && permissions?.products?.delete_product && (
+          {action === 'edit' && permissions?.expenses?.delete_expense && (
             <CardRoot
               title={`Eliminar ${operation_type === 'expense' ? 'Gasto' : 'Compra'}`}
               className="my-5"
@@ -227,7 +265,7 @@ const AddOperationPurchaseExpense = () => {
           )}
         </div>
       </div>
-      {(permissions?.expenses?.add_expense || permissions?.expenses?.edit_expense) && (
+      {(permissions?.expenses?.add_expense || permissions?.expenses?.edit_expense) && action === 'add' && (
         <Card
           className="rounded-none box-border absolute bottom-0 left-0 w-full"
           classNames={{ body: 'w-full flex items-center' }}

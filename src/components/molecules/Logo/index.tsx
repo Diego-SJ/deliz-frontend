@@ -18,8 +18,8 @@ const Logo = ({ src, title }: LogoProps) => {
         <img className="w-full object-contain" src={src} alt={title} />
       </div>
       <div className="flex w-full flex-col">
-        <span className="text-base font-bold max-lg:hidden">{company?.name || 'Posiffy'}</span>
-        <span className="text-xs text-slate-400 font-light w-full max-lg:hidden">{profile?.email || 'Posiffy'}</span>
+        <span className="text-base font-bold hidden lg:inline-block">{company?.name || 'Posiffy'}</span>
+        <span className="text-xs text-slate-400 font-light w-full hidden lg:inline-block">{profile?.email || 'Posiffy'}</span>
       </div>
     </div>
   );

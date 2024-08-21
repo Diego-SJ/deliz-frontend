@@ -151,7 +151,7 @@ const SideMenu = (props: SideMenuProps) => {
     <>
       <Logo src={company?.logo_url || LogoAppWhite} title="D'eliz" />
 
-      <div className="flex lg:px-4 mb-2 mt-5 w-full justify-center">
+      <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
         <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
           <Button
             className="w-full"

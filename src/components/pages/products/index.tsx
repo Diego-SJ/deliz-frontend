@@ -3,8 +3,15 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
-import { AppstoreOutlined, FileImageOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Col, Dropdown, Input, Row, Select, Tag, Typography } from 'antd';
+import {
+  AppstoreOutlined,
+  BarcodeOutlined,
+  FileImageOutlined,
+  FilterOutlined,
+  PlusCircleOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import { Avatar, Breadcrumb, Button, Col, Dropdown, Input, Row, Tag, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -70,7 +77,6 @@ const columns = (branch_id: string) =>
   ] as ColumnsType<DataType>;
 
 const categoriesSelected = (categories: number[]) => {
-  console.log(categories);
   return !!categories.length ? categories?.map(cat => cat + '') : ['ALL'];
 };
 
@@ -132,6 +138,11 @@ const Products = () => {
     await onRefresh();
   };
 
+  const onOrderChange = async (key: string) => {
+    await dispatch(productActions.setProductFilters({ order_by: key }));
+    await onRefresh();
+  };
+
   return (
     <div className="max-w-[1200px] mx-auto">
       <Row justify="space-between" align="middle">
@@ -160,7 +171,7 @@ const Products = () => {
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
-            <Col lg={6} xs={12}>
+            <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
                   selectedKeys: categoriesSelected(filters?.products?.categories || []),
@@ -189,19 +200,46 @@ const Products = () => {
                   Categorias
                 </Button>
               </Dropdown>
-              {/* <Select
-                placeholder="Categorías"
-                style={{ width: '100%' }}
-                mode="multiple"
-                allowClear
-                size={isTablet ? 'large' : 'middle'}
-                options={categories?.map(item => ({ value: item.category_id, label: item.name }))}
-                listHeight={1000}
-                onChange={value => getPanelValue({ categoryId: value })}
-              /> */}
             </Col>
+            <Col lg={4} xs={12}>
+              <Dropdown
+                menu={{
+                  selectedKeys: [filters?.products?.order_by || 'name,asc'],
+                  items: [
+                    { label: 'Nombre (A-Z)', key: 'name,asc' },
+                    { label: 'Nombre (Z-A)', key: 'name,desc' },
+                    // { label: 'Menos stock', key: 'inventory,asc' },
+                    // { label: 'Mayor stock', key: 'inventory,desc' },
+                    // { label: 'Precio (menor a mayor)', key: 'price_list,asc' },
+                    // { label: 'Precio (mayor a menor)', key: 'price_list,desc' },
+                    // { label: 'Categoría (A-Z)', key: 'categories.name,asc' },
+                    // { label: 'Categoría (Z-A)', key: 'categories.name,desc' },
+                    { label: 'Creado (recientes primero)', key: 'created_at,desc' },
+                    { label: 'Creado (antiguos primero)', key: 'created_at,asc' },
+                  ],
+                  selectable: true,
+                  onClick: async ({ key }) => onOrderChange(key),
+                }}
+              >
+                <Button
+                  type={!filters?.products?.order_by || filters?.products?.order_by === 'name,asc' ? 'default' : 'primary'}
+                  block
+                  className={`${!!filters?.products?.order_by && filters?.products?.order_by !== 'name,asc' ? '!bg-white' : ''}`}
+                  ghost={!!filters?.products?.order_by && filters?.products?.order_by !== 'name,asc'}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<FilterOutlined className="text-base" />}
+                >
+                  Ordenar
+                </Button>
+              </Dropdown>
+            </Col>
+            {/* <Col lg={4} xs={12}>
+              <Button block size={isTablet ? 'large' : 'middle'} icon={<BarcodeOutlined className="text-base" />}>
+                Etiquetas
+              </Button>
+            </Col> */}
             {permissions?.products?.add_product && (
-              <Col lg={{ span: 4, offset: 8 }} xs={{ offset: 0, span: 12 }}>
+              <Col lg={{ span: 4, offset: 6 }} xs={{ offset: 0, span: 12 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}
                   block
@@ -233,7 +271,7 @@ const Products = () => {
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-44px)]"
-              $bodyHeight="calc(100dvh - 300px)"
+              $bodyHeight="calc(100dvh - 350px)"
               pagination={{ position: 'bottom', align: 'center' }}
               dataSource={options}
               rootClassName="sadasd"

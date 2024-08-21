@@ -15,22 +15,26 @@ const customActions = {
   fetchProducts: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     let products = getState()?.products?.products || [];
     const company_id = getState().app?.company?.company_id;
-    const { categories } = getState()?.products?.filters?.products || {};
+    const { categories, order_by } = getState()?.products?.filters?.products || {};
 
     if (!products.length || args?.refetch) {
       dispatch(productActions.setLoading(true));
       const supabaseQuery = supabase
         .from('products')
         .select(`*, categories(category_id,name), units(*), sizes(*)`)
-        .eq('company_id', company_id)
-        .order('name', { ascending: true });
-      dispatch(productActions.setLoading(false));
+        .eq('company_id', company_id);
 
       if (categories?.length) {
         supabaseQuery.in('category_id', categories);
       }
 
+      if (order_by) {
+        const [field, order] = order_by.split(',');
+        supabaseQuery.order(field, { ascending: order === 'asc' });
+      }
+
       const { data, error } = await supabaseQuery;
+      dispatch(productActions.setLoading(false));
 
       if (error) {
         message.error('No se pudo obtener la información de los productos');

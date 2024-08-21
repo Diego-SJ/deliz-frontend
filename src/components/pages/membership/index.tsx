@@ -1,5 +1,7 @@
+import { Drawer } from 'antd';
 import PriceCard from './card';
 import { useState } from 'react';
+import ComparisionPlans from './compare-plans';
 
 const PRICES = [
   {
@@ -94,6 +96,11 @@ const PRICES = [
 
 const MembershipPage = () => {
   const [period, setPeriod] = useState<'monthly' | 'annualy'>('monthly');
+  const [openDrawer, setOpenDrawer] = useState(false);
+
+  const handleDrawer = () => {
+    setOpenDrawer(!openDrawer);
+  };
 
   return (
     <div className="p-5 pt-5 md:pt-10">
@@ -144,8 +151,14 @@ const MembershipPage = () => {
         </div>
 
         <div className="w-full flex justify-center">
-          <button className="w-40 bg-primary text-white h-10 my-5 rounded-lg hover:bg-primary/80">Comparar Planes</button>
+          <button className="w-40 bg-primary text-white h-10 my-5 rounded-lg hover:bg-primary/80" onClick={handleDrawer}>
+            Comparar Planes
+          </button>
         </div>
+
+        <Drawer open={openDrawer} onClose={handleDrawer} width={'95dvw'}>
+          <ComparisionPlans />
+        </Drawer>
 
         <div className="text-center mt-10">
           <p className="text-sm text-gray-400 font-light">* Precios en pesos mexicanos. Todos los precios incluyen IVA.</p>
