@@ -157,29 +157,6 @@ const PurchasesExpenses = () => {
                 </Button>
               </Dropdown>
             </Col>
-            {/* <Col lg={4} xs={12}>
-              <Dropdown
-                menu={{
-                  defaultSelectedKeys: ['ALL'],
-                  items: EXPENSES_TYPES,
-                  selectable: true,
-                  onClick: ({ key }) => {
-                    setFilters(p => ({ ...p, operationType: key }));
-                  },
-                }}
-              >
-                <Button
-                  type={filters?.operationType !== 'ALL' ? 'primary' : 'default'}
-                  block
-                  className={`${filters?.operationType !== 'ALL' ? '!bg-white' : ''}`}
-                  ghost={filters?.operationType !== 'ALL'}
-                  size={isTablet ? 'large' : 'middle'}
-                  icon={<AuditOutlined className="text-base" />}
-                >
-                  {filters?.operationType === 'ALL' ? 'Estado' : (EXPENSES_TYPES_MAP as any)[filters?.operationType || 'ALL']}
-                </Button>
-              </Dropdown>
-            </Col> */}
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{

@@ -3,14 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
-import {
-  AppstoreOutlined,
-  BarcodeOutlined,
-  FileImageOutlined,
-  FilterOutlined,
-  PlusCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { AppstoreOutlined, FileImageOutlined, FilterOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Button, Col, Dropdown, Input, Row, Tag, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
@@ -233,11 +226,6 @@ const Products = () => {
                 </Button>
               </Dropdown>
             </Col>
-            {/* <Col lg={4} xs={12}>
-              <Button block size={isTablet ? 'large' : 'middle'} icon={<BarcodeOutlined className="text-base" />}>
-                Etiquetas
-              </Button>
-            </Col> */}
             {permissions?.products?.add_product && (
               <Col lg={{ span: 4, offset: 6 }} xs={{ offset: 0, span: 12 }}>
                 <Button

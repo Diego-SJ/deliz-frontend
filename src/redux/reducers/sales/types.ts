@@ -22,6 +22,7 @@ export type SaleFilters = {
   orderBy?: string;
   branch_id?: string | null;
   status_id?: number | null;
+  search?: string;
 };
 
 export const PAYMENT_METHOD_NAME = {

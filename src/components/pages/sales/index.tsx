@@ -1,8 +1,8 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, Input, Typography, Table } from 'antd';
+import { FileTextOutlined, FilterOutlined, PlusCircleOutlined, SearchOutlined, ShopOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, Input, Typography, Table, Dropdown } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -70,6 +70,7 @@ const Sales = () => {
   const navigate = useNavigate();
   const { sales, cashiers, filters: salesFilters, loading } = useAppSelector(({ sales }) => sales);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const { branches } = useAppSelector(({ branches }) => branches);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
@@ -160,44 +161,101 @@ const Sales = () => {
                 onChange={({ target }) => applyFilters({ searchText: target.value })}
               />
             </Col>
+
             <Col lg={4} xs={12}>
-              <Select
-                placeholder="Status"
-                style={{ width: '100%' }}
-                allowClear
-                virtual={false}
-                size={isTablet ? 'large' : 'middle'}
-                value={salesFilters?.sales?.status_id}
-                options={[
-                  { label: 'Todos', value: 0 },
-                  { label: STATUS_DATA.PAID.name, value: STATUS_DATA.PAID.id },
-                  { label: STATUS_DATA.PENDING.name, value: STATUS_DATA.PENDING.id },
-                ]}
-                onChange={status_id => {
-                  dispatch(salesActions.setSaleFilters({ status_id }));
-                  dispatch(salesActions.fetchSales({ refetch: true }));
+              <Dropdown
+                menu={{
+                  defaultSelectedKeys: [
+                    salesFilters?.sales?.status_id !== 0 ? salesFilters?.sales?.status_id?.toString() || '' : '0',
+                  ],
+                  items: [
+                    { label: 'Mostrar todos', key: '0' },
+                    { label: STATUS_DATA.PAID.name, key: STATUS_DATA.PAID.id.toString() },
+                    { label: STATUS_DATA.PENDING.name, key: STATUS_DATA.PENDING.id.toString() },
+                  ],
+                  selectable: true,
+                  onClick: ({ key }) => {
+                    dispatch(salesActions.setSaleFilters({ status_id: Number(key) }));
+                    dispatch(salesActions.fetchSales({ refetch: true }));
+                  },
                 }}
-              />
+              >
+                <Button
+                  type={salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
+                  block
+                  className={`${salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
+                  ghost={salesFilters?.sales?.status_id !== 0}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<FileTextOutlined className="text-base" />}
+                >
+                  {salesFilters?.sales?.status_id === 0 ? 'Estado' : STATUS_OBJ[salesFilters?.sales?.status_id || 0]?.name}
+                </Button>
+              </Dropdown>
             </Col>
             <Col lg={4} xs={12}>
-              <DatePicker
-                placeholder="Desde"
-                style={{ width: '100%' }}
-                size={isTablet ? 'large' : 'middle'}
-                readOnly
-                onChange={(_, startDate) => setFilters(p => ({ ...p, startDate: startDate as string }))}
-              />
+              <Dropdown
+                menu={{
+                  defaultSelectedKeys: [salesFilters?.sales?.branch_id || 'ALL'],
+                  items: [
+                    { label: 'Todas las sucursales', key: 'ALL' },
+                    ...(branches?.map(branch => ({ label: branch.name, key: branch.branch_id })) || []),
+                  ],
+                  selectable: true,
+                  onClick: ({ key }) => {
+                    dispatch(salesActions.setSaleFilters({ branch_id: key }));
+                    dispatch(salesActions.fetchSales({ refetch: true }));
+                  },
+                }}
+              >
+                <Button
+                  type={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? 'primary' : 'default'}
+                  block
+                  className={`${!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? '!bg-white' : ''}`}
+                  ghost={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL'}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<ShopOutlined className="text-base" />}
+                >
+                  {!salesFilters?.sales?.branch_id || salesFilters?.sales?.branch_id === 'ALL'
+                    ? 'Sucursal'
+                    : branches?.find(branch => branch.branch_id === salesFilters?.sales?.branch_id)?.name}
+                </Button>
+              </Dropdown>
             </Col>
             <Col lg={4} xs={12}>
-              <DatePicker
-                placeholder="Hasta"
-                style={{ width: '100%' }}
-                size={isTablet ? 'large' : 'middle'}
-                onChange={(_, endDate) => setFilters(p => ({ ...p, endDate: endDate as string }))}
-              />
+              <Dropdown
+                menu={{
+                  selectedKeys: [salesFilters?.sales?.orderBy || 'created_at,desc'],
+                  items: [
+                    { label: 'Creado (recientes primero)', key: 'created_at,desc' },
+                    { label: 'Creado (antiguos primero)', key: 'created_at,asc' },
+                    { label: 'Estado (A-Z)', key: 'status_id,asc' },
+                    { label: 'Estado (Z-A)', key: 'status_id,desc' },
+                  ],
+                  selectable: true,
+                  onClick: async ({ key }) => {
+                    dispatch(salesActions.setSaleFilters({ orderBy: key }));
+                    dispatch(salesActions.fetchSales({ refetch: true }));
+                  },
+                }}
+              >
+                <Button
+                  type={
+                    !salesFilters?.sales?.orderBy || salesFilters?.sales?.orderBy === 'created_at,desc' ? 'default' : 'primary'
+                  }
+                  block
+                  className={`${
+                    !!salesFilters?.sales?.orderBy && salesFilters?.sales?.orderBy !== 'created_at,desc' ? '!bg-white' : ''
+                  }`}
+                  ghost={!!salesFilters?.sales?.orderBy && salesFilters?.sales?.orderBy !== 'created_at,desc'}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<FilterOutlined className="text-base" />}
+                >
+                  Ordenar
+                </Button>
+              </Dropdown>
             </Col>
             {permissions?.sales?.add_sale && (
-              <Col lg={{ offset: 1, span: 5 }} xs={12}>
+              <Col lg={{ offset: 2, span: 4 }} xs={12}>
                 <Button
                   block
                   type="primary"

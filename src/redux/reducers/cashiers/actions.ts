@@ -162,32 +162,48 @@ const customActions = {
     openCashier: (cashCut: Partial<CashCut>) => async (dispatch: AppDispatch, getState: AppState) => {
       const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
       const branch_id = getState()?.branches?.currentBranch?.branch_id;
-      const { data, error } = await supabase
+      let cashCutOpened: CashCut | null = null;
+
+      const { data: cashCutVerification, error: cashCutError } = await supabase
         .from('cash_cuts')
-        .insert([
-          {
-            ...cashCut,
-            is_open: true,
-            branch_id,
-            cash_register_id,
-          },
-        ])
-        .select()
+        .select('*')
+        .eq('cash_register_id', cash_register_id)
+        .eq('branch_id', branch_id)
+        .eq('is_open', true)
         .single();
 
-      if (error) {
-        message.error('No se pudo abrir la caja');
-        return false;
+      if (cashCutVerification && !cashCutError) {
+        cashCutOpened = cashCutVerification as CashCut;
+      } else {
+        const { data, error } = await supabase
+          .from('cash_cuts')
+          .insert([
+            {
+              ...cashCut,
+              is_open: true,
+              branch_id,
+              cash_register_id,
+            },
+          ])
+          .select()
+          .single();
+
+        if (error) {
+          message.error('No se pudo abrir la caja');
+          return false;
+        }
+
+        cashCutOpened = data as CashCut;
       }
 
-      dispatch(cashiersActions.setActiveCashCut(data as CashCut));
+      dispatch(cashiersActions.setActiveCashCut(cashCutOpened as CashCut));
       message.success('Caja abierta');
       return true;
     },
     fetchCashCutOpened: () => async (dispatch: AppDispatch, getState: AppState) => {
       const branch_id = getState()?.branches?.currentBranch?.branch_id || '';
       const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id || '';
-      console.log('cash_register_id', cash_register_id);
+
       const { data, error } = await supabase
         .from('cash_cuts')
         .select('*')
@@ -228,7 +244,6 @@ const customActions = {
       let cashCutData = cashCut || currentCashCut;
 
       if (!cash_register_id || !cashCutData?.cash_cut_id) {
-        message.error('No se pudo cargar la información de la caja', 4);
         return false;
       }
 
@@ -395,7 +410,7 @@ const customActions = {
       const state = getState();
       const cash_cut_id = getState()?.cashiers?.active_cash_cut?.cash_cut_id;
 
-      let { error } = await supabase.rpc('make_cash_cut', {
+      let { data, error } = await supabase.rpc('make_cash_cut', {
         p_received_amount: receivedAmount,
         p_cash_cut_id: cash_cut_id,
       });
@@ -424,7 +439,7 @@ const customActions = {
           closing_date: null,
         }),
       );
-      message.success('Corte de caja realizado', 4);
+      message.success(data ? 'Corte de caja realizado' : 'Corte de caja realizado previamente', 4);
       return true;
     },
   },

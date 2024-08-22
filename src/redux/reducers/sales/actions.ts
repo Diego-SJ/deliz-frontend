@@ -39,10 +39,9 @@ const customActions = {
           'status_id',
           !filters?.status_id ? [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id] : [filters?.status_id],
         )
-        .eq('company_id', company_id)
-        .order('created_at', { ascending: false });
+        .eq('company_id', company_id);
 
-      if (!isAdmin || !!branch_id) {
+      if (!isAdmin || (!!branch_id && branch_id !== 'ALL')) {
         supabaseQuery.eq('branch_id', branch_id || currentBranch?.branch_id);
 
         if (!isAdmin) {
@@ -53,6 +52,8 @@ const customActions = {
       if (orderBy) {
         const [field, order] = orderBy.split(',');
         supabaseQuery.order(field, { ascending: order === 'asc' });
+      } else {
+        supabaseQuery.order('created_at', { ascending: false });
       }
 
       // pagination

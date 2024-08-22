@@ -18,12 +18,13 @@ const initialState: SalesSlice = {
   sales: [],
   filters: {
     sales: {
-      page: 1,
+      page: 0,
       pageSize: 10,
       totalRecords: 0,
       orderBy: 'created_at,desc',
       branch_id: null,
       status_id: 0,
+      search: '',
     },
   },
   current_sale: {} as CurrentSale,

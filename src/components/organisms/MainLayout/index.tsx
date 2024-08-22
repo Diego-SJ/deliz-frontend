@@ -11,7 +11,7 @@ import { userActions } from '@/redux/reducers/users';
 import SideMobileMenu from '../SideMenu/mobile-menu';
 import { CloseOutlined } from '@ant-design/icons';
 
-const SIDER_WIDTH = 250;
+const SIDER_WIDTH = 220;
 
 const MainLayout: React.FC<MainLayoutProps> = () => {
   const dispatch = useAppDispatch();

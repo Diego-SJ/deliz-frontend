@@ -42,6 +42,7 @@ const OpenCashierModal = ({ visible, onClose }: Props) => {
             type="number"
             inputMode="decimal"
             onFocus={({ target }) => target.select()}
+            onPressEnter={onFinish}
           />
         </Form.Item>
         <Form.Item name="notes" label="Comentarios">

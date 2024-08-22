@@ -14,12 +14,14 @@ const Logo = ({ src, title }: LogoProps) => {
 
   return (
     <div className="flex gap-2 pt-5 items-center justify-start px-5 w-full" onClick={handleOnClick}>
-      <div className="min-h-11 max-h-11 min-w-11 max-w-11 flex justify-center items-center rounded-full p-1 bg-gray-100">
+      <div className="min-h-9 max-h-9 min-w-9 max-w-9 flex justify-center items-center rounded-full p-1 bg-gray-100">
         <img className="w-full object-contain" src={src} alt={title} />
       </div>
       <div className="flex w-full flex-col">
-        <span className="text-base font-bold hidden lg:inline-block">{company?.name || 'Posiffy'}</span>
-        <span className="text-xs text-slate-400 font-light w-full hidden lg:inline-block">{profile?.email || 'Posiffy'}</span>
+        <span className="text-sm font-semibold hidden lg:inline-block">{company?.name || 'Posiffy'}</span>
+        <span className="text-[0.7rem] text-slate-400 font-light w-full hidden lg:inline-block">
+          {profile?.email || 'Posiffy'}
+        </span>
       </div>
     </div>
   );

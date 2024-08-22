@@ -50,7 +50,10 @@ const AppRouter = () => {
   return (
     <Routes>
       {/* landing page */}
-      <Route path={APP_ROUTES.AUTH.MAIN.path} element={<Home />} />
+      <Route
+        path={APP_ROUTES.AUTH.MAIN.path}
+        element={authenticated ? <Navigate to={APP_ROUTES.PRIVATE.HOME.path} replace /> : <Home />}
+      />
 
       {/* Online store */}
       <Route path={APP_ROUTES.PUBLIC.PRODUCTS.path} element={<ProductsCatalog />} />
