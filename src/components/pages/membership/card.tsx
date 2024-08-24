@@ -13,9 +13,9 @@ const ItemList = ({ label = '', tooltip = '' }: { label: string; tooltip?: strin
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-check text-primary w-3 h-3"
             >
               <path d="M20 6 9 17l-5-5" />
@@ -41,9 +41,9 @@ const PlanItemList = ({ label = '', tooltip = '' }: { label: string; tooltip?: s
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-check text-slate-600 w-3 h-3"
             >
               <path d="M20 6 9 17l-5-5" />

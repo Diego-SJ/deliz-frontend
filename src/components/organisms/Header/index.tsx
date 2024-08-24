@@ -5,6 +5,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import { MenuOutlined } from '@ant-design/icons';
 import { PageTitleProvider } from '@/contexts/page-title-context';
 import HeaderTitlte from './header-title';
+import AIButton from '@/components/atoms/ai-button';
 
 type HeaderProps = {
   onClick?: () => void;
@@ -16,19 +17,16 @@ const Header = ({ onClick }: HeaderProps) => {
   return (
     <HeaderRoot className="border-b border-gray-200">
       {isTablet ? (
-        <Button onClick={onClick} size="large" icon={<MenuOutlined />}>
-          Menu
-        </Button>
+        <Button onClick={onClick} size="large" icon={<MenuOutlined />}></Button>
       ) : (
         <PageTitleProvider>
           <HeaderTitlte />
         </PageTitleProvider>
       )}
-      <HeaderActions>
-        <Space size={isTablet ? 0 : 50}>
-          <MenuPopover />
-        </Space>
-      </HeaderActions>
+      <div className="flex items-center gap-2 md:gap-5">
+        <AIButton />
+        <MenuPopover />
+      </div>
     </HeaderRoot>
   );
 };

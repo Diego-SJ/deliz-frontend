@@ -253,16 +253,35 @@ const Products = () => {
                 columns={columns(currentBranch?.branch_id || '')}
                 dataSource={options}
                 onRefresh={onRefresh}
-                totalItems={products?.length || 0}
+                hideTotalCount
+                pagination={{
+                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showSizeChanger: true,
+                  size: 'small',
+                  pageSize: 20,
+                  position: ['bottomRight'],
+                  total: products?.length,
+                  className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
+                  pageSizeOptions: ['20', '50', '100'],
+                }}
               />
             </CardRoot>
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-44px)]"
               $bodyHeight="calc(100dvh - 350px)"
-              pagination={{ position: 'bottom', align: 'center' }}
               dataSource={options}
-              rootClassName="sadasd"
+              pagination={{
+                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
+                showSizeChanger: true,
+                size: 'small',
+                pageSize: 20,
+                position: 'bottom',
+                align: 'center',
+                total: products?.length,
+                className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+                pageSizeOptions: ['20', '50', '100'],
+              }}
               renderItem={item => {
                 const { stock, hasStock } = productHelpers.calculateProductStock(item.inventory || {});
                 return (

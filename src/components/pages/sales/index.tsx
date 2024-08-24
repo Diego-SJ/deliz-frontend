@@ -2,9 +2,9 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { FileTextOutlined, FilterOutlined, PlusCircleOutlined, SearchOutlined, ShopOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, DatePicker, Row, Select, Tag, Input, Typography, Table, Dropdown } from 'antd';
+import { Breadcrumb, Button, Col, Row, Tag, Input, Typography, Table, Dropdown } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
@@ -12,6 +12,7 @@ import { SaleDetails } from '@/redux/reducers/sales/types';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
+import { useDebouncedCallback } from 'use-debounce';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -72,7 +73,6 @@ const Sales = () => {
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { branches } = useAppSelector(({ branches }) => branches);
   const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
-  const [filters, setFilters] = useState({ startDate: '', endDate: '', status: 0 });
   const isFirstRender = useRef(true);
   const { isTablet } = useMediaQuery();
   const activeCashier = cashiers?.activeCashier;
@@ -89,40 +89,13 @@ const Sales = () => {
     setAuxSales(sales);
   }, [sales]);
 
-  const applyFilters = useCallback(
-    ({
-      status,
-      endDate,
-      startDate,
-      searchText,
-    }: {
-      status?: number;
-      endDate?: string;
-      startDate?: string;
-      searchText?: string;
-    }) => {
-      if (!status && !startDate && !endDate && !searchText) {
-        setAuxSales(sales);
-      } else {
-        let salesList = sales?.filter(item => {
-          let matchDate1 = !!startDate ? functions.dateAfter(item?.created_at, startDate) : true;
-          let matchDate2 = !!endDate ? functions.dateBefore(item?.created_at, endDate) : true;
-          let matchStatus = !!status ? item?.status_id === status : true;
-          let texts =
-            functions.includes(item?.customers?.name, searchText) ||
-            functions.includes(item?.customers?.address, searchText) ||
-            functions.includes(item?.customers?.phone, searchText);
-          return matchStatus && matchDate1 && matchDate2 && texts;
-        });
-        setAuxSales(salesList);
-      }
-    },
-    [sales],
-  );
+  const fetchSalesByTerm = useDebouncedCallback(() => {
+    dispatch(salesActions.fetchSales({ refetch: true }));
+  }, 650);
 
   useEffect(() => {
-    applyFilters(filters);
-  }, [filters]);
+    fetchSalesByTerm();
+  }, [salesFilters?.sales?.search]);
 
   const onAddNew = () => {
     navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -158,7 +131,8 @@ const Sales = () => {
                 allowClear
                 size={isTablet ? 'large' : 'middle'}
                 prefix={<SearchOutlined />}
-                onChange={({ target }) => applyFilters({ searchText: target.value })}
+                value={salesFilters?.sales?.search || ''}
+                onChange={({ target }) => dispatch(salesActions.setSaleFilters({ search: target.value, page: 0 }))}
               />
             </Col>
 
@@ -295,6 +269,7 @@ const Sales = () => {
                   total: salesFilters?.sales?.totalRecords,
                   current: (salesFilters?.sales?.page || 0) + 1,
                   className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
+                  pageSizeOptions: ['20', '50', '100'],
                 }}
                 scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
               />
@@ -319,6 +294,7 @@ const Sales = () => {
                 total: salesFilters?.sales?.totalRecords,
                 current: (salesFilters?.sales?.page || 0) + 1,
                 className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+                pageSizeOptions: ['20', '50', '100'],
               }}
               dataSource={auxSales}
               rootClassName="sadasd"

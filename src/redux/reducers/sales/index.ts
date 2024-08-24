@@ -19,7 +19,7 @@ const initialState: SalesSlice = {
   filters: {
     sales: {
       page: 0,
-      pageSize: 10,
+      pageSize: 20,
       totalRecords: 0,
       orderBy: 'created_at,desc',
       branch_id: null,

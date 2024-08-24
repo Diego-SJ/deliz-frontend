@@ -34,7 +34,9 @@ const customActions = {
       dispatch(salesActions.setLoading(true));
       const supabaseQuery = supabase
         .from('sales')
-        .select(`*,customers ( * ), status ( status_id, name )`, { count: 'exact' })
+        .select(`*, customers!inner(customer_id, name,phone,address), status ( status_id, name )`, {
+          count: 'exact',
+        })
         .in(
           'status_id',
           !filters?.status_id ? [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id] : [filters?.status_id],
@@ -49,6 +51,13 @@ const customActions = {
         }
       }
 
+      if (!!filters?.search) {
+        supabaseQuery.or(
+          `name.ilike.%${filters?.search}%, phone.ilike.%${filters?.search}%, address.ilike.%${filters?.search}%`,
+          { referencedTable: 'customers' },
+        );
+      }
+
       if (orderBy) {
         const [field, order] = orderBy.split(',');
         supabaseQuery.order(field, { ascending: order === 'asc' });
@@ -58,7 +67,7 @@ const customActions = {
 
       // pagination
       const page = filters?.page || 0;
-      const pageSize = filters?.pageSize || 10;
+      const pageSize = filters?.pageSize || 20;
       let offset = page * pageSize;
       let limit = (page + 1) * pageSize - 1;
 

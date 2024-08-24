@@ -16,6 +16,8 @@
     "@capacitor/core": "^5.4.1",
     "@nivo/core": "^0.87.0",
     "@nivo/line": "^0.87.0",
+    "@nlux/react": "^2.17.1",
+    "@nlux/themes": "^2.17.1",
     "@radix-ui/react-popover": "^1.1.1",
     "@reduxjs/toolkit": "^1.9.5",
     "@supabase/supabase-js": "^2.44.2",

@@ -7,9 +7,10 @@ type Props = {
   onRefresh?: () => void;
   totalItems?: number;
   totalAmount?: number;
+  hideTotalCount?: boolean;
 } & TableProps<any>;
 
-const Table: React.FC<Props> = ({ onRefresh, totalItems, ...props }) => {
+const Table: React.FC<Props> = ({ onRefresh, totalItems, hideTotalCount, ...props }) => {
   return (
     <div style={{ position: 'relative' }}>
       <TableRoot {...props} />
@@ -27,9 +28,11 @@ const Table: React.FC<Props> = ({ onRefresh, totalItems, ...props }) => {
           </Tooltip>
         </Col>
 
-        <Col style={{ padding: '3px 0 3px 10px' }}>
-          <span>{props?.dataSource?.length || 0} elementos</span>
-        </Col>
+        {!hideTotalCount && (
+          <Col style={{ padding: '3px 0 3px 10px' }}>
+            <span>{props?.dataSource?.length || 0} elementos</span>
+          </Col>
+        )}
 
         {Number(props?.totalAmount) >= 0 && (
           <Col style={{ padding: '3px 0 3px 10px' }}>

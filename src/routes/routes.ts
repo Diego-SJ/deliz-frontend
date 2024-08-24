@@ -25,6 +25,10 @@ export const APP_ROUTES = {
     CASH_REGISTER: {
       MAIN: { path: '/cash-register', title: 'Caja registradora' },
     },
+    AI_CHAT: {
+      path: '/app/ai-chat',
+      title: 'Asistente IA',
+    },
     HOME: { path: '/app/home', title: 'Inicio' },
     PRODUCTS: {
       path: '/app/products',

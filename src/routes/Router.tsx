@@ -40,6 +40,7 @@ import ReportsHomePage from '@/components/pages/reports';
 import ReportsLayout from '@/components/pages/reports/layout';
 import OnlineStorePage from '@/components/pages/online-store';
 import Membership from '@/components/pages/membership';
+import AiChatPage from '@/components/pages/ai-chat';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -86,6 +87,7 @@ const AppRouter = () => {
         }
       >
         <Route path={APP_ROUTES.PRIVATE.HOME.path} element={<Dashboard />} />
+        <Route path={APP_ROUTES.PRIVATE.AI_CHAT.path} element={<AiChatPage />} />
 
         {/* PRODUCTS ROUTES - START */}
         {permissions?.products?.view_catalog && (
@@ -101,7 +103,6 @@ const AppRouter = () => {
             <Route path={APP_ROUTES.PRIVATE.PRODUCT_EDITOR.path} element={<ProductEditor />} />
           </>
         )}
-
         {/* PRODUCTS ROUTES - END */}
 
         {/* ORDERS ROUTES - START */}

@@ -1,7 +1,9 @@
-import { Drawer } from 'antd';
+import { Button } from 'antd';
 import PriceCard from './card';
 import { useState } from 'react';
-import ComparisionPlans from './compare-plans';
+import PricingTableMobile from './pricing-table-mobile';
+import PricingTable from './pricing-table';
+import { CloseOutlined } from '@ant-design/icons';
 
 const PRICES = [
   {
@@ -156,9 +158,19 @@ const MembershipPage = () => {
           </button>
         </div>
 
-        <Drawer open={openDrawer} onClose={handleDrawer} width={'95dvw'}>
-          <ComparisionPlans />
-        </Drawer>
+        {openDrawer && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={handleDrawer}></div>
+            <div className="fixed w-[95dvw] h-[95dvh] left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-50 bg-white rounded-xl border shadow-sm overflow-scroll">
+              <div className="px-5 h-[60px] border-b w-full flex justify-between sticky top-0 items-center bg-white">
+                <h5 className="text-xl font-semibold">Comparar Planes</h5>
+                <Button onClick={handleDrawer} icon={<CloseOutlined />} />
+              </div>
+              <PricingTable />
+              <PricingTableMobile />
+            </div>
+          </>
+        )}
 
         <div className="text-center mt-10">
           <p className="text-sm text-gray-400 font-light">* Precios en pesos mexicanos. Todos los precios incluyen IVA.</p>
