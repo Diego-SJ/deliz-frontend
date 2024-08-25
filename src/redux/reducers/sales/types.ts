@@ -3,7 +3,7 @@ import { Customer } from '../customers/types';
 import { Category, Product } from '../products/types';
 
 export type SalesSlice = {
-  sales: SaleDetails[];
+  sales: SaleRPC[];
   filters?: {
     sales?: SaleFilters;
   };
@@ -88,6 +88,20 @@ export type SaleItem = {
 export type CurrentSale = {
   metadata?: SaleDetails;
   items?: SaleItem[];
+};
+
+export type SaleRPC = {
+  created_at: string; // La fecha y hora se manejan como cadenas en este caso
+  customer_address: string;
+  customer_id: number | null; // Puede ser un número o null
+  customer_name: string;
+  customer_phone: string;
+  full_count: number;
+  sale_id: number;
+  status_id: number;
+  status_name: string;
+  total: number;
+  payment_method: string;
 };
 
 export type SaleDetails = {

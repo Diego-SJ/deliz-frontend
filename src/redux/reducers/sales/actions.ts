@@ -10,6 +10,7 @@ import {
   Sale,
   SaleDetails,
   SaleItem,
+  SaleRPC,
 } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
@@ -24,7 +25,7 @@ import dayjs from 'dayjs';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    let salesList: SaleDetails[] = getState().sales.sales || [];
+    let salesList: SaleRPC[] = getState().sales.sales || [];
     const company_id = getState().app.company.company_id;
     const isAdmin = getState().users.user_auth.profile?.role === 'ADMIN';
     const { currentBranch, currentCashRegister } = getState().branches;
@@ -32,31 +33,15 @@ const customActions = {
 
     if (!salesList.length || args?.refetch) {
       dispatch(salesActions.setLoading(true));
-      const supabaseQuery = supabase
-        .from('sales')
-        .select(`*, customers (customer_id, name,phone,address), status ( status_id, name )`, {
-          count: 'exact',
-        })
-        .in(
-          'status_id',
-          !filters?.status_id ? [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id] : [filters?.status_id],
-        )
-        .eq('company_id', company_id);
-
-      if (!isAdmin || (!!branch_id && branch_id !== 'ALL')) {
-        supabaseQuery.eq('branch_id', branch_id || currentBranch?.branch_id);
-
-        if (!isAdmin) {
-          supabaseQuery.eq('cash_register_id', currentCashRegister?.cash_register_id);
-        }
-      }
-
-      if (!!filters?.search) {
-        supabaseQuery.or(
-          `customers.name.ilike.%${filters?.search}%, customers.phone.ilike.%${filters?.search}%, customers.address.ilike.%${filters?.search}%`,
-          { foreignTable: 'customers' },
-        );
-      }
+      const supabaseQuery = supabase.rpc('fetch_sales', {
+        company_id_param: company_id,
+        status_ids_param: !filters?.status_id
+          ? [STATUS_DATA.PAID.id, STATUS_DATA.PENDING.id, STATUS_DATA.CANCELED.id]
+          : [filters?.status_id],
+        branch_id_param: !isAdmin || (!!branch_id && branch_id !== 'ALL') ? branch_id || currentBranch?.branch_id : null,
+        cash_register_ids_param: !isAdmin ? [currentCashRegister?.cash_register_id] : null,
+        search_param: filters?.search || null,
+      });
 
       if (orderBy) {
         const [field, order] = orderBy.split(',');
@@ -71,7 +56,8 @@ const customActions = {
       let offset = page * pageSize;
       let limit = (page + 1) * pageSize - 1;
 
-      const { data, error, count } = await supabaseQuery.range(offset, limit);
+      const { data, error } = await supabaseQuery.range(offset, limit);
+      const totalRecords = data?.length ? data[0]?.full_count : 0;
       dispatch(salesActions.setLoading(false));
 
       if (error) {
@@ -79,9 +65,9 @@ const customActions = {
         return false;
       }
 
-      salesList = data as SaleDetails[];
+      salesList = data as SaleRPC[];
 
-      dispatch(salesActions.setSaleFilters({ page: page, pageSize: pageSize, totalRecords: count || 0 }));
+      dispatch(salesActions.setSaleFilters({ page: page, pageSize: pageSize, totalRecords }));
       dispatch(salesActions.setSales(salesList));
       return true;
     }

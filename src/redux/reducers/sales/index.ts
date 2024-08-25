@@ -9,6 +9,7 @@ import {
   OperatingExpenses,
   SaleDetails,
   SaleFilters,
+  SaleRPC,
   SalesSlice,
 } from './types';
 import customActions from './actions';
@@ -53,7 +54,7 @@ const sales = createSlice({
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    setSales(state, action: PayloadAction<SaleDetails[]>) {
+    setSales(state, action: PayloadAction<SaleRPC[]>) {
       state.sales = action.payload;
     },
     setCurrentSale(state, action: PayloadAction<CurrentSale>) {

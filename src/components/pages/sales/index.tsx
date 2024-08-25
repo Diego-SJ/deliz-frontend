@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_DATA, STATUS_OBJ } from '@/constants/status';
 import { salesActions } from '@/redux/reducers/sales';
-import { SaleDetails } from '@/redux/reducers/sales/types';
+import { SaleRPC } from '@/redux/reducers/sales/types';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
@@ -22,14 +22,14 @@ export const PAYMENT_METHOD: { [key: string]: string } = {
   TRANSFER: 'Transferencia',
 };
 
-const columns: ColumnsType<SaleDetails> = [
+const columns: ColumnsType<SaleRPC> = [
   { title: 'Folio', dataIndex: 'sale_id', width: 80, align: 'center' },
   {
     title: 'Cliente',
     dataIndex: 'customers',
     align: 'left',
     width: 300,
-    render: value => value?.name || 'Público general',
+    render: (_, record) => record?.customer_name || 'Público general',
   },
   {
     title: 'Total',
@@ -52,9 +52,9 @@ const columns: ColumnsType<SaleDetails> = [
     dataIndex: 'status',
     width: 130,
     align: 'center',
-    render: (status, record) => {
-      const _status = STATUS_OBJ[status?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{record?.status?.name}</Tag>;
+    render: (_, record) => {
+      const _status = STATUS_OBJ[record?.status_id || 1];
+      return <Tag color={_status?.color ?? 'orange'}>{record?.status_name}</Tag>;
     },
   },
   {
@@ -72,7 +72,7 @@ const Sales = () => {
   const { sales, cashiers, filters: salesFilters, loading } = useAppSelector(({ sales }) => sales);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { branches } = useAppSelector(({ branches }) => branches);
-  const [auxSales, setAuxSales] = useState<SaleDetails[]>([]);
+  const [auxSales, setAuxSales] = useState<SaleRPC[]>([]);
   const isFirstRender = useRef(true);
   const { isTablet } = useMediaQuery();
   const activeCashier = cashiers?.activeCashier;
@@ -101,8 +101,7 @@ const Sales = () => {
     navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
   };
 
-  const onRowClick = (record: SaleDetails) => {
-    dispatch(salesActions.setCurrentSale({ metadata: record }));
+  const onRowClick = (record: SaleRPC) => {
     navigate(APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(record?.sale_id)}`);
   };
 
@@ -308,7 +307,7 @@ const Sales = () => {
                   >
                     <div className="flex flex-col w-1/3">
                       <Typography.Text strong className="!mb-2">
-                        {item?.customers?.name || 'Público general'}
+                        {item?.customer_name || 'Público general'}
                       </Typography.Text>
                       <Typography.Text type="secondary">{functions.tableDate(item.created_at)}</Typography.Text>
                     </div>
@@ -318,7 +317,7 @@ const Sales = () => {
                         {PAYMENT_METHOD[item.payment_method || '']}
                       </Typography.Text>
                       <Tag className="ml-auto w-fit mx-0" color={_status?.color ?? 'orange'}>
-                        {item?.status?.name}
+                        {item?.status_name}
                       </Tag>
                     </div>
                   </div>
