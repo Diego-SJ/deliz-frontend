@@ -34,7 +34,7 @@ const customActions = {
       dispatch(salesActions.setLoading(true));
       const supabaseQuery = supabase
         .from('sales')
-        .select(`*, customers!inner(customer_id, name,phone,address), status ( status_id, name )`, {
+        .select(`*, customers (customer_id, name,phone,address), status ( status_id, name )`, {
           count: 'exact',
         })
         .in(
@@ -53,8 +53,8 @@ const customActions = {
 
       if (!!filters?.search) {
         supabaseQuery.or(
-          `name.ilike.%${filters?.search}%, phone.ilike.%${filters?.search}%, address.ilike.%${filters?.search}%`,
-          { referencedTable: 'customers' },
+          `customers.name.ilike.%${filters?.search}%, customers.phone.ilike.%${filters?.search}%, customers.address.ilike.%${filters?.search}%`,
+          { foreignTable: 'customers' },
         );
       }
 
@@ -282,7 +282,7 @@ const customActions = {
           return false;
         }
 
-        await dispatch(salesActions.fetchSales({ refetch: true }));
+        // await dispatch(salesActions.fetchSales({ refetch: true }));
         await dispatch(productActions.fetchProducts({ refetch: true }));
         return true;
       } catch (error) {

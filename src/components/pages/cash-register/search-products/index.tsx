@@ -37,7 +37,7 @@ const SearchProducts = () => {
 
   const handleInputTextChange = useDebouncedCallback(() => {
     let _products = productHelpers.searchProducts(searchText, products);
-    setCurrentProducts(_products?.slice(0, 16) || []);
+    setCurrentProducts(_products?.slice(0, 30) || []);
   }, 250);
 
   useEffect(() => {
@@ -107,7 +107,6 @@ const SearchProducts = () => {
     if (isTablet) {
       setSearchText('');
     }
-    listReft.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   };
 
   const handleFavorite = (product_id: number) => {

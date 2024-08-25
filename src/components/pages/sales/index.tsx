@@ -256,7 +256,7 @@ const Sales = () => {
                 columns={columns}
                 dataSource={auxSales}
                 pagination={{
-                  defaultCurrent: 1,
+                  defaultCurrent: 0,
                   showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
                   showSizeChanger: true,
                   size: 'small',

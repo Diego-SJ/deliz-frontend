@@ -146,6 +146,7 @@ const customActions = {
 
     dispatch(productActions.fetchProducts({ refetch: true }));
     message.success('Registro eliminado');
+    return true;
   },
   fetchCategories: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     try {

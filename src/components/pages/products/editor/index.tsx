@@ -50,7 +50,7 @@ const ProductEditor = () => {
   const dispatch = useAppDispatch();
   let { action = 'add', product_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
-  const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
+  const { current_product, sizes, units, categories, loading: fetchProductLoading } = useAppSelector(({ products }) => products);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const firstRender = useRef<boolean>(false);
@@ -88,9 +88,12 @@ const ProductEditor = () => {
   }, [current_product]);
 
   useEffect(() => {
-    setInventory(current_product?.inventory ?? {});
-    setPriceList(current_product?.price_list ?? {});
-    setBarCode(current_product?.code);
+    if (!!current_product?.product_id) {
+      setInventory(current_product?.inventory ?? {});
+      setPriceList(current_product?.price_list ?? {});
+      setBarCode(current_product?.code);
+      form.setFieldsValue({ ...current_product, status: current_product?.status ?? 1 });
+    }
   }, [current_product]);
 
   const clearFields = () => {

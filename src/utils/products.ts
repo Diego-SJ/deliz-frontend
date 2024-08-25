@@ -1,4 +1,5 @@
 import { Inventory, Product } from '@/redux/reducers/products/types';
+import functions from './functions';
 
 export const productHelpers = {
   normalizeText: (text?: string): string => {
@@ -10,16 +11,13 @@ export const productHelpers = {
     );
   },
   searchProducts: function (searchText: string, products: Product[]): Product[] {
-    const normalizedSearchText = this.normalizeText(searchText);
-
-    const regex = new RegExp(normalizedSearchText, 'i');
-
     return products?.filter(product => {
       return (
-        regex?.test(this.normalizeText(product?.name)) ||
-        regex?.test(this.normalizeText(product?.description)) ||
-        regex?.test(this.normalizeText(product?.code)) ||
-        regex?.test(this.normalizeText(product?.sku))
+        functions.includes(product?.name, searchText) ||
+        functions.includes(product?.description, searchText) ||
+        functions.includes(product?.code, searchText) ||
+        functions.includes(product?.sku, searchText) ||
+        functions.includes(product?.categories?.name, searchText)
       );
     });
   },
