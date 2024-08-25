@@ -13,7 +13,6 @@ import Login from '@/components/pages/auth/login';
 import Home from '@/components/pages/lading-page';
 import ProductsCatalog from '@/components/pages/products/catalog';
 import TransactionsCashiers from '@/components/pages/cash_cuts';
-import DebtorsClients from '@/components/pages/debtors';
 import ProductSizes from '@/components/pages/settings/sizes';
 import ProductUnits from '@/components/pages/settings/units';
 import Orders from '@/components/pages/orders';
@@ -239,7 +238,6 @@ const AppRouter = () => {
         </Route>
         {/* SETTINGS ROUTES - END */}
 
-        <Route path={APP_ROUTES.PRIVATE.DEBTORS.path} element={<DebtorsClients />} />
         <Route
           path={APP_ROUTES.PRIVATE.REPORTS.path}
           element={
