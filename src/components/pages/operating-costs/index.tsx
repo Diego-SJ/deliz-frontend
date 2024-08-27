@@ -2,13 +2,11 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
 import { FileTextOutlined, PlusCircleOutlined, SearchOutlined, ShopOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Row, Tag, message, Input, Typography, Dropdown } from 'antd';
+import { Breadcrumb, Button, Col, Row, Tag, Table, message, Input, Typography, Dropdown } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { STATUS_OBJ } from '@/constants/status';
-import { SaleDetails } from '@/redux/reducers/sales/types';
-import Table from '@/components/molecules/Table';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
@@ -16,7 +14,7 @@ import { operatingCostsActions } from '@/redux/reducers/operatingCosts';
 import { OperatingCost } from '@/redux/reducers/operatingCosts/types';
 import { useDebouncedCallback } from 'use-debounce';
 
-const columns: ColumnsType<SaleDetails> = [
+const columns: ColumnsType<OperatingCost> = [
   {
     title: 'Motivo',
     dataIndex: 'reason',
@@ -40,7 +38,7 @@ const columns: ColumnsType<SaleDetails> = [
     align: 'center',
     render: (status, record) => {
       const _status = STATUS_OBJ[status?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{record?.status?.name}</Tag>;
+      return <Tag color={_status?.color ?? 'orange'}>{(record as any)?.status?.name}</Tag>;
     },
   },
 
@@ -65,7 +63,7 @@ const PurchasesExpenses = () => {
   const navigate = useNavigate();
   const { branches } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
-  const { operatingCosts, filters } = useAppSelector(({ operatingCosts }) => operatingCosts);
+  const { operatingCosts, filters, loading } = useAppSelector(({ operatingCosts }) => operatingCosts);
   const [operations, setOperations] = useState<OperatingCost[]>([]);
   const isFirstRender = useRef(true);
   const { isTablet } = useMediaQuery();
@@ -86,19 +84,12 @@ const PurchasesExpenses = () => {
     dispatch(operatingCostsActions.fetchOperations());
   };
 
-  const onSearch = useDebouncedCallback((value: string) => {
-    dispatch(operatingCostsActions.filterBySearch(value)).then(data => {
-      setOperations(data || []);
-    });
-  }, 300);
+  const onSearch = useDebouncedCallback(() => {
+    dispatch(operatingCostsActions.fetchOperations());
+  }, 650);
 
   const onRowClick = (record: OperatingCost) => {
     navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.hash`${record.operation_type?.toLowerCase()}${record.operating_cost_id}`);
-  };
-
-  const onRefresh = async () => {
-    const result = await dispatch(operatingCostsActions.fetchOperations());
-    if (result) message.info('Información actualizada');
   };
 
   return (
@@ -126,7 +117,11 @@ const PurchasesExpenses = () => {
                 allowClear
                 size={isTablet ? 'large' : 'middle'}
                 prefix={<SearchOutlined />}
-                onChange={({ target }) => onSearch(target.value)}
+                value={filters?.search_text}
+                onChange={({ target }) => {
+                  dispatch(operatingCostsActions.setFilters({ search_text: target.value, page: 0 }));
+                  onSearch();
+                }}
               />
             </Col>
             <Col lg={4} xs={12}>
@@ -187,20 +182,6 @@ const PurchasesExpenses = () => {
               </Dropdown>
             </Col>
             <Col lg={4} xs={12}>
-              {/* <Dropdown
-                menu={{
-                  defaultSelectedKeys: ['ALL'],
-                  items: [
-                    { label: 'Nueva compra', key: 'purchase' },
-                    { label: 'Nuevo gasto', key: 'expense' },
-                  ],
-
-                  selectable: true,
-                  onClick: ({ key }) => {
-                   ;
-                  },
-                }}
-              > */}
               {permissions?.expenses?.add_expense && (
                 <Button
                   block
@@ -212,7 +193,6 @@ const PurchasesExpenses = () => {
                   Agregar
                 </Button>
               )}
-              {/* </Dropdown> */}
             </Col>
           </Row>
 
@@ -224,21 +204,52 @@ const PurchasesExpenses = () => {
                     onClick: () => onRowClick(record), // click row
                   };
                 }}
+                loading={loading}
                 rowKey={record => record.operating_cost_id}
                 columns={columns}
                 dataSource={operations}
                 scroll={{ x: 700, y: 'calc(100dvh - 350px)' }}
-                onRefresh={onRefresh}
-                totalItems={operations?.length || 0}
+                pagination={{
+                  defaultCurrent: 0,
+                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showSizeChanger: true,
+                  size: 'small',
+                  onChange: (page, pageSize) => {
+                    dispatch(operatingCostsActions.setFilters({ page: page - 1, pageSize }));
+                    dispatch(operatingCostsActions.fetchOperations());
+                  },
+                  pageSize: filters?.pageSize,
+                  position: ['bottomRight'],
+                  total: filters?.totalRecords,
+                  current: (filters?.page || 0) + 1,
+                  className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
+                  pageSizeOptions: ['20', '50', '100'],
+                }}
               />
             </CardRoot>
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-284px)]"
               $bodyHeight="calc(100dvh - 340px)"
-              pagination={{ position: 'bottom', align: 'center' }}
               dataSource={operations}
-              rootClassName="sadasd"
+              loading={loading}
+              pagination={{
+                defaultCurrent: 1,
+                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
+                showSizeChanger: true,
+                size: 'small',
+                onChange: (page, pageSize) => {
+                  dispatch(operatingCostsActions.setFilters({ page: page - 1, pageSize }));
+                  dispatch(operatingCostsActions.fetchOperations());
+                },
+                pageSize: filters?.pageSize,
+                position: 'bottom',
+                align: 'center',
+                total: filters?.totalRecords,
+                current: (filters?.page || 0) + 1,
+                className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+                pageSizeOptions: ['20', '50', '100'],
+              }}
               renderItem={item => {
                 const _status = STATUS_OBJ[item?.status_id || 1];
                 return (

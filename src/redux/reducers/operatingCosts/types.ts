@@ -13,6 +13,7 @@ export type OperatingCost = {
   notes: string;
   supplier_id: string;
   status_id: number;
+  images: string[];
   operation_type: string;
   cash_register_id: string;
   branch_id: string;
@@ -25,4 +26,7 @@ export type FetchOperationsFilters = {
   operation_date?: string;
   branch_id?: string;
   search_text?: string;
+  page?: number;
+  pageSize?: number;
+  totalRecords?: number;
 };

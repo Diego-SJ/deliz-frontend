@@ -89,6 +89,7 @@ export const PERMISSIONS = {
     add_expense: true,
     edit_expense: true,
     delete_expense: true,
+    upload_evidence: true,
   },
 };
 
@@ -183,6 +184,7 @@ export const PERMISSIONS_DENIED = {
     add_expense: false,
     edit_expense: false,
     delete_expense: false,
+    upload_evidence: false,
   },
 };
 
@@ -271,6 +273,7 @@ export const PERMISSION_NAMES = {
   add_expense: 'Agregar gasto',
   edit_expense: 'Editar gasto',
   delete_expense: 'Eliminar gasto',
+  upload_evidence: 'Subir evidencia de gasto',
 };
 
 export type PermissionsType = {

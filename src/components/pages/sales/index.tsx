@@ -93,10 +93,6 @@ const Sales = () => {
     dispatch(salesActions.fetchSales({ refetch: true }));
   }, 650);
 
-  useEffect(() => {
-    fetchSalesByTerm();
-  }, [salesFilters?.sales?.search]);
-
   const onAddNew = () => {
     navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
   };
@@ -131,7 +127,10 @@ const Sales = () => {
                 size={isTablet ? 'large' : 'middle'}
                 prefix={<SearchOutlined />}
                 value={salesFilters?.sales?.search || ''}
-                onChange={({ target }) => dispatch(salesActions.setSaleFilters({ search: target.value, page: 0 }))}
+                onChange={({ target }) => {
+                  dispatch(salesActions.setSaleFilters({ search: target.value, page: 0 }));
+                  fetchSalesByTerm();
+                }}
               />
             </Col>
 

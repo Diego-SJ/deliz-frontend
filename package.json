@@ -24,6 +24,7 @@
     "@yudiel/react-qr-scanner": "^2.0.4",
     "antd": "^5.20.1",
     "axios": "^1.7.2",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^2.30.0",

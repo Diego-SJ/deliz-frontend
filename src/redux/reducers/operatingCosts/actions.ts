@@ -50,9 +50,13 @@ export const customOperatingCostsActions = {
 
     const supabaseQuery = supabase
       .from('operating_costs')
-      .select('*, status(*)')
+      .select('*, status(*)', { count: 'exact' })
       .eq('company_id', company_id)
       .order('created_at', { ascending: false });
+
+    if (filters?.search_text) {
+      supabaseQuery.or('reason.ilike.%' + filters.search_text + '%,notes.ilike.%' + filters.search_text + '%');
+    }
 
     if (filters.status_id && filters.status_id !== 0) {
       supabaseQuery.eq('status_id', filters.status_id);
@@ -66,7 +70,13 @@ export const customOperatingCostsActions = {
       supabaseQuery.in('branch_id', profile?.branches || []);
     }
 
-    const { data, error } = await supabaseQuery;
+    // pagination
+    const page = filters?.page || 0;
+    const pageSize = filters?.pageSize || 20;
+    let offset = page * pageSize;
+    let limit = (page + 1) * pageSize - 1;
+
+    const { data, error, count } = await supabaseQuery.range(offset, limit);
     dispatch(operatingCostsActions.setLoading(false));
 
     if (error) {
@@ -74,6 +84,13 @@ export const customOperatingCostsActions = {
       return null;
     }
 
+    dispatch(
+      operatingCostsActions.setFilters({
+        page,
+        pageSize,
+        totalRecords: count || 0,
+      }),
+    );
     dispatch(operatingCostsActions.setOperatingCosts(data));
     return data;
   },
