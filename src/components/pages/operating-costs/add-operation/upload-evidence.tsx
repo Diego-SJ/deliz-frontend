@@ -78,17 +78,16 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
           listType="picture-card"
           fileList={fileList}
           multiple={false}
-          className="w-full"
+          className="w-full "
           style={{ height: 10 }}
           onPreview={handlePreview}
           onChange={handleChange}
         >
           {fileList.length >= 1 ? null : uploadButton}
         </UploadAnt>
-        {previewImage && (
+        {previewImage ? (
           <Image
             wrapperStyle={{ display: 'none' }}
-            // className="w-60 h-60 bg-black"
             preview={{
               visible: previewOpen,
               onVisibleChange: visible => setPreviewOpen(visible),
@@ -99,7 +98,7 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
             }}
             src={previewImage}
           />
-        )}
+        ) : null}
       </div>
     </>
   );

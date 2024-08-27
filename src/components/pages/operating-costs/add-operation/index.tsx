@@ -225,7 +225,6 @@ const AddOperationPurchaseExpense = () => {
                   <div className="flex justify-center gap-5">
                     <Form.Item name="status_id" label="Estado" className="w-full">
                       <Segmented
-                        disabled={action !== 'add'}
                         size="large"
                         className="!mx-auto w-full"
                         onChange={(value = STATUS_DATA.PAID.id) => setStatusId(value)}
@@ -276,6 +275,8 @@ const AddOperationPurchaseExpense = () => {
                       defaultValue={dayjs()}
                       placeholder="Fecha de operación"
                       className="w-full"
+                      inputMode="none"
+                      inputReadOnly
                       onChange={date => {
                         if (date > dayjs()) {
                           form.setFieldsValue({ status_id: STATUS_DATA.PENDING.id });
@@ -345,7 +346,9 @@ const AddOperationPurchaseExpense = () => {
               <Col md={8} xs={24}>
                 <CardRoot loading={isLoading}>
                   <Typography.Paragraph>Evidencia</Typography.Paragraph>
-                  <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
+                  <div className="w-full justify-center">
+                    <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
+                  </div>
                 </CardRoot>
               </Col>
             </Row>

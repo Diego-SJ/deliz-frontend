@@ -121,7 +121,7 @@ export type CashRegister = {
   discountMoney?: number;
   status?: number;
   customer_id: number | null;
-  mode?: 'sale' | 'order';
+  mode?: 'sale' | 'order' | null;
   zone?: number;
   branch_id: string | null;
   price_id: string | null;

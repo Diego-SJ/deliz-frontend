@@ -22,6 +22,7 @@ const CashRegister = () => {
   const { products } = useAppSelector(({ products }) => products);
   const { customers } = useAppSelector(({ customers }) => customers);
   const firstRender = useRef<boolean>(false);
+  const siteModeObteined = useRef<boolean>(false);
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -31,18 +32,21 @@ const CashRegister = () => {
   }, [products, customers, dispatch]);
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const mode = query.get('mode');
-    if (mode === 'order') {
-      dispatch(salesActions.updateCashRegister({ mode: 'order' }));
-    } else {
-      dispatch(salesActions.updateCashRegister({ mode: 'sale' }));
+    if (!siteModeObteined.current && window) {
+      siteModeObteined.current = true;
+      const query = new URLSearchParams(window.location.search);
+      const mode = query.get('mode');
+      if (mode === 'order') {
+        dispatch(salesActions.updateCashRegister({ mode: 'order' }));
+      } else {
+        dispatch(salesActions.updateCashRegister({ mode: 'sale' }));
+      }
     }
 
     return () => {
-      dispatch(salesActions.updateCashRegister({ mode: undefined }));
+      dispatch(salesActions.updateCashRegister({ mode: null }));
     };
-  }, [params]);
+  }, [siteModeObteined, dispatch]);
 
   return (
     <Layout style={{ minHeight: '100dvh', maxHeight: '100dvh', minWidth: '100dvw', maxWidth: '100dvw' }}>
