@@ -3,7 +3,7 @@ import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { cashiersActions } from '.';
-import { CashCut, CashOperation, FetchCashCutArgs } from './types';
+import { CashCut, CashOperation, FetchCashCutArgs, MoveSalePayload } from './types';
 import { salesActions } from '../sales';
 import { Cashier, SaleDetails } from '../sales/types';
 import { STATUS_DATA } from '@/constants/status';
@@ -30,7 +30,13 @@ const customActions = {
         .eq('company_id', company_id)
         .order('name', { ascending: true }),
       supabase.from('cash_registers').select('*').eq('is_default', true).eq('branch_id', branch_id).single(),
-      supabase.from('cash_cuts').select('*').eq('cash_register_id', cash_register_id).eq('is_open', true).single(),
+      supabase
+        .from('cash_cuts')
+        .select('*')
+        .eq('cash_register_id', cash_register_id)
+        .eq('branch_id', branch_id)
+        .eq('is_open', true)
+        .single(),
       supabase.from('prices_list').select('*').order('created_at', { ascending: true }).eq('company_id', company_id),
     ]);
 
@@ -440,6 +446,22 @@ const customActions = {
         }),
       );
       message.success(data ? 'Corte de caja realizado' : 'Corte de caja realizado previamente', 4);
+      return true;
+    },
+    moveSaleToAnotherCashCut: (payload: MoveSalePayload) => async (dispatch: AppDispatch) => {
+      let { error } = await supabase.rpc('move_sale_to_another_cash_cut', {
+        branch_id_param: payload.branch_id,
+        cash_register_id_param: payload.cash_register_id,
+        new_cash_cut_id: payload.new_cash_cut_id,
+        old_cash_cut_id: payload.old_cash_cut_id,
+        sale_id_param: payload.sale_id,
+      });
+
+      if (error) {
+        return false;
+      }
+
+      await dispatch(salesActions.getSaleById({ sale_id: payload.sale_id, refetch: true }));
       return true;
     },
   },

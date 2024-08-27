@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { ItemProductMobile } from './product-item-mobile';
 import CashierModal from '../cashier-modal';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
-import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
   onOpenBarCode: () => void;

@@ -19,6 +19,7 @@ import {
 } from '@ant-design/icons';
 import ProductAvatar from '@/components/atoms/ProductAvatar';
 import { productHelpers } from '@/utils/products';
+import { branchesActions } from '@/redux/reducers/branches';
 
 type CashierModalProps = {
   currentProduct?: Product;
@@ -229,6 +230,9 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                   label: `${i?.name} - ${functions.money(productHelpers.getProductPrice(currentProduct, i?.price_id as string))}`,
                   ...i,
                 }))}
+                onClick={() => {
+                  if (!prices_list?.length) dispatch(branchesActions.getPrices());
+                }}
                 optionRender={option => {
                   return (
                     <div className="flex w-full justify-between items-center py-2">

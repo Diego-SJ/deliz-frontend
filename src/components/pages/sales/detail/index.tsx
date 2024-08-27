@@ -18,6 +18,7 @@ import ChangeCustomerModal from './change-customer';
 import { PAYMENT_METHOD_SHORT_NAME } from '@/constants/payment_methods';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
+import ChangeBranchDrawer from './change-branch';
 
 export type Amounts = {
   total: number;
@@ -38,6 +39,7 @@ const SaleDetail = () => {
 
   const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
   const [open, setOpen] = useState(false);
+  const [openBranchDrawer, setOpenBranchDrawer] = useState(false);
   const [currentItem, setCurrentItem] = useState<SaleItem>();
   const firstRender = useRef(false);
   const { isTablet } = useMediaQuery();
@@ -82,6 +84,10 @@ const SaleDetail = () => {
 
   const closeModal = () => {
     setOpen(false);
+  };
+
+  const handleBranchDrawer = () => {
+    setOpenBranchDrawer(prev => !prev);
   };
 
   return (
@@ -236,6 +242,16 @@ const SaleDetail = () => {
                   <Typography.Paragraph className="w-full !m-0" type="secondary">
                     Sucursal {(metadata as any)?.branches?.name || '- - -'}
                   </Typography.Paragraph>
+
+                  <Button
+                    shape="circle"
+                    size="large"
+                    className="!w-fit -mt-5"
+                    type="text"
+                    icon={<EditOutlined />}
+                    block
+                    onClick={handleBranchDrawer}
+                  />
                 </div>
               </div>
             </CardRoot>
@@ -275,7 +291,7 @@ const SaleDetail = () => {
                         <div className="flex gap-4 items-center pl-3">
                           <Avatar
                             src={record.products?.image_url}
-                            icon={<FileImageOutlined className="text-slate-600 text-2xl" />}
+                            icon={<FileImageOutlined className="text-slate-400 text-xl" />}
                             className="bg-slate-600/10 p-1 w-10 h-10 min-w-10"
                           />
                           <div>
@@ -488,6 +504,15 @@ const SaleDetail = () => {
                   <Typography.Paragraph className="w-full !m-0" type="secondary">
                     Sucursal {(metadata as any)?.branches?.name || '- - -'}
                   </Typography.Paragraph>
+                  <Button
+                    shape="circle"
+                    size="large"
+                    className="!w-fit -mt-5"
+                    type="text"
+                    icon={<EditOutlined />}
+                    block
+                    onClick={handleBranchDrawer}
+                  />
                 </div>
               </div>
             </CardRoot>
@@ -495,6 +520,14 @@ const SaleDetail = () => {
         </Col>
       </Row>
       {currentItem && <EditSaleItemModal currentItem={currentItem} open={open} onClose={closeModal} />}
+      <ChangeBranchDrawer
+        open={openBranchDrawer}
+        onClose={handleBranchDrawer}
+        saleId={current_sale?.metadata?.sale_id || null}
+        cashCutId={current_sale?.metadata?.cash_cut_id || null}
+        currentBranchId={current_sale?.metadata?.branch_id || null}
+        currentCashRegisterId={current_sale?.metadata?.cash_register_id || null}
+      />
     </div>
   );
 };

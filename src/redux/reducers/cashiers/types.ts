@@ -75,3 +75,11 @@ export type FetchCashCutArgs = {
   fetchSales?: boolean;
   fetchOperations?: boolean;
 };
+
+export type MoveSalePayload = {
+  sale_id: number;
+  new_cash_cut_id: string;
+  old_cash_cut_id: string;
+  cash_register_id: string;
+  branch_id: string;
+};

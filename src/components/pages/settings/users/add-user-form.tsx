@@ -183,7 +183,7 @@ const ManageUserProfile = () => {
                   placeholder="Selecciona la sucursal"
                   options={[
                     { label: 'Administrador', value: 'ADMIN' },
-                    { label: 'Cajero', value: 'CASHIER' },
+                    { label: 'Personalizado', value: 'CUSTOM' },
                   ]}
                   onChange={value => setSelectedRole(value)}
                 />

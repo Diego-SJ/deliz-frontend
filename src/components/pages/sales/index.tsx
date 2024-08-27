@@ -137,8 +137,10 @@ const Sales = () => {
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
-                  defaultSelectedKeys: [
-                    salesFilters?.sales?.status_id !== 0 ? salesFilters?.sales?.status_id?.toString() || '' : '0',
+                  selectedKeys: [
+                    !!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0
+                      ? salesFilters?.sales?.status_id?.toString() || ''
+                      : '0',
                   ],
                   items: [
                     { label: 'Mostrar todos', key: '0' },
@@ -153,14 +155,14 @@ const Sales = () => {
                 }}
               >
                 <Button
-                  type={salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
+                  type={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
                   block
-                  className={`${salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
-                  ghost={salesFilters?.sales?.status_id !== 0}
+                  className={`${!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
+                  ghost={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0}
                   size={isTablet ? 'large' : 'middle'}
                   icon={<FileTextOutlined className="text-base" />}
                 >
-                  {salesFilters?.sales?.status_id === 0 ? 'Estado' : STATUS_OBJ[salesFilters?.sales?.status_id || 0]?.name}
+                  Estado
                 </Button>
               </Dropdown>
             </Col>

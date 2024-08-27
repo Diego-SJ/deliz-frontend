@@ -56,7 +56,7 @@ const AddOperationPurchaseExpense = () => {
   const { loading: isLoading } = useAppSelector(({ operatingCosts }) => operatingCosts);
   const { currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { company } = useAppSelector(({ app }) => app);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const firstRender = useRef<boolean>(false);
   const [payWithCashRegister, setPayWithCashRegister] = useState(false);
   const [statusId, setStatusId] = useState(STATUS_DATA.PAID.id);
@@ -217,7 +217,7 @@ const AddOperationPurchaseExpense = () => {
             }}
           >
             <Row gutter={[20, 20]} className="mb-5">
-              <Col md={16} xs={24}>
+              <Col md={permissions?.expenses?.upload_evidence ? 16 : 24} xs={24}>
                 <CardRoot loading={isLoading} className="mb-5">
                   <Form.Item hidden name="supplier_id" label="Proveedor">
                     <Input size="large" placeholder="Proveedor" onPressEnter={onFinish} />
@@ -343,14 +343,16 @@ const AddOperationPurchaseExpense = () => {
                   </Form.Item>
                 </CardRoot>
               </Col>
-              <Col md={8} xs={24}>
-                <CardRoot loading={isLoading}>
-                  <Typography.Paragraph>Evidencia</Typography.Paragraph>
-                  <div className="w-full justify-center">
-                    <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
-                  </div>
-                </CardRoot>
-              </Col>
+              {permissions?.expenses?.upload_evidence ? (
+                <Col md={8} xs={24}>
+                  <CardRoot loading={isLoading}>
+                    <Typography.Paragraph>Evidencia</Typography.Paragraph>
+                    <div className="w-full justify-center">
+                      <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
+                    </div>
+                  </CardRoot>
+                </Col>
+              ) : null}
             </Row>
           </Form>
 
