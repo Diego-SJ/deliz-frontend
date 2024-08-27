@@ -7,7 +7,6 @@ import CashierHeader from '@/components/organisms/CashierHeader';
 import CashierCustomer from './change-customer';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
-import { useParams } from 'react-router-dom';
 import ChangePrice from './change-price';
 import SearchProducts from './search-products';
 import OpenCashCut from './open-cash-cut';
@@ -17,8 +16,6 @@ const { Content } = Layout;
 
 const CashRegister = () => {
   const dispatch = useAppDispatch();
-
-  const params = useParams();
   const { products } = useAppSelector(({ products }) => products);
   const { customers } = useAppSelector(({ customers }) => customers);
   const firstRender = useRef<boolean>(false);

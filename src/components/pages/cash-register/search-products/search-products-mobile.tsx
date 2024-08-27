@@ -64,9 +64,6 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
 
   const openDrawer = () => {
     setDrawerVisible(true);
-    setTimeout(() => {
-      inputSearchRef.current?.focus();
-    }, 100);
   };
 
   const closeModal = () => {
