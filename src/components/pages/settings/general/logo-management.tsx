@@ -90,7 +90,7 @@ const LogoManagement: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
-      {permissions?.company?.edit_company ? (
+      {permissions?.company?.edit_company?.value ? (
         <Upload
           listType="picture-circle"
           fileList={fileList}
@@ -99,7 +99,7 @@ const LogoManagement: React.FC = () => {
           onPreview={handlePreview}
           onChange={handleChange}
         >
-          {permissions?.company?.edit_company ? (fileList.length >= 1 ? null : uploadButton) : null}
+          {permissions?.company?.edit_company?.value ? (fileList.length >= 1 ? null : uploadButton) : null}
         </Upload>
       ) : null}
       {previewImage ? (
@@ -115,7 +115,7 @@ const LogoManagement: React.FC = () => {
         />
       ) : (
         <>
-          {!permissions?.company?.edit_company ? (
+          {!permissions?.company?.edit_company?.value ? (
             <Avatar className="w-48 h-48 bg-gray-100 p-4" src={previewImage || company?.logo_url || LogoFallback} />
           ) : null}
         </>

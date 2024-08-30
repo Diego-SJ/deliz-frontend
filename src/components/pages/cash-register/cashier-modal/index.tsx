@@ -9,6 +9,7 @@ import { CashRegisterItem } from '@/redux/reducers/sales/types';
 import { DollarOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { productHelpers } from '@/utils/products';
 import ProductAvatar from '@/components/atoms/ProductAvatar';
+import { ModuleAccess } from '@/routes/module-access';
 
 type CashierModalProps = {
   open?: boolean;
@@ -110,7 +111,6 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
               style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
               value={quantity}
               onPressEnter={handleOk}
-              autoFocus
               addonBefore={<ShoppingCartOutlined />}
               onFocus={({ target }) => {
                 target.select();
@@ -124,34 +124,36 @@ const CashierModal = ({ open, onCancel, casherItem }: CashierModalProps) => {
               </Typography.Paragraph>
             )}
           </div>
-          {permissions?.pos?.add_custom_price && (
-            <div>
-              <div className="flex gap-4 items-center !mb-3">
-                <Typography.Paragraph className="!m-0 font-medium">Precio personalizado</Typography.Paragraph>
-                <Switch onChange={setUseCustomPrice} checked={useCustomPrice} className="w-fit" />
+          <ModuleAccess moduleName="add_custom_price">
+            {permissions?.pos?.add_custom_price?.value && (
+              <div>
+                <div className="flex gap-4 items-center !mb-3">
+                  <Typography.Paragraph className="!m-0 font-medium">Precio personalizado</Typography.Paragraph>
+                  <Switch onChange={setUseCustomPrice} checked={useCustomPrice} className="w-fit" />
+                </div>
+                {useCustomPrice && (
+                  <InputNumber
+                    min={0}
+                    placeholder="Precio personalizado"
+                    size="large"
+                    className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
+                    style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
+                    value={productPrice}
+                    onPressEnter={handleOk}
+                    inputMode="decimal"
+                    type="number"
+                    onFocus={({ target }) => {
+                      target.select();
+                      setCurrentInput('price');
+                      setProductPrice(productPrice);
+                    }}
+                    addonBefore={<DollarOutlined />}
+                    onChange={value => setProductPrice(value as number)}
+                  />
+                )}
               </div>
-              {useCustomPrice && (
-                <InputNumber
-                  min={0}
-                  placeholder="Precio personalizado"
-                  size="large"
-                  className={currentInput === 'price' ? 'ant-input-number-focused' : ''}
-                  style={{ width: '100%', textAlign: 'center', borderRadius: '6px' }}
-                  value={productPrice}
-                  onPressEnter={handleOk}
-                  inputMode="decimal"
-                  type="number"
-                  onFocus={({ target }) => {
-                    target.select();
-                    setCurrentInput('price');
-                    setProductPrice(productPrice);
-                  }}
-                  addonBefore={<DollarOutlined />}
-                  onChange={value => setProductPrice(value as number)}
-                />
-              )}
-            </div>
-          )}
+            )}
+          </ModuleAccess>
         </div>
 
         <Space height="10px" />

@@ -21,8 +21,10 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
 
   const onFinish = async (values: Customer) => {
     let success: boolean | Customer = false;
-    if (current_customer?.customer_id === -1) success = await dispatch(customerActions.saveCustomer(values));
-    else success = await dispatch(customerActions.updateCustomer(values));
+    let customer = { ...values, phone: values.phone?.replaceAll(' ', '')?.trim() };
+
+    if (current_customer?.customer_id === -1) success = await dispatch(customerActions.saveCustomer(customer));
+    else success = await dispatch(customerActions.updateCustomer(customer));
 
     if (onSuccess && success) {
       form.resetFields();
@@ -36,14 +38,24 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       wrapperCol={{ span: 24 }}
       layout="vertical"
       onFinish={onFinish}
+      requiredMark={false}
       initialValues={current_customer}
       validateMessages={{ required: '${label} es obligatorio.', types: { email: 'Formato del correo inválido' } }}
     >
       <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
         <Input size="large" placeholder="E.g: Fulanito" />
       </Form.Item>
-      <Form.Item name="phone" label="Teléfono">
-        <Input size="large" placeholder="772 000 00 00" />
+      <Form.Item
+        name="phone"
+        label="Teléfono"
+        rules={[
+          {
+            pattern: new RegExp(/^[0-9\d]*$/),
+            message: 'Formato de teléfono inválido',
+          },
+        ]}
+      >
+        <Input size="large" placeholder="7720000000" maxLength={10} minLength={10} />
       </Form.Item>
       <Form.Item name="email" label="Correo" rules={[{ type: 'email' }]}>
         <Input size="large" placeholder="ejemplo@email.com" />
@@ -51,7 +63,7 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       <Form.Item name="address" label="Dirección">
         <TextArea size="large" rows={2} placeholder="E.g: Calle Pirul 6" />
       </Form.Item>
-      {permissions?.customers?.edit_customer && (
+      {permissions?.customers?.edit_customer?.value && (
         <Button size="large" block type="primary" htmlType="submit" loading={loading}>
           {UI_TEXTS.saveBtn[current_customer?.customer_id === -1 ? 'add' : 'edit']}
         </Button>

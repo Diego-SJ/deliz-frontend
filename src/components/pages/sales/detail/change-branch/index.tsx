@@ -14,18 +14,11 @@ type Props = {
   onClose: () => void;
   saleId: number | null;
   cashCutId: string | null;
-  currentBranchId: string | null;
-  currentCashRegisterId: string | null;
+  currentBranchId?: string | null;
+  currentCashRegisterId?: string | null;
 };
 
-const ChangeBranchDrawer = ({
-  open,
-  onClose,
-  saleId = null,
-  cashCutId = null,
-  currentBranchId,
-  currentCashRegisterId,
-}: Props) => {
+const ChangeBranchDrawer = ({ open, onClose, saleId = null, cashCutId = null }: Props) => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { branches, cash_registers } = useAppSelector(({ branches }) => branches);
@@ -119,9 +112,7 @@ const ChangeBranchDrawer = ({
             <Select
               size="large"
               placeholder="Seleccione una sucursal"
-              options={branches
-                ?.filter(b => b.branch_id !== currentBranchId)
-                .map(branch => ({ label: branch.name, value: branch.branch_id }))}
+              options={branches.map(branch => ({ label: branch.name, value: branch.branch_id }))}
               onClick={() => {
                 if (!branches?.length) dispatch(branchesActions.getBranches());
               }}
@@ -134,7 +125,7 @@ const ChangeBranchDrawer = ({
               size="large"
               placeholder="Seleccione una caja"
               options={cash_registers
-                ?.filter(cr => selectedBranch === cr?.branch_id && cr?.cash_register_id !== currentCashRegisterId)
+                ?.filter(cr => selectedBranch === cr?.branch_id)
                 .map(cash_register => ({ label: cash_register.name, value: cash_register.cash_register_id }))}
               onClick={() => {
                 if (!cash_registers?.length) dispatch(branchesActions.getCashRegistersByCompanyId());

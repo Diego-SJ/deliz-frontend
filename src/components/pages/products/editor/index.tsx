@@ -31,6 +31,7 @@ import { BUCKETS } from '@/constants/buckets';
 import { QuickCategoryCreationForm } from '../../settings/categories/editor';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
 import { branchesActions } from '@/redux/reducers/branches';
+import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
 
 type Params = {
   action: 'edit' | 'add';
@@ -50,7 +51,8 @@ const ProductEditor = () => {
   const dispatch = useAppDispatch();
   let { action = 'add', product_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
-  const { current_product, sizes, units, categories, loading: fetchProductLoading } = useAppSelector(({ products }) => products);
+  const { hasAccess } = useMembershipAccess();
+  const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const firstRender = useRef<boolean>(false);
@@ -134,8 +136,8 @@ const ProductEditor = () => {
         setLoading(true);
         let product = { ...values, inventory, price_list: priceList, code: barCode };
 
-        if (action === 'add' && !!permissions?.products?.add_product) await saveNewProduct(product);
-        else if (action === 'edit' && !!permissions?.products?.edit_product) await saveEditionProduct(product);
+        if (action === 'add' && !!permissions?.products?.add_product?.value) await saveNewProduct(product);
+        else if (action === 'edit' && !!permissions?.products?.edit_product?.value) await saveEditionProduct(product);
 
         setLoading(false);
       })
@@ -203,7 +205,7 @@ const ProductEditor = () => {
             }}
           >
             <Row gutter={[20, 20]} className="mb-5">
-              <Col md={12} xs={24}>
+              <Col md={hasAccess('update_image') ? 12 : 24} xs={24}>
                 <CardRoot title="Información del producto">
                   <Form.Item name="product_id" hidden>
                     <Input size="large" />
@@ -250,37 +252,43 @@ const ProductEditor = () => {
                         }}
                       />
                     )}
-                    <Form.Item
-                      name="code"
-                      label="Código de barras"
-                      className="mb-0 w-full"
-                      tooltip="Escanea el código de barras del producto"
-                    >
-                      <Space.Compact style={{ width: '100%' }}>
-                        <Input size="large" placeholder="Opcional" value={barCode as string} />
-                        <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
-                      </Space.Compact>
-                    </Form.Item>
+                    <ModuleAccess moduleName="use_barcode_scanner">
+                      <Form.Item
+                        name="code"
+                        label="Código de barras"
+                        className="mb-0 w-full"
+                        tooltip="Escanea el código de barras del producto"
+                      >
+                        <Space.Compact style={{ width: '100%' }}>
+                          <Input size="large" placeholder="Opcional" value={barCode as string} />
+                          <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
+                        </Space.Compact>
+                      </Form.Item>
+                    </ModuleAccess>
                     <Form.Item name="sku" label="SKU" className="w-full">
                       <Input size="large" placeholder="Opcional" />
                     </Form.Item>
                   </div>
-                  {permissions?.products?.show_in_catalog && (
-                    <Form.Item name="show_in_catalog" label="Mostrar en el catálogo en línea" className="mb-0 w-full">
-                      <Switch />
-                    </Form.Item>
-                  )}
+                  <ModuleAccess moduleName="show_in_catalog">
+                    {permissions?.products?.show_in_catalog?.value && (
+                      <Form.Item name="show_in_catalog" label="Mostrar en el catálogo en línea" className="mb-0 w-full">
+                        <Switch />
+                      </Form.Item>
+                    )}
+                  </ModuleAccess>
                 </CardRoot>
               </Col>
-              <Col md={12} xs={24}>
-                <CardRoot title="Imágen" className="h-full" styles={{ body: { height: '100%' } }}>
-                  <div className="flex justify-center items-center">
-                    <Form.Item name="image_url" className="mb-0">
-                      <Upload setFileList={setFileList} fileList={fileList} />
-                    </Form.Item>
-                  </div>
-                </CardRoot>
-              </Col>
+              <ModuleAccess moduleName="update_image">
+                <Col md={12} xs={24}>
+                  <CardRoot title="Imágen" className="h-full" styles={{ body: { height: '100%' } }}>
+                    <div className="flex justify-center items-center">
+                      <Form.Item name="image_url" className="mb-0">
+                        <Upload setFileList={setFileList} fileList={fileList} />
+                      </Form.Item>
+                    </div>
+                  </CardRoot>
+                </Col>
+              </ModuleAccess>
             </Row>
             <Row gutter={[20, 20]} className="mb-5">
               <Col span={24}>
@@ -323,7 +331,7 @@ const ProductEditor = () => {
               </Col>
             </Row>
 
-            {permissions?.products?.edit_product && (
+            {permissions?.products?.edit_product?.value && (
               <Row gutter={[20, 20]}>
                 <Col span={24}>
                   <PricesTable setPriceList={setPriceList} priceList={priceList} />
@@ -332,7 +340,7 @@ const ProductEditor = () => {
             )}
           </Form>
 
-          {action === 'edit' && permissions?.products?.delete_product && (
+          {action === 'edit' && permissions?.products?.delete_product?.value && (
             <CardRoot title="Eliminar producto" className="my-5">
               <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
                 <Typography.Text type="danger">
@@ -368,7 +376,7 @@ const ProductEditor = () => {
           )}
         </div>
       </div>
-      {(!!permissions?.products?.add_product || !!permissions?.products?.edit_product) && (
+      {(!!permissions?.products?.add_product?.value || !!permissions?.products?.edit_product?.value) && (
         <Card
           className="rounded-none box-border absolute bottom-0 left-0 w-full"
           classNames={{ body: 'w-full flex items-center' }}

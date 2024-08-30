@@ -4,9 +4,12 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { analyticsActions } from '@/redux/reducers/analytics';
 import { FileImageOutlined } from '@ant-design/icons';
 import functions from '@/utils/functions';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const TopProductsThumbnail = () => {
   const dispatch = useAppDispatch();
+  const { hasAccess } = useMembershipAccess();
+  const { user_auth } = useAppSelector(({ users }) => users);
   const { loading, top_products } = useAppSelector(({ analytics }) => analytics?.products || {});
 
   return (
@@ -14,7 +17,7 @@ const TopProductsThumbnail = () => {
       loading={loading}
       title={<h5 className="!text-base m-0 font-medium">Productos más vendidos</h5>}
       extra={
-        top_products?.length > 0 ? (
+        user_auth?.profile?.permissions?.reports?.view_products_report?.value && hasAccess('view_products_report') ? (
           <Button type="text" className="!text-primary underline" onClick={() => dispatch(analyticsActions.getTopProducts())}>
             Actualizar
           </Button>

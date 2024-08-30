@@ -14,14 +14,14 @@ const ReportsHomePage = () => {
   useEffect(() => {
     if (!firstLoad.current && !!Object.values(profile?.permissions?.reports || {}).some(Boolean)) {
       firstLoad.current = true;
-      if (profile?.permissions?.reports?.view_sales_report) {
+      if (profile?.permissions?.reports?.view_sales_report?.value) {
         dispatch(analyticsActions.getSales());
       }
-      if (profile?.permissions?.reports?.view_products_report) {
+      if (profile?.permissions?.reports?.view_products_report?.value) {
         dispatch(analyticsActions.getTopProducts());
       }
 
-      if (profile?.permissions?.reports?.view_customers_report) {
+      if (profile?.permissions?.reports?.view_customers_report?.value) {
         dispatch(analyticsActions.getTopCustomers());
       }
     }
@@ -29,10 +29,10 @@ const ReportsHomePage = () => {
 
   return (
     <div className="grid grid-cols-1  lg:grid-cols-2 gap-5">
-      {profile?.permissions?.reports?.view_sales_report ? <ReportSaleThumbnail /> : null}
-      {profile?.permissions?.reports?.view_sales_report ? <ReportMarginShortcut /> : null}
-      {profile?.permissions?.reports?.view_products_report ? <TopProductsThumbnail /> : null}
-      {profile?.permissions?.reports?.view_customers_report ? <TopCustomersThumbnail /> : null}
+      {profile?.permissions?.reports?.view_sales_report?.value ? <ReportSaleThumbnail /> : null}
+      {profile?.permissions?.reports?.view_sales_report?.value ? <ReportMarginShortcut /> : null}
+      {profile?.permissions?.reports?.view_products_report?.value ? <TopProductsThumbnail /> : null}
+      {profile?.permissions?.reports?.view_customers_report?.value ? <TopCustomersThumbnail /> : null}
     </div>
   );
 };

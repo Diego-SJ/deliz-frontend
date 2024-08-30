@@ -8,6 +8,7 @@ import { userActions } from '@/redux/reducers/users';
 import { createElement } from 'react';
 import { ITEM_LIST } from '.';
 import { APP_VERSION } from '@/constants/versions';
+import { useMembershipAccess } from '@/routes/module-access';
 
 type SideMobileMenuProps = {
   onClick?: (args?: any) => void;
@@ -16,6 +17,7 @@ type SideMobileMenuProps = {
 const SideMobileMenu = (props: SideMobileMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { hasAccess } = useMembershipAccess();
   const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
@@ -66,7 +68,7 @@ const SideMobileMenu = (props: SideMobileMenuProps) => {
       </div>
 
       <div className="flex flex-col bg-white rounded-lg gap-2 py-2 mb-6 shadow-sm">
-        {ITEM_LIST(profile?.permissions).map(item => {
+        {ITEM_LIST(profile?.permissions! || {}, hasAccess).map(item => {
           if (!item) return null;
 
           const { key, icon, label, path, children } = item;

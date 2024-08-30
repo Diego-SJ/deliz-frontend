@@ -1,21 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { CopyOutlined, ExportOutlined } from '@ant-design/icons';
-import {
-  App,
-  Badge,
-  Button,
-  Card,
-  Checkbox,
-  Col,
-  Form,
-  GetProp,
-  Input,
-  Row,
-  Switch,
-  TimePicker,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { App, Badge, Button, Card, Checkbox, Col, Form, GetProp, Input, Row, Switch, TimePicker, Typography } from 'antd';
 import LogoManagement from './logo-management';
 import CardRoot from '@/components/atoms/Card';
 import FormItem from 'antd/es/form/FormItem';
@@ -25,6 +10,7 @@ import { storesActions } from '@/redux/reducers/stores';
 import { STATUS_DATA } from '@/constants/status';
 import { getStoreRecord } from '@/utils/stores';
 import dayjs, { Dayjs } from 'dayjs';
+import { ModuleAccess } from '@/routes/module-access';
 
 const storeUrl = 'https://posiffy.store';
 const timeFormat = 'HH:mm';
@@ -91,7 +77,7 @@ const StoreForm = () => {
   };
 
   const onSubmit = () => {
-    if (!profile?.permissions?.online_store?.edit_online_store) return;
+    if (!profile?.permissions?.online_store?.edit_online_store?.value) return;
 
     form
       .validateFields()
@@ -116,8 +102,8 @@ const StoreForm = () => {
     <>
       <section
         className={`p-4 w-full max-w-[700px] mx-auto flex flex-col gap-5 ${
-          profile?.permissions?.online_store?.edit_online_store ? 'min-h-[calc(100dvh-144px)]' : ''
-        } ${profile?.permissions?.online_store?.edit_online_store ? 'max-h-[calc(100dvh-144px)]' : ''} overflow-auto`}
+          profile?.permissions?.online_store?.edit_online_store?.value ? 'min-h-[calc(100dvh-144px)]' : ''
+        } ${profile?.permissions?.online_store?.edit_online_store?.value ? 'max-h-[calc(100dvh-144px)]' : ''} overflow-auto`}
       >
         <CardRoot>
           <div className="flex justify-between w-full items-center">
@@ -148,26 +134,39 @@ const StoreForm = () => {
           layout="vertical"
           className="w-full"
         >
-          <CardRoot title="Link De Tu Catálogo" className="mb-5">
+          <CardRoot title="Links" className="mb-5">
             <div className="flex gap-5 items-center w-full">
               <Form.Item
-                label="Comparte tu catálogo con este link"
+                label="Edita la URL de tu negocio"
                 name="slug"
                 className="!w-full"
                 rules={[{ required: true, message: 'Por favor ingresa un nombre' }]}
               >
                 <Input addonBefore={storeUrl + '/'} className="!w-full" />
               </Form.Item>
-              <Tooltip title="Copiar">
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Button
+                icon={<CopyOutlined />}
+                onClick={() => {
+                  navigator.clipboard.writeText(`${storeUrl}/${store?.slug}/store`);
+                  message.success('Link copiado al portapapeles');
+                }}
+              >
+                Link del catálogo
+              </Button>
+              <ModuleAccess moduleName="landing_page">
                 <Button
                   icon={<CopyOutlined />}
-                  className="w-full -mb-1"
                   onClick={() => {
-                    navigator.clipboard.writeText(storeUrl + '/' + form.getFieldValue('slug'));
+                    navigator.clipboard.writeText(`${storeUrl}/${store?.slug}`);
                     message.success('Link copiado al portapapeles');
                   }}
-                />
-              </Tooltip>
+                >
+                  Link de la landing page
+                </Button>
+              </ModuleAccess>
             </div>
           </CardRoot>
 
@@ -259,9 +258,11 @@ const StoreForm = () => {
               >
                 <Input inputMode="tel" placeholder="Ingresa tu número de WhatsApp" />
               </Form.Item>
-              <Form.Item label="Permitir pedidos a través de WhatsApp" name="allow_orders_by_whatsapp" className="w-full">
-                <Switch />
-              </Form.Item>
+              <ModuleAccess moduleName="orders_by_whatsapp">
+                <Form.Item label="Permitir pedidos a través de WhatsApp" name="allow_orders_by_whatsapp" className="w-full">
+                  <Switch />
+                </Form.Item>
+              </ModuleAccess>
             </div>
           </CardRoot>
 
@@ -424,7 +425,7 @@ const StoreForm = () => {
           </CardRoot>
         </Form>
 
-        {profile?.permissions?.online_store?.edit_online_store && (
+        {profile?.permissions?.online_store?.edit_online_store?.value && (
           <CardRoot title="Desactivar Tienda" className="mb-10">
             <Typography.Paragraph>
               Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en línea. Puedes activarla nuevamente en cualquier
@@ -438,7 +439,7 @@ const StoreForm = () => {
         )}
       </section>
 
-      {profile?.permissions?.online_store?.edit_online_store && (
+      {profile?.permissions?.online_store?.edit_online_store?.value && (
         <Card
           className="rounded-none box-border w-full border-none !border-t border-slate-200"
           classNames={{ body: 'w-full flex items-center' }}

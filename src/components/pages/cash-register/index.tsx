@@ -48,7 +48,7 @@ const CashRegister = () => {
   return (
     <Layout style={{ minHeight: '100dvh', maxHeight: '100dvh', minWidth: '100dvw', maxWidth: '100dvw' }}>
       <CashierHeader />
-      <Layout className="bg-[#f5f5f5]">
+      <Layout className="bg-background">
         <Content>
           <Row gutter={[0, 10]} style={{ minHeight: '100%' }}>
             <Col lg={14} xl={14} sm={24} md={12} xs={24}>

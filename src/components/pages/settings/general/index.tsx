@@ -16,7 +16,7 @@ const GeneralSettingsPage = () => {
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
 
   const onFinish = () => {
-    if (permissions?.company?.edit_company) {
+    if (permissions?.company?.edit_company?.value) {
       setLoading(true);
       form.validateFields().then(async (values: Company) => {
         await dispatch(appActions.company.upsertBusiness(values));
@@ -29,7 +29,7 @@ const GeneralSettingsPage = () => {
     <>
       <div
         className={`flex flex-col gap-2 p-4 ${
-          permissions?.company?.edit_company ? 'min-h-[calc(100%-82px)] max-h-[calc(100%-82px)]' : 'h-full'
+          permissions?.company?.edit_company?.value ? 'min-h-[calc(100%-82px)] max-h-[calc(100%-82px)]' : 'h-full'
         } overflow-auto`}
       >
         <div className=" max-w-[700px] mx-auto w-full">
@@ -59,14 +59,14 @@ const GeneralSettingsPage = () => {
               </Form.Item>
 
               <Form.Item className="w-full" name="name" label="Nombre">
-                <Input placeholder="Nombre de tu negocio" readOnly={!permissions?.company?.edit_company} />
+                <Input placeholder="Nombre de tu negocio" readOnly={!permissions?.company?.edit_company?.value} />
               </Form.Item>
               <div className="flex gap-6">
                 <Form.Item className="w-full" name="phone" label="Teléfono">
                   <Input
                     placeholder="Teléfono de tu negocio"
                     onPressEnter={onFinish}
-                    readOnly={!permissions?.company?.edit_company}
+                    readOnly={!permissions?.company?.edit_company?.value}
                   />
                 </Form.Item>
                 <Form.Item
@@ -78,7 +78,7 @@ const GeneralSettingsPage = () => {
                   <Input
                     placeholder="Correo electrónico de tu negocio"
                     onPressEnter={onFinish}
-                    readOnly={!permissions?.company?.edit_company}
+                    readOnly={!permissions?.company?.edit_company?.value}
                   />
                 </Form.Item>
               </div>
@@ -86,7 +86,7 @@ const GeneralSettingsPage = () => {
                 <Input
                   placeholder="Dirección de tu negocio"
                   onPressEnter={onFinish}
-                  readOnly={!permissions?.company?.edit_company}
+                  readOnly={!permissions?.company?.edit_company?.value}
                 />
               </Form.Item>
             </Form>
@@ -94,7 +94,7 @@ const GeneralSettingsPage = () => {
         </div>
       </div>
 
-      {permissions?.company?.edit_company && (
+      {permissions?.company?.edit_company?.value && (
         <Card
           className="rounded-none box-border"
           classNames={{ body: 'w-full flex items-center' }}

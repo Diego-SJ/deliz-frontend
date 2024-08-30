@@ -17,6 +17,7 @@ import CashierActions from '../cashier-actions';
 import { useDebouncedCallback } from 'use-debounce';
 import SearchProductsMobile from './search-products-mobile';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
+import { ModuleAccess } from '@/routes/module-access';
 
 const SearchProducts = () => {
   const dispatch = useAppDispatch();
@@ -28,12 +29,12 @@ const SearchProducts = () => {
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [inputIsFocused, setInputIsFocused] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
-  const searchInputRef = useRef<InputRef>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { isPhablet, isTablet } = useMediaQuery();
   const [openBarCode, setOpenBarCode] = useState(false);
   const { message } = App.useApp();
   const listReft = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<InputRef>(null);
 
   const handleInputTextChange = useDebouncedCallback(() => {
     let _products = productHelpers.searchProducts(searchText, products);
@@ -179,7 +180,9 @@ const SearchProducts = () => {
                 }}
               />
             )}
-            <Button size="large" icon={<BarcodeOutlined />} onClick={openBarCodeClick} />
+            <ModuleAccess moduleName="use_barcode_scanner">
+              <Button size="large" icon={<BarcodeOutlined />} onClick={openBarCodeClick} />
+            </ModuleAccess>
           </Space.Compact>
         ) : (
           <SearchProductsMobile onOpenBarCode={openBarCodeClick} />

@@ -1,11 +1,12 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { App, Button, Card, Form, Input, List, Modal, Tag, Typography } from 'antd';
+import { App, Button, Form, Input, List, Modal, Tag, Typography } from 'antd';
 
 import BreadcrumbSettings from '../menu/breadcrumb';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { branchesActions } from '@/redux/reducers/branches';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import CardRoot from '@/components/atoms/Card';
 
 const PricesListPage = () => {
   const mounted = useRef(false);
@@ -82,7 +83,7 @@ const PricesListPage = () => {
             Configura las listas de precios que deseas ofrecerle a tus clientes
           </Typography.Text>
 
-          {permissions?.price_list?.add_price && (
+          {permissions?.price_list?.add_price?.value && (
             <Button icon={<PlusCircleOutlined />} onClick={openModal} size={isTablet ? 'large' : 'middle'}>
               Agregar nuevo
             </Button>
@@ -90,11 +91,11 @@ const PricesListPage = () => {
         </div>
       </div>
 
-      <Card style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Precios" className="shadow-md rounded-xl">
+      <CardRoot style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Precios">
         <List
           itemLayout="horizontal"
           footer={
-            permissions?.price_list?.add_price ? (
+            permissions?.price_list?.add_price?.value ? (
               <div className="px-2">
                 <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
                   Agregar nuevo
@@ -110,12 +111,12 @@ const PricesListPage = () => {
               classNames={{ actions: 'flex' }}
               className="flex"
               actions={[
-                permissions?.price_list?.edit_price ? (
+                permissions?.price_list?.edit_price?.value ? (
                   <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
                     Editar
                   </Button>
                 ) : null,
-                item.is_default || !permissions?.price_list?.delete_price ? null : (
+                item.is_default || !permissions?.price_list?.delete_price?.value ? null : (
                   <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.price_id)}>
                     Eliminar
                   </Button>
@@ -133,7 +134,7 @@ const PricesListPage = () => {
             </List.Item>
           )}
         />
-      </Card>
+      </CardRoot>
 
       <Modal
         open={open}

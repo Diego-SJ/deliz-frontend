@@ -92,7 +92,7 @@ const LogoManagement: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
-      {permissions?.online_store?.edit_online_store ? (
+      {permissions?.online_store?.edit_online_store?.value ? (
         <Upload
           listType="picture-circle"
           fileList={fileList}
@@ -101,7 +101,7 @@ const LogoManagement: React.FC = () => {
           onPreview={handlePreview}
           onChange={handleChange}
         >
-          {permissions?.online_store?.edit_online_store ? (fileList.length >= 1 ? null : uploadButton) : null}
+          {permissions?.online_store?.edit_online_store?.value ? (fileList.length >= 1 ? null : uploadButton) : null}
         </Upload>
       ) : null}
       {previewImage ? (
@@ -117,7 +117,7 @@ const LogoManagement: React.FC = () => {
         />
       ) : (
         <>
-          {!permissions?.online_store?.edit_online_store ? (
+          {!permissions?.online_store?.edit_online_store?.value ? (
             <Avatar className="w-48 h-48 bg-gray-100 p-3" src={previewImage || store?.logo_url || LogoFallback} />
           ) : null}
         </>

@@ -155,6 +155,21 @@ const functions = {
   sleep: async (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
   },
+  extractUUID(input: string): string | null {
+    const inputString = String(input);
+
+    // Expresión regular para extraer solo el UUID
+    const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+
+    // Extraer el UUID del string
+    const match = inputString.match(uuidRegex);
+
+    if (match) {
+      return match[0]; // Retorna el UUID encontrado
+    } else {
+      return null; // Retorna null si no se encuentra un UUID
+    }
+  },
 };
 
 export default functions;

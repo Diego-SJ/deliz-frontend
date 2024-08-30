@@ -27,19 +27,20 @@ import { Profile } from '@/redux/reducers/users/types';
 import { createElement } from 'react';
 import { APP_VERSION } from '@/constants/versions';
 import MyMembershipCard from '../membership';
+import { AppModules, useMembershipAccess } from '@/routes/module-access';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
 };
 
-export const ITEM_LIST = (permissions?: Profile['permissions']) => [
+export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: AppModules) => boolean) => [
   {
     key: 'dashboard',
     icon: HomeOutlined,
     label: 'Inicio',
     path: APP_ROUTES.PRIVATE.HOME.path,
   },
-  permissions?.products?.view_catalog
+  permissions?.products?.view_catalog?.value
     ? {
         key: 'products',
         icon: ShoppingOutlined,
@@ -47,7 +48,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.PRODUCTS.path,
       }
     : null,
-  permissions?.customers?.view_customers
+  permissions?.customers?.view_customers?.value
     ? {
         key: 'customers',
         icon: TeamOutlined,
@@ -55,7 +56,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.CUSTOMERS.path,
       }
     : null,
-  permissions?.sales?.view_sales
+  permissions?.sales?.view_sales?.value
     ? {
         key: 'sales',
         icon: DollarOutlined,
@@ -63,13 +64,14 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.SALES.path,
       }
     : null,
-  permissions?.cash_registers?.view_current_cash_cut || permissions?.cash_registers?.view_history_cash_cuts
+  (permissions?.cash_registers?.view_current_cash_cut?.value || permissions?.cash_registers?.view_history_cash_cuts?.value) &&
+  hasAccess('make_cash_cut')
     ? {
         key: 'cashiers',
         icon: CashRegisterSvg,
         label: 'Cajas',
         children: [
-          permissions?.cash_registers?.view_current_cash_cut
+          permissions?.cash_registers?.view_current_cash_cut?.value
             ? {
                 key: 'transactions.current_cashier',
                 label: 'Caja actual',
@@ -77,7 +79,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
                 icon: InboxOutlined,
               }
             : null,
-          permissions?.cash_registers?.view_history_cash_cuts
+          permissions?.cash_registers?.view_history_cash_cuts?.value
             ? {
                 key: 'transactions.cashiers',
                 label: 'Historial de cajas',
@@ -88,7 +90,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         ].filter(Boolean),
       }
     : null,
-  permissions?.expenses?.view_expenses
+  permissions?.expenses?.view_expenses?.value && hasAccess('expenses')
     ? {
         key: 'expenses',
         icon: ReconciliationOutlined,
@@ -96,7 +98,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path,
       }
     : null,
-  !!Object.values(permissions?.reports || {}).some(item => item)
+  !!Object.values(permissions?.reports || {}).some(item => item) && hasAccess('reports')
     ? {
         key: 'reports',
         icon: BarChartOutlined,
@@ -104,7 +106,7 @@ export const ITEM_LIST = (permissions?: Profile['permissions']) => [
         path: APP_ROUTES.PRIVATE.REPORTS.path,
       }
     : null,
-  permissions?.online_store?.view_online_store
+  permissions?.online_store?.view_online_store?.value && hasAccess('online_store')
     ? {
         key: 'online_catalog',
         icon: ReadOutlined,
@@ -126,6 +128,7 @@ const SideMenu = (props: SideMenuProps) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const { hasAccess } = useMembershipAccess();
   const { company } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
 
@@ -170,7 +173,7 @@ const SideMenu = (props: SideMenuProps) => {
         mode="inline"
         className=""
         inlineCollapsed={isPhablet && !isTablet}
-        items={ITEM_LIST(permissions)
+        items={ITEM_LIST(permissions!, hasAccess)
           ?.filter(Boolean)
           .map((item: any, key: any) => ({
             key,

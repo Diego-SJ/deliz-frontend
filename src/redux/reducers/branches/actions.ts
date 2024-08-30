@@ -189,10 +189,11 @@ export const customActions = {
 
     if (error) {
       message.error('Error al eliminar');
-      return;
+      return false;
     }
 
     await dispatch(branchesActions.getCashRegistersByCompanyId());
     message.info('Caja eliminada');
+    return true;
   },
 };

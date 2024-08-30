@@ -201,12 +201,6 @@ const Products = () => {
                   items: [
                     { label: 'Nombre (A-Z)', key: 'name,asc' },
                     { label: 'Nombre (Z-A)', key: 'name,desc' },
-                    // { label: 'Menos stock', key: 'inventory,asc' },
-                    // { label: 'Mayor stock', key: 'inventory,desc' },
-                    // { label: 'Precio (menor a mayor)', key: 'price_list,asc' },
-                    // { label: 'Precio (mayor a menor)', key: 'price_list,desc' },
-                    // { label: 'Categoría (A-Z)', key: 'categories.name,asc' },
-                    // { label: 'Categoría (Z-A)', key: 'categories.name,desc' },
                     { label: 'Creado (recientes primero)', key: 'created_at,desc' },
                     { label: 'Creado (antiguos primero)', key: 'created_at,asc' },
                   ],
@@ -226,7 +220,7 @@ const Products = () => {
                 </Button>
               </Dropdown>
             </Col>
-            {permissions?.products?.add_product && (
+            {permissions?.products?.add_product?.value && (
               <Col lg={{ span: 4, offset: 6 }} xs={{ offset: 0, span: 12 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}

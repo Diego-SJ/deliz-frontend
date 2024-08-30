@@ -95,7 +95,7 @@ const ChangeCustomerModal = () => {
                     <Avatar shape="square" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
                     <div className="flex flex-col">
                       <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
-                      <span className="text-slate-400 font-light">{option?.data?.phone}</span>{' '}
+                      <span className="text-slate-400 font-light">{option?.data?.phone || 'Sin número'}</span>{' '}
                     </div>
                   </div>
                 );

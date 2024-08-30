@@ -30,7 +30,7 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
   };
 
   const handleChange: UploadProps['onChange'] = ({ fileList: changeFileList, file }) => {
-    if (!permissions?.expenses?.upload_evidence) {
+    if (!permissions?.expenses?.upload_evidence?.value) {
       return null;
     }
 
@@ -92,7 +92,7 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
               visible: previewOpen,
               onVisibleChange: visible => setPreviewOpen(visible),
               afterOpenChange: visible => {
-                if (!permissions?.products?.update_image) return;
+                if (!permissions?.products?.update_image?.value) return;
                 if (!visible) setPreviewImage('');
               },
             }}

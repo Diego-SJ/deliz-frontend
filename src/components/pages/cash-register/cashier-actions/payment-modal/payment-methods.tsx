@@ -50,8 +50,8 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
     let newSale: Partial<Sale> = {
       payment_method: paymentMethod as string,
       status_id: statusId,
-      amount_paid: receivedMoney || 0,
-      cashback: total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney),
+      amount_paid: statusId === STATUS_DATA.PAID.id ? receivedMoney || 0 : 0,
+      cashback: statusId === STATUS_DATA.PAID.id ? (total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney)) : 0,
       total: total,
     };
 
@@ -99,7 +99,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                 className="pb-1"
                 onClick={() => saveSale(STATUS_DATA.PENDING.id)}
               >
-                Guardar como borrador
+                Guardar como pendiente
               </Button>
             </div>
           )}

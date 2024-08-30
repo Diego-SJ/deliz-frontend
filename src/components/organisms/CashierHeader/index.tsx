@@ -15,10 +15,11 @@ import { APP_ROUTES } from '@/routes/routes';
 import { useState } from 'react';
 import { useAppSelector } from '@/hooks/useStore';
 import ChangeBranchModal from './change-branch-modal';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
-
+  const { hasAccess } = useMembershipAccess();
   const [open, setOpen] = useState(false);
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
@@ -48,7 +49,7 @@ const CashierHeader = () => {
                 onClick: () => onNavigate(APP_ROUTES.PRIVATE.HOME.path),
               },
 
-              !!permissions?.products?.view_catalog
+              !!permissions?.products?.view_catalog?.value
                 ? {
                     key: 'products',
                     label: (
@@ -60,7 +61,7 @@ const CashierHeader = () => {
                     onClick: () => onNavigate(APP_ROUTES.PRIVATE.PRODUCTS.path),
                   }
                 : null,
-              permissions?.sales?.view_sales
+              permissions?.sales?.view_sales?.value
                 ? {
                     key: 'sales',
                     label: (
@@ -72,7 +73,7 @@ const CashierHeader = () => {
                     onClick: () => onNavigate(APP_ROUTES.PRIVATE.SALES.path),
                   }
                 : null,
-              permissions?.customers?.view_customers
+              permissions?.customers?.view_customers?.value
                 ? {
                     key: 'customers',
                     label: (
@@ -84,7 +85,7 @@ const CashierHeader = () => {
                     onClick: () => onNavigate(APP_ROUTES.PRIVATE.CUSTOMERS.path),
                   }
                 : null,
-              permissions?.cash_registers?.view_current_cash_cut
+              permissions?.cash_registers?.view_current_cash_cut?.value && hasAccess('make_cash_cut')
                 ? {
                     key: 'current_cash_cut',
                     label: (

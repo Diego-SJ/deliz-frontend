@@ -13,6 +13,7 @@ import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import { useDebouncedCallback } from 'use-debounce';
+import { ModuleAccess } from '@/routes/module-access';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -133,68 +134,6 @@ const Sales = () => {
                 }}
               />
             </Col>
-
-            <Col lg={4} xs={12}>
-              <Dropdown
-                menu={{
-                  selectedKeys: [
-                    !!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0
-                      ? salesFilters?.sales?.status_id?.toString() || ''
-                      : '0',
-                  ],
-                  items: [
-                    { label: 'Mostrar todos', key: '0' },
-                    { label: STATUS_DATA.PAID.name, key: STATUS_DATA.PAID.id.toString() },
-                    { label: STATUS_DATA.PENDING.name, key: STATUS_DATA.PENDING.id.toString() },
-                  ],
-                  selectable: true,
-                  onClick: ({ key }) => {
-                    dispatch(salesActions.setSaleFilters({ status_id: Number(key) }));
-                    dispatch(salesActions.fetchSales({ refetch: true }));
-                  },
-                }}
-              >
-                <Button
-                  type={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
-                  block
-                  className={`${!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
-                  ghost={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0}
-                  size={isTablet ? 'large' : 'middle'}
-                  icon={<FileTextOutlined className="text-base" />}
-                >
-                  Estado
-                </Button>
-              </Dropdown>
-            </Col>
-            <Col lg={4} xs={12}>
-              <Dropdown
-                menu={{
-                  defaultSelectedKeys: [salesFilters?.sales?.branch_id || 'ALL'],
-                  items: [
-                    { label: 'Todas las sucursales', key: 'ALL' },
-                    ...(branches?.map(branch => ({ label: branch.name, key: branch.branch_id })) || []),
-                  ],
-                  selectable: true,
-                  onClick: ({ key }) => {
-                    dispatch(salesActions.setSaleFilters({ branch_id: key }));
-                    dispatch(salesActions.fetchSales({ refetch: true }));
-                  },
-                }}
-              >
-                <Button
-                  type={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? 'primary' : 'default'}
-                  block
-                  className={`${!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? '!bg-white' : ''}`}
-                  ghost={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL'}
-                  size={isTablet ? 'large' : 'middle'}
-                  icon={<ShopOutlined className="text-base" />}
-                >
-                  {!salesFilters?.sales?.branch_id || salesFilters?.sales?.branch_id === 'ALL'
-                    ? 'Sucursal'
-                    : branches?.find(branch => branch.branch_id === salesFilters?.sales?.branch_id)?.name}
-                </Button>
-              </Dropdown>
-            </Col>
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
@@ -228,7 +167,72 @@ const Sales = () => {
                 </Button>
               </Dropdown>
             </Col>
-            {permissions?.sales?.add_sale && (
+            <Col lg={4} xs={12}>
+              <Dropdown
+                menu={{
+                  selectedKeys: [
+                    !!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0
+                      ? salesFilters?.sales?.status_id?.toString() || ''
+                      : '0',
+                  ],
+                  items: [
+                    { label: 'Mostrar todos', key: '0' },
+                    { label: STATUS_DATA.PAID.name, key: STATUS_DATA.PAID.id.toString() },
+                    { label: STATUS_DATA.PENDING.name, key: STATUS_DATA.PENDING.id.toString() },
+                  ],
+                  selectable: true,
+                  onClick: ({ key }) => {
+                    dispatch(salesActions.setSaleFilters({ status_id: Number(key) }));
+                    dispatch(salesActions.fetchSales({ refetch: true }));
+                  },
+                }}
+              >
+                <Button
+                  type={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
+                  block
+                  className={`${!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
+                  ghost={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0}
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<FileTextOutlined className="text-base" />}
+                >
+                  Estado
+                </Button>
+              </Dropdown>
+            </Col>
+            <Col lg={4} xs={12}>
+              <ModuleAccess moduleName="branches">
+                <Dropdown
+                  menu={{
+                    defaultSelectedKeys: [salesFilters?.sales?.branch_id || 'ALL'],
+                    items: [
+                      { label: 'Todas las sucursales', key: 'ALL' },
+                      ...(branches?.map(branch => ({ label: branch.name, key: branch.branch_id })) || []),
+                    ],
+                    selectable: true,
+                    onClick: ({ key }) => {
+                      dispatch(salesActions.setSaleFilters({ branch_id: key }));
+                      dispatch(salesActions.fetchSales({ refetch: true }));
+                    },
+                  }}
+                >
+                  <Button
+                    type={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? 'primary' : 'default'}
+                    block
+                    className={`${
+                      !!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? '!bg-white' : ''
+                    }`}
+                    ghost={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL'}
+                    size={isTablet ? 'large' : 'middle'}
+                    icon={<ShopOutlined className="text-base" />}
+                  >
+                    {!salesFilters?.sales?.branch_id || salesFilters?.sales?.branch_id === 'ALL'
+                      ? 'Sucursal'
+                      : branches?.find(branch => branch.branch_id === salesFilters?.sales?.branch_id)?.name}
+                  </Button>
+                </Dropdown>
+              </ModuleAccess>
+            </Col>
+            {permissions?.sales?.add_sale?.value && (
               <Col lg={{ offset: 2, span: 4 }} xs={12}>
                 <Button
                   block

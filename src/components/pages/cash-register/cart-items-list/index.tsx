@@ -77,7 +77,7 @@ const CashRegisterItemsList = () => {
                       >
                         {(record?.product?.name || 'Sin nombre')?.toLowerCase()}
                       </Typography.Paragraph>
-                      <p className="text-slate-400 font-light select-none leading-4">
+                      <div className="text-slate-400 font-light select-none leading-4">
                         {record?.price_type === 'PERSONALIZED' || !record?.product?.product_id ? (
                           <Tag
                             icon={<DollarCircleOutlined className="text-primary" />}
@@ -89,7 +89,7 @@ const CashRegisterItemsList = () => {
                         ) : (
                           <span className="text-sm !font-light block my-1">{functions.money(record.price)}</span>
                         )}
-                      </p>
+                      </div>
                     </div>
 
                     <div className="flex max-sm:justify-between w-full max-sm:mt-0 md:mt-1 lg:mt-0  sm:justify-center md:justify-between lg:justify-center">

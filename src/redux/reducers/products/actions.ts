@@ -5,6 +5,7 @@ import { Category, Product, Size, Unit } from './types';
 import { message } from 'antd';
 import { BUCKETS } from '@/constants/buckets';
 import { RcFile } from 'antd/es/upload';
+import { MAX_USERS, PLANS_IDS } from '@/routes/module-access';
 
 export interface FetchFunction {
   refetch?: boolean;
@@ -94,7 +95,15 @@ const customActions = {
   },
   saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch, getState: AppState) => {
     dispatch(productActions.setLoading(true));
-    const company_id = getState().app.company.company_id;
+    const { company_id, membership_id } = getState().app?.company;
+
+    const has100Products = getState()?.products?.products?.length >= MAX_USERS[PLANS_IDS.BASIC];
+
+    if (has100Products && membership_id === PLANS_IDS.BASIC) {
+      message.error('Tu membresía no te permite tener más de 100 productos');
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
 
     const result = await supabase.from('products').insert({ ...product, company_id });
 

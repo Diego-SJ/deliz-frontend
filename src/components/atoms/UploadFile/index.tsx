@@ -39,7 +39,7 @@ const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
   };
 
   const handleChange: UploadProps['onChange'] = ({ fileList: changeFileList }) => {
-    if (!permissions?.products?.update_image) {
+    if (!permissions?.products?.update_image?.value) {
       return null;
     }
 
@@ -90,7 +90,7 @@ const Upload: React.FC<UploadPropsType> = ({ setFileList, fileList }) => {
               visible: previewOpen,
               onVisibleChange: visible => setPreviewOpen(visible),
               afterOpenChange: visible => {
-                if (!permissions?.products?.update_image) return;
+                if (!permissions?.products?.update_image?.value) return;
                 if (!visible) setPreviewImage('');
               },
             }}

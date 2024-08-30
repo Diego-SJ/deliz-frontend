@@ -5,9 +5,12 @@ import { analyticsActions } from '@/redux/reducers/analytics';
 import { UserOutlined } from '@ant-design/icons';
 import functions from '@/utils/functions';
 import { Trophy } from 'lucide-react';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const TopCustomersThumbnail = () => {
   const dispatch = useAppDispatch();
+  const { hasAccess } = useMembershipAccess();
+  const { user_auth } = useAppSelector(({ users }) => users);
   const { loading, top_customers } = useAppSelector(({ analytics }) => analytics?.customers || {});
 
   return (
@@ -15,7 +18,7 @@ const TopCustomersThumbnail = () => {
       loading={loading}
       title={<h5 className="!text-base m-0 font-medium">Ventas por cliente</h5>}
       extra={
-        top_customers?.length ? (
+        user_auth?.profile?.permissions?.reports?.view_customers_report?.value && hasAccess('view_customers_report') ? (
           <Button type="text" className="!text-primary underline" onClick={() => dispatch(analyticsActions.getTopCustomers())}>
             Actualizar
           </Button>

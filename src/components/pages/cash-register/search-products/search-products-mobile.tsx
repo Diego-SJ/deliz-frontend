@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { ItemProductMobile } from './product-item-mobile';
 import CashierModal from '../cashier-modal';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
+import { ModuleAccess } from '@/routes/module-access';
 
 type Props = {
   onOpenBarCode: () => void;
@@ -30,6 +31,7 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
   const [openModal, setOpenModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Partial<CashRegisterItem> | undefined>(undefined);
   const inputSearchRef = useRef<HTMLInputElement>(null);
+  const inputGhostRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let _products = productHelpers.searchProducts(searchText, products);
@@ -80,7 +82,9 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
         >
           Buscar producto
         </Button>
-        <Button size="large" icon={<BarcodeOutlined />} onClick={onOpenBarCode} />
+        <ModuleAccess moduleName="use_barcode_scanner">
+          <Button size="large" icon={<BarcodeOutlined />} onClick={onOpenBarCode} />
+        </ModuleAccess>
       </Space.Compact>
 
       <Drawer
@@ -95,6 +99,7 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
             <CloseOutlined className="text-xl" />
           </Button>
         }
+        destroyOnClose
         styles={{ body: { padding: 0 } }}
         title="Buscar producto"
       >
@@ -124,44 +129,46 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
                 }}
               />
             )}
-            <Button
-              size="large"
-              icon={<BarcodeOutlined />}
-              onClick={() => {
-                handleClose();
-                onOpenBarCode();
-              }}
-            />
+            <ModuleAccess moduleName="use_barcode_scanner">
+              <Button
+                size="large"
+                icon={<BarcodeOutlined />}
+                onClick={() => {
+                  handleClose();
+                  onOpenBarCode();
+                }}
+              />
+            </ModuleAccess>
           </Space.Compact>
           <div className=" min-h-[calc(100dvh-175px)] max-h-[calc(100dvh-175px)] overflow-y-scroll py-0">
             {currentProducts.length > 0 ? (
-              <div className="flex flex-col">
+              <div className="w-full">
                 {currentProducts.map(product => {
                   const price = productHelpers.getProductPrice(product, price_id || null);
                   return (
-                    <div className="w-full" key={product.product_id}>
-                      <ItemProductMobile
-                        imageSrc={product.image_url}
-                        title={product.name}
-                        price={price}
-                        category={(product as any)?.categories?.name}
-                        size={(product as any)?.sizes?.name}
-                        onClick={() => {
-                          handleItemInteract(product);
-                        }}
-                        onCalculatorClick={() => {
-                          setCurrentProduct({
-                            quantity: 1,
-                            price: price,
-                            price_type: 'DEFAULT',
-                            product,
-                          });
-                          setOpenModal(true);
-                        }}
-                        isFavorite={profile?.favorite_products?.includes(product.product_id)}
-                        onFavorite={() => handleFavorite(product.product_id)}
-                      />
-                    </div>
+                    <ItemProductMobile
+                      key={product.product_id}
+                      imageSrc={product.image_url}
+                      title={product.name}
+                      price={price}
+                      category={(product as any)?.categories?.name}
+                      size={(product as any)?.sizes?.name}
+                      onClick={() => {
+                        handleItemInteract(product);
+                      }}
+                      onCalculatorClick={() => {
+                        setCurrentProduct({
+                          quantity: 1,
+                          price: price,
+                          price_type: 'DEFAULT',
+                          product,
+                        });
+                        setOpenModal(true);
+                        inputGhostRef.current?.focus();
+                      }}
+                      isFavorite={profile?.favorite_products?.includes(product.product_id)}
+                      onFavorite={() => handleFavorite(product.product_id)}
+                    />
                   );
                 })}
               </div>
@@ -177,6 +184,8 @@ const SearchProductsMobile = ({ onOpenBarCode }: Props) => {
           </div>
         </div>
       </Drawer>
+      <input type="text" ref={inputGhostRef} inputMode="numeric" className="w-1 h-1 bg-red-500 absolute -z-10" />
+
       <CashierModal open={openModal} casherItem={currentProduct} onCancel={closeModal} />
     </>
   );

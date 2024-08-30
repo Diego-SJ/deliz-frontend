@@ -28,7 +28,7 @@ const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
       !mounted.current &&
       profile?.profile_id &&
       profile?.permissions &&
-      (profile?.permissions?.cash_registers?.make_cash_cut || profile?.permissions?.cash_registers?.open_cash_cut)
+      (profile?.permissions?.cash_registers?.make_cash_cut?.value || profile?.permissions?.cash_registers?.open_cash_cut?.value)
     ) {
       mounted.current = true;
       dispatch(cashiersActions.cash_cuts.fetchCashCutOpened());

@@ -89,7 +89,9 @@ const customActions = {
             .order('created_at', { ascending: false }),
           supabase
             .from('sales')
-            .select('*, customers (*), status (status_id, name), branches (*), cash_registers (*)')
+            .select(
+              '*, customers (name, customer_id), status (status_id, name), branches (branch_id, name), cash_registers (cash_register_id, name)',
+            )
             .eq('sale_id', args?.sale_id),
         ]);
 
@@ -149,29 +151,32 @@ const customActions = {
         dispatch(salesActions.setLoading(true));
         const state = getState().sales;
         let { currentCashRegister, currentBranch } = getState().branches;
-        let activeCashCut = getState()?.cashiers?.active_cash_cut;
         let { company_id } = getState().app.company;
-        let newSale: Sale = {
-          ...sale,
-          customer_id: state.cash_register.customer_id as number,
-          discount: state.cash_register.discount,
-          discount_type: state.cash_register.discountType,
-          shipping: state.cash_register.shipping,
-          cash_register_id: currentCashRegister?.cash_register_id!,
-          branch_id: currentBranch?.branch_id!,
-          company_id,
-          cash_cut_id: activeCashCut?.cash_cut_id || null,
-          created_at: dayjs().toDate(),
-        };
 
-        const { data, error } = await supabase.from('sales').insert(newSale).select()?.single();
+        const { data, error } = await supabase
+          .rpc('create_sale', {
+            p_amount_paid: sale.amount_paid || 0,
+            p_branch_id: currentBranch?.branch_id!,
+            p_cash_register_id: currentCashRegister?.cash_register_id!,
+            p_cashback: sale.cashback || 0,
+            p_company_id: company_id,
+            p_customer_id: state.cash_register.customer_id as number,
+            p_discount: state.cash_register.discount,
+            p_discount_type: state.cash_register.discountType,
+            p_payment_method: sale?.payment_method || 'EFECTIVO',
+            p_shipping: state.cash_register.shipping,
+            p_status_id: sale.status_id || STATUS_DATA.PENDING.id,
+            p_total: sale.total || 0,
+          })
+          .select()
+          .single();
         dispatch(salesActions.setLoading(false));
 
         if (error) {
           message.error('No se pudo registrar la venta');
           return null;
         }
-
+        console.log(data);
         return data as Sale;
       } catch (error) {
         dispatch(salesActions.setLoading(false));

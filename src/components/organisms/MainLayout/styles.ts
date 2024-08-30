@@ -19,7 +19,6 @@ export const LayoutContainer = styled(Layout)`
   display: flex;
   width: 100%;
   flex-direction: column;
-  background: ${({ theme }) => theme.colors.background.secondary};
 `;
 
 export const LayoutContent = styled(Layout)`

@@ -7,7 +7,10 @@ import { App, Button, Card, Form, Input, Select, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Permissions from './permissions/index';
-import { PermissionsType } from './permissions/data-and-types';
+import { PERMISSIONS, PermissionsType } from './permissions/data-and-types';
+import { ROLES } from '@/constants/roles';
+import { useMembershipAccess } from '@/routes/module-access';
+import CardRoot from '@/components/atoms/Card';
 
 const getCashRegisters = (branches: Branch[], cash_registers: CashRegister[], branchesIds: string[]) => {
   const selectedBranches = branches.filter(cr => branchesIds.includes(cr.branch_id));
@@ -30,6 +33,7 @@ const ManageUserProfile = () => {
   const mounted = useRef(false);
   const [form] = Form.useForm();
   const { profile_id } = useParams();
+  const { hasAccess } = useMembershipAccess();
   const { branches, cash_registers } = useAppSelector(({ branches }) => branches);
   const [isDefaultUserAdmin, setIsDefaultUserAdmin] = useState(false);
   const navigate = useNavigate();
@@ -46,11 +50,11 @@ const ManageUserProfile = () => {
   const fetchDetails = async () => {
     setLoading(true);
     const data = await dispatch(userActions.fetchUser(profile_id!));
-    const role = data?.role || 'ADMIN';
+    const role = data?.role || ROLES.ADMIN;
     form.setFieldsValue({ ...data, role });
     setIsDefaultUserAdmin(!!data?.is_default);
     setSelectedRole(role);
-    setPermissions(data?.permissions || {});
+    setPermissions({ ...PERMISSIONS, ...data?.permissions });
     setSelectedBranches(data?.branches || []);
     setSelectedCashRegisters(data?.cash_registers || []);
     setCurrentProfile(data);
@@ -127,7 +131,7 @@ const ManageUserProfile = () => {
           <Form.Item name="is_default" hidden>
             <Input />
           </Form.Item>
-          <Card title="Información básica" className="shadow-md rounded-xl" loading={loading}>
+          <CardRoot title="Información básica" loading={loading}>
             <div className="flex flex-col md:flex-row gap-6 mb-4">
               <Form.Item className="mb-0 w-full" name="first_name" label="Nombre(s)">
                 <Input placeholder="Nombre(s)" onPressEnter={onSubmit} />
@@ -139,9 +143,9 @@ const ManageUserProfile = () => {
             <Form.Item className="w-full mb-4" name="phone" label="Teléfono">
               <Input placeholder="Teléfono" inputMode="tel" onPressEnter={onSubmit} />
             </Form.Item>
-          </Card>
+          </CardRoot>
 
-          <Card title="Credenciales" className="shadow-md rounded-xl" loading={loading}>
+          <CardRoot title="Credenciales" loading={loading}>
             <Typography.Paragraph className="!-mt-2 mb-2 text-slate-400 font-light">
               Con ellas el usuario podrá acceder al sistema
             </Typography.Paragraph>
@@ -174,21 +178,24 @@ const ManageUserProfile = () => {
                 />
               </Form.Item>
             </div>
-          </Card>
+          </CardRoot>
 
-          {!isDefaultUserAdmin && (
-            <Card title="Permisos" className="shadow-md rounded-xl" loading={loading}>
+          {!isDefaultUserAdmin && hasAccess('basic_permissions') && (
+            <CardRoot title="Permisos" loading={loading}>
               <Form.Item className="w-full" name="role" label="Tipo de usuario" tooltip="Selecciona el tipo de usuario">
                 <Select
-                  placeholder="Selecciona la sucursal"
+                  placeholder="Selecciona el tipo de usuario"
                   options={[
-                    { label: 'Administrador', value: 'ADMIN' },
-                    { label: 'Personalizado', value: 'CUSTOM' },
+                    { label: 'Administrador', value: ROLES.ADMIN },
+                    { label: 'Personalizado', value: ROLES.CUSTOM },
                   ]}
-                  onChange={value => setSelectedRole(value)}
+                  onChange={value => {
+                    setPermissions({ ...PERMISSIONS, ...currentProfile?.permissions });
+                    setSelectedRole(value);
+                  }}
                 />
               </Form.Item>
-              {selectedRole !== 'ADMIN' && (
+              {selectedRole !== ROLES.ADMIN && (
                 <>
                   <Form.Item
                     className="w-full"
@@ -225,12 +232,12 @@ const ManageUserProfile = () => {
                   <Permissions value={permissions} onPermissionsChange={setPermissions} />
                 </>
               )}
-            </Card>
+            </CardRoot>
           )}
         </Form>
 
         {profile_id && !currentProfile?.is_default && (
-          <Card title="Inhabilitar usuario" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
+          <CardRoot title="Inhabilitar usuario" className="my-2 max-w-[700px] mx-auto w-full">
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
               <Typography.Text type="danger">
                 NOTA: Una vez eliminado, el usuario no podrá acceder al sistema ni realizar acciones.
@@ -260,7 +267,7 @@ const ManageUserProfile = () => {
                 Eliminar
               </Button>
             </div>
-          </Card>
+          </CardRoot>
         )}
       </div>
       <Card

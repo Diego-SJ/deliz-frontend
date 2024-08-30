@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppSlice, Company } from './types';
 import customActions from './actions';
-import { STATUS_DATA } from '@/constants/status';
 import { ONBOARDING_STEPS } from '@/constants/onboarding';
 
 const initialState: AppSlice = {
@@ -14,6 +13,7 @@ const initialState: AppSlice = {
     address: '',
     theme: '',
     created_at: '',
+    membership_id: 1,
   },
   navigation: {
     menu: {

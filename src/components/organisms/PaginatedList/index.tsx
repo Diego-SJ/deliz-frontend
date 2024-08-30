@@ -29,7 +29,7 @@ const PaginatedList = <T,>(props: CustomListProps<T>) => {
       {...(restProps as any)}
       $bodyHeight={$bodyHeight}
       pagination={restProps.pagination ?? { position: 'bottom', align: 'center' }}
-      className={`${className || ''} bg-white rounded-lg shadow-lg`}
+      className={`${className || ''} bg-white rounded-lg border`}
     />
   );
 };

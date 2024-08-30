@@ -19,6 +19,7 @@ import { PAYMENT_METHOD_SHORT_NAME } from '@/constants/payment_methods';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import ChangeBranchDrawer from './change-branch';
+import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
 
 export type Amounts = {
   total: number;
@@ -36,7 +37,7 @@ const SaleDetail = () => {
   const { sale_id } = useParams();
   const { current_sale, loading: isLoading } = useAppSelector(({ sales }) => sales);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
-
+  const { hasAccess } = useMembershipAccess();
   const [amounts, setAmounts] = useState<Amounts>(initalAmounts);
   const [open, setOpen] = useState(false);
   const [openBranchDrawer, setOpenBranchDrawer] = useState(false);
@@ -157,25 +158,30 @@ const SaleDetail = () => {
               amounts?.total,
             )}`}</Typography.Title>
 
-            {[STATUS_DATA.PENDING.id].includes(current_sale?.metadata?.status_id as number) && permissions?.sales?.edit_sale && (
-              <Row gutter={[10, 10]} className="!mt-4">
-                <Col span={24}>
-                  <UpdateSaleButton amounts={amounts} />
-                </Col>
-              </Row>
-            )}
+            {[STATUS_DATA.PENDING.id].includes(current_sale?.metadata?.status_id as number) &&
+              permissions?.sales?.edit_sale?.value && (
+                <Row gutter={[10, 10]} className="!mt-4">
+                  <Col span={24}>
+                    <UpdateSaleButton amounts={amounts} />
+                  </Col>
+                </Row>
+              )}
 
             {isTablet && (
               <Row gutter={[20, 20]} className="!mt-5">
-                <Col xs={8}>
-                  <PrintInvoiceButton amounts={amounts} />
-                </Col>
-                {permissions?.sales?.edit_sale && (
+                <ModuleAccess moduleName="download_receipt">
                   <Col xs={8}>
-                    <AddNewItem />
+                    <PrintInvoiceButton amounts={amounts} />
                   </Col>
-                )}
-                {permissions?.sales?.delete_sale && (
+                </ModuleAccess>
+                <ModuleAccess moduleName="edit_sale">
+                  {permissions?.sales?.edit_sale?.value && (
+                    <Col xs={8}>
+                      <AddNewItem />
+                    </Col>
+                  )}
+                </ModuleAccess>
+                {permissions?.sales?.delete_sale?.value && (
                   <Col xs={8}>
                     <DeleteSaleButton />
                   </Col>
@@ -196,7 +202,7 @@ const SaleDetail = () => {
                     {current_sale?.metadata?.customers?.name || 'Público general'}
                   </Typography.Paragraph>
 
-                  {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
+                  {permissions?.sales?.edit_sale?.value && <ChangeCustomerModal />}
                 </div>
               </div>
               <Divider className="!my-3" />
@@ -243,15 +249,17 @@ const SaleDetail = () => {
                     Sucursal {(metadata as any)?.branches?.name || '- - -'}
                   </Typography.Paragraph>
 
-                  <Button
-                    shape="circle"
-                    size="large"
-                    className="!w-fit -mt-5"
-                    type="text"
-                    icon={<EditOutlined />}
-                    block
-                    onClick={handleBranchDrawer}
-                  />
+                  <ModuleAccess moduleName="transfer_sale">
+                    <Button
+                      shape="circle"
+                      size="large"
+                      className="!w-fit -mt-5"
+                      type="text"
+                      icon={<EditOutlined />}
+                      block
+                      onClick={handleBranchDrawer}
+                    />
+                  </ModuleAccess>
                 </div>
               </div>
             </CardRoot>
@@ -261,15 +269,19 @@ const SaleDetail = () => {
           {!isTablet && (
             <CardRoot style={{ marginBottom: 10 }} loading={isLoading} title="Acciones">
               <Row gutter={[20, 20]}>
-                <Col xs={12} md={6} lg={8}>
-                  <PrintInvoiceButton amounts={amounts} />
-                </Col>
-                {permissions?.sales?.edit_sale && (
+                <ModuleAccess moduleName="download_receipt">
                   <Col xs={12} md={6} lg={8}>
-                    <AddNewItem />
+                    <PrintInvoiceButton amounts={amounts} />
                   </Col>
-                )}
-                {permissions?.sales?.delete_sale && (
+                </ModuleAccess>
+                <ModuleAccess moduleName="edit_sale">
+                  {permissions?.sales?.edit_sale?.value && (
+                    <Col xs={12} md={6} lg={8}>
+                      <AddNewItem />
+                    </Col>
+                  )}
+                </ModuleAccess>
+                {permissions?.sales?.delete_sale?.value && (
                   <Col xs={12} md={6} lg={8}>
                     <DeleteSaleButton />
                   </Col>
@@ -282,94 +294,98 @@ const SaleDetail = () => {
               <Table
                 loading={isLoading}
                 rowKey={record => record?.sale_detail_id?.toString() || ''}
-                columns={[
-                  {
-                    title: 'Producto',
-                    dataIndex: 'products',
-                    render: (_, record) => {
-                      return (
-                        <div className="flex gap-4 items-center pl-3">
-                          <Avatar
-                            src={record.products?.image_url}
-                            icon={<FileImageOutlined className="text-slate-400 text-xl" />}
-                            className="bg-slate-600/10 p-1 w-10 h-10 min-w-10"
-                          />
-                          <div>
-                            <p className="text-slate-700 font-medium">
-                              {record?.products?.name || record?.metadata?.product_name || '- - -'}
-                            </p>
-                            <span>{record?.products?.categories?.name || 'Sin categoría'}</span>
+                columns={
+                  [
+                    {
+                      title: 'Producto',
+                      dataIndex: 'products',
+                      render: (_: any, record: SaleItem) => {
+                        return (
+                          <div className="flex gap-4 items-center pl-3">
+                            <Avatar
+                              src={record.products?.image_url}
+                              icon={<FileImageOutlined className="text-slate-400 text-xl" />}
+                              className="bg-slate-600/10 p-1 w-10 h-10 min-w-10"
+                            />
+                            <div>
+                              <p className="text-slate-700 font-medium">
+                                {record?.products?.name || record?.metadata?.product_name || '- - -'}
+                              </p>
+                              <span>{record?.products?.categories?.name || 'Sin categoría'}</span>
+                            </div>
                           </div>
-                        </div>
-                      );
+                        );
+                      },
                     },
-                  },
 
-                  {
-                    title: 'Precio',
-                    dataIndex: 'price',
-                    width: 100,
-                    align: 'center',
-                    render: (value: number) => functions.money(value),
-                  },
-                  {
-                    title: 'Cantidad',
-                    dataIndex: 'quantity',
-                    width: 100,
-                    align: 'center',
-                  },
-                  {
-                    title: 'Total',
-                    dataIndex: 'retail_price',
-                    width: 100,
-                    align: 'center',
-                    render: (_: number, record) => functions.money((record.quantity || 0) * (record.price || 0)),
-                  },
-                  {
-                    title: '',
-                    dataIndex: 'sale_detail_id',
-                    width: 150,
-                    align: 'center',
-                    render: (_, record) => {
-                      if (!permissions?.sales?.edit_sale) return null;
-                      return (
-                        <Dropdown
-                          menu={{
-                            items: [
-                              {
-                                key: 'edit',
-                                label: 'Editar',
-                                icon: <EditOutlined />,
-                                onClick: () => onRowClick(record),
-                              },
-                              {
-                                key: 'delete',
-                                label: 'Eliminar',
-                                icon: <DeleteOutlined />,
-                                onClick: () => {
-                                  modal.confirm({
-                                    title: 'Eliminar producto',
-                                    content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
-                                    onOk: async () => {
-                                      await dispatch(salesActions.deleteItemById(record.sale_detail_id || 0));
-                                    },
-                                    okText: 'Eliminar',
-                                    okType: 'danger',
-                                    cancelText: 'Cancelar',
-                                    maskClosable: true,
-                                  });
-                                },
-                              },
-                            ],
-                          }}
-                          trigger={['click']}
-                        >
-                          <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
-                        </Dropdown>
-                      );
+                    {
+                      title: 'Precio',
+                      dataIndex: 'price',
+                      width: 100,
+                      align: 'center',
+                      render: (value: number) => functions.money(value),
                     },
-                  },
-                ]}
+                    {
+                      title: 'Cantidad',
+                      dataIndex: 'quantity',
+                      width: 100,
+                      align: 'center',
+                    },
+                    {
+                      title: 'Total',
+                      dataIndex: 'retail_price',
+                      width: 100,
+                      align: 'center',
+                      render: (_: number, record: SaleItem) => functions.money((record.quantity || 0) * (record.price || 0)),
+                    },
+                    hasAccess('edit_sale')
+                      ? {
+                          title: '',
+                          dataIndex: 'sale_detail_id',
+                          width: 150,
+                          align: 'center',
+                          render: (_: any, record: SaleItem) => {
+                            if (!permissions?.sales?.edit_sale?.value) return null;
+                            return (
+                              <Dropdown
+                                menu={{
+                                  items: [
+                                    {
+                                      key: 'edit',
+                                      label: 'Editar',
+                                      icon: <EditOutlined />,
+                                      onClick: () => onRowClick(record),
+                                    },
+                                    {
+                                      key: 'delete',
+                                      label: 'Eliminar',
+                                      icon: <DeleteOutlined />,
+                                      onClick: () => {
+                                        modal.confirm({
+                                          title: 'Eliminar producto',
+                                          content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
+                                          onOk: async () => {
+                                            await dispatch(salesActions.deleteItemById(record.sale_detail_id || 0));
+                                          },
+                                          okText: 'Eliminar',
+                                          okType: 'danger',
+                                          cancelText: 'Cancelar',
+                                          maskClosable: true,
+                                        });
+                                      },
+                                    },
+                                  ],
+                                }}
+                                trigger={['click']}
+                              >
+                                <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
+                              </Dropdown>
+                            );
+                          },
+                        }
+                      : {},
+                  ].filter(i => i?.dataIndex) as any
+                }
                 dataSource={items}
                 size="small"
                 scroll={{ y: 'calc(100vh - 250px)', x: 600 }}
@@ -401,45 +417,47 @@ const SaleDetail = () => {
                         {item.quantity} x {functions.money(item.price)}
                       </Typography.Text>
                     </div>
-                    <div className="flex flex-col text-end justify-center self-end ml-auto my-auto gap-4">
-                      <Dropdown
-                        className="!-mt-3"
-                        menu={{
-                          items: [
-                            {
-                              key: 'edit',
-                              label: 'Editar',
-                              icon: <EditOutlined className="!text-lg !mr-3" />,
-                              className: '!text-lg',
-                              onClick: () => onRowClick(item),
-                            },
-                            {
-                              key: 'delete',
-                              label: 'Eliminar',
-                              icon: <DeleteOutlined className="!text-lg !mr-3" />,
-                              className: '!text-lg',
-                              onClick: () => {
-                                modal.confirm({
-                                  title: 'Eliminar producto',
-                                  content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
-                                  onOk: async () => {
-                                    await dispatch(salesActions.deleteItemById(item.sale_detail_id || 0));
-                                  },
-                                  okText: 'Eliminar',
-                                  okType: 'danger',
-                                  cancelText: 'Cancelar',
-                                  maskClosable: true,
-                                });
+                    <ModuleAccess moduleName="edit_sale">
+                      <div className="flex flex-col text-end justify-center self-end ml-auto my-auto gap-4">
+                        <Dropdown
+                          className="!-mt-3"
+                          menu={{
+                            items: [
+                              {
+                                key: 'edit',
+                                label: 'Editar',
+                                icon: <EditOutlined className="!text-lg !mr-3" />,
+                                className: '!text-lg',
+                                onClick: () => onRowClick(item),
                               },
-                            },
-                          ],
-                        }}
-                        trigger={['click']}
-                      >
-                        <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
-                      </Dropdown>
-                      <span className="font-medium mt-2">{functions.money(Number(item.quantity) * Number(item.price))}</span>
-                    </div>
+                              {
+                                key: 'delete',
+                                label: 'Eliminar',
+                                icon: <DeleteOutlined className="!text-lg !mr-3" />,
+                                className: '!text-lg',
+                                onClick: () => {
+                                  modal.confirm({
+                                    title: 'Eliminar producto',
+                                    content: '¿Estás seguro de que deseas eliminar este producto de la venta?',
+                                    onOk: async () => {
+                                      await dispatch(salesActions.deleteItemById(item.sale_detail_id || 0));
+                                    },
+                                    okText: 'Eliminar',
+                                    okType: 'danger',
+                                    cancelText: 'Cancelar',
+                                    maskClosable: true,
+                                  });
+                                },
+                              },
+                            ],
+                          }}
+                          trigger={['click']}
+                        >
+                          <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
+                        </Dropdown>
+                        <span className="font-medium mt-2">{functions.money(Number(item.quantity) * Number(item.price))}</span>
+                      </div>
+                    </ModuleAccess>
                   </div>
                 );
               }}
@@ -458,7 +476,7 @@ const SaleDetail = () => {
                     {current_sale?.metadata?.customers?.name || 'Público general'}
                   </Typography.Paragraph>
 
-                  {permissions?.sales?.edit_sale && <ChangeCustomerModal />}
+                  {permissions?.sales?.edit_sale?.value && <ChangeCustomerModal />}
                 </div>
               </div>
               <Divider className="!my-3" />
@@ -504,15 +522,17 @@ const SaleDetail = () => {
                   <Typography.Paragraph className="w-full !m-0" type="secondary">
                     Sucursal {(metadata as any)?.branches?.name || '- - -'}
                   </Typography.Paragraph>
-                  <Button
-                    shape="circle"
-                    size="large"
-                    className="!w-fit -mt-5"
-                    type="text"
-                    icon={<EditOutlined />}
-                    block
-                    onClick={handleBranchDrawer}
-                  />
+                  <ModuleAccess moduleName="transfer_sale">
+                    <Button
+                      shape="circle"
+                      size="large"
+                      className="!w-fit -mt-5"
+                      type="text"
+                      icon={<EditOutlined />}
+                      block
+                      onClick={handleBranchDrawer}
+                    />
+                  </ModuleAccess>
                 </div>
               </div>
             </CardRoot>

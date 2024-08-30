@@ -17,6 +17,7 @@ import { ROLES } from '@/constants/roles';
 import { operatingCostsActions } from '../operatingCosts';
 import { analyticsActions } from '../analytics';
 import { storesActions } from '../stores';
+import functions from '@/utils/functions';
 
 const customActions = {
   fetchAppData: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -71,7 +72,7 @@ const customActions = {
       permissions: data?.role === ROLES.ADMIN ? PERMISSIONS : data.permissions || null,
     };
 
-    await dispatch(userActions.setUserAuth({ profile: profileData, isAdmin: data.role === 'ADMIN' }));
+    await dispatch(userActions.setUserAuth({ profile: profileData, isAdmin: data.role === ROLES.ADMIN }));
     return data;
   },
   loginSuccess: (profile_id: string) => async (dispatch: AppDispatch) => {
@@ -221,7 +222,16 @@ const customActions = {
       message.error(error.message);
       return null;
     }
-    return data;
+
+    if (data?.branches?.some((b: string) => b?.includes('['))) {
+      data.branches = data?.branches?.map((b: string) => functions.extractUUID(b));
+    }
+
+    if (data?.cash_registers?.some((b: string) => b?.includes('['))) {
+      data.cash_registers = data?.cash_registers?.map((b: string) => functions.extractUUID(b));
+    }
+
+    return { ...data };
   },
   updateProfile: (profile: Partial<Profile>) => async (dispatch: AppDispatch, getState: AppState) => {
     const profile_id = getState().users.user_auth.profile?.profile_id;
@@ -231,12 +241,12 @@ const customActions = {
       phone: profile.phone || '',
       email: profile.email,
       password: profile.password,
-      role: profile.role || 'ADMIN',
+      role: profile.role || ROLES.ADMIN,
       branches: profile.branches,
       cash_registers: profile.cash_registers,
       permissions: !!Object.keys(profile.permissions || {})?.length
         ? profile.permissions
-        : profile?.role === 'ADMIN'
+        : profile?.role === ROLES.ADMIN
         ? PERMISSIONS
         : PERMISSIONS_DENIED,
     } as Profile;

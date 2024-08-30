@@ -17,6 +17,7 @@ import { DiscountType } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
 import PaymentModal from './payment-modal';
 import SubtotalBox from './subtotal-box';
+import { ModuleAccess } from '@/routes/module-access';
 
 type ModalAction = '' | 'APPLY_SHIPPING' | 'APPLY_DISCOUNT' | 'ADD_NEW_ITEM';
 
@@ -170,22 +171,24 @@ const CashierActions = ({}: CashierActionsProps) => {
           </div>
         </ContainerItems>
         <Row gutter={{ lg: 20, md: 20, sm: 10, xs: 10 }}>
-          {permissions?.pos?.apply_shipping && (
-            <Col span={6}>
-              <div
-                className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
-                onClick={() => openModal('APPLY_SHIPPING')}
-              >
-                <Avatar
-                  icon={<TruckOutlined className="text-gray-400 !text-lg" />}
-                  shape="square"
-                  className="mb-1 bg-gray-300/10"
-                />
-                <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
-              </div>
-            </Col>
-          )}
-          {permissions?.pos?.apply_discount && (
+          <ModuleAccess moduleName="apply_shipping">
+            {permissions?.pos?.apply_shipping?.value && (
+              <Col span={6}>
+                <div
+                  className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
+                  onClick={() => openModal('APPLY_SHIPPING')}
+                >
+                  <Avatar
+                    icon={<TruckOutlined className="text-gray-400 !text-lg" />}
+                    shape="square"
+                    className="mb-1 bg-gray-300/10"
+                  />
+                  <span className="text-xs lowercase select-none text-center leading-3 !font-light">envío</span>
+                </div>
+              </Col>
+            )}
+          </ModuleAccess>
+          {permissions?.pos?.apply_discount?.value && (
             <Col span={6}>
               <div
                 className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"
@@ -215,7 +218,7 @@ const CashierActions = ({}: CashierActionsProps) => {
             </div>
           </Col>
 
-          {permissions?.pos?.add_manual_item && (
+          {permissions?.pos?.add_manual_item?.value && (
             <Col span={6}>
               <div
                 className="py-2 flex flex-col items-center border border-gray-300 hover:border-gray-400 h-full rounded-lg justify-center cursor-pointer"

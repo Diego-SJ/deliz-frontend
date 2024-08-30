@@ -1,3 +1,4 @@
+import CardRoot from '@/components/atoms/Card';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { branchesActions } from '@/redux/reducers/branches';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -37,7 +38,7 @@ const AddBranchForm = () => {
   };
 
   const onSubmit = async () => {
-    if (!permissions?.branches?.edit_branch && !permissions?.branches?.add_branch) return;
+    if (!permissions?.branches?.edit_branch?.value && !permissions?.branches?.add_branch?.value) return;
 
     setLoadingSave(true);
     await form.validateFields().then(async values => {
@@ -51,7 +52,7 @@ const AddBranchForm = () => {
     <>
       <div
         className={`flex flex-col gap-2 p-4 ${
-          permissions?.branches?.edit_branch || permissions?.branches?.add_branch
+          permissions?.branches?.edit_branch?.value || permissions?.branches?.add_branch?.value
             ? 'min-h-[calc(100%-82px)] max-h-[calc(100%-82px)] '
             : ''
         } overflow-auto`}
@@ -71,13 +72,13 @@ const AddBranchForm = () => {
           <Form.Item name="branch_id" hidden>
             <Input />
           </Form.Item>
-          <Card title="Sucursal" className="shadow-md rounded-xl" loading={loading}>
+          <CardRoot title="Sucursal" loading={loading}>
             <Form.Item className="mb-0 w-full" name="name" label="Nombre" rules={[{ required: true }]}>
               <Input placeholder="Nombre de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
-          </Card>
+          </CardRoot>
 
-          <Card title="Dirección" className="shadow-md rounded-xl" loading={loading}>
+          <CardRoot title="Dirección" loading={loading}>
             <Form.Item className="w-full" name="street" label="Dirección">
               <Input placeholder="Dirección de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
@@ -100,9 +101,9 @@ const AddBranchForm = () => {
             <Form.Item className="mb-0 w-full" name="zip_code" label="Código postal">
               <Input placeholder="Código postal de la sucursal" onPressEnter={onSubmit} />
             </Form.Item>
-          </Card>
+          </CardRoot>
 
-          <Card title="Contacto" className="shadow-md rounded-xl" loading={loading}>
+          <CardRoot title="Contacto" loading={loading}>
             <div className="flex md:gap-8 flex-col md:flex-row">
               <Form.Item className="mb-0 w-full" name="phone" label="Teléfono">
                 <Input placeholder="Teléfono de la sucursal" className="w-full" onPressEnter={onSubmit} />
@@ -111,11 +112,11 @@ const AddBranchForm = () => {
                 <Input placeholder="Correo electrónico de la sucursal" className="w-full" onPressEnter={onSubmit} />
               </Form.Item>
             </div>
-          </Card>
+          </CardRoot>
         </Form>
 
-        {branch_id && !isMainBranch && permissions?.branches?.delete_branch && (
-          <Card title="Eliminar sucursal" className="my-2 shadow-md rounded-xl max-w-[700px] mx-auto w-full">
+        {branch_id && !isMainBranch && permissions?.branches?.delete_branch?.value && (
+          <CardRoot title="Eliminar sucursal" className="my-2 max-w-[700px] mx-auto w-full">
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
               <Typography.Text type="danger">
                 Una vez eliminada la sucursal, no se podrá recuperar la información.
@@ -145,10 +146,10 @@ const AddBranchForm = () => {
                 Eliminar
               </Button>
             </div>
-          </Card>
+          </CardRoot>
         )}
       </div>
-      {permissions?.branches?.edit_branch || permissions?.branches?.add_branch ? (
+      {permissions?.branches?.edit_branch?.value || permissions?.branches?.add_branch?.value ? (
         <Card
           className="rounded-none box-border"
           classNames={{ body: 'w-full flex items-center' }}

@@ -94,7 +94,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex gap-4 px-6 justify-center pt-4">
-          {permissions?.sales?.download_receipt && (
+          {permissions?.sales?.download_receipt?.value && (
             <Button block onClick={downloadInvoice} icon={<PrinterOutlined />}>
               Imprimir
             </Button>

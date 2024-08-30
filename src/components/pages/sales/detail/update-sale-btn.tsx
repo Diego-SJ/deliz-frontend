@@ -136,7 +136,7 @@ const UpdateSaleButton: FC<UpdateSaleButton> = ({ amounts }) => {
                       </Button>
                     ) : (
                       <>
-                        <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(pending)}>
+                        <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(total)}>
                           {functions.money(total)}
                         </Button>
                         <Button className="w-full" type="primary" size="large" onClick={() => setReceivedMoney(suggestion1)}>

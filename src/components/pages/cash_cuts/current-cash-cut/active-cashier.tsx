@@ -65,7 +65,7 @@ const OpenCashier = () => {
                     }
                     description={<Typography.Text className="text-neutral-400">Sucursal {currentBranch?.name}</Typography.Text>}
                   />
-                  {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut && (
+                  {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut?.value && (
                     <>
                       <Button
                         className="w-full md:w-fit"
@@ -89,7 +89,7 @@ const OpenCashier = () => {
                   <Typography.Title level={5} className="m-0 py-3 px-4" style={{ marginBottom: 0 }}>
                     Administración del dinero
                   </Typography.Title>
-                  {permissions?.cash_registers?.make_cash_cut_operation && (
+                  {permissions?.cash_registers?.make_cash_cut_operation?.value && (
                     <>
                       <Divider className="m-0" />
                       <AddOperationDrawer />

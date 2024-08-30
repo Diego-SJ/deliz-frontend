@@ -12,6 +12,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import CashCutForm from '../cash_cuts/current-cash-cut/cash-cut-form';
 import { useState } from 'react';
 import OpenCashierModal from '../cash_cuts/current-cash-cut/open-cashier-modal/modal';
+import { ModuleAccess } from '@/routes/module-access';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -54,16 +55,16 @@ const Dashboard = () => {
 
   return (
     <div className="p-3">
-      {permissions?.sales?.add_sale ||
-      permissions?.expenses?.add_expense ||
-      permissions?.cash_registers?.make_cash_cut ||
-      permissions?.cash_registers?.open_cash_cut ? (
+      {permissions?.sales?.add_sale?.value ||
+      permissions?.expenses?.add_expense?.value ||
+      permissions?.cash_registers?.make_cash_cut?.value ||
+      permissions?.cash_registers?.open_cash_cut?.value ? (
         <Typography.Title level={5} className="mb-3">
           Movimientos
         </Typography.Title>
       ) : null}
       <Row gutter={[10, 10]}>
-        {permissions?.sales?.add_sale && (
+        {permissions?.sales?.add_sale?.value && (
           <CardButton
             title="Nueva venta"
             description="Accede al punto de venta"
@@ -73,46 +74,50 @@ const Dashboard = () => {
           />
         )}
 
-        {permissions?.expenses?.add_expense && (
-          <CardButton
-            title="Registrar gasto"
-            description="Registra un gasto"
-            icon={<CircleDollarSign strokeWidth={1.8} className="text-pink-600 !w-7 !h-7" />}
-            className="bg-pink-600/10"
-            onClick={addExpense}
-          />
-        )}
+        <ModuleAccess moduleName="expenses">
+          {permissions?.expenses?.add_expense?.value && (
+            <CardButton
+              title="Registrar gasto"
+              description="Registra un gasto"
+              icon={<CircleDollarSign strokeWidth={1.8} className="text-pink-600 !w-7 !h-7" />}
+              className="bg-pink-600/10"
+              onClick={addExpense}
+            />
+          )}
+        </ModuleAccess>
 
-        {(permissions?.cash_registers?.make_cash_cut || permissions?.cash_registers?.open_cash_cut) && (
-          <CardButton
-            title={active_cash_cut?.cash_cut_id ? (isTablet ? 'Hacer corte de caja' : 'Corte de caja') : 'Abrir caja'}
-            description={active_cash_cut?.cash_cut_id ? 'Realiza el corte de caja' : 'Abre la caja registradora'}
-            icon={
-              active_cash_cut?.cash_cut_id ? (
-                <MonitorX strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
-              ) : (
-                <MonitorCheck strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
-              )
-            }
-            className="bg-teal-600/10"
-            onClick={() => {
-              if (active_cash_cut?.cash_cut_id) {
-                handleDrawerVisible();
-              } else {
-                handleOpenCashier();
+        <ModuleAccess moduleName="make_cash_cut">
+          {(permissions?.cash_registers?.make_cash_cut?.value || permissions?.cash_registers?.open_cash_cut?.value) && (
+            <CardButton
+              title={active_cash_cut?.cash_cut_id ? (isTablet ? 'Hacer corte de caja' : 'Corte de caja') : 'Abrir caja'}
+              description={active_cash_cut?.cash_cut_id ? 'Realiza el corte de caja' : 'Abre la caja registradora'}
+              icon={
+                active_cash_cut?.cash_cut_id ? (
+                  <MonitorX strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
+                ) : (
+                  <MonitorCheck strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
+                )
               }
-            }}
-          />
-        )}
+              className="bg-teal-600/10"
+              onClick={() => {
+                if (active_cash_cut?.cash_cut_id) {
+                  handleDrawerVisible();
+                } else {
+                  handleOpenCashier();
+                }
+              }}
+            />
+          )}
+        </ModuleAccess>
       </Row>
 
-      {permissions?.products?.add_product || permissions?.customers?.add_customer ? (
+      {permissions?.products?.add_product?.value || permissions?.customers?.add_customer?.value ? (
         <Typography.Title level={5} className="mt-5 mb-3">
           Agregar nuevo
         </Typography.Title>
       ) : null}
       <Row gutter={[10, 10]}>
-        {permissions?.products?.add_product && (
+        {permissions?.products?.add_product?.value && (
           <CardButton
             title="Nuevo producto"
             description="Agregar un producto al catalogo"
@@ -122,7 +127,7 @@ const Dashboard = () => {
           />
         )}
 
-        {permissions?.customers?.add_customer && (
+        {permissions?.customers?.add_customer?.value && (
           <CardButton
             title="Nuevo cliente"
             description="Crea un nuevo cliente"

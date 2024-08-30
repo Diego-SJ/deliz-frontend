@@ -129,7 +129,7 @@ const Customers = () => {
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
-            {permissions?.customers?.add_customer && (
+            {permissions?.customers?.add_customer?.value && (
               <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}

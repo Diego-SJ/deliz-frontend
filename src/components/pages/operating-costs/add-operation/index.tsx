@@ -30,6 +30,7 @@ import { BUCKETS } from '@/constants/buckets';
 import { imageCompressionFile } from '@/utils/images';
 import { supabase } from '@/config/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
 
 type Params = {
   action: 'edit' | 'add';
@@ -53,6 +54,7 @@ const AddOperationPurchaseExpense = () => {
   const dispatch = useAppDispatch();
   let { action = 'add', operation_type = 'expense', operating_cost_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
+  const { hasAccess } = useMembershipAccess();
   const { loading: isLoading } = useAppSelector(({ operatingCosts }) => operatingCosts);
   const { currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { company } = useAppSelector(({ app }) => app);
@@ -217,7 +219,7 @@ const AddOperationPurchaseExpense = () => {
             }}
           >
             <Row gutter={[20, 20]} className="mb-5">
-              <Col md={permissions?.expenses?.upload_evidence ? 16 : 24} xs={24}>
+              <Col md={permissions?.expenses?.upload_evidence?.value && hasAccess('upload_evidence') ? 16 : 24} xs={24}>
                 <CardRoot loading={isLoading} className="mb-5">
                   <Form.Item hidden name="supplier_id" label="Proveedor">
                     <Input size="large" placeholder="Proveedor" onPressEnter={onFinish} />
@@ -343,20 +345,22 @@ const AddOperationPurchaseExpense = () => {
                   </Form.Item>
                 </CardRoot>
               </Col>
-              {permissions?.expenses?.upload_evidence ? (
-                <Col md={8} xs={24}>
-                  <CardRoot loading={isLoading}>
-                    <Typography.Paragraph>Evidencia</Typography.Paragraph>
-                    <div className="w-full justify-center">
-                      <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
-                    </div>
-                  </CardRoot>
-                </Col>
-              ) : null}
+              <ModuleAccess moduleName="upload_evidence">
+                {permissions?.expenses?.upload_evidence?.value ? (
+                  <Col md={8} xs={24}>
+                    <CardRoot loading={isLoading}>
+                      <Typography.Paragraph>Evidencia</Typography.Paragraph>
+                      <div className="w-full justify-center">
+                        <UploadEvidence fileList={fileList} setFileList={setFileList} deleteFunction={deleteImage} />
+                      </div>
+                    </CardRoot>
+                  </Col>
+                ) : null}
+              </ModuleAccess>
             </Row>
           </Form>
 
-          {action === 'edit' && permissions?.expenses?.delete_expense && (
+          {action === 'edit' && permissions?.expenses?.delete_expense?.value && (
             <CardRoot
               title={`Eliminar ${operation_type === 'expense' ? 'Gasto' : 'Compra'}`}
               className="my-5"
@@ -395,7 +399,7 @@ const AddOperationPurchaseExpense = () => {
           )}
         </div>
       </div>
-      {(permissions?.expenses?.add_expense || permissions?.expenses?.edit_expense) && (
+      {(permissions?.expenses?.add_expense?.value || permissions?.expenses?.edit_expense?.value) && (
         <Card
           className="rounded-none box-border absolute bottom-0 left-0 w-full"
           classNames={{ body: 'w-full flex items-center' }}

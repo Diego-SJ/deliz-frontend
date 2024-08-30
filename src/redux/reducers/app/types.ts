@@ -19,6 +19,7 @@ export type Company = {
   address: string;
   theme: string;
   created_at: string;
+  membership_id: number | null;
 };
 
 export type Onboarding = {

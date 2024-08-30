@@ -6,6 +6,7 @@ import { MenuOutlined } from '@ant-design/icons';
 import { PageTitleProvider } from '@/contexts/page-title-context';
 import HeaderTitlte from './header-title';
 import AIButton from '@/components/atoms/ai-button';
+import { ModuleAccess } from '@/routes/module-access';
 
 type HeaderProps = {
   onClick?: () => void;
@@ -24,7 +25,9 @@ const Header = ({ onClick }: HeaderProps) => {
         </PageTitleProvider>
       )}
       <div className="flex items-center gap-2 md:gap-5">
-        <AIButton />
+        <ModuleAccess moduleName="chat_ia">
+          <AIButton />
+        </ModuleAccess>
         <MenuPopover />
       </div>
     </HeaderRoot>

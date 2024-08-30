@@ -61,7 +61,7 @@ const CategoriesPage = () => {
         <div className="flex justify-between md:items-center mb-4 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra las categorías de productos que deseas ofrecer</Typography.Text>
 
-          {permissions?.categories?.add_category && (
+          {permissions?.categories?.add_category?.value && (
             <Button icon={<PlusCircleOutlined />} onClick={onAddNew} size={isTablet ? 'large' : 'middle'}>
               Agregar nueva
             </Button>
@@ -87,7 +87,7 @@ const CategoriesPage = () => {
             <List
               itemLayout="horizontal"
               footer={
-                permissions?.categories?.add_category ? (
+                permissions?.categories?.add_category?.value ? (
                   <div className="px-2">
                     <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
                       Agregar nueva
@@ -104,8 +104,8 @@ const CategoriesPage = () => {
                   className="flex"
                   actions={[
                     <ActionTableButtons
-                      hideDeleteButton={!permissions?.categories?.delete_category}
-                      hideEditButton={!permissions?.categories?.edit_category}
+                      hideDeleteButton={!permissions?.categories?.delete_category?.value}
+                      hideEditButton={!permissions?.categories?.edit_category?.value}
                       deleteFunction={productActions.categories.delete(item.category_id as number)}
                       editFunction={productActions.setCurrentCategory(item)}
                     />,

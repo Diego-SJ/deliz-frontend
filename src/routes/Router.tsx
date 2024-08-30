@@ -40,9 +40,12 @@ import ReportsLayout from '@/components/pages/reports/layout';
 import OnlineStorePage from '@/components/pages/online-store';
 import Membership from '@/components/pages/membership';
 import AiChatPage from '@/components/pages/ai-chat';
+import SalesReports from '@/components/pages/reports/sales/full-report';
+import { useMembershipAccess } from './module-access';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
+  const { hasAccess } = useMembershipAccess();
   const { permissions } = useAppSelector(({ users }) => users?.user_auth.profile! || {});
   const { isAdmin, authenticated } = useAppSelector(({ users }) => users.user_auth);
   const { status_id } = useAppSelector(({ app }) => app?.onboarding || { status_id: null });
@@ -86,10 +89,10 @@ const AppRouter = () => {
         }
       >
         <Route path={APP_ROUTES.PRIVATE.HOME.path} element={<Dashboard />} />
-        <Route path={APP_ROUTES.PRIVATE.AI_CHAT.path} element={<AiChatPage />} />
+        {hasAccess('chat_ia') && <Route path={APP_ROUTES.PRIVATE.AI_CHAT.path} element={<AiChatPage />} />}
 
         {/* PRODUCTS ROUTES - START */}
-        {permissions?.products?.view_catalog && (
+        {permissions?.products?.view_catalog?.value && (
           <>
             <Route
               path={APP_ROUTES.PRIVATE.PRODUCTS.path}
@@ -116,7 +119,7 @@ const AppRouter = () => {
         {/* ORDERS ROUTES - END */}
 
         {/* TRANSACTIONS ROUTES - START */}
-        {permissions?.cash_registers?.view_history_cash_cuts && (
+        {permissions?.cash_registers?.view_history_cash_cuts?.value && hasAccess('make_cash_cut') ? (
           <>
             <Route
               path={APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIERS.path}
@@ -135,8 +138,8 @@ const AppRouter = () => {
               }
             />
           </>
-        )}
-        {permissions?.cash_registers?.view_current_cash_cut && (
+        ) : null}
+        {permissions?.cash_registers?.view_current_cash_cut?.value && hasAccess('make_cash_cut') ? (
           <Route
             path={APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path}
             element={
@@ -145,10 +148,10 @@ const AppRouter = () => {
               </PaddingLayout>
             }
           />
-        )}
+        ) : null}
         {/* TRANSACTIONS ROUTES - END */}
 
-        {permissions?.customers?.view_customers && (
+        {permissions?.customers?.view_customers?.value && (
           <Route
             path={APP_ROUTES.PRIVATE.CUSTOMERS.path}
             element={
@@ -158,7 +161,7 @@ const AppRouter = () => {
             }
           />
         )}
-        {permissions?.sales?.view_sales && (
+        {permissions?.sales?.view_sales?.value && (
           <>
             <Route
               path={APP_ROUTES.PRIVATE.SALES.path}
@@ -181,7 +184,7 @@ const AppRouter = () => {
 
         {/* PURCHASES EXPENSES ROUTES - START */}
 
-        {permissions?.expenses?.view_expenses && (
+        {permissions?.expenses?.view_expenses?.value && hasAccess('expenses') ? (
           <>
             <Route
               path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path}
@@ -191,21 +194,25 @@ const AppRouter = () => {
                 </PaddingLayout>
               }
             />
-            <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.path} element={<AddOperationPurchaseExpense />} />
-            <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
+            {permissions?.expenses?.add_expense?.value && (
+              <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.path} element={<AddOperationPurchaseExpense />} />
+            )}
+            {permissions?.expenses?.edit_expense?.value && (
+              <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
+            )}
           </>
-        )}
+        ) : null}
 
         {/* PURCHASES EXPENSES ROUTES - END */}
 
-        <Route path={APP_ROUTES.PRIVATE.ONLINE_STORE.path} element={<OnlineStorePage />} />
+        {hasAccess('online_store') && <Route path={APP_ROUTES.PRIVATE.ONLINE_STORE.path} element={<OnlineStorePage />} />}
 
         {/* SETTINGS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.SETTINGS.path} element={<SettingsPage />}>
           {isTablet && <Route path={APP_ROUTES.PRIVATE.SETTINGS.path} element={<SettingsMenu />} />}
           <Route path={APP_ROUTES.PRIVATE.SETTINGS.path + '/general'} element={<GeneralSettingsPage />} />
           <Route path={APP_ROUTES.PRIVATE.SETTINGS.GENERAL.path} element={<GeneralSettingsPage />} />
-          {permissions?.branches?.view_branches && (
+          {permissions?.branches?.view_branches?.value && (
             <>
               <Route path={APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.path} element={<BranchesPage />} />
               <Route path={APP_ROUTES.PRIVATE.SETTINGS.BRANCHES.ADD.path} element={<AddBranchForm />} />
@@ -213,18 +220,22 @@ const AppRouter = () => {
             </>
           )}
 
-          {permissions?.sizes?.view_sizes && <Route path={APP_ROUTES.PRIVATE.SETTINGS.SIZES.path} element={<ProductSizes />} />}
+          {permissions?.sizes?.view_sizes?.value && (
+            <Route path={APP_ROUTES.PRIVATE.SETTINGS.SIZES.path} element={<ProductSizes />} />
+          )}
 
-          {permissions?.units?.view_units && <Route path={APP_ROUTES.PRIVATE.SETTINGS.UNITS.path} element={<ProductUnits />} />}
+          {permissions?.units?.view_units?.value && (
+            <Route path={APP_ROUTES.PRIVATE.SETTINGS.UNITS.path} element={<ProductUnits />} />
+          )}
 
-          {permissions?.cash_registers?.view_cash_registers && (
+          {permissions?.price_list?.view_price_list?.value && (
             <Route path={APP_ROUTES.PRIVATE.SETTINGS.PRICES_LIST.path} element={<PricesListPage />} />
           )}
-          {permissions?.categories?.view_categories && (
+          {permissions?.categories?.view_categories?.value && (
             <Route path={APP_ROUTES.PRIVATE.SETTINGS.CATEGORIES.path} element={<CategoriesPage />} />
           )}
 
-          {permissions?.cash_registers?.view_cash_registers && (
+          {permissions?.cash_registers?.view_cash_registers?.value && (
             <Route path={APP_ROUTES.PRIVATE.SETTINGS.CASH_REGISTERS.path} element={<CashRegistersPage />} />
           )}
 
@@ -238,14 +249,28 @@ const AppRouter = () => {
         </Route>
         {/* SETTINGS ROUTES - END */}
 
-        <Route
-          path={APP_ROUTES.PRIVATE.REPORTS.path}
-          element={
-            <ReportsLayout>
-              <ReportsHomePage />
-            </ReportsLayout>
-          }
-        />
+        {/* REPORTS ROUTES - START */}
+        {hasAccess('reports') && (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.path}
+            element={
+              <ReportsLayout>
+                <ReportsHomePage />
+              </ReportsLayout>
+            }
+          />
+        )}
+        {permissions?.reports?.view_sales_report?.value && hasAccess('reports') ? (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.SALES.path}
+            element={
+              <ReportsLayout>
+                <SalesReports />
+              </ReportsLayout>
+            }
+          />
+        ) : null}
+        {/* REPORTS ROUTES - END */}
 
         <Route path={APP_ROUTES.PRIVATE.MEMBERSHIP.path} element={<Membership />} />
       </Route>

@@ -31,7 +31,7 @@ const ExistencesTable = ({ onChange, setInventory, inventory }: Props) => {
             Sucursal
           </Typography.Title>
           <Typography.Title level={5} className="w-[30%] py-1" style={{ margin: 0, fontSize: 14 }}>
-            Cantidad
+            Existencias
           </Typography.Title>
         </div>
         <div className="flex w-full flex-col">

@@ -55,9 +55,9 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
       >
         <SideMobileMenu onClick={handleDrawer} />
       </Drawer>
-      <LayoutContainer>
+      <LayoutContainer className="!bg-background">
         <Header onClick={handleDrawer} />
-        <LayoutContent className="relative">
+        <LayoutContent className="relative !bg-transparent">
           <Outlet />
         </LayoutContent>
       </LayoutContainer>

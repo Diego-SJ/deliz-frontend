@@ -19,7 +19,7 @@ import {
   UploadFile,
   message,
 } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
@@ -47,7 +47,6 @@ const ProductQuickEditor = () => {
   const [loading, setLoading] = useState(false);
   const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const firstRender = useRef<boolean>(false);
   const [inventory, setInventory] = useState<Inventory>({});
   const [priceList, setPriceList] = useState<PriceList>({});
   const { modal } = App.useApp();

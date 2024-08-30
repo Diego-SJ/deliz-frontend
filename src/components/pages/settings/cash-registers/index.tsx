@@ -7,12 +7,14 @@ import CardRoot from '@/components/atoms/Card';
 import { branchesActions } from '@/redux/reducers/branches';
 import { Branch, CashRegister } from '@/redux/reducers/branches/type';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const CashRegistersPage = () => {
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const [open, setOpen] = useState(false);
+  const { maxCashRegisters } = useMembershipAccess();
   const { cash_registers, branches } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [options, setOptions] = useState<CashRegister[]>([]);
@@ -59,7 +61,6 @@ const CashRegistersPage = () => {
       okType: 'danger',
       onOk: async () => {
         await dispatch(branchesActions.deleteCashRegister(cash_register_id));
-        message.success('Caja eliminada correctamente');
       },
     });
   };
@@ -89,11 +90,11 @@ const CashRegistersPage = () => {
             placeholder="Selecciona una sucursal"
           />
 
-          {permissions?.branches?.add_branch && (
+          {permissions?.cash_registers?.add_cash_register?.value && options?.length < maxCashRegisters ? (
             <Button icon={<PlusCircleOutlined />} onClick={openModal} size={isTablet ? 'large' : 'middle'}>
               Agregar nueva
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -105,7 +106,7 @@ const CashRegistersPage = () => {
         <List
           itemLayout="horizontal"
           footer={
-            permissions?.branches?.add_branch ? (
+            permissions?.cash_registers?.add_cash_register?.value && options?.length < maxCashRegisters ? (
               <div className="px-2">
                 <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={openModal}>
                   Agregar nueva
@@ -121,12 +122,12 @@ const CashRegistersPage = () => {
               classNames={{ actions: 'flex' }}
               className="flex"
               actions={[
-                permissions?.cash_registers?.edit_cash_register ? (
+                permissions?.cash_registers?.edit_cash_register?.value ? (
                   <Button type="link" onClick={() => onEdit(item)} className="w-min px-0">
                     Editar
                   </Button>
                 ) : null,
-                item?.is_default || !permissions?.cash_registers?.delete_cash_register ? null : (
+                item?.is_default || !permissions?.cash_registers?.delete_cash_register?.value ? null : (
                   <Button danger type="link" className="w-min px-0" onClick={() => onDelete(item.cash_register_id)}>
                     Eliminar
                   </Button>

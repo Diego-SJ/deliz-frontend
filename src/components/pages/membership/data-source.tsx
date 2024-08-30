@@ -296,6 +296,17 @@ export const TABLE_BODY = [
       { title: <CheckIcon /> },
     ],
   },
+  {
+    rowType: 'body',
+    id: uuidv4(),
+    cols: [
+      { title: 'Transferir venta a una sucursal y caja diferente' },
+      { title: <NoneIcon /> },
+      { title: <NoneIcon /> },
+      { title: <NoneIcon /> },
+      { title: <CheckIcon /> },
+    ],
+  },
   // Online Store
   {
     rowType: 'header',
@@ -324,7 +335,7 @@ export const TABLE_BODY = [
     cols: [
       { title: 'Recibe pedidos por WhatsApp' },
       { title: <NoneIcon /> },
-      { title: <CheckIcon /> },
+      { title: <NoneIcon /> },
       { title: <CheckIcon /> },
       { title: <CheckIcon /> },
     ],
@@ -336,7 +347,7 @@ export const TABLE_BODY = [
       { title: 'Landing page', tooltip: 'Comparte con tus clientes una pagina con la información de tu negocio.' },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
-      { title: <CheckIcon /> },
+      { title: <NoneIcon /> },
       { title: <CheckIcon /> },
     ],
   },
@@ -370,6 +381,17 @@ export const TABLE_BODY = [
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
       { title: <CheckIcon /> },
+      { title: <CheckIcon /> },
+    ],
+  },
+  {
+    rowType: 'body',
+    id: uuidv4(),
+    cols: [
+      { title: 'Agregar evidencia a gastos', tooltip: 'Agrega una foto a tus gastos para tener un mejor control.' },
+      { title: <NoneIcon /> },
+      { title: <NoneIcon /> },
+      { title: <NoneIcon /> },
       { title: <CheckIcon /> },
     ],
   },

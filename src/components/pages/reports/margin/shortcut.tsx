@@ -6,12 +6,15 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { LineChartData } from '@/redux/reducers/analytics/types';
 import functions from '@/utils/functions';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const getTotalAmountSales = (data: LineChartData) =>
   data.reduce((acc, series) => acc + series.data.reduce((sum, point) => sum + point.total, 0), 0);
 
 const ReportMarginShortcut = () => {
   const dispatch = useAppDispatch();
+  const { hasAccess } = useMembershipAccess();
+  const { user_auth } = useAppSelector(({ users }) => users);
   const { loading, data } = useAppSelector(({ analytics }) => analytics?.sales || {});
   const totalAmountSales = getTotalAmountSales(data) || 0;
 
@@ -20,9 +23,11 @@ const ReportMarginShortcut = () => {
       loading={loading}
       title={<h5 className="!text-base m-0 font-medium">Monto total de ventas</h5>}
       extra={
-        <Button type="text" className="!text-primary underline" onClick={() => dispatch(analyticsActions.getSales())}>
-          Actualizar
-        </Button>
+        user_auth?.profile?.permissions?.reports?.view_sales_report?.value && hasAccess('view_sales_report') ? (
+          <Button type="text" className="!text-primary underline" onClick={() => dispatch(analyticsActions.getSales())}>
+            Actualizar
+          </Button>
+        ) : null
       }
       classNames={{ body: '!px-4 !pt-2' }}
     >

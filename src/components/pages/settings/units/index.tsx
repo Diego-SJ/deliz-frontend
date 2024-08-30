@@ -2,12 +2,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { productActions } from '@/redux/reducers/products';
 import { Unit } from '@/redux/reducers/products/types';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Card, Drawer, List, Tag, Typography } from 'antd';
+import { Button, Drawer, List, Tag, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import SizeEditor from './editor';
 import ActionTableButtons from '@/components/molecules/Table/action-table-btns';
 import BreadcrumbSettings from '../../settings/menu/breadcrumb';
+import CardRoot from '@/components/atoms/Card';
 
 const ProductUnitsPage = () => {
   const dispatch = useAppDispatch();
@@ -47,7 +48,7 @@ const ProductUnitsPage = () => {
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text type="secondary">Administra las unidades de medida que tendrán tus productos</Typography.Text>
 
-          {permissions?.units?.add_unit && (
+          {permissions?.units?.add_unit?.value && (
             <Button icon={<PlusCircleOutlined />} onClick={onAddNew} size={isTablet ? 'large' : 'middle'}>
               Agregar nuevo
             </Button>
@@ -55,11 +56,11 @@ const ProductUnitsPage = () => {
         </div>
       </div>
 
-      <Card style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Unidades" className="shadow-md rounded-xl">
+      <CardRoot style={{ width: '100%' }} styles={{ body: { padding: 0 } }} title="Unidades">
         <List
           itemLayout="horizontal"
           footer={
-            permissions?.units?.add_unit ? (
+            permissions?.units?.add_unit?.value ? (
               <div className="px-2">
                 <Button type="text" icon={<PlusCircleOutlined />} className="text-primary" onClick={onAddNew}>
                   Agregar nuevo
@@ -76,8 +77,8 @@ const ProductUnitsPage = () => {
               className="flex"
               actions={[
                 <ActionTableButtons
-                  hideDeleteButton={!permissions?.units?.delete_unit}
-                  hideEditButton={!permissions?.units?.edit_unit}
+                  hideDeleteButton={!permissions?.units?.delete_unit?.value}
+                  hideEditButton={!permissions?.units?.edit_unit?.value}
                   deleteFunction={productActions.units.delete(item.unit_id as number)}
                   editFunction={productActions.units.edit(item)}
                 />,
@@ -90,7 +91,7 @@ const ProductUnitsPage = () => {
             </List.Item>
           )}
         />
-      </Card>
+      </CardRoot>
       <Drawer
         title={units?.drawer === 'edit' ? 'Editar unidad' : 'Agregar nueva unidad'}
         width={isTablet ? 350 : 420}

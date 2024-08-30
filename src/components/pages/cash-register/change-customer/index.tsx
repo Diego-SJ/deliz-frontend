@@ -4,7 +4,7 @@ import CustomerEditor from '../../customers/editor';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import functions from '@/utils/functions';
 import useMediaQuery from '@/hooks/useMediaQueries';
@@ -27,6 +27,12 @@ const CashierCustomer = () => {
   const { customer_id } = cash_register;
   const [hoverDelete, setHoverDelete] = useState(false);
   const { isTablet } = useMediaQuery();
+
+  useEffect(() => {
+    if (!!openForm && !customers?.length) {
+      dispatch(customerActions.fetchCustomers({ refetch: true }));
+    }
+  }, [dispatch, customers]);
 
   useEffect(() => {
     let _customers: Option[] = customers.map(item => ({ value: item.customer_id, label: item.name, ...item }));
@@ -58,7 +64,7 @@ const CashierCustomer = () => {
     dispatch(customerActions.setCurrentCustomer({ customer_id: -1 }));
   };
 
-  const CUstomerForm = () => {
+  const CustomerForm = () => {
     return (
       <>
         {isCreating ? (
@@ -68,41 +74,39 @@ const CashierCustomer = () => {
             <Typography.Text type="secondary" className="block mb-4">
               Selecciona un cliente
             </Typography.Text>
-            <Select
-              showSearch
-              style={{ width: '100%', height: 58 }}
-              size="large"
-              value={currentCustomerId as number}
-              placeholder="Buscar cliente"
-              virtual={false}
-              suffixIcon={<SearchOutlined />}
-              optionFilterProp="children"
-              className="xl-select"
-              onChange={onChange}
-              filterOption={(input, option) => {
-                return (
-                  functions.includes(option?.label, input.toLowerCase()) || functions.includes(option?.phone, input.toLowerCase())
-                );
-              }}
-              options={customerList}
-              onClick={() => {
-                if (!customerList.length) {
-                  dispatch(customerActions.fetchCustomers({ refetch: true }));
-                }
-              }}
-              optionRender={option => {
-                if (option.value === '') return null;
-                return (
-                  <div className="flex items-center px-0 py-0 gap-4">
-                    <Avatar shape="square" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
-                    <div className="flex flex-col">
-                      <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
-                      <span className="text-slate-400 font-light">{option?.data?.phone}</span>{' '}
+            {!!customers?.length ? (
+              <Select
+                showSearch
+                style={{ width: '100%', height: 58 }}
+                size="large"
+                value={currentCustomerId as number}
+                placeholder="Buscar cliente"
+                virtual={false}
+                suffixIcon={<SearchOutlined />}
+                optionFilterProp="children"
+                className="xl-select"
+                onChange={onChange}
+                filterOption={(input, option) => {
+                  return (
+                    functions.includes(option?.label, input.toLowerCase()) ||
+                    functions.includes(option?.phone, input.toLowerCase())
+                  );
+                }}
+                options={customerList}
+                optionRender={option => {
+                  if (option.value === '') return null;
+                  return (
+                    <div className="flex items-center px-0 py-0 gap-4">
+                      <Avatar shape="square" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
+                      <div className="flex flex-col">
+                        <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
+                        <span className="text-slate-400 font-light">{option?.data?.phone || 'Sin número'}</span>{' '}
+                      </div>
                     </div>
-                  </div>
-                );
-              }}
-            />
+                  );
+                }}
+              />
+            ) : null}
             <div
               onClick={() => onChange(null)}
               className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg my-2"
@@ -110,7 +114,7 @@ const CashierCustomer = () => {
               <Avatar shape="square" size="large" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
               <div className="flex flex-col">Público General</div>
             </div>
-            {permissions?.customers?.add_customer && (
+            {permissions?.customers?.add_customer?.value && (
               <div
                 onClick={onRegister}
                 className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg mb-3"
@@ -170,7 +174,7 @@ const CashierCustomer = () => {
           onCancel={onClose}
           open={openForm}
         >
-          <CUstomerForm />
+          <CustomerForm />
         </Modal>
       ) : (
         <Drawer
@@ -182,7 +186,7 @@ const CashierCustomer = () => {
           width={350}
           styles={{ body: { paddingBottom: 80 } }}
         >
-          <CUstomerForm />
+          <CustomerForm />
         </Drawer>
       )}
     </>

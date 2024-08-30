@@ -32,6 +32,9 @@ dependencies:
   '@supabase/supabase-js':
     specifier: ^2.44.2
     version: 2.44.2
+  '@uidotdev/usehooks':
+    specifier: ^2.4.1
+    version: 2.4.1(react-dom@18.3.1)(react@18.3.1)
   '@yudiel/react-qr-scanner':
     specifier: ^2.0.4
     version: 2.0.4(react-dom@18.3.1)(react@18.3.1)
@@ -71,6 +74,9 @@ dependencies:
   numeral:
     specifier: ^2.0.6
     version: 2.0.6
+  rc-virtual-list:
+    specifier: ^3.14.5
+    version: 3.14.5(react-dom@18.3.1)(react@18.3.1)
   react:
     specifier: ^18.3.1
     version: 18.3.1
@@ -3036,6 +3042,17 @@ packages:
       '@typescript-eslint/types': 5.62.0
       eslint-visitor-keys: 3.4.3
     dev: true
+
+  /@uidotdev/usehooks@2.4.1(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-1I+RwWyS+kdv3Mv0Vmc+p0dPYH0DTRAo04HLyXReYBL9AeseDWUJyi4THuksBJcu9F0Pih69Ak150VDnqbVnXg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: false
 
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
@@ -6489,7 +6506,7 @@ packages:
   /rtl-css-js@1.16.1:
     resolution: {integrity: sha512-lRQgou1mu19e+Ya0LsTvKrVJ5TYUbqCVPAiImX3UfLTenarvPUl1QFdvu5Z3PYmHT9RCcwIfbjRQBntExyj3Zg==}
     dependencies:
-      '@babel/runtime': 7.24.7
+      '@babel/runtime': 7.25.0
     dev: false
 
   /run-parallel@1.2.0:

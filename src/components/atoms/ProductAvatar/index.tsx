@@ -50,7 +50,7 @@ const ProductAvatar = ({ product, stock = 0, enableEdit = false, icon, onButtonC
             {product?.categories?.name || 'Sin categoría'}
           </Typography.Paragraph>
 
-          {(enableEdit || onButtonClick) && !!permissions?.products?.edit_product && (
+          {(enableEdit || onButtonClick) && !!permissions?.products?.edit_product?.value && (
             <Button
               icon={icon || <EditOutlined />}
               onClick={() => {

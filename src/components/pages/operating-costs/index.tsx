@@ -182,7 +182,7 @@ const PurchasesExpenses = () => {
               </Dropdown>
             </Col>
             <Col lg={4} xs={12}>
-              {permissions?.expenses?.add_expense && (
+              {permissions?.expenses?.add_expense?.value && (
                 <Button
                   block
                   type="primary"

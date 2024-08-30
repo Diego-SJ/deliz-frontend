@@ -1,6 +1,6 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { PlusCircleOutlined, ShopOutlined } from '@ant-design/icons';
-import { Avatar, Button, List, Result, Tag, Typography } from 'antd';
+import { Avatar, Button, List, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbSettings from '../menu/breadcrumb';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -8,10 +8,12 @@ import { useEffect, useRef } from 'react';
 import { branchesActions } from '@/redux/reducers/branches';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import { useMembershipAccess } from '@/routes/module-access';
 
 const BranchesPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { maxBranches } = useMembershipAccess();
   const { branches } = useAppSelector(state => state.branches);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { isTablet } = useMediaQuery();
@@ -40,11 +42,11 @@ const BranchesPage = () => {
         <Typography.Title level={4}>Sucursales</Typography.Title>
         <div className="flex justify-between md:items-center mb-6 flex-col md:flex-row gap-3">
           <Typography.Text className="text-gray-500">Administra tus sucursales aquí</Typography.Text>
-          {permissions?.branches?.add_branch && (
+          {permissions?.branches?.add_branch?.value && branches?.length < maxBranches ? (
             <Button icon={<PlusCircleOutlined />} onClick={onAddBranch} size={isTablet ? 'large' : 'middle'}>
               Agregar sucursal
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -53,7 +55,7 @@ const BranchesPage = () => {
           <List
             itemLayout="horizontal"
             footer={
-              permissions?.branches?.add_branch ? (
+              permissions?.branches?.add_branch?.value && branches?.length < maxBranches ? (
                 <div className="px-2">
                   <Button
                     type="text"
@@ -88,21 +90,7 @@ const BranchesPage = () => {
               </List.Item>
             )}
           />
-        ) : (
-          <>
-            <Result
-              className="mx-auto"
-              status="404"
-              title="No hay sucursales"
-              subTitle="No se encontraron sucursales registradas."
-              extra={
-                <Button type="primary" ghost>
-                  Registra tu primer sucursal
-                </Button>
-              }
-            />
-          </>
-        )}
+        ) : null}
       </CardRoot>
     </div>
   );

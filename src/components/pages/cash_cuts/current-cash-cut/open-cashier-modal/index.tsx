@@ -14,7 +14,7 @@ const OpenCashier = () => {
   return (
     <div className="min-h-60 flex justify-center items-center">
       <Empty description="Aún no tienes una caja abierta">
-        {permissions?.cash_registers?.open_cash_cut && <Button onClick={() => setVisible(true)}>Empezar a vender</Button>}
+        {permissions?.cash_registers?.open_cash_cut?.value && <Button onClick={() => setVisible(true)}>Empezar a vender</Button>}
       </Empty>
       <OpenCashierModal visible={visible} onClose={handleClose} />
     </div>
