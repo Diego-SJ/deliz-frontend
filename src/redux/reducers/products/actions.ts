@@ -5,7 +5,8 @@ import { Category, Product, Size, Unit } from './types';
 import { message } from 'antd';
 import { BUCKETS } from '@/constants/buckets';
 import { RcFile } from 'antd/es/upload';
-import { MAX_USERS, PLANS_IDS } from '@/routes/module-access';
+import { MAX_USERS } from '@/routes/module-access';
+import { PLANS_IDS } from '@/constants/membership-plans';
 
 export interface FetchFunction {
   refetch?: boolean;

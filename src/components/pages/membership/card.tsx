@@ -67,6 +67,7 @@ type Props = {
   onClick?: () => void;
   periodicity?: 'monthly' | 'annual';
   subTitle?: string;
+  isCurrentPlan?: boolean;
 };
 
 const PriceCard = ({
@@ -81,9 +82,9 @@ const PriceCard = ({
   subTitle = '',
 }: Props) => {
   return (
-    <div className={`w-full relative rounded-xl px-5 py-5 bg-white shadow-md border ${!isPopular ? '' : 'border-primary'}`}>
+    <div className={`w-full relative rounded-xl px-5 py-5 bg-white shadow-sm border ${!isPopular ? '' : 'border-primary'}`}>
       {isPopular && (
-        <span className="absolute text-white h-5 bg-primary text-sm -top-2 left-1/2 -translate-x-1/2 px-2 rounded-full">
+        <span className="absolute text-white h-5 bg-primary text-xs -top-2 left-1/2 -translate-x-1/2 px-3 leading-[1.5] rounded-full">
           Más popular
         </span>
       )}

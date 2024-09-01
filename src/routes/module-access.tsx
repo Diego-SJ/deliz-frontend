@@ -1,4 +1,5 @@
 import { PERMISSION_NAMES } from '@/components/pages/settings/users/permissions/data-and-types';
+import { PLANS_IDS } from '@/constants/membership-plans';
 import { useAppSelector } from '@/hooks/useStore';
 import { FC } from 'react';
 
@@ -10,13 +11,6 @@ export type AppModules =
   | 'landing_page'
   | 'basic_permissions'
   | 'chat_ia';
-
-export const PLANS_IDS = {
-  BASIC: 1,
-  ESSENTIAL: 2,
-  ADVANCED: 3,
-  PRO: 4,
-};
 
 const plans: { [planId: number]: AppModules[] } = {
   // basic
