@@ -1,12 +1,10 @@
-import { Button, Space } from 'antd';
-import { HeaderActions, HeaderRoot } from './styles';
+import { Button } from 'antd';
+import { HeaderRoot } from './styles';
 import MenuPopover from '@/components/molecules/MenuPopover';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { MenuOutlined } from '@ant-design/icons';
 import { PageTitleProvider } from '@/contexts/page-title-context';
 import HeaderTitlte from './header-title';
-import AIButton from '@/components/atoms/ai-button';
-import { ModuleAccess } from '@/routes/module-access';
 
 type HeaderProps = {
   onClick?: () => void;
@@ -25,9 +23,9 @@ const Header = ({ onClick }: HeaderProps) => {
         </PageTitleProvider>
       )}
       <div className="flex items-center gap-2 md:gap-5">
-        <ModuleAccess moduleName="chat_ia">
+        {/* <ModuleAccess moduleName="chat_ia">
           <AIButton />
-        </ModuleAccess>
+        </ModuleAccess> */}
         <MenuPopover />
       </div>
     </HeaderRoot>

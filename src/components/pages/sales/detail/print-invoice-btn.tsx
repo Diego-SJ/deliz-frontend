@@ -117,10 +117,13 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 800, margin: 0 }}>Cliente:</Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                {metadata?.customers?.name || 'Público General'}
+                Nombre: {metadata?.customers?.name || 'Público General'}
               </Typography.Paragraph>
               <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
-                {metadata?.customers?.phone || 'Tel.: N/A'}
+                Teléfono: {metadata?.customers?.phone || 'N/A'}
+              </Typography.Paragraph>
+              <Typography.Paragraph style={{ fontSize: 12, fontWeight: 400, margin: 0 }}>
+                Dirección: {metadata?.customers?.address || 'N/A'}
               </Typography.Paragraph>
             </Col>
             <Col span={8} style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>

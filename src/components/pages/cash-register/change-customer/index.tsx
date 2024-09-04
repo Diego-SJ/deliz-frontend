@@ -32,7 +32,7 @@ const CashierCustomer = () => {
     if (!!openForm && !customers?.length) {
       dispatch(customerActions.fetchCustomers({ refetch: true }));
     }
-  }, [dispatch, customers]);
+  }, [dispatch, customers, openForm]);
 
   useEffect(() => {
     let _customers: Option[] = customers.map(item => ({ value: item.customer_id, label: item.name, ...item }));

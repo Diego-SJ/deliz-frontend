@@ -90,7 +90,7 @@ const customActions = {
           supabase
             .from('sales')
             .select(
-              '*, customers (name, customer_id), status (status_id, name), branches (branch_id, name), cash_registers (cash_register_id, name)',
+              '*, customers (name, customer_id, phone, address), status (status_id, name), branches (branch_id, name), cash_registers (cash_register_id, name)',
             )
             .eq('sale_id', args?.sale_id),
         ]);
@@ -162,7 +162,7 @@ const customActions = {
             p_company_id: company_id,
             p_customer_id: state.cash_register.customer_id as number,
             p_discount: state.cash_register.discount,
-            p_discount_type: state.cash_register.discountType,
+            p_discount_type: state.cash_register.discountType || 'AMOUNT',
             p_payment_method: sale?.payment_method || 'EFECTIVO',
             p_shipping: state.cash_register.shipping,
             p_status_id: sale.status_id || STATUS_DATA.PENDING.id,

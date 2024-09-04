@@ -55,10 +55,10 @@ const CustomerEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
           },
         ]}
       >
-        <Input size="large" placeholder="7720000000" maxLength={10} minLength={10} />
+        <Input size="large" placeholder="E.g: 1234567890" maxLength={10} minLength={10} inputMode="tel" type="number" />
       </Form.Item>
       <Form.Item name="email" label="Correo" rules={[{ type: 'email' }]}>
-        <Input size="large" placeholder="ejemplo@email.com" />
+        <Input size="large" placeholder="ejemplo@email.com" inputMode="email" />
       </Form.Item>
       <Form.Item name="address" label="Dirección">
         <TextArea size="large" rows={2} placeholder="E.g: Calle Pirul 6" />
