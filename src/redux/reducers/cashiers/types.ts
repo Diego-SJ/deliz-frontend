@@ -2,11 +2,23 @@ import { Cashier, SaleDetails } from '../sales/types';
 
 export type CashiersSlice = {
   active_cash_cut: CashCut | null;
-  cash_cuts: CashCut[];
+  cash_cuts: {
+    data: CashCut[];
+    filters: Partial<CashCutFilters>;
+  };
   cash_operations: CashOperations;
   cashier_detail: CashierDetail;
   loading: boolean;
   error?: string | null;
+};
+
+export type CashCutFilters = {
+  cash_register_id?: string;
+  branch_id?: string;
+  order_by?: string;
+  page?: number;
+  pageSize?: number;
+  total?: number;
 };
 
 export type CashierDetail = {

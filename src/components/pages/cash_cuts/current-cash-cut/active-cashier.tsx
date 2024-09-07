@@ -105,21 +105,21 @@ const OpenCashier = () => {
                     </div>
 
                     <div className="flex justify-between py-1">
-                      <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de ventas</Typography.Text>
+                      <Typography.Text className="m-0 text-neutral-400 !font-light">Ventas realizadas</Typography.Text>
                       <Typography.Text className="m-0 text-neutral-600">
                         {functions.money(active_cash_cut?.sales_amount || 0)}
                       </Typography.Text>
                     </div>
 
                     <div className="flex justify-between py-1">
-                      <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de ingresos</Typography.Text>
+                      <Typography.Text className="m-0 text-neutral-400 !font-light">Ingresos</Typography.Text>
                       <Typography.Text className="m-0 text-neutral-600">
                         {functions.money(active_cash_cut?.incomes_amount || 0)}
                       </Typography.Text>
                     </div>
 
                     <div className="flex justify-between py-1">
-                      <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de egresos</Typography.Text>
+                      <Typography.Text className="m-0 text-neutral-400 !font-light">Gastos y egresos</Typography.Text>
                       <Typography.Text className="m-0 text-neutral-600">
                         - {functions.money(active_cash_cut?.expenses_amount)}
                       </Typography.Text>

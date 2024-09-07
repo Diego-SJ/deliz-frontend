@@ -320,6 +320,48 @@ const customActions = {
       dispatch(cashiersActions.setActiveCashCut(currentCashCutData));
       return true;
     },
+    fetchCashCutsByCompany: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState()?.app?.company?.company_id;
+      const filters = getState()?.cashiers?.cash_cuts?.filters;
+      dispatch(cashiersActions.setLoading(true));
+      let supabaseQuery = supabase
+        .from('cash_cuts')
+        .select('*', { count: 'exact' })
+        .eq('company_id', company_id)
+        .eq('is_open', false);
+
+      if (filters?.order_by) {
+        const [field, direction] = filters?.order_by.split(',');
+        supabaseQuery.order(field, { ascending: direction === 'true' });
+      } else {
+        supabaseQuery.order('closing_date', { ascending: false });
+      }
+
+      if (filters?.cash_register_id) {
+        supabaseQuery.eq('cash_register_id', filters?.cash_register_id);
+      }
+
+      if (filters?.branch_id) {
+        supabaseQuery.eq('branch_id', filters?.branch_id);
+      }
+
+      // pagination
+      const page = filters?.page || 0;
+      const pageSize = filters?.pageSize || 10;
+      let offset = page * pageSize;
+      let limit = (page + 1) * pageSize - 1;
+
+      const { data, error: cashCutError, count } = await supabaseQuery.range(offset, limit);
+      dispatch(cashiersActions.setLoading(false));
+      dispatch(cashiersActions.setCashCutFilters({ total: count || 0, page, pageSize }));
+
+      if (cashCutError) {
+        dispatch(cashiersActions.setCashCuts([]));
+        return false;
+      }
+      dispatch(cashiersActions.setCashCuts(data));
+      return true;
+    },
     fetchCashCutsByCashRegister:
       ({ cash_register_id, order }: { order: string; cash_register_id: string }) =>
       async (dispatch: AppDispatch) => {

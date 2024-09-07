@@ -1,16 +1,14 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { Avatar, Breadcrumb, Card, Col, Divider, List, Row, Tag, Typography } from 'antd';
+import { Avatar, Breadcrumb, Card, Col, Divider, List, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
 import { cashiersActions } from '@/redux/reducers/cashiers';
-import { OPERATION_TYPE_NAME, getColorName, getImageType } from '../current-cash-cut/active-cashier';
 import CardRoot from '@/components/atoms/Card';
-import { PAYMENT_METHOD_NAME } from '@/constants/payment_methods';
 import CashRegisterSvg from '@/assets/img/jsx/cash-register';
 import { CashCut } from '@/redux/reducers/cashiers/types';
-import { getStatus } from '../index';
+import OperationItem from './operation-item';
 
 const CashierDetail = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +16,6 @@ const CashierDetail = () => {
   const { cashiers } = useAppSelector(({ sales }) => sales);
   const [currentCashCut, setCurrentCashCut] = useState<(CashCut & { branches: any; cash_registers: any }) | null>(null);
   const firstRender = useRef(true);
-  const { text, color } = getStatus(currentCashCut?.final_amount, currentCashCut?.received_amount);
 
   useEffect(() => {
     if (firstRender.current && cash_cut_id) {
@@ -66,19 +63,23 @@ const CashierDetail = () => {
                   }
                 />
                 <div className="flex flex-col text-start w-full">
-                  <Typography.Text className="!mb-2 text-neutral-400 !font-light">
-                    <span className="block text-gray-600 font-medium">Apertura: </span>{' '}
-                    {functions.tableDate(currentCashCut?.opening_date || '')}
+                  <Typography.Text className="!mb-2 text-gray-400 !font-light">
+                    Fecha y hora de apertura:
+                    <span className="block text-gray-600 font-medium">
+                      {functions.tableDate(currentCashCut?.opening_date || '')}
+                    </span>
                   </Typography.Text>
-                  <Typography.Text className="mb-2 text-neutral-400 !font-light">
-                    <span className="block text-gray-600 font-medium">Cierre: </span>
-                    {functions.tableDate(currentCashCut?.closing_date || '')}
+                  <Typography.Text className="mb-2 text-gray-400 !font-light">
+                    Fecha y hora de cierre:
+                    <span className="block text-gray-600 font-medium">
+                      {functions.tableDate(currentCashCut?.closing_date || '')}
+                    </span>
                   </Typography.Text>
 
-                  <span className="block text-gray-600 font-medium mb-2">Estado: </span>
+                  {/* <span className="mb-2 text-gray-400 !font-light">Estado: </span>
                   <Tag color={color} className="w-fit">
                     {text}
-                  </Tag>
+                  </Tag> */}
                 </div>
               </div>
             </CardRoot>
@@ -92,7 +93,6 @@ const CashierDetail = () => {
                 Administración del dinero
               </Typography.Title>
               <Divider className="m-0" />
-              <Divider className="mt-0 mb-4" />
               <div className="p-2">
                 <div className="flex flex-col px-4">
                   <div className="flex justify-between py-1 ">
@@ -103,21 +103,21 @@ const CashierDetail = () => {
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de ventas</Typography.Text>
+                    <Typography.Text className="m-0 text-neutral-400 !font-light">Ventas realizadas</Typography.Text>
                     <Typography.Text className="m-0 text-neutral-600">
                       {functions.money(currentCashCut?.sales_amount || 0)}
                     </Typography.Text>
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de ingresos</Typography.Text>
+                    <Typography.Text className="m-0 text-neutral-400 !font-light">Ingresos</Typography.Text>
                     <Typography.Text className="m-0 text-neutral-600">
                       {functions.money(currentCashCut?.incomes_amount || 0)}
                     </Typography.Text>
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Monto de egresos</Typography.Text>
+                    <Typography.Text className="m-0 text-neutral-400 !font-light">Gastos y egresos</Typography.Text>
                     <Typography.Text className="m-0 text-neutral-600">
                       - {functions.money(currentCashCut?.expenses_amount)}
                     </Typography.Text>
@@ -125,13 +125,13 @@ const CashierDetail = () => {
                 </div>
                 <Divider className="my-2" />
                 <div className="flex justify-between py-0 mb-1 px-4">
-                  <Typography.Text className="m-0 text-base font-medium">Monto esperado</Typography.Text>
+                  <Typography.Text className="m-0 text-sm font-base">Monto esperado</Typography.Text>
                   <Typography.Text className="m-0 text-base font-medium">
                     {functions.money(currentCashCut?.final_amount)}
                   </Typography.Text>
                 </div>
                 <div className="flex justify-between py-0 mb-1 px-4">
-                  <Typography.Text className="m-0 text-base font-medium">Monto recibido</Typography.Text>
+                  <Typography.Text className="m-0 text-sm font-base">Monto recibido</Typography.Text>
                   <Typography.Text className="m-0 text-base font-medium">
                     {functions.money(currentCashCut?.received_amount)}
                   </Typography.Text>
@@ -147,43 +147,14 @@ const CashierDetail = () => {
           </Col>
           <Col xs={24} md={24} lg={14}>
             <CardRoot
-              className="max-h-[30rem] overflow-auto"
+              className="max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-150px)] overflow-auto"
               styles={{ body: { padding: !!currentCashCut?.cash_cut_id ? 0 : 20 } }}
               loading={!currentCashCut?.cash_cut_id}
             >
               <List
                 itemLayout="horizontal"
                 dataSource={currentCashCut?.operations || []}
-                renderItem={(item, index) => {
-                  const { border, bg } = getColorName(item.operation_type);
-                  return (
-                    <List.Item className="w-full" key={index}>
-                      <div className="flex justify-between w-full px-4">
-                        <div className="flex gap-4 ">
-                          <Avatar
-                            src={getImageType(item?.operation_type)}
-                            className={`p-[0.4rem] ${bg} border-2 ${border} min-w-[3rem] min-h-[3rem] max-w-[3rem] max-h-[3rem]`}
-                          />
-                          <div className="flex flex-col">
-                            <Typography.Text className="text-base font-normal">
-                              {OPERATION_TYPE_NAME[item.operation_type] || '- - -'}{' '}
-                              {PAYMENT_METHOD_NAME[item.payment_method] || item.payment_method || '- - -'}
-                            </Typography.Text>
-                            <Typography.Text className="text-sm text-slate-400 font-light">
-                              {item.name || '- - -'}
-                            </Typography.Text>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end min-w-[35%]">
-                          <Typography.Text className="text-base font-medium mb-1">{functions.money(item.amount)}</Typography.Text>
-                          <Typography.Text className="text-xs text-slate-400 font-light text-end">
-                            {functions.tableDate(item.created_at)}
-                          </Typography.Text>
-                        </div>
-                      </div>
-                    </List.Item>
-                  );
-                }}
+                renderItem={(item, index) => <OperationItem data={item} key={index} />}
               />
             </CardRoot>
           </Col>

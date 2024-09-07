@@ -89,7 +89,7 @@ const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
       >
         <Form layout="vertical" onFinish={closeCashier} form={closeDayForm} initialValues={{}}>
           <div className="bg-gray-50 text-center rounded-lg px-5 py-6 mb-4">
-            <Typography.Paragraph className="!m-0 text-lg font-normal text-gray-400">Total esperado</Typography.Paragraph>
+            <Typography.Paragraph className="!m-0 text-lg font-normal text-gray-400">Monto esperado</Typography.Paragraph>
             <Typography.Title level={2} className="!m-0 !font-extrabold !text-5xl">
               {functions.money(active_cash_cut?.final_amount || 0)}
             </Typography.Title>

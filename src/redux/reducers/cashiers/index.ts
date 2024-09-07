@@ -1,11 +1,20 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import customActions from './actions';
-import { CashCut, CashOperation, CashOperations, CashierDetail, CashiersSlice } from './types';
+import { CashCut, CashCutFilters, CashOperation, CashOperations, CashierDetail, CashiersSlice } from './types';
 import { Cashier } from '../sales/types';
 
 const initialState: CashiersSlice = {
   active_cash_cut: null,
-  cash_cuts: [],
+  cash_cuts: {
+    data: [],
+    filters: {
+      cash_register_id: '',
+      order_by: 'closing_date,false',
+      page: 1,
+      pageSize: 10,
+      total: 0,
+    },
+  },
   cash_operations: {
     data: [],
     sales_by_cashier: [],
@@ -43,7 +52,10 @@ const cashiers = createSlice({
       state.active_cash_cut = action.payload;
     },
     setCashCuts(state, action: PayloadAction<CashCut[]>) {
-      state.cash_cuts = action.payload;
+      state.cash_cuts = { ...state.cash_cuts, data: action.payload };
+    },
+    setCashCutFilters(state, action: PayloadAction<Partial<CashCutFilters>>) {
+      state.cash_cuts = { ...state.cash_cuts, filters: { ...state.cash_cuts.filters, ...action.payload } };
     },
   },
 });

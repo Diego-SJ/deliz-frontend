@@ -111,7 +111,15 @@ const customActions = {
             return { ...item, products: product } as SaleItem;
           }) || [];
 
-        dispatch(salesActions.setCurrentSale({ items, metadata: metadata?.length ? (metadata[0] as SaleDetails) : undefined }));
+        let saleDetails: SaleDetails | undefined =
+          metadata && metadata[0]
+            ? ({
+                ...metadata[0],
+                amount_paid: metadata[0]?.status_id === STATUS_DATA.PAID.id ? metadata[0]?.amount_paid : 0,
+              } as SaleDetails)
+            : undefined;
+
+        dispatch(salesActions.setCurrentSale({ items, metadata: saleDetails }));
         dispatch(salesActions.setLoading(false));
 
         if (error) {
