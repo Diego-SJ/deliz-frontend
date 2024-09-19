@@ -168,6 +168,7 @@ const customActions = {
     openCashier: (cashCut: Partial<CashCut>) => async (dispatch: AppDispatch, getState: AppState) => {
       const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
       const branch_id = getState()?.branches?.currentBranch?.branch_id;
+      const company_id = getState()?.app?.company?.company_id;
       let cashCutOpened: CashCut | null = null;
 
       const { data: cashCutVerification, error: cashCutError } = await supabase
@@ -175,6 +176,7 @@ const customActions = {
         .select('*')
         .eq('cash_register_id', cash_register_id)
         .eq('branch_id', branch_id)
+        .eq('company_id', company_id)
         .eq('is_open', true)
         .single();
 
