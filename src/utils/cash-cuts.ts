@@ -5,9 +5,9 @@ export const groupCashRegisters = (cashRegisters: CashRegister[], branches: Bran
   let data: MenuProps['items'] = [{ label: 'Todas las cajas', key: '' }];
 
   branches?.forEach(branch => {
-    const cashRegistersFiltered = cashRegisters?.filter(cashRegister => cashRegister?.branch_id === branch?.branch_id);
-    console.log(cashRegistersFiltered);
-    data.push({
+    const cashRegistersFiltered = cashRegisters?.filter(cashRegister => cashRegister?.branch_id === branch?.branch_id) || [];
+
+    data?.push({
       key: branch.branch_id,
       type: 'group',
       label: `Sucursal ${branch.name}`,
