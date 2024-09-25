@@ -1,6 +1,7 @@
 import { LineChartData } from '@/redux/reducers/analytics/types';
 import functions from '@/utils/functions';
 import { ResponsiveLine } from '@nivo/line';
+import numeral from 'numeral';
 
 type Props = {
   data: LineChartData;
@@ -52,20 +53,21 @@ export const LineChartMargin = ({ data }: Props) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: null,
-        legendOffset: -40,
+        legend: 'Monto',
+        legendOffset: -50,
         legendPosition: 'middle',
         truncateTickAt: 0,
-        tickValues: updatedData
-          .reduce((acc: any, series) => {
-            series.data.forEach(point => {
-              if (!acc.includes(point.y.toString())) {
-                acc.push(point.y.toString());
-              }
-            });
-            return acc;
-          }, [])
-          .sort((a: any, b: any) => a - b),
+        format: e => numeral(e).format('$0 a'),
+        // tickValues: updatedData
+        //   .reduce((acc: any, series) => {
+        //     series.data.forEach(point => {
+        //       if (!acc.includes(point.y.toString())) {
+        //         acc.push(point.y.toString());
+        //       }
+        //     });
+        //     return acc;
+        //   }, [])
+        //   .sort((a: any, b: any) => a - b),
       }}
       enableArea
       colors={{ datum: 'color' }} // Colores según cada serie
@@ -83,11 +85,11 @@ export const LineChartMargin = ({ data }: Props) => {
       pointBorderColor={{ from: 'serieColor', modifiers: [] }}
       pointLabel="data.y"
       pointLabelYOffset={-12}
-      enableTouchCrosshair={true}
+      enableTouchCrosshair
       areaBaselineValue={dynamicBaselineValue}
       areaOpacity={0.2} // Ajusta la opacidad del área
       areaBlendMode="normal" // Asegura que el área se dibuje debajo de las líneas
-      useMesh={true}
+      useMesh
       enableGridX={false}
       enableGridY={false}
     />

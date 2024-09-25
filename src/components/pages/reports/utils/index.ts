@@ -4,6 +4,7 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 
 dayjs.extend(advancedFormat);
 dayjs.extend(isoWeek);
+dayjs.locale('es');
 
 const today = dayjs();
 const startOfLastWeek = today.subtract(6, 'days');

@@ -12,7 +12,7 @@ const OpenCashCut = () => {
   const onFinish = async () => {
     form.validateFields().then(async values => {
       setLoading(true);
-      let success = await dispatch(cashiersActions.cash_cuts.openCashier(values));
+      let success = await dispatch(cashiersActions.cash_cuts.openCashCut(values));
       setLoading(false);
       if (success) {
         form.resetFields();

@@ -12,6 +12,7 @@ import AddOperationDrawer from './add-operation';
 import CashCutForm from './cash-cut-form';
 import { useState } from 'react';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import dayjs from 'dayjs';
 
 export const OPERATION_TYPE_NAME = {
   INCOME: 'Ingreso',
@@ -54,16 +55,25 @@ const OpenCashier = () => {
                     className="w-full"
                     avatar={<Avatar src={<CashRegisterSvg className="fill-primary" />} className="bg-primary/5 p-3" size={60} />}
                     title={
-                      <Typography.Title level={5} style={{ margin: 0 }}>
-                        Caja {currentCashRegister?.name}
-                        <Badge
-                          style={{ marginLeft: 15, color: !!active_cash_cut?.cash_cut_id ? 'green' : 'red' }}
-                          status={!!active_cash_cut?.cash_cut_id ? 'success' : 'error'}
-                          text={!!active_cash_cut?.cash_cut_id ? 'Abierta' : 'Cerrada'}
-                        />
-                      </Typography.Title>
+                      <div className="flex flex-col  justify-between h-full">
+                        <Typography.Title level={5} style={{ margin: 0 }}>
+                          Caja {currentCashRegister?.name}
+                          <Badge
+                            style={{ marginLeft: 15, color: !!active_cash_cut?.cash_cut_id ? 'green' : 'red' }}
+                            status={!!active_cash_cut?.cash_cut_id ? 'success' : 'error'}
+                            text={!!active_cash_cut?.cash_cut_id ? `Abierta` : 'Cerrada'}
+                          />
+                        </Typography.Title>
+                        <div className="flex flex-col">
+                          {active_cash_cut?.opening_date && (
+                            <span className="text-neutral-400 text-sm font-light">
+                              Apertura: {dayjs(active_cash_cut?.opening_date).utc().format('dddd DD MMMM hh:mm a')}
+                            </span>
+                          )}
+                          <span className="text-neutral-400 text-sm font-light">Sucursal {currentBranch?.name}</span>
+                        </div>
+                      </div>
                     }
-                    description={<Typography.Text className="text-neutral-400">Sucursal {currentBranch?.name}</Typography.Text>}
                   />
                   {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut?.value && (
                     <>

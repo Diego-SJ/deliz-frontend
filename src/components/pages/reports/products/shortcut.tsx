@@ -5,34 +5,36 @@ import { analyticsActions } from '@/redux/reducers/analytics';
 import { FileImageOutlined } from '@ant-design/icons';
 import functions from '@/utils/functions';
 import { useMembershipAccess } from '@/routes/module-access';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
+import { CloudDownload } from 'lucide-react';
 
 const TopProductsThumbnail = () => {
   const dispatch = useAppDispatch();
   const { hasAccess } = useMembershipAccess();
   const { user_auth } = useAppSelector(({ users }) => users);
   const { loading, top_products } = useAppSelector(({ analytics }) => analytics?.products || {});
+  const elementRef = useRef<any>(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => elementRef.current,
+  });
 
   return (
     <CardRoot
       loading={loading}
       title={<h5 className="!text-base m-0 font-medium">Productos más vendidos</h5>}
-      extra={
-        user_auth?.profile?.permissions?.reports?.view_products_report?.value && hasAccess('view_products_report') ? (
-          <Button type="text" className="!text-primary underline" onClick={() => dispatch(analyticsActions.getTopProducts())}>
-            Actualizar
-          </Button>
-        ) : null
-      }
+      extra={<Button onClick={handlePrint} icon={<CloudDownload className="w-4 h-4" />} />}
       classNames={{ body: '!px-4 !pt-2' }}
     >
       {top_products?.length ? (
-        <>
-          <div className="flex justify-between items-center mb-2 pl-1 pr-2">
+        <div ref={elementRef}>
+          <div className="justify-between items-center mb-2 pl-1 pr-2 hidden print:flex">
             <Typography.Title level={2} className="!text-3xl !m-0">
-              {top_products?.length || 0}
+              Productos más vendidos
             </Typography.Title>
           </div>
-          <div className="flex flex-col max-h-[20rem] overflow-y-auto over">
+          <div className="flex flex-col">
             {top_products?.map((product, index) => {
               return (
                 <div
@@ -54,7 +56,7 @@ const TopProductsThumbnail = () => {
               );
             })}
           </div>
-        </>
+        </div>
       ) : (
         <>
           <Empty description="Registra tus primeras ventas para visualizar información" />

@@ -29,7 +29,7 @@ const columns: ColumnsType<SaleRPC> = [
     title: 'Cliente',
     dataIndex: 'customers',
     align: 'left',
-    width: 300,
+    width: 180,
     render: (_, record) => record?.customer_name || 'Público general',
   },
   {
@@ -47,6 +47,13 @@ const columns: ColumnsType<SaleRPC> = [
     align: 'center',
     dataIndex: 'payment_method',
     render: (value = 'CASH') => PAYMENT_METHOD[value],
+  },
+  {
+    title: 'Sucursal',
+    dataIndex: 'branch_name',
+    align: 'center',
+    width: 120,
+    render: value => <Tag>{value || 'N/A'}</Tag>,
   },
   {
     title: 'Status',

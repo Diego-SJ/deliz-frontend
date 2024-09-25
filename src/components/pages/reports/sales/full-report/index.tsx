@@ -1,133 +1,113 @@
 import CardRoot from '@/components/atoms/Card';
-import { STATUS_DATA } from '@/constants/status';
-import { Avatar, Button, Col, Divider, Dropdown, Row, Select, Typography } from 'antd';
-import { ArrowLeft, CalendarDays, CircleDollarSign, Printer, ShoppingCart, Store, UserRoundSearchIcon } from 'lucide-react';
+import SaleInsight from '@/components/organisms/SaleReports/sale-insight';
+import { ArrowLeft, CircleDollarSign, Printer, ShoppingCart, PiggyBank, Clock9 } from 'lucide-react';
+import { Button, Col, Row, Typography } from 'antd';
+import SalesReportFilters from './filters';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '@/routes/routes';
+import LastCompletedSales from './last-completed-sales';
+import { useAppSelector } from '@/hooks/useStore';
+import numeral from 'numeral';
+import Pendingsales from './pending-sales';
+import CompletedSalesChart from './last-completed-sales/chart';
+import PendingSalesChart from './pending-sales/chart';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 
 const SalesReports = () => {
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-5">
-        <div className="flex items-center gap-2">
-          <Button icon={<ArrowLeft strokeWidth={1.5} className="w-4 h-4" />} />
-          <Typography.Title level={4} className="!m-0">
-            Reporte de Ventas
-          </Typography.Title>
-        </div>
-        <Button type="primary" icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}>
-          Imprimir
-        </Button>
-      </div>
-      <Row className="" gutter={[20, 20]}>
-        <Col xs={24} md={8}>
-          <CardRoot
-            className="!mb-5"
-            classNames={{
-              body: '!p-5',
-            }}
-          >
-            <div className="w-full flex items-center py-0 gap-5 ">
-              <Avatar icon={<ShoppingCart className="text-indigo-600" />} className="bg-indigo-600/10 w-12 h-12" />
-              <div>
-                <h5 className="m-0 text-2xl font-semibold">12,456</h5>
-                <p className="m-0 text-sm font-light text-gray-400">ventas realizadas</p>
-              </div>
-            </div>
-            <Divider />
-            <div className="w-full flex items-center py-0 gap-5">
-              <Avatar icon={<CircleDollarSign className="text-green-600" />} className="bg-green-600/10 w-12 h-12" />
-              <div>
-                <h5 className="m-0 text-2xl font-semibold">$212,456</h5>
-                <p className="m-0 text-sm font-light text-gray-400">monto en ventas</p>
-              </div>
-            </div>
-          </CardRoot>
+  const navigate = useNavigate();
+  const { total_sales_amount_chart_data, last_sales } = useAppSelector(({ analytics }) => analytics.sales);
+  const { sales_summary, total_sales_chart_data, filters } = useAppSelector(({ analytics }) => analytics.sales);
+  const elementRef = useRef<any>(null);
 
-          <CardRoot
-            title="Últimas ventas"
-            extra={
-              <Select
-                className="!w-28"
-                value={STATUS_DATA.PAID.id}
-                options={[
-                  { label: STATUS_DATA.PAID.name, value: STATUS_DATA.PAID.id },
-                  { label: STATUS_DATA.PENDING.name, value: STATUS_DATA.PENDING.id },
-                ]}
-              />
-            }
-            classNames={{
-              body: '!p-0',
-            }}
+  const handlePrint = useReactToPrint({
+    content: () => elementRef.current,
+  });
+
+  return (
+    <div ref={elementRef} className="print:bg-white print:p-4 bg-[#f0f2f5]">
+      <div className="flex gap-5 flex-col lg:flex-row lg:justify-between lg:items-center mb-5">
+        <div className="flex items-center gap-2 justify-between">
+          <div className="flex gap-3 items-center">
+            <Button
+              className="print:hidden"
+              icon={<ArrowLeft strokeWidth={1.5} className="w-4 h-4" />}
+              onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
+            />
+            <Typography.Title level={4} className="!m-0">
+              Reporte de Ventas
+            </Typography.Title>
+          </div>
+          <Button
+            type="primary"
+            className="w-fit sm:hidden"
+            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
+            onClick={handlePrint}
           >
-            <div className="w-full flex items-center py-3 px-4 gap-5">
-              <Avatar icon={<ShoppingCart className="text-slate-600 w-4 h-4" />} className="bg-slate-600/10 w-8 min-w-8 h-8" />
-              <div className="flex items-center justify-between w-full">
-                <h5 className="m-0 text-sm font-medium capitalize">Juan diego salas</h5>
-                <p className="m-0 text-sm font-light text-gray-400">$100.00</p>
-              </div>
+            Imprimir
+          </Button>
+        </div>
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 print:hidden">
+          <SalesReportFilters />
+          <Button
+            type="primary"
+            className="w-fit hidden sm:inline-flex"
+            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
+            onClick={handlePrint}
+          >
+            Imprimir
+          </Button>
+        </div>
+      </div>
+      <Row className="" gutter={[10, 10]}>
+        <Col xs={24} md={12} lg={6}>
+          <SaleInsight
+            icon={<ShoppingCart className="text-indigo-600" />}
+            title="ventas realizadas"
+            value={numeral(sales_summary?.completed_sales).format('0,0')}
+          />
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <SaleInsight
+            icon={<CircleDollarSign className="text-indigo-600" />}
+            title="$ ventas completadas"
+            value={numeral(sales_summary?.completed_sales_amount).format('$0,0.00')}
+          />
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <SaleInsight
+            icon={<Clock9 className="text-indigo-600" />}
+            title="ventas pendientes"
+            value={numeral(sales_summary?.pending_sales).format('0,0')}
+          />
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <SaleInsight
+            icon={<PiggyBank className="text-indigo-600" />}
+            title="$ ventas pendientes"
+            value={numeral(sales_summary?.pending_sales_amount).format('$0,0.00')}
+          />
+        </Col>
+        <Col xs={24} md={12} lg={12}>
+          <CardRoot classNames={{ body: '!px-2' }} title="Ventas">
+            <div className="h-[390px] w-full">
+              <CompletedSalesChart data={total_sales_chart_data || []} range={filters?.date_range} />
             </div>
           </CardRoot>
         </Col>
-        <Col xs={24} md={16}>
-          <div className="grid grid-cols-3 mb-5 gap-5">
-            <Dropdown
-              menu={{
-                // selectedKeys: [filters?.products?.order_by || 'name,asc'],
-                items: [
-                  { key: 'today', label: 'Hoy' },
-                  { key: 'last_7_days', label: 'Últimos 7 días' },
-                  { key: 'last_30_days', label: 'Últimos 30 días' },
-                  { key: 'this_month', label: 'Este mes' },
-                  { key: 'last_month', label: 'Mes pasado' },
-                  { key: 'custom', label: 'Personalizado' },
-                ],
-                selectable: true,
-                // onClick: async ({ key }) => onOrderChange(key),
-              }}
-            >
-              <Button block icon={<CalendarDays className="text-base w-5 h-5" />}>
-                Hoy
-              </Button>
-            </Dropdown>
-            <Dropdown
-              menu={{
-                // selectedKeys: [filters?.products?.order_by || 'name,asc'],
-                items: [
-                  { key: 'today', label: 'Hoy' },
-                  { key: 'last_7_days', label: 'Últimos 7 días' },
-                  { key: 'last_30_days', label: 'Últimos 30 días' },
-                  { key: 'this_month', label: 'Este mes' },
-                  { key: 'last_month', label: 'Mes pasado' },
-                  { key: 'custom', label: 'Personalizado' },
-                ],
-                selectable: true,
-                // onClick: async ({ key }) => onOrderChange(key),
-              }}
-            >
-              <Button block icon={<Store className="text-base w-5 h-5" />}>
-                Sucursal
-              </Button>
-            </Dropdown>
-            <Dropdown
-              menu={{
-                // selectedKeys: [filters?.products?.order_by || 'name,asc'],
-                items: [
-                  { key: 'today', label: 'Hoy' },
-                  { key: 'last_7_days', label: 'Últimos 7 días' },
-                  { key: 'last_30_days', label: 'Últimos 30 días' },
-                  { key: 'this_month', label: 'Este mes' },
-                  { key: 'last_month', label: 'Mes pasado' },
-                  { key: 'custom', label: 'Personalizado' },
-                ],
-                selectable: true,
-                // onClick: async ({ key }) => onOrderChange(key),
-              }}
-            >
-              <Button block icon={<UserRoundSearchIcon className="text-base w-5 h-5" />}>
-                Cliente
-              </Button>
-            </Dropdown>
-          </div>
-          <CardRoot></CardRoot>
+        <Col xs={24} md={12} lg={12}>
+          <CardRoot classNames={{ body: '!px-2' }} title="Monto de las ventas">
+            <div className="h-[390px] w-full">
+              <PendingSalesChart range={filters?.date_range} data={total_sales_amount_chart_data || []} />
+            </div>
+          </CardRoot>
+        </Col>
+
+        <Col xs={24} md={12} lg={12}>
+          <LastCompletedSales data={last_sales?.completed || []} />
+        </Col>
+        <Col xs={24} md={12} lg={12}>
+          <Pendingsales data={last_sales?.pending || []} />
         </Col>
       </Row>
     </div>

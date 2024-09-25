@@ -34,6 +34,12 @@ const ChangeCustomerModal = () => {
     setCurrentCustomerId(current_sale?.metadata?.customer_id || null);
   }, [current_sale]);
 
+  const checkCustomerList = () => {
+    if (!customerList.length) {
+      dispatch(customerActions.fetchCustomers());
+    }
+  };
+
   const onClose = () => {
     setIsCreating(false);
     setOpenForm(false);
@@ -82,6 +88,7 @@ const ChangeCustomerModal = () => {
               className="xl-select"
               onChange={onChange}
               disabled={loading}
+              onClick={checkCustomerList}
               filterOption={(input, option) => {
                 return (
                   functions.includes(option?.label, input.toLowerCase()) || functions.includes(option?.phone, input.toLowerCase())

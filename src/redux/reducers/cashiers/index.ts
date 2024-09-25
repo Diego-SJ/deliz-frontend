@@ -10,7 +10,7 @@ const initialState: CashiersSlice = {
     filters: {
       cash_register_id: '',
       order_by: 'closing_date,false',
-      page: 1,
+      page: 0,
       pageSize: 10,
       total: 0,
     },

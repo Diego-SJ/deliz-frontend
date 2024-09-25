@@ -83,9 +83,9 @@ const CashierCustomer = () => {
                 placeholder="Buscar cliente"
                 virtual={false}
                 suffixIcon={<SearchOutlined />}
-                optionFilterProp="children"
                 className="xl-select"
                 onChange={onChange}
+                optionFilterProp="children"
                 filterOption={(input, option) => {
                   return (
                     functions.includes(option?.label, input.toLowerCase()) ||

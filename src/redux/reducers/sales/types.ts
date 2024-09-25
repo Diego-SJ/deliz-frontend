@@ -1,6 +1,7 @@
 import { Pagination } from '@supabase/supabase-js';
 import { Customer } from '../customers/types';
 import { Category, Product } from '../products/types';
+import { CashCut } from '../cashiers/types';
 
 export type SalesSlice = {
   sales: SaleRPC[];
@@ -102,6 +103,8 @@ export type SaleRPC = {
   status_name: string;
   total: number;
   payment_method: string;
+  branch_name: string;
+  cash_register_name: string;
 };
 
 export type SaleDetails = {
@@ -110,6 +113,7 @@ export type SaleDetails = {
   customer_id: number;
   customers: Customer;
   status: { status_id: number; name: string };
+  cash_cut: Partial<CashCut>;
 } & Sale;
 
 // redux cash register

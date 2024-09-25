@@ -330,7 +330,7 @@ const AddOperationPurchaseExpense = () => {
                           <Checkbox
                             className="w-full px-3 h-[40px] rounded-lg border border-gray-300 checked:bg-primary z-[1]"
                             onChange={({ target }) => setPayWithCashRegister(target.checked)}
-                            value={payWithCashRegister}
+                            checked={payWithCashRegister}
                           />
                           <span className="absolute left-10 z-[-1] top-1/2 -translate-y-1/2">
                             Caja actual: {currentCashRegister?.name || 'Principal'}

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AnalyticsSlice, CustomerAnalytics, LineChartData, ProductAnalytics, SalesAnalytics } from './types';
+import { AnalyticsSlice, CustomerAnalytics, LineChartData, ProductAnalytics, SalesAnalytics, SalesSummary } from './types';
 import { analyticsCustomActions } from './actions';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -24,6 +24,18 @@ export const initialData: LineChartData = [
 const initialState: AnalyticsSlice = {
   sales: {
     data: initialData,
+    sales_summary: { completed_sales: 0, pending_sales: 0, completed_sales_amount: 0, pending_sales_amount: 0 },
+    last_sales: { completed: [], pending: [] },
+    total_sales_chart_data: [],
+    total_sales_amount_chart_data: [],
+    filters: {
+      branches: [],
+      customers: [],
+      date_range: 'last_7_days',
+      products: [],
+      limits: { completed: 5, pending: 5 },
+      custom_dates: [null, null],
+    },
     total: 0,
     loading: false,
   },
@@ -50,6 +62,12 @@ const analytics = createSlice({
     },
     setCustomers: (state, action: PayloadAction<Partial<CustomerAnalytics>>) => {
       state.customers = { ...state.customers, ...action.payload };
+    },
+    setSalesFilters: (state, action: PayloadAction<Partial<SalesAnalytics['filters']>>) => {
+      state.sales.filters = { ...state.sales.filters, ...action.payload };
+    },
+    setSalesSummary: (state, action: PayloadAction<Partial<SalesSummary>>) => {
+      state.sales.sales_summary = { ...state.sales.sales_summary, ...action.payload };
     },
   },
 });

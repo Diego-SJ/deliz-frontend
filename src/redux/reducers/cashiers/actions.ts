@@ -105,39 +105,34 @@ const customActions = {
       }
     },
     add: (expense: Partial<CashOperation>) => async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        let activeCashCut = getState()?.cashiers?.active_cash_cut;
+      let activeCashCut = getState()?.cashiers?.active_cash_cut;
 
-        dispatch(cashiersActions.setLoading(true));
-        const { data, error } = await supabase
-          .from('cash_operations')
-          .insert([
-            {
-              name: expense.name || '',
-              operation_type: expense.operation_type,
-              amount: expense.amount || 0,
-              payment_method: expense.payment_method,
-              cash_register_id: activeCashCut?.cash_register_id,
-              branch_id: activeCashCut?.branch_id,
-              cash_cut_id: activeCashCut?.cash_cut_id,
-            },
-          ])
-          .select()
-          .single();
-        dispatch(cashiersActions.setLoading(false));
+      dispatch(cashiersActions.setLoading(true));
+      const { error } = await supabase
+        .from('cash_operations')
+        .insert([
+          {
+            name: expense.name || '',
+            operation_type: expense.operation_type,
+            amount: expense.amount || 0,
+            payment_method: expense.payment_method,
+            cash_register_id: activeCashCut?.cash_register_id,
+            branch_id: activeCashCut?.branch_id,
+            cash_cut_id: activeCashCut?.cash_cut_id,
+          },
+        ])
+        .select()
+        .single();
+      dispatch(cashiersActions.setLoading(false));
 
-        if (error) {
-          message.error('No se pudo guardar el registro.', 4);
-          return false;
-        }
-
-        await dispatch(cashiersActions.cash_cuts.fetchCashCutData({ cashCut: data }));
-        message.success('Registro agregado', 4);
-        return true;
-      } catch (error) {
-        dispatch(cashiersActions.setLoading(false));
+      if (error) {
+        message.error('No se pudo guardar el registro.', 4);
         return false;
       }
+
+      await dispatch(cashiersActions.cash_cuts.fetchCashCutData());
+      message.success('Registro agregado', 4);
+      return true;
     },
     delete: (cash_operation_id: number) => async (dispatch: AppDispatch) => {
       try {
@@ -165,7 +160,7 @@ const customActions = {
     },
   },
   cash_cuts: {
-    openCashier: (cashCut: Partial<CashCut>) => async (dispatch: AppDispatch, getState: AppState) => {
+    openCashCut: (cashCut: Partial<CashCut>) => async (dispatch: AppDispatch, getState: AppState) => {
       const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id;
       const branch_id = getState()?.branches?.currentBranch?.branch_id;
       const company_id = getState()?.app?.company?.company_id;
@@ -191,6 +186,7 @@ const customActions = {
               is_open: true,
               branch_id,
               cash_register_id,
+              company_id,
             },
           ])
           .select()
@@ -208,7 +204,7 @@ const customActions = {
       message.success('Caja abierta');
       return true;
     },
-    fetchCashCutOpened: () => async (dispatch: AppDispatch, getState: AppState) => {
+    fetchCashCutOpened: (args?: { fetchCashCutOperations?: boolean }) => async (dispatch: AppDispatch, getState: AppState) => {
       const branch_id = getState()?.branches?.currentBranch?.branch_id || '';
       const cash_register_id = getState()?.branches?.currentCashRegister?.cash_register_id || '';
 
@@ -241,7 +237,10 @@ const customActions = {
         return false;
       }
 
-      dispatch(cashiersActions.setActiveCashCut(data as CashCut));
+      await dispatch(cashiersActions.setActiveCashCut(data as CashCut));
+      if (args?.fetchCashCutOperations) {
+        await dispatch(cashiersActions.cash_cuts.fetchCashCutData());
+      }
       return data;
     },
     fetchCashCutData: (args?: FetchCashCutArgs) => async (dispatch: AppDispatch, getState: AppState) => {
@@ -458,11 +457,15 @@ const customActions = {
     makeCashCut: (receivedAmount: number) => async (dispatch: AppDispatch, getState: AppState) => {
       dispatch(salesActions.setLoading(true));
       const state = getState();
-      const cash_cut_id = getState()?.cashiers?.active_cash_cut?.cash_cut_id;
+      const company_id = state?.app?.company?.company_id;
+      const branch_id = state?.branches?.currentBranch?.branch_id;
+      const cash_register_id = state?.branches?.currentCashRegister?.cash_register_id;
 
       let { data, error } = await supabase.rpc('make_cash_cut', {
         p_received_amount: receivedAmount,
-        p_cash_cut_id: cash_cut_id,
+        p_company_id: company_id,
+        p_branch_id: branch_id,
+        p_cash_register_id: cash_register_id,
       });
       dispatch(salesActions.setLoading(false));
 

@@ -1,13 +1,52 @@
+import { DateRangeKey } from '@/utils/sales-report';
+import { Sale } from '../sales/types';
+
 export type AnalyticsSlice = {
   sales: SalesAnalytics;
   products: ProductAnalytics;
   customers: CustomerAnalytics;
 };
 
+export type SalesFilters = {
+  date_range: DateRangeKey;
+  customers: number[];
+  products: number[];
+  branches: string[];
+  custom_dates: (string | null)[];
+  limits: {
+    completed: number;
+    pending: number;
+  };
+};
+
 export type SalesAnalytics = {
   data: LineChartData;
+  sales_summary: SalesSummary;
+  last_sales: { completed: Partial<Sale>[]; pending: Partial<Sale>[] };
+  total_sales_chart_data: BarChartDataItem[];
+  total_sales_amount_chart_data: BarChartDataItem[];
   total: number;
   loading: boolean;
+  filters: SalesFilters;
+};
+
+export type SalesSummary = {
+  completed_sales: number;
+  pending_sales: number;
+  completed_sales_amount: number;
+  pending_sales_amount: number;
+};
+
+export type BarChartData = {
+  id: string | number;
+  color?: string;
+  data: BarChartDataItem[];
+}[];
+
+export type BarChartDataItem = {
+  date: string;
+  Pendiente: number | string;
+  Pagado: number | string;
 };
 
 export type LineChartData = {

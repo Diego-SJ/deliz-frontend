@@ -5,14 +5,8 @@ import numeral from 'numeral';
 
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import localeData from 'dayjs/plugin/localeData';
-import 'dayjs/locale/es'; // Importar el idioma español
 
 dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(localeData);
-dayjs.locale('es');
 
 const functions = {
   distanceTime: (date: Date): string => {
@@ -70,11 +64,7 @@ const functions = {
   },
   tableDate: (dateStr: Date | string | null) => {
     if (!dateStr) return '- - -';
-    const date = dayjs.utc(dateStr?.toString());
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const localDate = date.tz(timeZone);
-
-    return localDate.format('D MMMM, YYYY h:mma');
+    return dayjs.utc(dateStr?.toString()).format('D MMMM, YYYY h:mma');
   },
   dateTime: (date: Date | string) => {
     let _date = subHours(new Date(date), 6);

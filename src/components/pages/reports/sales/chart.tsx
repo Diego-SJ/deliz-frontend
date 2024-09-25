@@ -1,5 +1,6 @@
 import { LineChartData } from '@/redux/reducers/analytics/types';
 import { ResponsiveLine } from '@nivo/line';
+import numeral from 'numeral';
 
 type Props = {
   data: LineChartData;
@@ -12,7 +13,7 @@ export const LineChartSales = ({ data }: Props) => {
   return (
     <ResponsiveLine
       data={data}
-      margin={{ top: 10, right: 20, bottom: 25, left: 30 }}
+      margin={{ top: 10, right: 20, bottom: 25, left: 45 }}
       xScale={{ type: 'point' }}
       yScale={{
         type: 'linear',
@@ -37,18 +38,19 @@ export const LineChartSales = ({ data }: Props) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: null,
+        legend: 'Ventas',
         legendOffset: -40,
         legendPosition: 'middle',
         truncateTickAt: 0,
-        tickValues: data.reduce((acc: any, series) => {
-          series.data.forEach(point => {
-            if (!acc.includes(point.y.toString())) {
-              acc.push(point.y.toString());
-            }
-          });
-          return acc;
-        }, []),
+        format: e => numeral(e).format('0 a'),
+        // tickValues: data.reduce((acc: any, series) => {
+        //   series.data.forEach(point => {
+        //     if (!acc.includes(point.y.toString())) {
+        //       acc.push(point.y.toString());
+        //     }
+        //   });
+        //   return acc;
+        // }, []),
       }}
       enableArea
       colors={'#6366F1'}

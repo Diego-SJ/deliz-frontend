@@ -4,8 +4,9 @@ import { supabase } from '@/config/supabase';
 import dayjs from 'dayjs';
 import { STATUS_DATA } from '@/constants/status';
 import { message } from 'antd';
-import { LineChartDataItem } from './types';
+import { BarChartDataItem, LineChartDataItem } from './types';
 import functions from '@/utils/functions';
+import { DateRangeKey, getDateRange } from '@/utils/sales-report';
 
 export const analyticsCustomActions = {
   getSales: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -83,5 +84,197 @@ export const analyticsCustomActions = {
     }
 
     dispatch(analyticsActions.setCustomers({ top_customers: data, loading: false }));
+  },
+  sales: {
+    getWeekReport: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      let [start_date, end_date, rangeDates] = getDateRange('last_7_days');
+      const { data, error } = await supabase.rpc('get_sales_by_date_range', {
+        p_company_ids: [company_id],
+        p_start_date: start_date,
+        p_end_date: end_date,
+      });
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      const salesData: LineChartDataItem[] = [];
+      let totalSales = 0;
+
+      rangeDates.forEach(date => {
+        const sales = data.find((sale: any) => sale.sale_date === date);
+        totalSales += sales?.total_completed_sales || 0;
+        salesData.push({
+          x: dayjs(date).format('D MMM'),
+          y: sales?.total_completed_sales || 0,
+          total: sales?.total_completed_amount || 0,
+        });
+      });
+
+      dispatch(analyticsActions.setSales({ total: totalSales }));
+      dispatch(analyticsActions.setSales({ data: [{ id: 'sales_report', data: salesData }] }));
+    },
+    getFullDataByFilters: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const filters = getState().analytics?.sales?.filters;
+      const company_id = getState().app.company.company_id;
+      let [start_date, end_date, rangeDates] = getDateRange(filters?.date_range, filters?.custom_dates);
+
+      dispatch(analyticsActions.setSales({ loading: true }));
+
+      const filtersData = {
+        p_company_ids: [company_id],
+        p_customer_ids: filters?.customers?.length ? filters?.customers : null,
+        p_branch_ids: filters?.branches?.length ? filters?.branches : null,
+        p_start_date: start_date || null,
+        p_end_date: end_date || null,
+      };
+
+      const [salesSummaryResponse, salesByDatesResponse] = await Promise.all([
+        supabase.rpc('get_sales_summary', filtersData).single(),
+        supabase.rpc('get_sales_by_date_range', filtersData),
+      ]);
+
+      const { data: salesSummary, error: error1 } = salesSummaryResponse;
+      const { data: salesByDates, error: error2 } = salesByDatesResponse;
+
+      dispatch(analyticsActions.setSales({ loading: false }));
+
+      if (error1) {
+        message.error(error1.message);
+      }
+
+      if (error2) {
+        message.error(error2.message);
+      }
+
+      dispatch(
+        analyticsActions.setSalesSummary({
+          completed_sales: (salesSummary as any)?.total_completed_sales || 0,
+          pending_sales: (salesSummary as any)?.total_pending_sales || 0,
+          completed_sales_amount: (salesSummary as any)?.total_completed_amount || 0,
+          pending_sales_amount: (salesSummary as any)?.total_pending_amount || 0,
+        }),
+      );
+
+      const salesData: BarChartDataItem[] = [];
+      const salesDataAmounts: BarChartDataItem[] = [];
+
+      rangeDates.forEach(date => {
+        const sales = salesByDates.find((sale: any) => sale.sale_date === date);
+        salesData.push({
+          date,
+          Pagado: sales?.total_completed_sales || 0,
+          Pendiente: sales?.total_pending_sales || 0,
+        });
+        salesDataAmounts.push({
+          date,
+          Pagado: sales?.total_completed_amount || 0,
+          Pendiente: sales?.total_pending_amount || 0,
+        });
+      });
+
+      dispatch(
+        analyticsActions.setSales({
+          total_sales_chart_data: salesData,
+          total_sales_amount_chart_data: salesDataAmounts,
+        }),
+      );
+    },
+    getLastSales: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const filters = getState().analytics?.sales?.filters;
+
+      const [last10SalesResponse, pendingSalesResponse] = await Promise.all([
+        supabase
+          .from('sales')
+          .select('sale_id, customers (name), payment_method, created_at, total')
+          .eq('company_id', company_id)
+          .eq('status_id', STATUS_DATA.PAID.id)
+          .order('created_at', { ascending: false })
+          .limit(filters?.limits?.completed || 5),
+        supabase
+          .from('sales')
+          .select('sale_id, customers (name), created_at, total')
+          .eq('company_id', company_id)
+          .eq('status_id', STATUS_DATA.PENDING.id)
+          .order('created_at', { ascending: false })
+          .limit(filters?.limits?.pending || 5),
+      ]);
+
+      const { data: last10Sales, error: error1 } = last10SalesResponse;
+      const { data: pendingSales, error: error2 } = pendingSalesResponse;
+
+      dispatch(analyticsActions.setSales({ loading: false }));
+
+      if (error1) {
+        message.error(error1.message);
+      }
+
+      if (error2) {
+        message.error(error2.message);
+      }
+
+      dispatch(
+        analyticsActions.setSales({
+          last_sales: {
+            completed: last10Sales || [],
+            pending: pendingSales || [],
+          },
+        }),
+      );
+    },
+    getLastPendingSales: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const filters = getState().analytics?.sales?.filters;
+      const lastSalesData = getState().analytics?.sales?.last_sales;
+
+      const { data, error } = await supabase
+        .from('sales')
+        .select('sale_id, customers (name), created_at, total')
+        .eq('company_id', company_id)
+        .eq('status_id', STATUS_DATA.PENDING.id)
+        .order('created_at', { ascending: false })
+        .limit(filters?.limits?.pending || 5);
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      dispatch(
+        analyticsActions.setSales({
+          last_sales: {
+            ...lastSalesData,
+            pending: data || [],
+          },
+        }),
+      );
+    },
+    getLastCompletedSales: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const filters = getState().analytics?.sales?.filters;
+      const lastSalesData = getState().analytics?.sales?.last_sales;
+
+      const { data, error } = await supabase
+        .from('sales')
+        .select('sale_id, customers (name), payment_method, created_at, total')
+        .eq('company_id', company_id)
+        .eq('status_id', STATUS_DATA.PAID.id)
+        .order('created_at', { ascending: false })
+        .limit(filters?.limits?.completed || 5);
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      dispatch(
+        analyticsActions.setSales({
+          last_sales: {
+            ...lastSalesData,
+            completed: data || [],
+          },
+        }),
+      );
+    },
   },
 };

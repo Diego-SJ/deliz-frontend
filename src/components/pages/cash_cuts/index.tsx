@@ -12,6 +12,8 @@ import CashRegisterSvg from '@/assets/img/jsx/cash-register';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import { CashCut } from '@/redux/reducers/cashiers/types';
 import { Building, LockKeyhole, LockKeyholeOpen } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { groupCashRegisters } from '@/utils/cash-cuts';
 
 export const getStatus = (total = 0, received = 0) => {
   if (total === received) return { color: 'green', text: 'Cerrada sin diferencias' };
@@ -78,6 +80,14 @@ const CloseSales = () => {
   const navigation = useNavigate();
   const { cash_cuts, loading } = useAppSelector(({ cashiers }) => cashiers);
   const { cash_registers, branches } = useAppSelector(({ branches }) => branches);
+  const firstRender = useRef(false);
+
+  useEffect(() => {
+    if (!firstRender.current) {
+      firstRender.current = true;
+      dispatch(cashiersActions.cash_cuts.fetchCashCutsByCompany());
+    }
+  }, [dispatch]);
 
   const { isTablet } = useMediaQuery();
 
@@ -108,7 +118,7 @@ const CloseSales = () => {
                 menu={{
                   defaultSelectedKeys: [cash_cuts?.filters?.branch_id || ''],
                   items: [{ label: 'Todas las sucursales', key: '' }].concat(
-                    branches?.map(item => ({ label: `Sucursal ${item.name}`, key: item.branch_id })),
+                    branches?.map(item => ({ label: `${item.name}`, key: item.branch_id })),
                   ),
                   selectable: true,
                   onClick: ({ key }) => {
@@ -126,9 +136,7 @@ const CloseSales = () => {
               <Dropdown
                 menu={{
                   defaultSelectedKeys: [cash_cuts?.filters?.cash_register_id || ''],
-                  items: [{ label: 'Todas las cajas', key: '' }].concat(
-                    cash_registers?.map(item => ({ label: `Caja ${item.name}`, key: item.cash_register_id })),
-                  ),
+                  items: groupCashRegisters(cash_registers, branches),
                   selectable: true,
                   onClick: ({ key }) => {
                     dispatch(cashiersActions.setCashCutFilters({ cash_register_id: key, page: 0 }));

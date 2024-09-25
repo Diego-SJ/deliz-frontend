@@ -10,7 +10,7 @@ export const customActions = {
     const company_id = getState()?.app?.company?.company_id;
     const { data, error } = await supabase
       .from('branches')
-      .upsert({ ...branch, company_id })
+      .upsert({ ...branch, company_id, name: branch?.name?.trim() })
       .select()
       .single();
 
@@ -171,6 +171,7 @@ export const customActions = {
       .from('cash_registers')
       .upsert({
         ...cash_register,
+        name: cash_register?.name?.trim(),
         company_id,
         is_default: cash_register?.is_default || false,
       })

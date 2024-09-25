@@ -22,12 +22,13 @@ import functions from '@/utils/functions';
 import { productHelpers } from '@/utils/products';
 import { STATUS_DATA } from '@/constants/status';
 import dayjs from 'dayjs';
+import { ROLES } from '@/constants/roles';
 
 const customActions = {
   fetchSales: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
     let salesList: SaleRPC[] = getState().sales.sales || [];
     const company_id = getState().app.company.company_id;
-    const isAdmin = getState().users.user_auth.profile?.role === 'ADMIN';
+    const isAdmin = getState().users.user_auth.profile?.role === ROLES.ADMIN;
     const { currentBranch, currentCashRegister } = getState().branches;
     const { orderBy, branch_id = null, ...filters } = getState()?.sales?.filters?.sales || {};
 
@@ -83,14 +84,22 @@ const customActions = {
           supabase
             .from('sale_detail')
             .select(
-              '*, products (name, inventory, category_id, image_url, price_list, product_id, raw_price, categories (name, category_id))',
+              `*,
+              products (name, inventory, category_id, image_url, price_list, product_id, raw_price, categories (name, category_id))
+            `,
             )
             .eq('sale_id', args?.sale_id)
             .order('created_at', { ascending: false }),
           supabase
             .from('sales')
             .select(
-              '*, customers (name, customer_id, phone, address), status (status_id, name), branches (branch_id, name), cash_registers (cash_register_id, name)',
+              `*,
+              customers (name, customer_id, phone, address),
+              status (status_id, name),
+              branches (branch_id, name),
+              cash_registers (cash_register_id, name),
+              cash_cuts ( opening_date, closing_date )
+            `,
             )
             .eq('sale_id', args?.sale_id),
         ]);
