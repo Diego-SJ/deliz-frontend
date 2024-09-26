@@ -46,7 +46,7 @@ export const ItemProduct = (props: ItemProductsProps) => {
             </Typography.Paragraph>
             <div className="flex gap-2 w-full items-center">
               <Tag className="select-none border !border-gray-300 !bg-transparent text-gray-400 max-h-fit">{category}</Tag>
-              <Typography.Text className="text-gray-400 font-light !m-0 !text-sm max-h-fit">
+              <Typography.Text className="text-gray-400 font-light !m-0 !text-sm max-h-fit select-none">
                 {functions.money(props.price)}
               </Typography.Text>
             </div>

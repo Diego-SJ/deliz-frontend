@@ -213,7 +213,7 @@ const customActions = {
 
         const { error, data } = await supabase
           .from('categories')
-          .insert([{ name: category.name, description: category.description, status: category.status, company_id }])
+          .insert({ ...category, company_id })
           .select()
           .single();
 
