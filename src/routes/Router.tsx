@@ -15,7 +15,6 @@ import ProductsCatalog from '@/components/pages/products/catalog';
 import TransactionsCashiers from '@/components/pages/cash_cuts';
 import ProductSizes from '@/components/pages/settings/sizes';
 import ProductUnits from '@/components/pages/settings/units';
-import Orders from '@/components/pages/orders';
 import CurrentCashier from '@/components/pages/cash_cuts/current-cash-cut';
 import CashierDetail from '@/components/pages/cash_cuts/detail';
 import SettingsPage from '@/components/pages/settings';
@@ -106,17 +105,6 @@ const AppRouter = () => {
           </>
         )}
         {/* PRODUCTS ROUTES - END */}
-
-        {/* ORDERS ROUTES - START */}
-        <Route
-          path={APP_ROUTES.PRIVATE.ORDERS.path}
-          element={
-            <PaddingLayout>
-              <Orders />
-            </PaddingLayout>
-          }
-        />
-        {/* ORDERS ROUTES - END */}
 
         {/* TRANSACTIONS ROUTES - START */}
         {permissions?.cash_registers?.view_history_cash_cuts?.value && hasAccess('make_cash_cut') ? (

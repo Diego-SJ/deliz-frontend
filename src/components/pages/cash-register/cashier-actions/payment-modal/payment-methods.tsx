@@ -110,10 +110,10 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
               accordion
               destroyInactivePanel={false}
               onChange={value => {
-                if (value !== PAYMENT_METHODS_KEYS.CASH) {
+                if (value[0] !== PAYMENT_METHODS_KEYS.CASH) {
                   onChange(prev => ({ ...prev, receivedMoney: total }));
                 }
-                onChange(prev => ({ ...prev, paymentMethod: typeof value === 'string' ? value : value[0] }));
+                onChange(prev => ({ ...prev, paymentMethod: value[0] }));
               }}
               items={[
                 {

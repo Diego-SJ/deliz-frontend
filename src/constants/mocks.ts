@@ -1,31 +1,6 @@
 import { Product } from '@/redux/reducers/products/types';
-import { subDays, subHours, subMinutes } from 'date-fns';
 
 export const PROFILE_PIC = 'https://xsgames.co/randomusers/avatar.php?g=pixel&key=1';
-
-export const NOTIFICATIONS = [
-  {
-    id: '1',
-    title: 'Nuevo cliente',
-    message: '5 clientes nuevos en la última hora wegwegweg qegwegweg weg weg wegweg we',
-    date: subDays(new Date(), 3),
-    type: 'NEW_CLIENT', //  NEW_CLIENT, NEW_ORDER, EMPTY_STOCK, NEW_SCHEDULE, ORDER_CANCELLED, SCHEDULE_CANCELLED
-  },
-  {
-    id: '2',
-    title: 'Nuevo pedido',
-    message: '5 clientes nuevos en la última hora',
-    date: subHours(new Date(), 1),
-    type: 'NEW_ORDER', //  NEW_CLIENT, NEW_ORDER, EMPTY_STOCK, NEW_SCHEDULE, ORDER_CANCELLED, SCHEDULE_CANCELLED
-  },
-  {
-    id: '3',
-    title: 'Stock vácio',
-    message: '5 clientes nuevos en la última hora wegwegweg qegwegweg weg weg wegweg we',
-    date: subMinutes(new Date(), 3),
-    type: 'EMPTY_STOCK', //  NEW_CLIENT, NEW_ORDER, EMPTY_STOCK, NEW_SCHEDULE, ORDER_CANCELLED, SCHEDULE_CANCELLED
-  },
-];
 
 export const CATEGORIES = [
   { id: 1, name: 'Paleta de agua' },

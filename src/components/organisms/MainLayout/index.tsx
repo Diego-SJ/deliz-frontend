@@ -39,7 +39,7 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
           width={SIDER_WIDTH}
           collapsed={collapsed}
           className="!border-r !min-h-[100dvh] !max-h-[100dvh]"
-          theme={'light' as any}
+          theme={'light'}
         >
           <SideMenu collapsed={collapsed} />
         </LayoutSider>

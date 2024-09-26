@@ -1,5 +1,5 @@
 import { FileProtectOutlined, PrinterOutlined, WhatsAppOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Drawer, Row, Typography, message } from 'antd';
+import { Avatar, Button, Col, Drawer, Row, TableColumnsType, Typography, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import FallbackImage from '@/assets/logo-color.svg';
 import functions from '@/utils/functions';
@@ -16,6 +16,41 @@ import { Branch, CashRegister } from '@/redux/reducers/branches/type';
 type PrintInvoiceButtonProps = {
   amounts: { total: number; subtotal: number; pending: number; cashback: number; amount_paid: number; discount?: number };
 };
+
+const columns: TableColumnsType<SaleItem> = [
+  {
+    title: 'Producto',
+    dataIndex: 'products',
+    render: (_, record) => {
+      return (
+        <div>
+          <p className="text-sm text-slate-600">{record.products?.name || record?.metadata?.product_name || '- - -'}</p>
+          <span className="block text-xs text-slate-400">{record?.products?.categories?.name || 'Sin categoría'}</span>
+        </div>
+      );
+    },
+  },
+  {
+    title: 'Cantidad',
+    dataIndex: 'quantity',
+    align: 'center',
+    render: (value: number) => <span className="block text-xs text-slate-600"> {value}</span>,
+  },
+  {
+    title: 'Precio',
+    dataIndex: 'price',
+    align: 'center',
+    render: (value: number) => <span className="block text-xs text-slate-600"> {functions.money(value)}</span>,
+  },
+  {
+    title: 'Total',
+    dataIndex: 'retail_price',
+    align: 'center',
+    render: (_: number, record: SaleItem) => (
+      <span className="block text-xs text-slate-600">{functions.money((record.quantity || 0) * (record.price || 0))}</span>
+    ),
+  },
+];
 
 const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const { current_sale } = useAppSelector(({ sales }) => sales);
@@ -131,47 +166,8 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
             </Col>
           </Row>
           <CustomTable
-            rowKey={(record: SaleItem) => record.sale_detail_id?.toString() || ''}
-            columns={[
-              {
-                title: 'Producto',
-                dataIndex: 'products',
-                render: (_, record: SaleItem) => {
-                  return (
-                    <div>
-                      <p className="text-sm text-slate-600">
-                        {record.products?.name || record?.metadata?.product_name || '- - -'}
-                      </p>
-                      <span className="block text-xs text-slate-400">
-                        {record?.products?.categories?.name || 'Sin categoría'}
-                      </span>
-                    </div>
-                  );
-                },
-              },
-              {
-                title: 'Cantidad',
-                dataIndex: 'quantity',
-                align: 'center',
-                render: (value: number) => <span className="block text-xs text-slate-600"> {value}</span>,
-              },
-              {
-                title: 'Precio',
-                dataIndex: 'price',
-                align: 'center',
-                render: (value: number) => <span className="block text-xs text-slate-600"> {functions.money(value)}</span>,
-              },
-              {
-                title: 'Total',
-                dataIndex: 'retail_price',
-                align: 'center',
-                render: (_: number, record: SaleItem) => (
-                  <span className="block text-xs text-slate-600">
-                    {functions.money((record.quantity || 0) * (record.price || 0))}
-                  </span>
-                ),
-              },
-            ]}
+            rowKey={record => record?.sale_detail_id?.toString() || ''}
+            columns={columns}
             dataSource={items}
             size="small"
             pagination={false}

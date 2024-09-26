@@ -12,6 +12,10 @@ export const LayoutSider = styled(Sider)`
     min-height: 100dvh;
     max-height: 100dvh;
     overflow-x: visible !important;
+
+    .ant-layout-sider-children {
+      background-color: #fff;
+    }
   }
 `;
 

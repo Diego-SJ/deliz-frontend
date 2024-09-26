@@ -1,3 +1,4 @@
+import { SaleItem } from '@/redux/reducers/sales/types';
 import { Table, TableProps } from 'antd';
 import styled from 'styled-components';
 
@@ -29,7 +30,7 @@ export const ImageLogo = styled.img`
   margin-top: -10px;
 `;
 
-export const CustomTable = styled(Table)`
+export const CustomTable = styled(Table<SaleItem>)`
   &.ant-table-wrapper {
     table {
       thead.ant-table-thead {

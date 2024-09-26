@@ -17,7 +17,6 @@ import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
 import { Product } from '../products/types';
-import { isToday } from 'date-fns';
 import functions from '@/utils/functions';
 import { productHelpers } from '@/utils/products';
 import { STATUS_DATA } from '@/constants/status';
@@ -466,24 +465,6 @@ const customActions = {
     dispatch(salesActions.setClosingDays({ data: newData, today_is_done: true }));
 
     message.success('Información guardada con exito');
-    return true;
-  },
-  fetchClosedDays: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
-    let salesList: CashClosing[] = getState().sales?.closing_days?.data || [];
-
-    if (!salesList.length || args?.refetch) {
-      let { data, error } = await supabase.from('cash_closing').select('*').order('created_at', { ascending: false });
-
-      if (error) {
-        message.error('No se pudo obtener la lista de registros');
-        return false;
-      }
-
-      salesList = data || [];
-    }
-
-    let todayIsDone = salesList?.some(i => (i?.closing_date ? isToday(new Date(functions.date(i.closing_date))) : false));
-    dispatch(salesActions.setClosingDays({ data: salesList as CashClosing[], today_is_done: todayIsDone }));
     return true;
   },
   operating_expenses: {
