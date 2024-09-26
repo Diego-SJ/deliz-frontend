@@ -16,6 +16,7 @@ const initialState: AppSlice = {
     membership_id: 1,
   },
   navigation: {
+    collapsed: false,
     menu: {
       activeItem: '',
       activeTitle: '',

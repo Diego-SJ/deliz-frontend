@@ -74,7 +74,7 @@ export const PLANS_PRICES = [
     subTitle: 'Incluye Plan Esencial, Más',
     planItems: [
       { label: 'Permisos personalizados', tooltip: null },
-      { label: 'Landing page', tooltip: null },
+      { label: 'Pedidos por Whatsapp', tooltip: null },
       { label: 'Reportes', tooltip: null },
       { label: 'Soporte prioritario', tooltip: null },
     ],
@@ -100,8 +100,11 @@ export const PLANS_PRICES = [
     planItems: [
       { label: 'Soporte personalizado', tooltip: null },
       { label: 'Reportes avanzados', tooltip: null },
-      { label: 'Pago a proveedores', tooltip: null },
-      { label: 'Chat IA', tooltip: null },
+      { label: 'Landing page', tooltip: null },
+      {
+        label: 'Almacenamiento ilimitado',
+        tooltip: 'Agrega evidencias a tus gastos e imagenes a tus productos de forma ilimitada.',
+      },
     ],
     buttonText: 'Elegir plan',
   },

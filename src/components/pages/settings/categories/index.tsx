@@ -111,7 +111,7 @@ const CategoriesPage = () => {
                     />,
                   ]}
                 >
-                  <div className="pl-4 md:pl-6 flex gap-4">
+                  <div className="pl-4 md:pl-6 gap-4 flex items-center">
                     <Avatar
                       className="bg-slate-600/10 text-xl"
                       icon={item?.image_url ? null : <FileImageOutlined className="text-slate-400 text-base" />}

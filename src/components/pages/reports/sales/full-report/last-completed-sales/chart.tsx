@@ -57,7 +57,7 @@ const CompletedSalesChart = ({ data = [], axisLeft, range }: Props) => (
     labelSkipWidth={9}
     labelSkipHeight={12}
     labelFormat={e => `${e} ventas`}
-    labelTextColor="#ffffff"
+    labelTextColor={'#ffffff'}
     legends={[
       {
         dataFrom: 'keys',

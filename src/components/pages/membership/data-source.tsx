@@ -138,17 +138,17 @@ export const TABLE_BODY = [
       { title: 'Ilimitadas' },
     ],
   },
-  {
-    rowType: 'body',
-    id: uuidv4(),
-    cols: [
-      { title: 'Chat IA' },
-      { title: <NoneIcon /> },
-      { title: <NoneIcon /> },
-      { title: '1000 tokens al mes' },
-      { title: 'Tokens ilimitados' },
-    ],
-  },
+  // {
+  //   rowType: 'body',
+  //   id: uuidv4(),
+  //   cols: [
+  //     { title: 'Chat IA' },
+  //     { title: <NoneIcon /> },
+  //     { title: <NoneIcon /> },
+  //     { title: '1000 tokens al mes' },
+  //     { title: 'Tokens ilimitados' },
+  //   ],
+  // },
   // Products
   {
     rowType: 'header',

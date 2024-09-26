@@ -20,7 +20,7 @@ const MembershipPage = () => {
 
   return (
     <div className="p-5 pt-5">
-      <CurrentCompanyPlan />
+      {user_auth?.authenticated && <CurrentCompanyPlan />}
       <div className="max-w-[1200px] mx-auto">
         <div className="flex justify-between items-center mb-10 flex-col sm:flex-row gap-4 sm:gap-0">
           <div className="flex flex-col text-center sm:text-start">

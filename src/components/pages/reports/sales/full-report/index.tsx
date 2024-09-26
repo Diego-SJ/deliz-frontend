@@ -6,19 +6,31 @@ import SalesReportFilters from './filters';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import LastCompletedSales from './last-completed-sales';
-import { useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import numeral from 'numeral';
 import Pendingsales from './pending-sales';
 import CompletedSalesChart from './last-completed-sales/chart';
 import PendingSalesChart from './pending-sales/chart';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { analyticsActions } from '@/redux/reducers/analytics';
 
 const SalesReports = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { total_sales_amount_chart_data, last_sales } = useAppSelector(({ analytics }) => analytics.sales);
   const { sales_summary, total_sales_chart_data, filters } = useAppSelector(({ analytics }) => analytics.sales);
   const elementRef = useRef<any>(null);
+  const firstRender = useRef(false);
+
+  useEffect(() => {
+    if (!firstRender.current) {
+      firstRender.current = true;
+      dispatch(analyticsActions.sales.getFullDataByFilters());
+      dispatch(analyticsActions.sales.getLastCompletedSales());
+      dispatch(analyticsActions.sales.getLastPendingSales());
+    }
+  }, [firstRender]);
 
   const handlePrint = useReactToPrint({
     content: () => elementRef.current,

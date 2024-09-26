@@ -28,9 +28,12 @@ import { createElement } from 'react';
 import { APP_VERSION } from '@/constants/versions';
 import MyMembershipCard from '../membership';
 import { AppModules, useMembershipAccess } from '@/routes/module-access';
+import { ChevronUp } from 'lucide-react';
+import { appActions } from '@/redux/reducers/app';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
+  collapsed: boolean;
 };
 
 export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: AppModules) => boolean) => [
@@ -122,14 +125,14 @@ export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: 
   },
 ];
 
-const SideMenu = (props: SideMenuProps) => {
-  const { isTablet, isPhablet } = useMediaQuery();
+const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
+  const { isPhablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { hasAccess } = useMembershipAccess();
-  const { company } = useAppSelector(({ app }) => app);
+  const { company, navigation } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
 
   const handleLogout = () => {
@@ -147,15 +150,15 @@ const SideMenu = (props: SideMenuProps) => {
 
   const handlePathChange = (path: string) => {
     if (path) navigate(path);
-    if (props?.onClick) props.onClick();
+    if (onClick) onClick();
   };
 
   return (
     <>
-      <Logo src={company?.logo_url || LogoAppWhite} title="D'eliz" />
+      <Logo collapsed={collapsed} src={company?.logo_url || LogoAppWhite} title="D'eliz" />
 
       <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
-        <Tooltip title={isPhablet && !isTablet ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
+        <Tooltip title={collapsed ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
           <Button
             className="w-full"
             icon={<PlusCircleOutlined />}
@@ -163,22 +166,31 @@ const SideMenu = (props: SideMenuProps) => {
               handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
             }}
           >
-            {isPhablet && !isTablet ? '' : 'Nueva venta'}
+            {collapsed ? '' : 'Nueva venta'}
           </Button>
         </Tooltip>
       </div>
 
+      {!isPhablet && (
+        <Button
+          size="small"
+          shape="circle"
+          icon={<ChevronUp className={`${collapsed ? 'rotate-90' : '-rotate-90'} w-4 stroke-2`} />}
+          className="absolute top-3 -right-3 z-50"
+          onClick={() => dispatch(appActions.setNavigation({ collapsed: !navigation?.collapsed }))}
+        />
+      )}
       <MenuRoot
         // theme={'dark' as any}
         mode="inline"
         className=""
-        inlineCollapsed={isPhablet && !isTablet}
+        inlineCollapsed={navigation.collapsed && !isPhablet ? true : collapsed}
         items={ITEM_LIST(permissions!, hasAccess)
           ?.filter(Boolean)
           .map((item: any, key: any) => ({
             key,
             icon: createElement(item?.icon),
-            label: isPhablet && !isTablet ? '' : item?.label,
+            label: collapsed ? '' : item?.label,
             className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
@@ -196,13 +208,13 @@ const SideMenu = (props: SideMenuProps) => {
 
       <div className="absolute bottom-0 w-full">
         <div className="px-5">
-          <MyMembershipCard />
+          <MyMembershipCard collapsed={collapsed} />
         </div>
         <MenuRoot
           className=""
           mode="inline"
           style={{ borderInlineEnd: 'none' }}
-          inlineCollapsed={isPhablet && !isTablet}
+          inlineCollapsed={collapsed}
           items={[
             {
               key: 1,
@@ -213,7 +225,7 @@ const SideMenu = (props: SideMenuProps) => {
           ]}
         />
 
-        {!isTablet && !isPhablet && (
+        {!collapsed && (
           <div className="w-full flex justify-center text-xs text-slate-400 font-light py-2">
             <p>Posiffy App</p>
             <span className="">v{APP_VERSION}</span>

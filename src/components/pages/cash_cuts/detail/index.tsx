@@ -1,6 +1,6 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { Avatar, Breadcrumb, Card, Col, Divider, List, Row, Typography } from 'antd';
+import { Avatar, Breadcrumb, Card, Col, Divider, Input, List, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
@@ -146,6 +146,14 @@ const CashierDetail = () => {
             </CardRoot>
           </Col>
           <Col xs={24} md={24} lg={14}>
+            {!!currentCashCut?.notes && (
+              <Col xs={24}>
+                <CardRoot>
+                  <Typography.Paragraph className="!mb-1">Notas</Typography.Paragraph>
+                  <Input.TextArea defaultValue={currentCashCut?.notes} readOnly autoSize={false} />
+                </CardRoot>
+              </Col>
+            )}
             <CardRoot
               className="max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-150px)] overflow-auto"
               styles={{ body: { padding: !!currentCashCut?.cash_cut_id ? 0 : 20 } }}

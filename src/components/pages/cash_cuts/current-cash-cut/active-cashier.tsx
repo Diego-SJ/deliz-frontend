@@ -3,7 +3,7 @@ import functions from '@/utils/functions';
 import IncomeBlueSvg from '@/assets/img/svg/income-blue.svg';
 import ExpenseSvg from '@/assets/img/svg/expense.svg';
 import SaleCashSvg from '@/assets/img/svg/sale-cash.svg';
-import { Avatar, Badge, Button, Card, Col, Divider, List, Row, Typography } from 'antd';
+import { Avatar, Badge, Button, Card, Col, Divider, Input, List, Row, Typography } from 'antd';
 import CardRoot from '@/components/atoms/Card';
 import { PAYMENT_METHOD_NAME } from '@/constants/payment_methods';
 import CashRegisterSvg from '@/assets/img/jsx/cash-register';
@@ -66,14 +66,22 @@ const OpenCashier = () => {
                         </Typography.Title>
                         <div className="flex flex-col">
                           {active_cash_cut?.opening_date && (
-                            <span className="text-neutral-400 text-sm font-light">
+                            <span className="text-slate-400 text-sm font-light">
                               Apertura: {dayjs(active_cash_cut?.opening_date).utc().format('dddd DD MMMM hh:mm a')}
                             </span>
                           )}
-                          <span className="text-neutral-400 text-sm font-light">Sucursal {currentBranch?.name}</span>
+                          <span className="text-slate-400 text-sm font-light">Sucursal {currentBranch?.name}</span>
                         </div>
                       </div>
                     }
+                    // description={
+                    //   !!active_cash_cut?.notes && (
+                    //     <div>
+                    //       <Typography.Paragraph className="!mb-1">Notas</Typography.Paragraph>
+                    //       <Typography.Paragraph className="text-slate-400">active_cash_cut?.notes</Typography.Paragraph>
+                    //     </div>
+                    //   )
+                    // }
                   />
                   {!!active_cash_cut?.cash_cut_id && permissions?.cash_registers?.make_cash_cut?.value && (
                     <>
@@ -91,6 +99,15 @@ const OpenCashier = () => {
                 </div>
               </CardRoot>
             </Col>
+            {!!active_cash_cut?.notes && (
+              <Col xs={24}>
+                <CardRoot classNames={{ body: '!py-3' }}>
+                  <Typography.Paragraph className="!m-0">Notas</Typography.Paragraph>
+                  <Typography.Paragraph className="font-light !m-0 text-slate-400">{active_cash_cut?.notes}</Typography.Paragraph>
+                  {/* <Input.TextArea defaultValue={active_cash_cut?.notes} disabled autoSize={false} /> */}
+                </CardRoot>
+              </Col>
+            )}
           </Row>
           {!!active_cash_cut?.cash_cut_id && (
             <Row style={{ marginTop: 20 }} gutter={[20, 20]}>

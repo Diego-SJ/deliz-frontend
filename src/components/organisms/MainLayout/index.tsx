@@ -6,7 +6,7 @@ import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './style
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { Button, Drawer } from 'antd';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { useAppDispatch } from '@/hooks/useStore';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import SideMobileMenu from '../SideMenu/mobile-menu';
 import { CloseOutlined } from '@ant-design/icons';
@@ -18,6 +18,8 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
   const { isTablet, isPhablet } = useMediaQuery();
   const [open, setOpen] = useState(false);
   const firstRender = useRef(true);
+  const { navigation } = useAppSelector(({ app }) => app);
+  const collapsed = navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -35,11 +37,11 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
       {!isTablet && (
         <LayoutSider
           width={SIDER_WIDTH}
-          collapsed={isPhablet}
-          className="!border-r !min-h-[100dvh] !max-h-[100dvh] overflow-y-auto"
+          collapsed={collapsed}
+          className="!border-r !min-h-[100dvh] !max-h-[100dvh]"
           theme={'light' as any}
         >
-          <SideMenu />
+          <SideMenu collapsed={collapsed} />
         </LayoutSider>
       )}
       <Drawer

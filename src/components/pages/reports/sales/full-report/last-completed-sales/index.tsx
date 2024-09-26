@@ -1,5 +1,5 @@
 import CardRoot from '@/components/atoms/Card';
-import { Sale } from '@/redux/reducers/sales/types';
+import { PAYMENT_METHOD_NAME, Sale } from '@/redux/reducers/sales/types';
 import { Avatar, Empty, Select } from 'antd';
 import dayjs from 'dayjs';
 import { Banknote, ShoppingCart } from 'lucide-react';
@@ -60,7 +60,9 @@ const LastCompletedSales = ({ data = [] }: Props) => {
                   <div className="flex items-center">
                     <div className="flex gap-1 items-center">
                       <Banknote className="text-green-500 w-4 h-4" />
-                      <span className="text-xs font-light text-gray-400">{sale?.payment_method}</span>
+                      <span className="text-xs font-light text-gray-400">
+                        {PAYMENT_METHOD_NAME[sale?.payment_method as keyof typeof PAYMENT_METHOD_NAME]}
+                      </span>
                     </div>
                     <span className="text-xs font-light text-gray-400 ml-5">{dayjs(sale?.created_at).fromNow()}</span>
                   </div>

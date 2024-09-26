@@ -1,6 +1,7 @@
 export type AppSlice = {
   company: Company;
   navigation: {
+    collapsed: boolean;
     menu: {
       activeItem: string;
       activeTitle: string;

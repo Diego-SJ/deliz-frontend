@@ -11,7 +11,7 @@ export const LayoutSider = styled(Sider)`
     bottom: 0;
     min-height: 100dvh;
     max-height: 100dvh;
-    overflow: auto;
+    overflow-x: visible !important;
   }
 `;
 

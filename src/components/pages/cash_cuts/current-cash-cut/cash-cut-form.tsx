@@ -87,7 +87,13 @@ const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
           </Row>
         }
       >
-        <Form layout="vertical" onFinish={closeCashier} form={closeDayForm} initialValues={{}}>
+        <Form
+          requiredMark={false}
+          layout="vertical"
+          onFinish={closeCashier}
+          form={closeDayForm}
+          initialValues={{ notes: active_cash_cut?.notes }}
+        >
           <div className="bg-gray-50 text-center rounded-lg px-5 py-6 mb-4">
             <Typography.Paragraph className="!m-0 text-lg font-normal text-gray-400">Monto esperado</Typography.Paragraph>
             <Typography.Title level={2} className="!m-0 !font-extrabold !text-5xl">
@@ -109,7 +115,11 @@ const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
               </Tag>
             )}
           </div>
-          <Form.Item name="amount" rules={[{ required: true, message: 'Campo obligatorio' }]}>
+          <Form.Item
+            label="¿Cuanto dinero hay en tu caja?"
+            name="amount"
+            rules={[{ required: true, message: 'Campo obligatorio' }]}
+          >
             <InputNumber
               prefix="$"
               size="large"
@@ -125,6 +135,9 @@ const CashCutForm = ({ visible, onClose, fetchOnOpen = false }: Props) => {
               className="text-center"
             />
           </Form.Item>
+          {/* <Form.Item label="Agrega una nota" name="notes">
+            <Input.TextArea placeholder="Agrega una nota" />
+          </Form.Item> */}
         </Form>
       </Drawer>
     </>
