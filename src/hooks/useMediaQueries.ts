@@ -8,7 +8,7 @@ const useMediaQuery = () => {
   useEffect(() => {
     const isMobile = window.matchMedia('(max-width: 600px)');
     const isTablet = window.matchMedia('(max-width: 767px)');
-    const isPhablet = window.matchMedia('(max-width: 992px)');
+    const isPhablet = window.matchMedia('(max-width: 1024px)');
 
     const handleMQMobileChange = (event: any) => {
       setIsMobile(event.matches);

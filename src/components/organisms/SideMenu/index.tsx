@@ -30,10 +30,10 @@ import MyMembershipCard from '../membership';
 import { AppModules, useMembershipAccess } from '@/routes/module-access';
 import { ChevronUp } from 'lucide-react';
 import { appActions } from '@/redux/reducers/app';
+import { LayoutSider } from '../MainLayout/styles';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
-  collapsed: boolean;
 };
 
 export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: AppModules) => boolean) => [
@@ -125,8 +125,8 @@ export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: 
   },
 ];
 
-const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
-  const { isPhablet } = useMediaQuery();
+const SideMenu = ({ onClick }: SideMenuProps) => {
+  const { isPhablet, isTablet } = useMediaQuery();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -134,6 +134,7 @@ const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
   const { hasAccess } = useMembershipAccess();
   const { company, navigation } = useAppSelector(({ app }) => app);
   const [modal, contextHolder] = Modal.useModal();
+  const collapsed = navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
 
   const handleLogout = () => {
     modal.confirm({
@@ -154,7 +155,7 @@ const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
   };
 
   return (
-    <>
+    <LayoutSider width={220} collapsed={collapsed} className="!border-r !min-h-[100dvh] !max-h-[100dvh]" theme={'light'}>
       <Logo collapsed={collapsed} src={company?.logo_url || LogoAppWhite} title="D'eliz" />
 
       <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
@@ -181,7 +182,6 @@ const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
         />
       )}
       <MenuRoot
-        // theme={'dark' as any}
         mode="inline"
         className=""
         inlineCollapsed={navigation.collapsed && !isPhablet ? true : collapsed}
@@ -190,7 +190,7 @@ const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
           .map((item: any, key: any) => ({
             key,
             icon: createElement(item?.icon),
-            label: collapsed ? '' : item?.label,
+            label: item?.label,
             className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
@@ -233,7 +233,7 @@ const SideMenu = ({ onClick, collapsed }: SideMenuProps) => {
         )}
       </div>
       {contextHolder}
-    </>
+    </LayoutSider>
   );
 };
 

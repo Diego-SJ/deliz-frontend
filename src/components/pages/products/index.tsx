@@ -242,6 +242,7 @@ const Products = () => {
                     onClick: () => onRowClick(record), // click row
                   };
                 }}
+                rowKey={record => record?.product_id?.toString()}
                 size="small"
                 scroll={{ y: 'calc(100vh - 300px)', x: 700 }}
                 columns={columns(currentBranch?.branch_id || '')}

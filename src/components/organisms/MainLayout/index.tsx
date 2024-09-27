@@ -1,25 +1,21 @@
 import { Outlet } from 'react-router-dom';
-import SideMenu from '../SideMenu';
 import Header from '../Header';
 import { MainLayoutProps } from './types';
-import { LayoutContainer, LayoutContent, LayoutRoot, LayoutSider } from './styles';
+import { LayoutContainer, LayoutContent, LayoutRoot } from './styles';
 import useMediaQuery from '@/hooks/useMediaQueries';
-import { Button, Drawer } from 'antd';
+
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useAppDispatch } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import SideMobileMenu from '../SideMenu/mobile-menu';
-import { CloseOutlined } from '@ant-design/icons';
-
-const SIDER_WIDTH = 220;
+import SideMenu from '../SideMenu';
 
 const MainLayout: React.FC<MainLayoutProps> = () => {
   const dispatch = useAppDispatch();
-  const { isTablet, isPhablet } = useMediaQuery();
+  const { isTablet } = useMediaQuery();
   const [open, setOpen] = useState(false);
+
   const firstRender = useRef(true);
-  const { navigation } = useAppSelector(({ app }) => app);
-  const collapsed = navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -34,29 +30,8 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
 
   return (
     <LayoutRoot hasSider={!isTablet}>
-      {!isTablet && (
-        <LayoutSider
-          width={SIDER_WIDTH}
-          collapsed={collapsed}
-          className="!border-r !min-h-[100dvh] !max-h-[100dvh]"
-          theme={'light'}
-        >
-          <SideMenu collapsed={collapsed} />
-        </LayoutSider>
-      )}
-      <Drawer
-        placement="bottom"
-        height={'100dvh'}
-        open={open}
-        closeIcon={<></>}
-        extra={
-          <Button onClick={handleDrawer} type="text" icon={<CloseOutlined className="text-slate-900 !text-2xl" />} size="large" />
-        }
-        onClose={handleDrawer}
-        classNames={{ body: '!bg-neutral-100 !px-5 !pt-0', header: '!bg-neutral-100 !border-b-transparent' }}
-      >
-        <SideMobileMenu onClick={handleDrawer} />
-      </Drawer>
+      {!isTablet ? <SideMenu /> : <SideMobileMenu open={open} closeDrawer={handleDrawer} />}
+
       <LayoutContainer className="!bg-background">
         <Header onClick={handleDrawer} />
         <LayoutContent className="relative !bg-transparent">
