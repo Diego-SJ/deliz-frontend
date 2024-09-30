@@ -92,6 +92,17 @@ const customActions = {
       return false;
     }
   },
+  deleteCustomerById: (customer_id: number) => async () => {
+    const result = await supabase.from('customers').delete().eq('customer_id', customer_id);
+
+    if (result?.error) {
+      message.error('No se pudo eliminar la información.', 4);
+      return false;
+    }
+
+    message.success('Cliente eliminado con éxito!', 4);
+    return true;
+  },
 };
 
 export default customActions;

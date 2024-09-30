@@ -139,6 +139,7 @@ export const MAX_CASH_REGISTERS = {
 
 export const useMembershipAccess = () => {
   const { company } = useAppSelector(({ app }) => app);
+  const { user_auth } = useAppSelector(({ users }) => users);
 
   const maxUsers = MAX_USERS[company?.membership_id || 1] || 1;
   const maxBranches = MAX_BRANCHES[company?.membership_id || 1] || 1;
@@ -162,5 +163,6 @@ export const useMembershipAccess = () => {
     maxBranches,
     maxCashRegisters,
     maxProducts: company?.membership_id === PLANS_IDS.BASIC ? 1 : 10000,
+    isAdmin: user_auth?.isAdmin || false,
   };
 };

@@ -13,6 +13,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import Table from '@/components/molecules/Table';
 import CardRoot from '@/components/atoms/Card';
 import PaginatedList from '@/components/organisms/PaginatedList';
+import DeleteCustomer from './delete-customer';
 
 type DataType = Customer;
 
@@ -20,19 +21,21 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Nombre',
     dataIndex: 'name',
+
     render: text => {
       return (
         <div className="flex items-center gap-4 pl-2">
-          <Avatar className="bg-slate-600/10 text-slate-600">{text.charAt(0)}</Avatar>
+          <Avatar className="bg-slate-600/10 text-slate-600 w-8 min-w-8 h-8">{text.charAt(0)}</Avatar>
           <p className="m-0 ">{text}</p>
         </div>
       );
     },
   },
-  { title: 'Dirección', dataIndex: 'address' },
+  { title: 'Dirección', dataIndex: 'address', align: 'center' },
   {
     title: 'Teléfono',
     dataIndex: 'phone',
+    align: 'center',
     render: text =>
       text ? (
         <Typography.Text type="secondary" copyable>
@@ -43,6 +46,7 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Correo',
     dataIndex: 'email',
+    align: 'center',
     render: text =>
       text ? (
         <Typography.Text copyable className="!text-primary">
@@ -102,6 +106,11 @@ const Customers = () => {
     dispatch(customerActions.fetchCustomers({ refetch: true }));
   };
 
+  const deleteCompleted = () => {
+    dispatch(customerActions.setCurrentCustomer({} as Customer));
+    onRefresh();
+  };
+
   return (
     <div className="max-w-[1200px] mx-auto ">
       <Row justify="space-between" align="middle">
@@ -120,17 +129,17 @@ const Customers = () => {
       <Row>
         <Col span={24}>
           <Row gutter={[10, 10]} className="mt-3 mb-6">
-            <Col lg={{ span: 6 }} sm={18} xs={24}>
+            <Col lg={{ span: 8 }} sm={18} xs={24}>
               <Input
                 size={isTablet ? 'large' : 'middle'}
-                placeholder="Buscar por nombre, telefono o dirección"
+                placeholder="Buscar por nombre, teléfono o dirección"
                 style={{ width: '100%' }}
                 allowClear
                 onChange={({ target }) => getPanelValue({ searchText: target.value })}
               />
             </Col>
             {permissions?.customers?.add_customer?.value && (
-              <Col lg={{ span: 4, offset: 14 }} sm={{ span: 6 }} xs={{ span: 24 }}>
+              <Col lg={{ span: 4, offset: 12 }} sm={{ span: 6 }} xs={{ span: 24 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}
                   block
@@ -199,6 +208,11 @@ const Customers = () => {
         onClose={() => onClose(true)}
         open={!!current_customer.customer_id}
         styles={{ body: { paddingBottom: 80 } }}
+        extra={
+          current_customer.customer_id !== -1 && current_customer.customer_id ? (
+            <DeleteCustomer customer_id={current_customer.customer_id} onCompleted={deleteCompleted} />
+          ) : null
+        }
         destroyOnClose
       >
         <CustomerEditor onSuccess={() => onClose} />
