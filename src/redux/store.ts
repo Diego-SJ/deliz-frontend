@@ -10,7 +10,7 @@ import cashiersReducer from './reducers/cashiers';
 import branchesReducer from './reducers/branches';
 import appReducer from './reducers/app';
 import ordersReducer from './reducers/orders';
-import operatingCostsReducer from './reducers/operatingCosts';
+import operatingCostsReducer from './reducers/operating-costs';
 import analyticsReducer from './reducers/analytics';
 import storesReducer from './reducers/stores';
 

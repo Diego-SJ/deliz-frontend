@@ -14,7 +14,7 @@ import { PERMISSIONS, PERMISSIONS_DENIED } from '@/components/pages/settings/use
 import { STATUS_DATA } from '@/constants/status';
 import { Company } from '../app/types';
 import { ROLES } from '@/constants/roles';
-import { operatingCostsActions } from '../operatingCosts';
+import { operatingCostsActions } from '../operating-costs';
 import { analyticsActions } from '../analytics';
 import { storesActions } from '../stores';
 import functions from '@/utils/functions';

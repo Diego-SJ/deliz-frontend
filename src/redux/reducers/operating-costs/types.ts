@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs';
+
 export type OperatingCostsSlice = {
   operatingCosts: OperatingCost[];
   loading: boolean;
@@ -7,7 +9,7 @@ export type OperatingCostsSlice = {
 export type OperatingCost = {
   operating_cost_id: string;
   created_at: string;
-  operation_date: string;
+  operation_date: string | Dayjs;
   reason: string;
   amount: number;
   notes: string;

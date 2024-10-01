@@ -10,8 +10,8 @@ import { STATUS_OBJ } from '@/constants/status';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
-import { operatingCostsActions } from '@/redux/reducers/operatingCosts';
-import { OperatingCost } from '@/redux/reducers/operatingCosts/types';
+import { operatingCostsActions } from '@/redux/reducers/operating-costs';
+import { OperatingCost } from '@/redux/reducers/operating-costs/types';
 import { useDebouncedCallback } from 'use-debounce';
 
 const columns: ColumnsType<OperatingCost> = [

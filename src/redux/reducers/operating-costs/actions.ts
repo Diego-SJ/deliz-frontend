@@ -4,6 +4,13 @@ import { supabase } from '@/config/supabase';
 import { message } from 'antd';
 import { operatingCostsActions } from '.';
 import functions from '@/utils/functions';
+import dayjs from 'dayjs';
+
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const customOperatingCostsActions = {
   upsertOperation: (operatingCost: Partial<OperatingCost>) => async (_: AppDispatch, getState: AppState) => {
@@ -12,10 +19,11 @@ export const customOperatingCostsActions = {
 
     const newOperation = {
       ...operation,
+      operation_date: dayjs(operation?.operation_date).tz('America/Mexico_City').format(),
       company_id: state.app.company.company_id || null,
       branch_id: state.branches.currentBranch?.branch_id || null,
       cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
-    };
+    } as OperatingCost;
 
     const supabaseQuery = supabase;
 

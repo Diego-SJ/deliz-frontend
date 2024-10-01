@@ -21,7 +21,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined, CheckCircleOutlined, DollarOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
 import dayjs from 'dayjs';
-import { operatingCostsActions } from '@/redux/reducers/operatingCosts';
+import { operatingCostsActions } from '@/redux/reducers/operating-costs';
 import { STATUS_DATA } from '@/constants/status';
 import { ScrollText } from 'lucide-react';
 import UploadEvidence from './upload-evidence';
@@ -128,6 +128,7 @@ const AddOperationPurchaseExpense = () => {
         pay_from_cash_register: payWithCashRegister,
         images: imageUrl ? [imageUrl] : null,
       };
+
       const result = await dispatch(operatingCostsActions.upsertOperation(operation));
 
       if (result) {

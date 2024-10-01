@@ -49,6 +49,10 @@ const customActions = {
       dispatch(customerActions.setLoading(false));
 
       if (error) {
+        if (error.message.includes('duplicate key value violates unique constraint')) {
+          message.error('El cliente ya está registrado.', 4);
+          return false;
+        }
         message.error('No se pudo guardar la información.', 4);
         return false;
       }
