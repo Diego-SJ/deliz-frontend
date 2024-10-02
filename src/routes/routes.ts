@@ -96,6 +96,10 @@ export const APP_ROUTES = {
         path: '/app/reports/sales',
         title: 'Reporte de ventas',
       },
+      PROFIT: {
+        path: '/app/reports/profit',
+        title: 'Reporte de ganancias',
+      },
     },
     ONLINE_STORE: { path: '/app/online-store', title: 'Catálogo en linea' },
     SETTINGS: {

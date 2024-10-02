@@ -41,6 +41,7 @@ import Membership from '@/components/pages/membership';
 import AiChatPage from '@/components/pages/ai-chat';
 import SalesReports from '@/components/pages/reports/sales/full-report';
 import { useMembershipAccess } from './module-access';
+import ProfitReport from '@/components/pages/reports/profit/full-report';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -254,6 +255,17 @@ const AppRouter = () => {
             element={
               <ReportsLayout>
                 <SalesReports />
+              </ReportsLayout>
+            }
+          />
+        ) : null}
+
+        {permissions?.reports?.view_sales_report && hasAccess('reports') ? (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.PROFIT.path}
+            element={
+              <ReportsLayout>
+                <ProfitReport />
               </ReportsLayout>
             }
           />

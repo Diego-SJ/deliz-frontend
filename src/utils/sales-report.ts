@@ -53,7 +53,8 @@ export function getDateRange(key: DateRangeKey, customRange?: (string | null)[])
   let currentDate = startDate.clone();
 
   while (currentDate.isBefore(endDate) || currentDate.isSame(endDate, 'day')) {
-    dateList.push(currentDate.format('YYYY-MM-DD'));
+    let nextDay = currentDate.format('YYYY-MM-DD');
+    dateList.push(nextDay);
     currentDate = currentDate.add(1, 'day');
   }
 
@@ -87,6 +88,8 @@ export const formatAxisBottomLabel = (range: DateRangeKey, totalItems?: number) 
       return dayjs().format('MMMM, YYYY');
     case 'last_month':
       return dayjs().subtract(1, 'month').format('MMMM, YYYY');
+    case 'custom':
+      return 'Día';
     default:
       return 'Día';
   }

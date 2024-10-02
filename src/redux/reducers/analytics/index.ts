@@ -1,5 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AnalyticsSlice, CustomerAnalytics, LineChartData, ProductAnalytics, SalesAnalytics, SalesSummary } from './types';
+import {
+  AnalyticsSlice,
+  CustomerAnalytics,
+  LineChartData,
+  ProductAnalytics,
+  ProfitAnalytics,
+  ProfitFilters,
+  ProfitSummary,
+  SalesAnalytics,
+  SalesSummary,
+} from './types';
 import { analyticsCustomActions } from './actions';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -39,6 +49,27 @@ const initialState: AnalyticsSlice = {
     total: 0,
     loading: false,
   },
+  profit: {
+    data: initialData,
+    filters: {
+      branches: [],
+      date_range: 'last_7_days',
+      custom_dates: [null, null],
+    },
+    summary: {
+      completed_expenses: 0,
+      completed_sales: 0,
+      pending_expenses: 0,
+      pending_sales: 0,
+    },
+    summary_by_range: {
+      completed_expenses: 0,
+      completed_sales: 0,
+      pending_expenses: 0,
+      pending_sales: 0,
+    },
+    loading: false,
+  },
   products: {
     top_products: [],
     loading: false,
@@ -68,6 +99,30 @@ const analytics = createSlice({
     },
     setSalesSummary: (state, action: PayloadAction<Partial<SalesSummary>>) => {
       state.sales.sales_summary = { ...state.sales.sales_summary, ...action.payload };
+    },
+    setProfitAnalytics: (state, action: PayloadAction<Partial<ProfitAnalytics>>) => {
+      if (!state.profit) {
+        state = { ...state, profit: { ...initialState.profit } };
+      }
+      state.profit = { ...state.profit, ...action.payload };
+    },
+    setProfitData: (state, action: PayloadAction<LineChartData>) => {
+      if (!state.profit) {
+        state = { ...state, profit: { ...initialState.profit } };
+      }
+      state.profit = { ...state.profit, data: action.payload || [] };
+    },
+    setProfitFilters: (state, action: PayloadAction<Partial<ProfitFilters>>) => {
+      if (!state.profit) {
+        state = { ...state, profit: { ...initialState.profit } };
+      }
+      state.profit.filters = { ...state.profit.filters, ...action.payload };
+    },
+    setProfitSummary: (state, action: PayloadAction<Partial<ProfitSummary>>) => {
+      if (!state.profit) {
+        state = { ...state, profit: { ...initialState.profit } };
+      }
+      state.profit.summary = { ...state.profit.summary, ...action.payload };
     },
   },
 });

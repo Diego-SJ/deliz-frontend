@@ -43,14 +43,6 @@ export const LineChartSales = ({ data }: Props) => {
         legendPosition: 'middle',
         truncateTickAt: 0,
         format: e => numeral(e).format('0 a'),
-        // tickValues: data.reduce((acc: any, series) => {
-        //   series.data.forEach(point => {
-        //     if (!acc.includes(point.y.toString())) {
-        //       acc.push(point.y.toString());
-        //     }
-        //   });
-        //   return acc;
-        // }, []),
       }}
       enableArea
       colors={'#6366F1'}
@@ -66,7 +58,7 @@ export const LineChartSales = ({ data }: Props) => {
       pointColor={{ theme: 'background' }}
       pointBorderWidth={5}
       pointBorderColor={{ from: 'serieColor', modifiers: [] }}
-      pointLabel="data.y"
+      pointLabel={e => e.data.x + ': ' + e.data.y}
       pointLabelYOffset={-12}
       enableTouchCrosshair={true}
       areaBaselineValue={dynamicBaselineValue}

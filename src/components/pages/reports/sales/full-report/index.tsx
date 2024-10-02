@@ -37,7 +37,7 @@ const SalesReports = () => {
   });
 
   return (
-    <div ref={elementRef} className="print:bg-white print:p-4 bg-[#f0f2f5]">
+    <div ref={elementRef} className="print:bg-white">
       <div className="flex gap-5 flex-col lg:flex-row lg:justify-between lg:items-center mb-5">
         <div className="flex items-center gap-2 justify-between">
           <div className="flex gap-3 items-center">

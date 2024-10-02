@@ -2,7 +2,7 @@ import { supabase } from '@/config/supabase';
 import { APP_VERSION } from '@/constants/versions';
 import { useAppSelector } from '@/hooks/useStore';
 import { Button, Modal, Tag } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import UfoWebp from '@/assets/webp/ufo.webp';
 
 type SuscriberData = {
@@ -18,28 +18,22 @@ type SuscriberData = {
 const NewVersionModal = () => {
   const [suscriberData, setSuscriberData] = useState<SuscriberData>(null);
   const { authenticated } = useAppSelector(({ users }) => users?.user_auth);
+  const mounted = useRef(false);
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado
-
-    if (authenticated) {
-      // Suscribirse a la tabla notifications
-
-      const channels = supabase
-        .channel('new-version-channel')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
-          if (payload.new.version !== APP_VERSION) {
-            setSuscriberData(payload.new as SuscriberData);
-          }
-        })
-        .subscribe();
-
-      // Limpieza al desmontar el componente
-      return () => {
-        channels.unsubscribe();
-      };
+    if (authenticated && !mounted.current) {
+      mounted.current = true;
+      (async () => {
+        let { data, error } = await supabase.from('notifications').select('*').eq('active', true).single();
+        if (error) {
+          return;
+        }
+        if (data && data.version !== APP_VERSION) {
+          setSuscriberData(data);
+        }
+      })();
     }
-  }, [authenticated]);
+  }, [authenticated, mounted]);
 
   return (
     <Modal open={!!suscriberData} footer={null} classNames={{ body: '!pb-8' }} closeIcon={null}>

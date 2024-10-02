@@ -1,23 +1,12 @@
 import { AppDispatch, AppState } from '@/redux/store';
 import { salesActions } from '.';
 import { supabase } from '@/config/supabase';
-import {
-  CashClosing,
-  CashRegister,
-  CashRegisterItem,
-  DiscountType,
-  OperatingExpense,
-  Sale,
-  SaleDetails,
-  SaleItem,
-  SaleRPC,
-} from './types';
+import { CashRegister, CashRegisterItem, DiscountType, OperatingExpense, Sale, SaleDetails, SaleItem, SaleRPC } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { message } from 'antd';
 import { FetchFunction } from '../products/actions';
 import { productActions } from '../products';
 import { Product } from '../products/types';
-import functions from '@/utils/functions';
 import { productHelpers } from '@/utils/products';
 import { STATUS_DATA } from '@/constants/status';
 import dayjs from 'dayjs';
@@ -203,7 +192,7 @@ const customActions = {
     try {
       const { error } = await supabase
         .from('sales')
-        .upsert({ ...item, updated_at: dayjs().toISOString() })
+        .upsert({ ...item, updated_at: dayjs().tz('America/Mexico_City').format() })
         .eq('sale_id', item.sale_id)
         .single();
 

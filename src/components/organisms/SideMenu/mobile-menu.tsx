@@ -5,7 +5,7 @@ import LogoAppWhite from '@/assets/logo-color.svg';
 import { Avatar, Button, Drawer, Modal } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
-import { createElement, useState } from 'react';
+import { createElement } from 'react';
 import { ITEM_LIST } from '.';
 import { APP_VERSION } from '@/constants/versions';
 import { useMembershipAccess } from '@/routes/module-access';
@@ -144,7 +144,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
           }}
         >
           <p>Posiffy App</p>
-          <span>v{APP_VERSION}</span>
+          <span className="ml-1">v{APP_VERSION}</span>
         </div>
         {contextHolder}
       </div>

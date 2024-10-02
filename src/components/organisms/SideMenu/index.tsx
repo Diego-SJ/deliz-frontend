@@ -228,7 +228,7 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
         {!collapsed && (
           <div className="w-full flex justify-center text-xs text-slate-400 font-light py-2">
             <p>Posiffy App</p>
-            <span className="">v{APP_VERSION}</span>
+            <span className=" ml-1">v{APP_VERSION}</span>
           </div>
         )}
       </div>

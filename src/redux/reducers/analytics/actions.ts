@@ -4,9 +4,9 @@ import { supabase } from '@/config/supabase';
 import dayjs from 'dayjs';
 import { STATUS_DATA } from '@/constants/status';
 import { message } from 'antd';
-import { BarChartDataItem, LineChartDataItem } from './types';
+import { BarChartDataItem, LineChartData, LineChartDataItem, ProfitSummary } from './types';
 import functions from '@/utils/functions';
-import { DateRangeKey, getDateRange } from '@/utils/sales-report';
+import { getDateRange } from '@/utils/sales-report';
 
 export const analyticsCustomActions = {
   getSales: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -275,6 +275,115 @@ export const analyticsCustomActions = {
           },
         }),
       );
+    },
+  },
+  profit: {
+    getHistoriReport: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const { data, error } = await supabase
+        .rpc('get_net_profit', {
+          p_company_id: company_id,
+          p_date_from: null,
+          p_date_to: null,
+        })
+        .single();
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      dispatch(
+        analyticsActions.setProfitSummary({
+          completed_expenses: (data as any)?.completed_expenses || 0,
+          completed_sales: (data as any)?.completed_sales || 0,
+          pending_expenses: (data as any)?.pending_expenses || 0,
+          pending_sales: (data as any)?.pending_sales || 0,
+        }),
+      );
+    },
+    getFullDataByFilters: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const filters = getState().analytics?.profit?.filters;
+      const company_id = getState().app.company.company_id;
+      let [start_date, end_date, rangeDates] = getDateRange(filters?.date_range, filters?.custom_dates);
+
+      dispatch(analyticsActions.setProfitAnalytics({ loading: true }));
+
+      const filtersData = {
+        p_company_id: company_id,
+        p_branch_ids: filters?.branches?.length ? filters?.branches : null,
+        p_start_date: start_date || null,
+        p_end_date: end_date || null,
+      };
+
+      const [incomesResponse, expensesResponse] = await Promise.all([
+        supabase.rpc('get_incomes_by_date', filtersData),
+        supabase.rpc('get_expenses_by_date', filtersData),
+      ]);
+
+      const { data: incomesByDates, error: error1 } = incomesResponse;
+      const { data: expensesByDates, error: error2 } = expensesResponse;
+
+      dispatch(analyticsActions.setProfitAnalytics({ loading: false }));
+
+      if (error1) {
+        message.error(error1.message);
+      }
+
+      if (error2) {
+        message.error(error2.message);
+      }
+
+      let summaryByRange = {
+        completed_expenses: 0,
+        completed_sales: 0,
+        pending_expenses: 0,
+        pending_sales: 0,
+      };
+
+      const chartData: LineChartData = [
+        {
+          id: 'Entradas',
+          color: 'hsl(0, 70%, 50%)',
+          data:
+            rangeDates?.map(date => {
+              const income = incomesByDates.find((income: any) => income?.date === date);
+              const total = income?.completed_amount || 0 + income?.pending_amount || 0;
+
+              summaryByRange.completed_sales += income?.completed_amount || 0;
+              summaryByRange.pending_sales += income?.pending_amount || 0;
+
+              return {
+                completed: income?.completed_amount || 0,
+                pending: income?.pending_amount || 0,
+                x: date,
+                y: total,
+                total,
+              } as LineChartDataItem;
+            }) || [],
+        },
+        {
+          id: 'Gastos',
+          color: 'hsl(0, 70%, 50%)',
+          data:
+            rangeDates?.map(date => {
+              const expense = expensesByDates.find((expense: any) => expense?.date === date);
+              const total = expense?.completed_amount || 0 + expense?.pending_amount || 0;
+
+              summaryByRange.completed_expenses += expense?.completed_amount || 0;
+              summaryByRange.pending_expenses += expense?.pending_amount || 0;
+
+              return {
+                completed: expense?.completed_amount || 0,
+                pending: expense?.pending_amount || 0,
+                x: date,
+                y: total,
+                total,
+              } as LineChartDataItem;
+            }) || [],
+        },
+      ];
+
+      dispatch(analyticsActions.setProfitAnalytics({ data: chartData, summary_by_range: summaryByRange }));
     },
   },
 };

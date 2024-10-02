@@ -3,8 +3,30 @@ import { Sale } from '../sales/types';
 
 export type AnalyticsSlice = {
   sales: SalesAnalytics;
+  profit: ProfitAnalytics;
   products: ProductAnalytics;
   customers: CustomerAnalytics;
+};
+
+export type ProfitAnalytics = {
+  loading: boolean;
+  data: LineChartData;
+  summary_by_range: ProfitSummary;
+  filters: ProfitFilters;
+  summary: ProfitSummary;
+};
+
+export type ProfitFilters = {
+  date_range: DateRangeKey;
+  branches: string[];
+  custom_dates: (string | null)[];
+};
+
+export type ProfitSummary = {
+  completed_expenses: number;
+  completed_sales: number;
+  pending_expenses: number;
+  pending_sales: number;
 };
 
 export type SalesFilters = {
@@ -59,6 +81,7 @@ export type LineChartDataItem = {
   x: string;
   y: number;
   total: number;
+  [key: string]: any;
 };
 
 export type ProductAnalytics = {

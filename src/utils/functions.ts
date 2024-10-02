@@ -23,11 +23,7 @@ const functions = {
     return localDate;
   },
   formatToLocalTimezone(dateStr: string): string {
-    const date = dayjs.utc(dateStr);
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const localDate = date.tz(timeZone);
-
-    return localDate.format('D [de] MMMM [del] YYYY, h:mma');
+    return dayjs(dateStr).format('D [de] MMMM [del] YYYY, h:mma');
   },
   formatToLocalTimezoneShort(dateStr: string): string {
     const date = dayjs.utc(dateStr);

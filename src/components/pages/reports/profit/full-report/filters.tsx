@@ -3,7 +3,6 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { analyticsActions } from '@/redux/reducers/analytics';
 import { branchesActions } from '@/redux/reducers/branches';
-import { customerActions } from '@/redux/reducers/customers';
 import functions from '@/utils/functions';
 import { DateRangeKey } from '@/utils/sales-report';
 import { Avatar, Button, DatePicker, Drawer, Dropdown, Select, Space, Typography } from 'antd';
@@ -11,20 +10,17 @@ import dayjs from 'dayjs';
 import { Building2, CalendarDays, Filter, FilterX, SearchIcon } from 'lucide-react';
 import { useState } from 'react';
 
-const SalesReportFilters = () => {
+const ProfitReportFilters = () => {
   const dispatch = useAppDispatch();
-  const { customers } = useAppSelector(({ customers }) => customers);
   const { branches } = useAppSelector(({ branches }) => branches);
-  const { filters } = useAppSelector(({ analytics }) => analytics?.sales);
+  const { filters } = useAppSelector(({ analytics }) => analytics?.profit);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [customersSelected, setCustomersSelected] = useState<number[]>([]);
-  const [productsSelected, setProductsSelected] = useState<number[]>([]);
   const [branchesSelected, setBranchesSelected] = useState<string[]>([]);
   const { isTablet } = useMediaQuery();
-  const filtersApplied = !!filters?.customers?.length || !!filters?.branches?.length;
+  const filtersApplied = !!filters?.branches?.length;
 
   const fetchReportData = () => {
-    dispatch(analyticsActions.sales.getFullDataByFilters());
+    dispatch(analyticsActions.profit.getFullDataByFilters());
     // dispatch(analyticsActions.sales.getLastSales());
   };
 
@@ -34,30 +30,24 @@ const SalesReportFilters = () => {
 
   const openFiltersDrawer = () => {
     setOpenDrawer(true);
-    if (filters?.customers?.length) setCustomersSelected(filters?.customers);
-    if (filters?.products?.length) setProductsSelected(filters?.products);
     if (filters?.branches?.length) setBranchesSelected(filters?.branches);
   };
 
   const onDateRangeChange = async (dateRange: DateRangeKey) => {
-    await dispatch(analyticsActions.setSalesFilters({ date_range: dateRange }));
+    await dispatch(analyticsActions.setProfitFilters({ date_range: dateRange }));
     if (dateRange !== 'custom') {
-      dispatch(analyticsActions.setSalesFilters({ custom_dates: [null, null] }));
+      dispatch(analyticsActions.setProfitFilters({ custom_dates: [null, null] }));
       fetchReportData();
     }
   };
 
   const removeFilters = () => {
-    setCustomersSelected([]);
-    setProductsSelected([]);
     setBranchesSelected([]);
   };
 
   const applyFilters = () => {
     dispatch(
-      analyticsActions.setSalesFilters({
-        customers: customersSelected,
-        products: productsSelected,
+      analyticsActions.setProfitFilters({
         branches: branchesSelected,
       }),
     );
@@ -107,7 +97,7 @@ const SalesReportFilters = () => {
               format={['DD MMM, YYYY', 'DD MMM, YYYY']}
               onChange={dates => {
                 const custom_dates = dates ? [dates[0]?.toISOString() || null, dates[1]?.toISOString() || null] : [null, null];
-                dispatch(analyticsActions.setSalesFilters({ custom_dates }));
+                dispatch(analyticsActions.setProfitFilters({ custom_dates }));
               }}
             />
             <Button onClick={fetchReportData} icon={<SearchIcon className="w-4 h-4" />} />
@@ -129,35 +119,7 @@ const SalesReportFilters = () => {
           ) : null
         }
       >
-        <Typography.Paragraph>Agrega filtros para personalizar tu reporte de ventas</Typography.Paragraph>
-
-        <Typography.Paragraph className="!font-semibold !mb-1">Clientes</Typography.Paragraph>
-        <Select
-          mode="multiple"
-          allowClear
-          className="!mb-8 w-full"
-          placeholder="Selecciona uno o varios clientes"
-          options={customers?.map(customer => ({
-            ...customer,
-            label: customer?.name,
-            value: customer?.customer_id,
-          }))}
-          showSearch
-          filterOption={(input, option) =>
-            functions.includes(option?.name, input.toLowerCase()) || functions.includes(option?.phone, input.toLowerCase())
-          }
-          onFocus={() => {
-            if (!customers?.length) dispatch(customerActions.fetchCustomers());
-          }}
-          onChange={setCustomersSelected}
-          value={customersSelected}
-          optionRender={item => (
-            <div className="flex flex-col">
-              <p className="m-0 text-sm font-medium">{item.data?.name}</p>
-              <p className="m-0 text-xs font-light text-gray-400">{item.data?.phone}</p>
-            </div>
-          )}
-        />
+        <Typography.Paragraph>Agrega filtros para personalizar tu reporte</Typography.Paragraph>
 
         <Typography.Paragraph className="!font-semibold !mb-1">Sucursales</Typography.Paragraph>
         <Select
@@ -193,4 +155,4 @@ const SalesReportFilters = () => {
   );
 };
 
-export default SalesReportFilters;
+export default ProfitReportFilters;

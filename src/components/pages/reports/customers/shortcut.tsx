@@ -28,7 +28,7 @@ const TopCustomersThumbnail = () => {
   return (
     <CardRoot
       loading={loading}
-      title={<h5 className="!text-base m-0 font-medium">Ventas por cliente</h5>}
+      title={<h5 className="!text-base m-0 font-medium">Los 10 mejores clientes</h5>}
       extra={
         <div className="flex gap-3">
           {user_auth?.profile?.permissions?.reports?.view_customers_report?.value && hasAccess('view_customers_report') ? (
@@ -46,7 +46,7 @@ const TopCustomersThumbnail = () => {
           <>
             <div className="hidden print:flex justify-between items-center mb-2 pl-1 pr-2">
               <Typography.Title level={2} className="!text-3xl !m-0">
-                Ventas por cliente
+                Los 10 mejores clientes
               </Typography.Title>
             </div>
             <div className="flex flex-col">
