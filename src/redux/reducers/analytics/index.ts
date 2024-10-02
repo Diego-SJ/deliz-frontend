@@ -119,8 +119,8 @@ const analytics = createSlice({
       state.profit.filters = { ...state.profit.filters, ...action.payload };
     },
     setProfitSummary: (state, action: PayloadAction<Partial<ProfitSummary>>) => {
-      if (!state.profit) {
-        state = { ...state, profit: { ...initialState.profit } };
+      if (!state?.profit || !state?.profit?.summary) {
+        state = { ...state, profit: { ...initialState.profit, summary: initialState.profit.summary } };
       }
       state.profit.summary = { ...state.profit.summary, ...action.payload };
     },
