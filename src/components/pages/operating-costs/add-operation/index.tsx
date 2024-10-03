@@ -14,6 +14,8 @@ import {
   InputNumber,
   Row,
   Segmented,
+  Select,
+  Tooltip,
   Typography,
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
@@ -31,6 +33,8 @@ import { imageCompressionFile } from '@/utils/images';
 import { supabase } from '@/config/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
+import { EXPENSE_CATEGORIES } from '@/constants/categories';
+import functions from '@/utils/functions';
 
 type Params = {
   action: 'edit' | 'add';
@@ -56,7 +60,7 @@ const AddOperationPurchaseExpense = () => {
   const [loading, setLoading] = useState(false);
   const { hasAccess } = useMembershipAccess();
   const { loading: isLoading } = useAppSelector(({ operatingCosts }) => operatingCosts);
-  const { currentCashRegister } = useAppSelector(({ branches }) => branches);
+  const { currentCashRegister, branches, currentBranch } = useAppSelector(({ branches }) => branches);
   const { company } = useAppSelector(({ app }) => app);
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const firstRender = useRef<boolean>(false);
@@ -211,6 +215,7 @@ const AddOperationPurchaseExpense = () => {
               status_id: STATUS_DATA.PAID.id,
               operation_date: dayjs(),
               pay_from_cash_register: false,
+              branch_id: currentBranch?.branch_id,
             }}
             validateMessages={{
               required: '${label} es obligatorio.',
@@ -339,6 +344,58 @@ const AddOperationPurchaseExpense = () => {
                         </div>
                       </Form.Item>
                     )}
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:gap-5">
+                    <Form.Item
+                      name="operational_category_id"
+                      label="Categoría del gasto"
+                      rules={[{ required: true }]}
+                      className="w-full md:w-1/2"
+                    >
+                      <Select
+                        size="large"
+                        placeholder="Selecciona una categoría"
+                        className="w-full"
+                        options={EXPENSE_CATEGORIES}
+                        allowClear
+                        showSearch
+                        filterOption={(input, option) =>
+                          functions.includes(option?.label, input.toLowerCase()) ||
+                          functions.includes(option?.description, input.toLowerCase())
+                        }
+                        optionRender={item => (
+                          <Tooltip title={item?.data?.description} placement="right">
+                            <div className="flex flex-col w-full">
+                              <p className="m-0 text-sm font-medium">{item.data?.label}</p>
+                              <p className="m-0 text-xs font-light text-gray-400">{item.data?.description}</p>
+                            </div>
+                          </Tooltip>
+                        )}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="branch_id"
+                      label="Sucursal"
+                      tooltip="Sucursal en la que se realizó la operación"
+                      className="w-full md:w-1/2"
+                    >
+                      <Select
+                        size="large"
+                        placeholder="Selecciona una sucursal"
+                        className="w-full"
+                        allowClear
+                        options={branches?.map(branch => ({ label: branch.name, value: branch.branch_id }))}
+                        showSearch
+                        filterOption={(input, option) => functions.includes(option?.label, input.toLowerCase())}
+                        // optionRender={item => (
+                        //   <div className="flex flex-col">
+                        //     <p className="m-0 text-sm font-medium">{item.data?.label}</p>
+                        //   </div>
+                        // )}
+                      />
+                    </Form.Item>
                   </div>
 
                   <Form.Item name="notes" label="Notas" className="!m-0">

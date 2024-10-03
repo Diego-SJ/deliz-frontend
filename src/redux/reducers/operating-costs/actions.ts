@@ -21,7 +21,6 @@ export const customOperatingCostsActions = {
       ...operation,
       operation_date: dayjs(operation?.operation_date).tz('America/Mexico_City').format(),
       company_id: state.app.company.company_id || null,
-      branch_id: state.branches.currentBranch?.branch_id || null,
       cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
     } as OperatingCost;
 
@@ -41,7 +40,7 @@ export const customOperatingCostsActions = {
         amount: operation?.amount || 0,
         payment_method: 'CASH',
         cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
-        branch_id: state.branches.currentBranch?.branch_id || null,
+        branch_id: newOperation?.branch_id || null,
         cash_cut_id: state?.cashiers?.active_cash_cut?.cash_cut_id || null,
         operating_cost_id: data?.operating_cost_id,
       });
@@ -58,7 +57,12 @@ export const customOperatingCostsActions = {
 
     const supabaseQuery = supabase
       .from('operating_costs')
-      .select('*, status(*)', { count: 'exact' })
+      .select(
+        'operating_cost_id, reason, amount, operation_date, operation_type, created_at, branches(name), status(name, status_id)',
+        {
+          count: 'exact',
+        },
+      )
       .eq('company_id', company_id)
       .order('created_at', { ascending: false });
 
@@ -99,7 +103,7 @@ export const customOperatingCostsActions = {
         totalRecords: count || 0,
       }),
     );
-    dispatch(operatingCostsActions.setOperatingCosts(data));
+    dispatch(operatingCostsActions.setOperatingCosts(data as unknown as OperatingCost[]));
     return data;
   },
   getOperationById: (operation_id: string) => async (dispatch: AppDispatch, __: AppState) => {

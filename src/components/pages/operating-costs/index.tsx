@@ -41,7 +41,6 @@ const columns: ColumnsType<OperatingCost> = [
       return <Tag color={_status?.color ?? 'orange'}>{(record as any)?.status?.name}</Tag>;
     },
   },
-
   {
     title: 'Fecha del gasto',
     dataIndex: 'operation_date',
@@ -50,10 +49,17 @@ const columns: ColumnsType<OperatingCost> = [
     render: (value: Date | string) => functions.date(value),
   },
   {
+    title: 'Sucursal',
+    dataIndex: 'branches',
+    align: 'center',
+    width: 120,
+    render: (_, record) => <Tag>{record?.branches?.name}</Tag>,
+  },
+  {
     title: 'Fecha de creación',
     dataIndex: 'created_at',
     align: 'center',
-    width: 210,
+    width: 230,
     render: (value: Date | string) => functions.tableDate(value),
   },
 ];
@@ -208,7 +214,7 @@ const PurchasesExpenses = () => {
                 rowKey={record => record.operating_cost_id}
                 columns={columns}
                 dataSource={operations}
-                scroll={{ x: 700, y: 'calc(100dvh - 350px)' }}
+                scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
                 pagination={{
                   defaultCurrent: 0,
                   showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
@@ -258,15 +264,18 @@ const PurchasesExpenses = () => {
                     onClick={() => onRowClick(item)}
                     className="flex justify-between py-3 px-4 items-center border-b border-gray-200 cursor-pointer"
                   >
-                    <div className="flex flex-col w-1/3">
-                      <Typography.Text strong className="!mb-2">
+                    <div className="flex flex-col w-3/5">
+                      <Typography.Text strong className="!mb-1">
                         {item?.reason || 'Público general'}
                       </Typography.Text>
-                      <Typography.Text type="secondary">{functions.tableDate(item.created_at)}</Typography.Text>
+                      <Typography.Text className="text-gray-400 text-small font-light mb-1">
+                        {functions.tableDate(item.created_at)}
+                      </Typography.Text>
+                      <Tag className="w-fit text-small font-light">Sucursal {item?.branches?.name || 'Desconocida'}</Tag>
                     </div>
 
-                    <div className="flex flex-col w-1/3 text-end justify-end">
-                      <Typography.Text className="!mb-2 font-medium">{functions.money(item.amount)}</Typography.Text>
+                    <div className="flex flex-col w-2/5 text-end justify-between h-full ">
+                      <Typography.Text className="!mb-4 font-medium">{functions.money(item.amount)}</Typography.Text>
                       <Tag className="ml-auto w-fit mx-0" color={_status?.color ?? 'orange'}>
                         {(item as any)?.status?.name}
                       </Tag>

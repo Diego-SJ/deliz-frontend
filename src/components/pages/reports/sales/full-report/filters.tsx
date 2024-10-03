@@ -146,17 +146,17 @@ const SalesReportFilters = () => {
           filterOption={(input, option) =>
             functions.includes(option?.name, input.toLowerCase()) || functions.includes(option?.phone, input.toLowerCase())
           }
-          onFocus={() => {
-            if (!customers?.length) dispatch(customerActions.fetchCustomers());
-          }}
-          onChange={setCustomersSelected}
-          value={customersSelected}
           optionRender={item => (
             <div className="flex flex-col">
               <p className="m-0 text-sm font-medium">{item.data?.name}</p>
               <p className="m-0 text-xs font-light text-gray-400">{item.data?.phone}</p>
             </div>
           )}
+          onFocus={() => {
+            if (!customers?.length) dispatch(customerActions.fetchCustomers());
+          }}
+          onChange={setCustomersSelected}
+          value={customersSelected}
         />
 
         <Typography.Paragraph className="!font-semibold !mb-1">Sucursales</Typography.Paragraph>

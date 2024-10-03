@@ -1,4 +1,5 @@
 import { Dayjs } from 'dayjs';
+import { Branch } from '../branches/type';
 
 export type OperatingCostsSlice = {
   operatingCosts: OperatingCost[];
@@ -20,6 +21,7 @@ export type OperatingCost = {
   cash_register_id: string;
   branch_id: string;
   company_id: string;
+  branches?: Branch;
 };
 
 export type FetchOperationsFilters = {
