@@ -1,4 +1,13 @@
-import { ArrowLeft, Printer, ChartLine, ChartColumnBig, Layers2, Layers } from 'lucide-react';
+import {
+  ArrowDown01,
+  ArrowLeft,
+  ChartColumnBig,
+  ChartLine,
+  Layers,
+  Layers2,
+  Printer,
+  Shuffle,
+} from 'lucide-react';
 import { Button, Col, Row, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -8,22 +17,27 @@ import { useReactToPrint } from 'react-to-print';
 import { LineChartProfit } from './chart';
 import CardRoot from '@/components/atoms/Card';
 import { analyticsActions } from '@/redux/reducers/analytics';
-import ProfitShorcutReport from './total-profits';
 import ProfitsByRange from './profits-by-range';
+import ProfitReportFilters from '@/components/pages/reports/expenses/full-report/filters';
+import ExpensesPieChart from '@/components/pages/reports/expenses/shortcut/chart';
 
-const ProfitReport = () => {
+const ExpensesFullReport = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { filters, data } = useAppSelector(({ analytics }) => analytics?.profit);
+  const { filters, charts } = useAppSelector(
+    ({ analytics }) => analytics?.expenses,
+  );
   const [stacked, setStacked] = useState(false);
   const [chartStyle, setChartStyle] = useState<'linear' | 'step'>('linear');
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
+  const [sortByValue, setSortByValue] = useState(false);
 
   useEffect(() => {
     if (!firstRender.current) {
       firstRender.current = true;
-      dispatch(analyticsActions.profit.getFullDataByFilters());
+      dispatch(analyticsActions.expenses.getExpensesByCategory());
+      dispatch(analyticsActions.expenses.getExpensesByDate());
     }
   }, [firstRender]);
 
@@ -32,11 +46,15 @@ const ProfitReport = () => {
   });
 
   const handleStacked = () => {
-    setStacked(prev => !prev);
+    setStacked((prev) => !prev);
   };
 
   const handleChartStyle = () => {
-    setChartStyle(prev => (prev === 'linear' ? 'step' : 'linear'));
+    setChartStyle((prev) => (prev === 'linear' ? 'step' : 'linear'));
+  };
+
+  const handleSort = () => {
+    setSortByValue((prev) => !prev);
   };
 
   return (
@@ -50,19 +68,23 @@ const ProfitReport = () => {
               onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
             />
             <Typography.Title level={4} className="!m-0">
-              Reporte de ganancias
+              Reporte de gastos
             </Typography.Title>
           </div>
-          <Button
-            type="primary"
-            className="w-fit sm:hidden"
-            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
-          >
-            Imprimir
-          </Button>
+          <div className="flex items-center gap-5">
+            <Button
+              type="primary"
+              className="w-fit sm:hidden"
+              icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
+              onClick={handlePrint}
+            >
+              Imprimir
+            </Button>
+          </div>
         </div>
+
         <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 print:hidden">
+          <ProfitReportFilters />
           <Button
             type="primary"
             className="w-fit hidden sm:inline-flex"
@@ -73,13 +95,12 @@ const ProfitReport = () => {
           </Button>
         </div>
       </div>
-      <ProfitShorcutReport />
 
-      <Row gutter={[10, 10]}>
+      <Row gutter={[20, 20]}>
         <Col xs={24}>
           <ProfitsByRange />
         </Col>
-        <Col xs={24}>
+        <Col xs={24} md={24} lg={24} xl={12}>
           <CardRoot
             classNames={{ body: '!px-2' }}
             title="Entradas y gastos"
@@ -88,21 +109,63 @@ const ProfitReport = () => {
                 <Tooltip title={'Cambiar estilo de gráfico'}>
                   <Button
                     onClick={handleChartStyle}
-                    icon={chartStyle === 'linear' ? <ChartColumnBig className="w-4 h-4" /> : <ChartLine className="w-4 h-4" />}
+                    icon={
+                      chartStyle === 'linear' ? (
+                        <ChartColumnBig className="w-4 h-4" />
+                      ) : (
+                        <ChartLine className="w-4 h-4" />
+                      )
+                    }
                   />
                 </Tooltip>
 
                 <Tooltip title={stacked ? 'Sin apilar' : 'Apilar'}>
                   <Button
                     onClick={handleStacked}
-                    icon={stacked ? <Layers2 className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+                    icon={
+                      stacked ? (
+                        <Layers2 className="w-4 h-4" />
+                      ) : (
+                        <Layers className="w-4 h-4" />
+                      )
+                    }
                   />
                 </Tooltip>
               </div>
             }
           >
             <div className="h-[390px] w-full">
-              <LineChartProfit data={data || []} range={filters?.date_range} stacked={stacked} chartStyle={chartStyle} />
+              <LineChartProfit
+                data={charts?.line || []}
+                range={filters?.date_range}
+                stacked={stacked}
+                chartStyle={chartStyle}
+              />
+            </div>
+          </CardRoot>
+        </Col>
+        <Col xs={24} md={24} lg={24} xl={12}>
+          <CardRoot
+            classNames={{ body: '!px-2' }}
+            title="Gastos por categoría"
+            extra={
+              <Button
+                onClick={handleSort}
+                icon={
+                  sortByValue ? (
+                    <Shuffle className="w-4 h-4" />
+                  ) : (
+                    <ArrowDown01 className="w-4 h-4" />
+                  )
+                }
+              />
+            }
+          >
+            <div className="h-[390px] w-full">
+              <ExpensesPieChart
+                data={charts?.pieCustom || []}
+                sortByValue={sortByValue}
+              />
             </div>
           </CardRoot>
         </Col>
@@ -111,4 +174,4 @@ const ProfitReport = () => {
   );
 };
 
-export default ProfitReport;
+export default ExpensesFullReport;

@@ -1,8 +1,23 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { FileTextOutlined, FilterOutlined, PlusCircleOutlined, SearchOutlined, ShopOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Row, Tag, Input, Typography, Table, Dropdown } from 'antd';
+import {
+  FileTextOutlined,
+  FilterOutlined,
+  PlusCircleOutlined,
+  SearchOutlined,
+  ShopOutlined,
+} from '@ant-design/icons';
+import {
+  Breadcrumb,
+  Button,
+  Col,
+  Dropdown,
+  Input,
+  Row,
+  Table,
+  Tag,
+} from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +29,7 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import { useDebouncedCallback } from 'use-debounce';
 import { ModuleAccess } from '@/routes/module-access';
+import BottomMenu from '@/components/organisms/bottom-menu';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -53,7 +69,7 @@ const columns: ColumnsType<SaleRPC> = [
     dataIndex: 'branch_name',
     align: 'center',
     width: 120,
-    render: value => <Tag>{value || 'N/A'}</Tag>,
+    render: (value) => <Tag>{value || 'N/A'}</Tag>,
   },
   {
     title: 'Status',
@@ -62,7 +78,9 @@ const columns: ColumnsType<SaleRPC> = [
     align: 'center',
     render: (_, record) => {
       const _status = STATUS_OBJ[record?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{record?.status_name}</Tag>;
+      return (
+        <Tag color={_status?.color ?? 'orange'}>{record?.status_name}</Tag>
+      );
     },
   },
   {
@@ -77,8 +95,15 @@ const columns: ColumnsType<SaleRPC> = [
 const Sales = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { sales, cashiers, filters: salesFilters, loading } = useAppSelector(({ sales }) => sales);
-  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const {
+    sales,
+    cashiers,
+    filters: salesFilters,
+    loading,
+  } = useAppSelector(({ sales }) => sales);
+  const { permissions } = useAppSelector(
+    ({ users }) => users?.user_auth?.profile!,
+  );
   const { branches } = useAppSelector(({ branches }) => branches);
   const [auxSales, setAuxSales] = useState<SaleRPC[]>([]);
   const isFirstRender = useRef(true);
@@ -136,7 +161,12 @@ const Sales = () => {
                 prefix={<SearchOutlined />}
                 value={salesFilters?.sales?.search || ''}
                 onChange={({ target }) => {
-                  dispatch(salesActions.setSaleFilters({ search: target.value, page: 0 }));
+                  dispatch(
+                    salesActions.setSaleFilters({
+                      search: target.value,
+                      page: 0,
+                    }),
+                  );
                   fetchSalesByTerm();
                 }}
               />
@@ -144,10 +174,18 @@ const Sales = () => {
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
-                  selectedKeys: [salesFilters?.sales?.orderBy || 'created_at,desc'],
+                  selectedKeys: [
+                    salesFilters?.sales?.orderBy || 'created_at,desc',
+                  ],
                   items: [
-                    { label: 'Creado (recientes primero)', key: 'created_at,desc' },
-                    { label: 'Creado (antiguos primero)', key: 'created_at,asc' },
+                    {
+                      label: 'Creado (recientes primero)',
+                      key: 'created_at,desc',
+                    },
+                    {
+                      label: 'Creado (antiguos primero)',
+                      key: 'created_at,asc',
+                    },
                     { label: 'Estado (A-Z)', key: 'status_id,asc' },
                     { label: 'Estado (Z-A)', key: 'status_id,desc' },
                   ],
@@ -160,13 +198,22 @@ const Sales = () => {
               >
                 <Button
                   type={
-                    !salesFilters?.sales?.orderBy || salesFilters?.sales?.orderBy === 'created_at,desc' ? 'default' : 'primary'
+                    !salesFilters?.sales?.orderBy ||
+                    salesFilters?.sales?.orderBy === 'created_at,desc'
+                      ? 'default'
+                      : 'primary'
                   }
                   block
                   className={`${
-                    !!salesFilters?.sales?.orderBy && salesFilters?.sales?.orderBy !== 'created_at,desc' ? '!bg-white' : ''
+                    !!salesFilters?.sales?.orderBy &&
+                    salesFilters?.sales?.orderBy !== 'created_at,desc'
+                      ? '!bg-white'
+                      : ''
                   }`}
-                  ghost={!!salesFilters?.sales?.orderBy && salesFilters?.sales?.orderBy !== 'created_at,desc'}
+                  ghost={
+                    !!salesFilters?.sales?.orderBy &&
+                    salesFilters?.sales?.orderBy !== 'created_at,desc'
+                  }
                   size={isTablet ? 'large' : 'middle'}
                   icon={<FilterOutlined className="text-base" />}
                 >
@@ -178,27 +225,44 @@ const Sales = () => {
               <Dropdown
                 menu={{
                   selectedKeys: [
-                    !!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0
+                    !!salesFilters?.sales?.status_id &&
+                    salesFilters?.sales?.status_id !== 0
                       ? salesFilters?.sales?.status_id?.toString() || ''
                       : '0',
                   ],
                   items: [
                     { label: 'Mostrar todos', key: '0' },
-                    { label: STATUS_DATA.PAID.name, key: STATUS_DATA.PAID.id.toString() },
-                    { label: STATUS_DATA.PENDING.name, key: STATUS_DATA.PENDING.id.toString() },
+                    {
+                      label: STATUS_DATA.PAID.name,
+                      key: STATUS_DATA.PAID.id.toString(),
+                    },
+                    {
+                      label: STATUS_DATA.PENDING.name,
+                      key: STATUS_DATA.PENDING.id.toString(),
+                    },
                   ],
                   selectable: true,
                   onClick: ({ key }) => {
-                    dispatch(salesActions.setSaleFilters({ status_id: Number(key) }));
+                    dispatch(
+                      salesActions.setSaleFilters({ status_id: Number(key) }),
+                    );
                     dispatch(salesActions.fetchSales({ refetch: true }));
                   },
                 }}
               >
                 <Button
-                  type={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? 'primary' : 'default'}
+                  type={
+                    !!salesFilters?.sales?.status_id &&
+                    salesFilters?.sales?.status_id !== 0
+                      ? 'primary'
+                      : 'default'
+                  }
                   block
                   className={`${!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0 ? '!bg-white' : ''}`}
-                  ghost={!!salesFilters?.sales?.status_id && salesFilters?.sales?.status_id !== 0}
+                  ghost={
+                    !!salesFilters?.sales?.status_id &&
+                    salesFilters?.sales?.status_id !== 0
+                  }
                   size={isTablet ? 'large' : 'middle'}
                   icon={<FileTextOutlined className="text-base" />}
                 >
@@ -210,10 +274,15 @@ const Sales = () => {
               <ModuleAccess moduleName="branches">
                 <Dropdown
                   menu={{
-                    defaultSelectedKeys: [salesFilters?.sales?.branch_id || 'ALL'],
+                    defaultSelectedKeys: [
+                      salesFilters?.sales?.branch_id || 'ALL',
+                    ],
                     items: [
                       { label: 'Todas las sucursales', key: 'ALL' },
-                      ...(branches?.map(branch => ({ label: branch.name, key: branch.branch_id })) || []),
+                      ...(branches?.map((branch) => ({
+                        label: branch.name,
+                        key: branch.branch_id,
+                      })) || []),
                     ],
                     selectable: true,
                     onClick: ({ key }) => {
@@ -223,18 +292,33 @@ const Sales = () => {
                   }}
                 >
                   <Button
-                    type={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? 'primary' : 'default'}
+                    type={
+                      !!salesFilters?.sales?.branch_id &&
+                      salesFilters?.sales?.branch_id !== 'ALL'
+                        ? 'primary'
+                        : 'default'
+                    }
                     block
                     className={`${
-                      !!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL' ? '!bg-white' : ''
+                      !!salesFilters?.sales?.branch_id &&
+                      salesFilters?.sales?.branch_id !== 'ALL'
+                        ? '!bg-white'
+                        : ''
                     }`}
-                    ghost={!!salesFilters?.sales?.branch_id && salesFilters?.sales?.branch_id !== 'ALL'}
+                    ghost={
+                      !!salesFilters?.sales?.branch_id &&
+                      salesFilters?.sales?.branch_id !== 'ALL'
+                    }
                     size={isTablet ? 'large' : 'middle'}
                     icon={<ShopOutlined className="text-base" />}
                   >
-                    {!salesFilters?.sales?.branch_id || salesFilters?.sales?.branch_id === 'ALL'
+                    {!salesFilters?.sales?.branch_id ||
+                    salesFilters?.sales?.branch_id === 'ALL'
                       ? 'Sucursal'
-                      : branches?.find(branch => branch.branch_id === salesFilters?.sales?.branch_id)?.name}
+                      : branches?.find(
+                          (branch) =>
+                            branch.branch_id === salesFilters?.sales?.branch_id,
+                        )?.name}
                   </Button>
                 </Dropdown>
               </ModuleAccess>
@@ -258,21 +342,24 @@ const Sales = () => {
             <CardRoot styles={{ body: { padding: 0 } }} className={`!mt-6`}>
               <Table
                 loading={loading}
-                onRow={record => {
+                onRow={(record) => {
                   return {
                     onClick: () => onRowClick(record), // click row
                   };
                 }}
-                rowKey={record => `${record.sale_id}`}
+                rowKey={(record) => `${record.sale_id}`}
                 columns={columns}
                 dataSource={auxSales}
                 pagination={{
                   defaultCurrent: 0,
-                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showTotal: (total, range) =>
+                    `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
                   showSizeChanger: true,
                   size: 'small',
                   onChange: (page, pageSize) => {
-                    dispatch(salesActions.setSaleFilters({ page: page - 1, pageSize }));
+                    dispatch(
+                      salesActions.setSaleFilters({ page: page - 1, pageSize }),
+                    );
                     dispatch(salesActions.fetchSales({ refetch: true }));
                   },
                   pageSize: salesFilters?.sales?.pageSize,
@@ -287,16 +374,19 @@ const Sales = () => {
             </CardRoot>
           ) : (
             <PaginatedList
-              className="mt-4 !max-h-[calc(100dvh-284px)]"
-              $bodyHeight="calc(100dvh - 340px)"
+              className="mt-4 !max-h-[calc(100dvh-284px-80px)]" // screen - navbar - bottom menu
+              $bodyHeight="calc(100dvh - 340px - 75px)"
               loading={loading}
               pagination={{
                 defaultCurrent: 1,
-                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} de ${total}`,
                 showSizeChanger: true,
                 size: 'small',
                 onChange: (page, pageSize) => {
-                  dispatch(salesActions.setSaleFilters({ page: page - 1, pageSize }));
+                  dispatch(
+                    salesActions.setSaleFilters({ page: page - 1, pageSize }),
+                  );
                   dispatch(salesActions.fetchSales({ refetch: true }));
                 },
                 pageSize: salesFilters?.sales?.pageSize,
@@ -309,7 +399,7 @@ const Sales = () => {
               }}
               dataSource={auxSales}
               rootClassName="sadasd"
-              renderItem={item => {
+              renderItem={(item) => {
                 const _status = STATUS_OBJ[item?.status_id || 1];
                 return (
                   <div
@@ -317,20 +407,30 @@ const Sales = () => {
                     onClick={() => onRowClick(item)}
                     className="flex justify-between py-3 px-4 items-center border-b border-gray-200 cursor-pointer"
                   >
-                    <div className="flex flex-col w-1/3">
-                      <Typography.Text strong className="!mb-2">
+                    <div className="flex flex-col w-3/6">
+                      <p className="m-0 mb-1 font-medium leading-[1.1]">
                         {item?.customer_name || 'Público general'}
-                      </Typography.Text>
-                      <Typography.Text type="secondary">{functions.tableDate(item.created_at)}</Typography.Text>
+                      </p>
+                      <span className="text-xs text-gray-400/70">
+                        {functions.tableDate(item.created_at)}
+                      </span>
                     </div>
-                    <Typography.Text>{functions.money(item.total)}</Typography.Text>
-                    <div className="flex flex-col w-1/3 text-end justify-end">
-                      <Typography.Text className="!mb-2" type="secondary">
-                        {PAYMENT_METHOD[item.payment_method || '']}
-                      </Typography.Text>
-                      <Tag className="ml-auto w-fit mx-0" color={_status?.color ?? 'orange'}>
+
+                    <div className="flex justify-between items-center pl-4 w-3/6">
+                      <Tag
+                        className="w-fit mx-0"
+                        color={_status?.color ?? 'orange'}
+                      >
                         {item?.status_name}
                       </Tag>
+                      <div className="flex flex-col text-end justify-end">
+                        <span className="text-xs text-gray-500 font-medium">
+                          {functions.money(item.total)}
+                        </span>
+                        <span className="text-xs text-gray-400/70 mb-1">
+                          {PAYMENT_METHOD[item.payment_method || '']}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -339,6 +439,7 @@ const Sales = () => {
           )}
         </Col>
       </Row>
+      {isTablet && <BottomMenu />}
     </div>
   );
 };

@@ -8,15 +8,16 @@ type Props = {
 };
 
 export const LineChartMargin = ({ data }: Props) => {
-  const minYValue = Math.min(...data?.flatMap(series => series?.data?.map(point => point.y)));
-  const dynamicBaselineValue = minYValue;
+  const dynamicBaselineValue = Math.min(
+    ...data?.flatMap((series) => series?.data?.map((point) => point.y)),
+  );
 
   // Suponiendo que la serie de totales ya está incluida en "data"
   // Si no, puedes agregarla manualmente como en este ejemplo:
   const totalSalesData = {
     id: 'Total Sales',
     color: 'hsl(220, 70%, 50%)', // Puedes cambiar el color según lo necesites
-    data: data[0]?.data.map((point, index) => ({
+    data: data[0]?.data.map((point) => ({
       x: point.x, // Mismo valor de "x" que la serie principal
       y: point.total, // Valor del total de ventas para ese día
     })),
@@ -57,7 +58,7 @@ export const LineChartMargin = ({ data }: Props) => {
         legendOffset: -50,
         legendPosition: 'middle',
         truncateTickAt: 0,
-        format: e => numeral(e).format('$0 a'),
+        format: (e) => numeral(e).format('$0 a'),
         // tickValues: updatedData
         //   .reduce((acc: any, series) => {
         //     series.data.forEach(point => {
@@ -75,8 +76,10 @@ export const LineChartMargin = ({ data }: Props) => {
       tooltip={function (e) {
         return (
           <div className="bg-white py-2 px-3 shadow-lg rounded-md text-center">
-            <p className="font-medium text-xl">{functions.money(e.point.data.y.toString())}</p>
-            <p className="font-base">En ventas</p>
+            <p className="font-medium text-xl">
+              {functions.money(e.point.data.y.toString())}
+            </p>
+            <p className="font-base font-light text-gray-400">En ventas</p>
           </div>
         );
       }}

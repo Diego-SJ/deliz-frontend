@@ -42,6 +42,7 @@ import AiChatPage from '@/components/pages/ai-chat';
 import SalesReports from '@/components/pages/reports/sales/full-report';
 import { useMembershipAccess } from './module-access';
 import ProfitReport from '@/components/pages/reports/profit/full-report';
+import ExpensesFullReport from '@/components/pages/reports/expenses/full-report';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -68,7 +69,7 @@ const AppRouter = () => {
         </>
       )}
 
-      {status_id !== STATUS_DATA.COMPLETED.id && !!authenticated && (
+      {status_id !== STATUS_DATA.COMPLETED.id && authenticated && (
         <Route path={APP_ROUTES.AUTH.SIGN_UP.ONBOARDING.path} element={<SignUpSteps />} />
       )}
 
@@ -184,7 +185,8 @@ const AppRouter = () => {
               }
             />
             {permissions?.expenses?.add_expense?.value && (
-              <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.path} element={<AddOperationPurchaseExpense />} />
+              <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.path}
+                     element={<AddOperationPurchaseExpense />} />
             )}
             {permissions?.expenses?.edit_expense?.value && (
               <Route path={APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.path} element={<AddOperationPurchaseExpense />} />
@@ -194,7 +196,8 @@ const AppRouter = () => {
 
         {/* PURCHASES EXPENSES ROUTES - END */}
 
-        {hasAccess('online_store') && <Route path={APP_ROUTES.PRIVATE.ONLINE_STORE.path} element={<OnlineStorePage />} />}
+        {hasAccess('online_store') &&
+          <Route path={APP_ROUTES.PRIVATE.ONLINE_STORE.path} element={<OnlineStorePage />} />}
 
         {/* SETTINGS ROUTES - START */}
         <Route path={APP_ROUTES.PRIVATE.SETTINGS.path} element={<SettingsPage />}>
@@ -266,6 +269,17 @@ const AppRouter = () => {
             element={
               <ReportsLayout>
                 <ProfitReport />
+              </ReportsLayout>
+            }
+          />
+        ) : null}
+
+        {permissions?.reports?.view_sales_report && hasAccess('reports') ? (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.EXPENSES.path}
+            element={
+              <ReportsLayout>
+                <ExpensesFullReport />
               </ReportsLayout>
             }
           />

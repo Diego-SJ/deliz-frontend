@@ -7,12 +7,20 @@ import { Product } from '@/redux/reducers/products/types';
 import { Avatar, Col, Drawer, Row, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CustomerEditor from '../customers/editor';
-import { CircleDollarSign, MonitorCheck, MonitorX, PackagePlus, ShoppingBasket, UserRoundPlus } from 'lucide-react';
+import {
+  CircleDollarSign,
+  MonitorCheck,
+  MonitorX,
+  PackagePlus,
+  ShoppingBasket,
+  UserRoundPlus,
+} from 'lucide-react';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CashCutForm from '../cash_cuts/current-cash-cut/cash-cut-form';
 import { useState } from 'react';
 import OpenCashierModal from '../cash_cuts/current-cash-cut/open-cashier-modal/modal';
 import { ModuleAccess } from '@/routes/module-access';
+import BottomMenu from '@/components/organisms/bottom-menu';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +28,9 @@ const Dashboard = () => {
   const { isTablet } = useMediaQuery();
   const { current_customer } = useAppSelector(({ customers }) => customers);
   const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(
+    ({ users }) => users.user_auth.profile!,
+  );
   const [openCloseCashier, setOpenCloseCashier] = useState(false);
   const [openCashierVisible, setOpenCashierVisible] = useState(false);
 
@@ -34,7 +44,9 @@ const Dashboard = () => {
   };
 
   const addCustomer = () => {
-    dispatch(customerActions.setCurrentCustomer({ customer_id: -1 } as Customer));
+    dispatch(
+      customerActions.setCurrentCustomer({ customer_id: -1 } as Customer),
+    );
   };
 
   const onClose = () => {
@@ -46,111 +58,163 @@ const Dashboard = () => {
   };
 
   const handleDrawerVisible = () => {
-    setOpenCloseCashier(prev => !prev);
+    setOpenCloseCashier((prev) => !prev);
   };
 
   const handleOpenCashier = () => {
-    setOpenCashierVisible(prev => !prev);
+    setOpenCashierVisible((prev) => !prev);
   };
 
   return (
-    <div className="p-3">
-      {permissions?.sales?.add_sale?.value ||
-      permissions?.expenses?.add_expense?.value ||
-      permissions?.cash_registers?.make_cash_cut?.value ||
-      permissions?.cash_registers?.open_cash_cut?.value ? (
-        <Typography.Title level={5} className="mb-3">
-          Movimientos
-        </Typography.Title>
-      ) : null}
-      <Row gutter={[10, 10]}>
-        {permissions?.sales?.add_sale?.value && (
-          <CardButton
-            title="Nueva venta"
-            description="Accede al punto de venta"
-            icon={<ShoppingBasket strokeWidth={1.5} className="text-purple-600 !w-8 !h-8" />}
-            className="bg-purple-600/10"
-            onClick={newSale}
-          />
-        )}
-
-        <ModuleAccess moduleName="expenses">
-          {permissions?.expenses?.add_expense?.value && (
+    <>
+      <div className="p-3">
+        {permissions?.sales?.add_sale?.value ||
+        permissions?.expenses?.add_expense?.value ||
+        permissions?.cash_registers?.make_cash_cut?.value ||
+        permissions?.cash_registers?.open_cash_cut?.value ? (
+          <Typography.Title level={5} className="mb-3">
+            Movimientos
+          </Typography.Title>
+        ) : null}
+        <Row gutter={[10, 10]}>
+          {permissions?.sales?.add_sale?.value && (
             <CardButton
-              title="Registrar gasto"
-              description="Registra un gasto"
-              icon={<CircleDollarSign strokeWidth={1.8} className="text-pink-600 !w-7 !h-7" />}
-              className="bg-pink-600/10"
-              onClick={addExpense}
-            />
-          )}
-        </ModuleAccess>
-
-        <ModuleAccess moduleName="make_cash_cut">
-          {(permissions?.cash_registers?.make_cash_cut?.value || permissions?.cash_registers?.open_cash_cut?.value) && (
-            <CardButton
-              title={active_cash_cut?.cash_cut_id ? (isTablet ? 'Hacer corte de caja' : 'Corte de caja') : 'Abrir caja'}
-              description={active_cash_cut?.cash_cut_id ? 'Realiza el corte de caja' : 'Abre la caja registradora'}
+              title="Nueva venta"
+              description="Accede al punto de venta"
               icon={
-                active_cash_cut?.cash_cut_id ? (
-                  <MonitorX strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
-                ) : (
-                  <MonitorCheck strokeWidth={1.8} className="text-teal-600 !w-7 !h-7" />
-                )
+                <ShoppingBasket
+                  strokeWidth={1.5}
+                  className="text-purple-600 !w-8 !h-8"
+                />
               }
-              className="bg-teal-600/10"
-              onClick={() => {
-                if (active_cash_cut?.cash_cut_id) {
-                  handleDrawerVisible();
-                } else {
-                  handleOpenCashier();
-                }
-              }}
+              className="bg-purple-600/10"
+              onClick={newSale}
             />
           )}
-        </ModuleAccess>
-      </Row>
 
-      {permissions?.products?.add_product?.value || permissions?.customers?.add_customer?.value ? (
-        <Typography.Title level={5} className="mt-5 mb-3">
-          Agregar nuevo
-        </Typography.Title>
-      ) : null}
-      <Row gutter={[10, 10]}>
-        {permissions?.products?.add_product?.value && (
-          <CardButton
-            title="Nuevo producto"
-            description="Agregar un producto al catalogo"
-            icon={<PackagePlus strokeWidth={1.5} className="text-green-600 !w-8 !h-8" />}
-            className="bg-green-600/10"
-            onClick={addProduct}
+          <ModuleAccess moduleName="expenses">
+            {permissions?.expenses?.add_expense?.value && (
+              <CardButton
+                title="Registrar gasto"
+                description="Registra un gasto"
+                icon={
+                  <CircleDollarSign
+                    strokeWidth={1.8}
+                    className="text-pink-600 !w-7 !h-7"
+                  />
+                }
+                className="bg-pink-600/10"
+                onClick={addExpense}
+              />
+            )}
+          </ModuleAccess>
+
+          <ModuleAccess moduleName="make_cash_cut">
+            {(permissions?.cash_registers?.make_cash_cut?.value ||
+              permissions?.cash_registers?.open_cash_cut?.value) && (
+              <CardButton
+                title={
+                  active_cash_cut?.cash_cut_id
+                    ? isTablet
+                      ? 'Hacer corte de caja'
+                      : 'Corte de caja'
+                    : 'Abrir caja'
+                }
+                description={
+                  active_cash_cut?.cash_cut_id
+                    ? 'Realiza el corte de caja'
+                    : 'Abre la caja registradora'
+                }
+                icon={
+                  active_cash_cut?.cash_cut_id ? (
+                    <MonitorX
+                      strokeWidth={1.8}
+                      className="text-teal-600 !w-7 !h-7"
+                    />
+                  ) : (
+                    <MonitorCheck
+                      strokeWidth={1.8}
+                      className="text-teal-600 !w-7 !h-7"
+                    />
+                  )
+                }
+                className="bg-teal-600/10"
+                onClick={() => {
+                  if (active_cash_cut?.cash_cut_id) {
+                    handleDrawerVisible();
+                  } else {
+                    handleOpenCashier();
+                  }
+                }}
+              />
+            )}
+          </ModuleAccess>
+        </Row>
+
+        {permissions?.products?.add_product?.value ||
+        permissions?.customers?.add_customer?.value ? (
+          <Typography.Title level={5} className="mt-5 mb-3">
+            Agregar nuevo
+          </Typography.Title>
+        ) : null}
+        <Row gutter={[10, 10]}>
+          {permissions?.products?.add_product?.value && (
+            <CardButton
+              title="Nuevo producto"
+              description="Agregar un producto al catalogo"
+              icon={
+                <PackagePlus
+                  strokeWidth={1.5}
+                  className="text-green-600 !w-8 !h-8"
+                />
+              }
+              className="bg-green-600/10"
+              onClick={addProduct}
+            />
+          )}
+
+          {permissions?.customers?.add_customer?.value && (
+            <CardButton
+              title="Nuevo cliente"
+              description="Crea un nuevo cliente"
+              icon={
+                <UserRoundPlus
+                  strokeWidth={1.8}
+                  className="text-sky-600 !w-7 !h-7 -mr-1"
+                />
+              }
+              className="bg-sky-600/10"
+              onClick={addCustomer}
+            />
+          )}
+
+          <Drawer
+            title={
+              current_customer.customer_id !== -1
+                ? 'Editar cliente'
+                : 'Agregar nuevo cliente'
+            }
+            width={420}
+            onClose={onClose}
+            open={!!current_customer.customer_id}
+            styles={{ body: { paddingBottom: 80 } }}
+          >
+            <CustomerEditor />
+          </Drawer>
+
+          <CashCutForm
+            visible={openCloseCashier}
+            onClose={handleDrawerVisible}
+            fetchOnOpen
           />
-        )}
-
-        {permissions?.customers?.add_customer?.value && (
-          <CardButton
-            title="Nuevo cliente"
-            description="Crea un nuevo cliente"
-            icon={<UserRoundPlus strokeWidth={1.8} className="text-sky-600 !w-7 !h-7 -mr-1" />}
-            className="bg-sky-600/10"
-            onClick={addCustomer}
+          <OpenCashierModal
+            visible={openCashierVisible}
+            onClose={handleOpenCashier}
           />
-        )}
-
-        <Drawer
-          title={current_customer.customer_id !== -1 ? 'Editar cliente' : 'Agregar nuevo cliente'}
-          width={420}
-          onClose={onClose}
-          open={!!current_customer.customer_id}
-          styles={{ body: { paddingBottom: 80 } }}
-        >
-          <CustomerEditor />
-        </Drawer>
-
-        <CashCutForm visible={openCloseCashier} onClose={handleDrawerVisible} fetchOnOpen />
-        <OpenCashierModal visible={openCashierVisible} onClose={handleOpenCashier} />
-      </Row>
-    </div>
+        </Row>
+      </div>
+      {isTablet && <BottomMenu />}
+    </>
   );
 };
 
@@ -162,17 +226,28 @@ type CardButtonProps = {
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 };
 
-export const CardButton = ({ description, icon, title, onClick, className }: CardButtonProps) => {
+export const CardButton = ({
+  description,
+  icon,
+  title,
+  onClick,
+  className,
+}: CardButtonProps) => {
   return (
     <Col lg={8} sm={12} xs={12} xxl={6}>
       <div
         className="flex flex-col border sm:flex-row gap-2 sm:gap-4 items-center w-full rounded-lg px-4 h-auto py-3 sm:py-1 sm:h-20 bg-white cursor-pointer hover:shadow-md"
         onClick={onClick}
       >
-        <Avatar icon={icon} className={`${className} h-14 w-14 min-w-14 min-h-14`} />
+        <Avatar
+          icon={icon}
+          className={`${className} h-14 w-14 min-w-14 min-h-14`}
+        />
         <div className="flex flex-col">
           <h5 className="font-semibold">{title}</h5>
-          <p className="text-xs font-light text-slate-400 leading-[1.3] hidden sm:inline-flex">{description}</p>
+          <p className="text-xs font-light text-slate-400 leading-[1.3] hidden sm:inline-flex">
+            {description}
+          </p>
         </div>
       </div>
     </Col>

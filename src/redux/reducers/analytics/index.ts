@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AnalyticsSlice,
   CustomerAnalytics,
+  ExpensesAnalytics,
+  ExpensesFilters,
   LineChartData,
   ProductAnalytics,
   ProfitAnalytics,
@@ -34,7 +36,12 @@ export const initialData: LineChartData = [
 const initialState: AnalyticsSlice = {
   sales: {
     data: initialData,
-    sales_summary: { completed_sales: 0, pending_sales: 0, completed_sales_amount: 0, pending_sales_amount: 0 },
+    sales_summary: {
+      completed_sales: 0,
+      pending_sales: 0,
+      completed_sales_amount: 0,
+      pending_sales_amount: 0,
+    },
     last_sales: { completed: [], pending: [] },
     total_sales_chart_data: [],
     total_sales_amount_chart_data: [],
@@ -70,6 +77,16 @@ const initialState: AnalyticsSlice = {
     },
     loading: false,
   },
+  expenses: {
+    loading: false,
+    charts: { line: [], pie: [], pieCustom: [], totalAmount: 0 },
+    filters: {
+      branches: [],
+      date_range: 'last_7_days',
+      custom_dates: [null, null],
+      operational_category_ids: [],
+    },
+  },
   products: {
     top_products: [],
     loading: false,
@@ -91,42 +108,82 @@ const analytics = createSlice({
     setProducts: (state, action: PayloadAction<Partial<ProductAnalytics>>) => {
       state.products = { ...state.products, ...action.payload };
     },
-    setCustomers: (state, action: PayloadAction<Partial<CustomerAnalytics>>) => {
+    setCustomers: (
+      state,
+      action: PayloadAction<Partial<CustomerAnalytics>>,
+    ) => {
       state.customers = { ...state.customers, ...action.payload };
     },
-    setSalesFilters: (state, action: PayloadAction<Partial<SalesAnalytics['filters']>>) => {
+    setSalesFilters: (
+      state,
+      action: PayloadAction<Partial<SalesAnalytics['filters']>>,
+    ) => {
       state.sales.filters = { ...state.sales.filters, ...action.payload };
     },
     setSalesSummary: (state, action: PayloadAction<Partial<SalesSummary>>) => {
-      state.sales.sales_summary = { ...state.sales.sales_summary, ...action.payload };
+      state.sales.sales_summary = {
+        ...state.sales.sales_summary,
+        ...action.payload,
+      };
     },
-    setProfitAnalytics: (state, action: PayloadAction<Partial<ProfitAnalytics>>) => {
+    setProfitAnalytics: (
+      state,
+      action: PayloadAction<Partial<ProfitAnalytics>>,
+    ) => {
       if (!state.profit) {
         state = { ...state, profit: { ...initialState.profit } };
       }
       state.profit = { ...state.profit, ...action.payload };
     },
-    setProfitData: (state, action: PayloadAction<LineChartData>) => {
-      if (!state.profit) {
-        state = { ...state, profit: { ...initialState.profit } };
-      }
-      state.profit = { ...state.profit, data: action.payload || [] };
-    },
-    setProfitFilters: (state, action: PayloadAction<Partial<ProfitFilters>>) => {
+    setProfitFilters: (
+      state,
+      action: PayloadAction<Partial<ProfitFilters>>,
+    ) => {
       if (!state.profit) {
         state = { ...state, profit: { ...initialState.profit } };
       }
       state.profit.filters = { ...state.profit.filters, ...action.payload };
     },
-    setProfitSummary: (state, action: PayloadAction<Partial<ProfitSummary>>) => {
+    setProfitSummary: (
+      state,
+      action: PayloadAction<Partial<ProfitSummary>>,
+    ) => {
       if (!state?.profit || !state?.profit?.summary) {
-        state = { ...state, profit: { ...initialState.profit, summary: initialState.profit.summary } };
+        state.profit = {
+          ...state.profit,
+          summary: { ...state?.profit?.summary, ...action?.payload },
+        };
+      } else {
+        state.profit.summary = { ...state.profit.summary, ...action.payload };
       }
-      state.profit.summary = { ...state.profit.summary, ...action.payload };
+    },
+    setExpensesFilters: (
+      state,
+      action: PayloadAction<Partial<ExpensesFilters>>,
+    ) => {
+      state.expenses = {
+        ...state.expenses,
+        filters: { ...state?.expenses?.filters, ...action.payload },
+      };
+    },
+    setExpensesData: (
+      state,
+      action: PayloadAction<Partial<ExpensesAnalytics>>,
+    ) => {
+      state.expenses = { ...state.expenses, ...action.payload };
+    },
+    setExpensesCharts: (
+      state,
+      action: PayloadAction<Partial<ExpensesAnalytics['charts']>>,
+    ) => {
+      state.expenses.charts = { ...state?.expenses?.charts, ...action.payload };
     },
   },
 });
 
-export const analyticsActions = { ...analytics.actions, ...analyticsCustomActions };
+export const analyticsActions = {
+  ...analytics.actions,
+  ...analyticsCustomActions,
+};
 
 export default analytics.reducer;

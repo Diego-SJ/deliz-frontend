@@ -20,6 +20,9 @@ dependencies:
   '@nivo/line':
     specifier: ^0.87.0
     version: 0.87.0(react-dom@18.3.1)(react@18.3.1)
+  '@nivo/pie':
+    specifier: ^0.87.0
+    version: 0.87.0(react-dom@18.3.1)(react@18.3.1)
   '@nlux/react':
     specifier: ^2.17.1
     version: 2.17.1(react-dom@18.3.1)(react@18.3.1)
@@ -178,6 +181,9 @@ devDependencies:
   postcss:
     specifier: ^8.4.47
     version: 8.4.47
+  prettier:
+    specifier: 3.3.3
+    version: 3.3.3
   source-map-explorer:
     specifier: ^2.5.3
     version: 2.5.3
@@ -2439,6 +2445,21 @@ packages:
       - react-dom
     dev: false
 
+  /@nivo/arcs@0.87.0(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-YWmIm0el0hgVbPI3C5AX6R59WNnuKjh2GdocaVDP5zupqAMhfqyoMx+IM+A+Cg+UzE4xakrL0mSzL+rpMUK90Q==}
+    peerDependencies:
+      react: '>= 16.14.0 < 19.0.0'
+    dependencies:
+      '@nivo/colors': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@nivo/core': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@react-spring/web': 9.7.4(react-dom@18.3.1)(react@18.3.1)
+      '@types/d3-shape': 3.1.6
+      d3-shape: 3.2.0
+      react: 18.3.1
+    transitivePeerDependencies:
+      - react-dom
+    dev: false
+
   /@nivo/axes@0.87.0(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-zCRBfiRKJi+xOxwxH5Pxq/8+yv3fAYDl4a1F2Ssnp5gMIobwzVsdearvsm5B04e9bfy3ZXTL7KgbkEkSAwu6SA==}
     peerDependencies:
@@ -2549,6 +2570,23 @@ packages:
       '@nivo/tooltip': 0.87.0(react-dom@18.3.1)(react@18.3.1)
       '@nivo/voronoi': 0.87.0(react-dom@18.3.1)(react@18.3.1)
       '@react-spring/web': 9.7.4(react-dom@18.3.1)(react@18.3.1)
+      d3-shape: 3.2.0
+      react: 18.3.1
+    transitivePeerDependencies:
+      - react-dom
+    dev: false
+
+  /@nivo/pie@0.87.0(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-kY6LAQhOITwg8waFoDYLPkwUj/5XavSm61c7dXXJgCtqoj6c5u9AgwOTnZqS6IhMVEc5KV7ZNxSEHlHLQinmrg==}
+    peerDependencies:
+      react: '>= 16.14.0 < 19.0.0'
+    dependencies:
+      '@nivo/arcs': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@nivo/colors': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@nivo/core': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@nivo/legends': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@nivo/tooltip': 0.87.0(react-dom@18.3.1)(react@18.3.1)
+      '@types/d3-shape': 3.1.6
       d3-shape: 3.2.0
       react: 18.3.1
     transitivePeerDependencies:
@@ -6360,6 +6398,12 @@ packages:
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier@3.3.3:
+    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /pretty-bytes@5.6.0:

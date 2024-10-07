@@ -13,7 +13,9 @@ import { useRef } from 'react';
 const ReportSaleThumbnail = () => {
   const navigate = useNavigate();
   const { hasAccess } = useMembershipAccess();
-  const { total, loading, data } = useAppSelector(({ analytics }) => analytics?.sales || {});
+  const { total, loading, data } = useAppSelector(
+    ({ analytics }) => analytics?.sales || {},
+  );
   const { user_auth } = useAppSelector(({ users }) => users);
   const elementRef = useRef<any>(null);
 
@@ -31,12 +33,19 @@ const ReportSaleThumbnail = () => {
       title={<h5 className="!text-base m-0 font-medium">Ventas</h5>}
       extra={
         <div className="flex gap-3">
-          {user_auth?.profile?.permissions?.reports?.view_sales_report?.value && hasAccess('view_sales_report') ? (
+          {user_auth?.profile?.permissions?.reports?.view_sales_report?.value &&
+          hasAccess('view_sales_report') ? (
             <Tooltip title="Ver reporte completo">
-              <Button onClick={onActionClick} icon={<SquareChartGantt className="w-4 h-4" />} />
+              <Button
+                onClick={onActionClick}
+                icon={<SquareChartGantt className="w-4 h-4" />}
+              />
             </Tooltip>
           ) : null}
-          <Button onClick={handlePrint} icon={<CloudDownload className="w-4 h-4" />} />
+          <Button
+            onClick={handlePrint}
+            icon={<CloudDownload className="w-4 h-4" />}
+          />
         </div>
       }
       classNames={{ body: '!px-4 !pt-2' }}
@@ -49,9 +58,11 @@ const ReportSaleThumbnail = () => {
                 {total || 0}
               </Typography.Title>
 
-              <Typography.Text className="!text-sm mt-2">{formattedDateRange}</Typography.Text>
+              <Typography.Text className="!text-sm mt-2">
+                {formattedDateRange}
+              </Typography.Text>
             </div>
-            <div className="h-56 sm:h-64 md:h-80 w-full">
+            <div className="h-56 sm:h-64 md:h-80 w-full mt-5">
               <LineChartSales data={data} />
             </div>
           </div>

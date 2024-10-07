@@ -1,7 +1,7 @@
 import ProfitInsight from '@/components/organisms/SaleReports/profit-insight';
 import functions from '@/utils/functions';
 import { Badge, Col, Row, Typography } from 'antd';
-import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowDownToDotIcon, ArrowUpFromDotIcon, Wallet } from 'lucide-react';
 import { getTotalAmounts } from './total-profits';
 import { useAppSelector } from '@/hooks/useStore';
 import ProfitReportFilters from './filters';
@@ -23,8 +23,6 @@ const ProfitsByRange = () => {
   const { profit } = useAppSelector(({ analytics }) => analytics);
   const [expensesTotalByRange, incomesTotalByRange, profitTotalByRange] = getTotalAmounts(profit?.summary_by_range);
 
-  console.log(profit.summary_by_range);
-
   return (
     <>
       <div className="flex gap-5 w-full justify-between items-center mb-5">
@@ -36,7 +34,7 @@ const ProfitsByRange = () => {
       <Row className="mb-5" gutter={[10, 10]}>
         <Col xs={24} md={12} lg={8}>
           <ProfitInsight
-            icon={<TrendingUp className="text-indigo-600 w-4" />}
+            icon={<ArrowDownToDotIcon className="text-indigo-600 w-4" />}
             title="Entradas"
             size="small"
             value={incomesTotalByRange}
@@ -50,8 +48,8 @@ const ProfitsByRange = () => {
         </Col>
         <Col xs={24} md={12} lg={8}>
           <ProfitInsight
-            icon={<TrendingDown className="text-indigo-600 w-4" />}
-            title="Gastos"
+            icon={<ArrowUpFromDotIcon className="text-indigo-600 w-4" />}
+            title="Salidas"
             size="small"
             value={expensesTotalByRange}
             showArrow

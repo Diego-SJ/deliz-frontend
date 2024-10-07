@@ -1,11 +1,31 @@
 import { DateRangeKey } from '@/utils/sales-report';
 import { Sale } from '../sales/types';
+import { PieChartItem } from '@/types/charts';
 
 export type AnalyticsSlice = {
   sales: SalesAnalytics;
   profit: ProfitAnalytics;
   products: ProductAnalytics;
   customers: CustomerAnalytics;
+  expenses: ExpensesAnalytics;
+};
+
+export type ExpensesAnalytics = {
+  loading: boolean;
+  charts: {
+    pie?: PieChartItem[];
+    pieCustom?: PieChartItem[];
+    line?: LineChartData;
+    totalAmount?: number;
+  };
+  filters: Partial<ExpensesFilters>;
+};
+
+export type ExpensesFilters = {
+  date_range: DateRangeKey;
+  operational_category_ids: number[];
+  branches: string[];
+  custom_dates: (string | null)[];
 };
 
 export type ProfitAnalytics = {

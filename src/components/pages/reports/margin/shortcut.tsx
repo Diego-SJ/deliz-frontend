@@ -57,7 +57,7 @@ const ReportMarginShortcut = () => {
 
               <Typography.Text className="!text-sm mt-2">{formattedDateRange}</Typography.Text>
             </div>
-            <div className="h-56 sm:h-64 md:h-80 w-full">
+            <div className="h-64 md:h-80 w-full mt-5">
               <LineChartMargin data={data} />
             </div>
           </div>

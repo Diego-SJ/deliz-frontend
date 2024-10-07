@@ -143,11 +143,17 @@ export const EXPENSE_CATEGORIES = [
     label: 'Viáticos',
     description: 'Viajes de negocio, incluyendo alojamiento, alimentación, transporte, entre otros.',
   },
-  // {
-  //   value: 15,
-  //   label: 'Publicidad en redes sociales y Google Ads',
-  //   description: 'Costos de anuncios en plataformas digitales para atraer nuevos clientes.',
-  // },
+  {
+    value: 15,
+    label: 'Gastos Variables',
+    description: 'Aquellos que cambian en función del nivel de actividad o producción de una entidad.',
+  },
+  {
+    value: 16,
+    label: 'Devoluciones y Garantías',
+    description:
+      'Costos asociados con devoluciones de productos o el cumplimiento de garantías, que pueden impactar los márgenes.',
+  },
   // {
   //   value: 16,
   //   label: 'Investigación y Desarrollo (I+D)',
@@ -167,11 +173,5 @@ export const EXPENSE_CATEGORIES = [
   //   value: 19,
   //   label: 'Seguridad',
   //   description: 'Inversión en la protección del negocio, como sistemas de vigilancia o seguros de responsabilidad civil.',
-  // },
-  // {
-  //   value: 20,
-  //   label: 'Devoluciones y Garantías',
-  //   description:
-  //     'Costos asociados con devoluciones de productos o el cumplimiento de garantías, que pueden impactar los márgenes.',
   // },
 ];

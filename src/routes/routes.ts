@@ -100,6 +100,10 @@ export const APP_ROUTES = {
         path: '/app/reports/profit',
         title: 'Reporte de ganancias',
       },
+      EXPENSES: {
+        path: '/app/reports/expenses',
+        title: 'Reporte de gastos',
+      }
     },
     ONLINE_STORE: { path: '/app/online-store', title: 'Catálogo en linea' },
     SETTINGS: {

@@ -22,6 +22,7 @@ export type OperatingCost = {
   branch_id: string;
   company_id: string;
   branches?: Branch;
+  operational_category_id?: number;
 };
 
 export type FetchOperationsFilters = {

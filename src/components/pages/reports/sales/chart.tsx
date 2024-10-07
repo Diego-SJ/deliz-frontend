@@ -7,8 +7,7 @@ type Props = {
 };
 
 export const LineChartSales = ({ data }: Props) => {
-  const minYValue = Math.min(...data?.flatMap(series => series?.data?.map(point => point.y)));
-  const dynamicBaselineValue = minYValue;
+  const dynamicBaselineValue = Math.min(...data?.flatMap(series => series?.data?.map(point => point.y)));
 
   return (
     <ResponsiveLine
@@ -47,11 +46,11 @@ export const LineChartSales = ({ data }: Props) => {
       enableArea
       colors={'#6366F1'}
       pointSize={7}
-      tooltip={function (e) {
+      tooltip={function(e) {
         return (
           <div className="bg-white py-2 px-3 shadow-lg rounded-md text-center">
             <p className="font-medium text-xl">{e.point.data.y.toString()}</p>
-            <p className="font-base">ventas</p>
+            <p className="font-base font-light text-gray-400">ventas</p>
           </div>
         );
       }}

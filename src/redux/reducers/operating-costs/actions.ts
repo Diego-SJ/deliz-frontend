@@ -13,42 +13,54 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const customOperatingCostsActions = {
-  upsertOperation: (operatingCost: Partial<OperatingCost>) => async (_: AppDispatch, getState: AppState) => {
-    const state = getState();
-    const { pay_from_cash_register, ...operation } = operatingCost as OperatingCost & { pay_from_cash_register: boolean };
+  upsertOperation:
+    (operatingCost: Partial<OperatingCost>) =>
+    async (_: AppDispatch, getState: AppState) => {
+      const state = getState();
+      const { pay_from_cash_register, ...operation } =
+        operatingCost as OperatingCost & { pay_from_cash_register: boolean };
 
-    const newOperation = {
-      ...operation,
-      operation_date: dayjs(operation?.operation_date).tz('America/Mexico_City').format(),
-      company_id: state.app.company.company_id || null,
-      cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
-    } as OperatingCost;
+      const newOperation = {
+        ...operation,
+        operational_category_id: operation?.operational_category_id || 15,
+        operation_date: dayjs(operation?.operation_date)
+          .tz('America/Mexico_City')
+          .format(),
+        company_id: state.app.company.company_id || null,
+        cash_register_id:
+          state.branches.currentCashRegister?.cash_register_id || null,
+      } as OperatingCost;
 
-    const supabaseQuery = supabase;
+      const { data, error } = await supabase
+        .from('operating_costs')
+        .upsert(newOperation)
+        .select()
+        .single();
 
-    const { data, error } = await supabaseQuery.from('operating_costs').upsert(newOperation).select().single();
+      if (error) {
+        message.error('Error al guardar la operación');
+        return false;
+      }
 
-    if (error) {
-      message.error('Error al guardar la operación');
-      return false;
-    }
+      if (pay_from_cash_register) {
+        await supabase.from('cash_operations').insert({
+          name: operation?.reason || '',
+          operation_type: 'EXPENSE',
+          amount: operation?.amount || 0,
+          payment_method: 'CASH',
+          cash_register_id:
+            state.branches.currentCashRegister?.cash_register_id || null,
+          branch_id: newOperation?.branch_id || null,
+          cash_cut_id: state?.cashiers?.active_cash_cut?.cash_cut_id || null,
+          operating_cost_id: data?.operating_cost_id,
+        });
+      }
 
-    if (!!pay_from_cash_register) {
-      await supabase.from('cash_operations').insert({
-        name: operation?.reason || '',
-        operation_type: 'EXPENSE',
-        amount: operation?.amount || 0,
-        payment_method: 'CASH',
-        cash_register_id: state.branches.currentCashRegister?.cash_register_id || null,
-        branch_id: newOperation?.branch_id || null,
-        cash_cut_id: state?.cashiers?.active_cash_cut?.cash_cut_id || null,
-        operating_cost_id: data?.operating_cost_id,
-      });
-    }
-
-    message.success(`Información ${operation?.operating_cost_id ? 'actualizada' : 'guardada'} correctamente`);
-    return data;
-  },
+      message.success(
+        `Información ${operation?.operating_cost_id ? 'actualizada' : 'guardada'} correctamente`,
+      );
+      return data;
+    },
   fetchOperations: () => async (dispatch: AppDispatch, getState: AppState) => {
     const { filters } = getState().operatingCosts;
     const { company_id } = getState().app.company;
@@ -67,7 +79,13 @@ export const customOperatingCostsActions = {
       .order('created_at', { ascending: false });
 
     if (filters?.search_text) {
-      supabaseQuery.or('reason.ilike.%' + filters.search_text + '%,notes.ilike.%' + filters.search_text + '%');
+      supabaseQuery.or(
+        'reason.ilike.%' +
+          filters.search_text +
+          '%,notes.ilike.%' +
+          filters.search_text +
+          '%',
+      );
     }
 
     if (filters.status_id && filters.status_id !== 0) {
@@ -103,51 +121,60 @@ export const customOperatingCostsActions = {
         totalRecords: count || 0,
       }),
     );
-    dispatch(operatingCostsActions.setOperatingCosts(data as unknown as OperatingCost[]));
+    dispatch(
+      operatingCostsActions.setOperatingCosts(
+        data as unknown as OperatingCost[],
+      ),
+    );
     return data;
   },
-  getOperationById: (operation_id: string) => async (dispatch: AppDispatch, __: AppState) => {
-    dispatch(operatingCostsActions.setLoading(true));
-    const { data, error } = await supabase
-      .from('operating_costs')
-      .select('*, status(*)')
-      .eq('operating_cost_id', operation_id)
-      .single();
-    dispatch(operatingCostsActions.setLoading(false));
-    if (error) {
-      message.error('Error al obtener la operación');
-      return null;
-    }
+  getOperationById:
+    (operation_id: string) => async (dispatch: AppDispatch, __: AppState) => {
+      dispatch(operatingCostsActions.setLoading(true));
+      const { data, error } = await supabase
+        .from('operating_costs')
+        .select('*, status(*)')
+        .eq('operating_cost_id', operation_id)
+        .single();
+      dispatch(operatingCostsActions.setLoading(false));
+      if (error) {
+        message.error('Error al obtener la operación');
+        return null;
+      }
 
-    return data;
-  },
-  filterBySearch: (search_text: string) => async (dispatch: AppDispatch, getState: AppState) => {
-    const state = getState().operatingCosts?.operatingCosts || [];
+      return data;
+    },
+  filterBySearch:
+    (search_text: string) =>
+    async (dispatch: AppDispatch, getState: AppState) => {
+      const state = getState().operatingCosts?.operatingCosts || [];
 
-    if (!search_text) {
-      return state;
-    }
+      if (!search_text) {
+        return state;
+      }
 
-    const filtered = state.filter(operation => {
-      return functions.includes(operation?.reason, search_text) || functions.includes(operation?.notes, search_text);
-    });
+      return state?.filter((operation) => {
+        return (
+          functions.includes(operation?.reason, search_text) ||
+          functions.includes(operation?.notes, search_text)
+        );
+      });
+    },
+  deleteOperation:
+    (operation_id: string) => async (_: AppDispatch, getState: AppState) => {
+      const { company_id } = getState().app.company;
+      const { error } = await supabase
+        .from('operating_costs')
+        .delete()
+        .eq('operating_cost_id', operation_id)
+        .eq('company_id', company_id);
 
-    return filtered;
-  },
-  deleteOperation: (operation_id: string) => async (_: AppDispatch, getState: AppState) => {
-    const { company_id } = getState().app.company;
-    const { error } = await supabase
-      .from('operating_costs')
-      .delete()
-      .eq('operating_cost_id', operation_id)
-      .eq('company_id', company_id);
+      if (error) {
+        message.error('Error al eliminar la operación');
+        return null;
+      }
 
-    if (error) {
-      message.error('Error al eliminar la operación');
-      return null;
-    }
-
-    message.success('Operación eliminada correctamente');
-    return true;
-  },
+      message.success('Operación eliminada correctamente');
+      return true;
+    },
 };
