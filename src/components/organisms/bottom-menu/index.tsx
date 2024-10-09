@@ -4,9 +4,12 @@ import {
   Plus,
   Settings,
   ShoppingBag,
+  ShoppingBasket,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
+import { useAppSelector } from '@/hooks/useStore';
+import { useMembershipAccess } from '@/routes/module-access';
 
 type BottomMenuButtomProps = {
   icon?: React.ReactNode;
@@ -28,6 +31,8 @@ const BottomMenuButton = ({ icon, title, onClick }: BottomMenuButtomProps) => {
 
 const BottomMenu = () => {
   const navigate = useNavigate();
+  const { hasAccess } = useMembershipAccess();
+  const { profile } = useAppSelector(({ users }) => users?.user_auth);
 
   return (
     <div className="fixed bottom-0 left-0 w-full flex justify-evenly py-4 bg-white border shadow-lg">
@@ -36,24 +41,44 @@ const BottomMenu = () => {
         title="Inicio"
         onClick={() => navigate(APP_ROUTES.PRIVATE.HOME.path)}
       />
-      <BottomMenuButton
-        icon={<ShoppingBag className="stroke-[1.5]" />}
-        title="Ventas"
-        onClick={() => navigate(APP_ROUTES.PRIVATE.SALES.path)}
-      />
-      <div
-        onClick={() => navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path)}
-        className="flex items-center justify-center rounded-full bg-primary w-12 h-12 cursor-pointer shadow shadow-primary/50 text-white py-1 "
-      >
-        <Plus className="w-12 min-w-12" />
-      </div>
-      <BottomMenuButton
-        icon={<CircleDollarSign className="stroke-[1.5]" />}
-        title="Caja"
-        onClick={() =>
-          navigate(APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path)
-        }
-      />
+      {profile?.permissions?.sales?.view_sales?.value && (
+        <BottomMenuButton
+          icon={<ShoppingBag className="stroke-[1.5]" />}
+          title="Ventas"
+          onClick={() => navigate(APP_ROUTES.PRIVATE.SALES.path)}
+        />
+      )}
+      {profile?.permissions?.pos?.add_sale?.value && (
+        <div
+          onClick={() => navigate(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path)}
+          className="flex items-center justify-center rounded-full bg-primary w-12 h-12 cursor-pointer shadow shadow-primary/50 text-white py-1 "
+        >
+          <Plus className="w-12 min-w-12" />
+        </div>
+      )}
+      {hasAccess('view_expenses') ? (
+        <>
+          {profile?.permissions?.expenses?.view_expenses?.value && (
+            <BottomMenuButton
+              icon={<CircleDollarSign className="stroke-[1.5]" />}
+              title="Caja"
+              onClick={() =>
+                navigate(APP_ROUTES.PRIVATE.TRANSACTIONS.CURRENT_CASHIER.path)
+              }
+            />
+          )}
+        </>
+      ) : (
+        <>
+          {profile?.permissions?.products?.view_catalog?.value && (
+            <BottomMenuButton
+              icon={<ShoppingBasket className="stroke-[1.5]" />}
+              title="Productos"
+              onClick={() => navigate(APP_ROUTES.PRIVATE.PRODUCTS.path)}
+            />
+          )}
+        </>
+      )}
       <BottomMenuButton
         icon={<Settings className="stroke-[1.5]" />}
         title="Ajustes"

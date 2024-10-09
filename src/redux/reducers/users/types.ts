@@ -27,4 +27,5 @@ export type Profile = {
   is_default: boolean;
   is_inactive: boolean;
   permissions: typeof PERMISSIONS | null;
+  price_list?: string[];
 };

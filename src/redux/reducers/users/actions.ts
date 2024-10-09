@@ -10,7 +10,10 @@ import { message } from 'antd';
 import { orderActions } from '../orders';
 import { cashiersActions } from '../cashiers';
 import { Profile } from './types';
-import { PERMISSIONS, PERMISSIONS_DENIED } from '@/components/pages/settings/users/permissions/data-and-types';
+import {
+  PERMISSIONS,
+  PERMISSIONS_DENIED,
+} from '@/components/pages/settings/users/permissions/data-and-types';
 import { STATUS_DATA } from '@/constants/status';
 import { Company } from '../app/types';
 import { ROLES } from '@/constants/roles';
@@ -29,38 +32,51 @@ const customActions = {
       await dispatch(branchesActions.getCashRegistersByCompanyId());
 
       const branches = getState().branches.branches;
-      const branch = branches?.find(item => item.main_branch) || branches[0] || null;
+      const branch =
+        branches?.find((item) => item.main_branch) || branches[0] || null;
       await dispatch(branchesActions.setCurrentBranch(branch));
 
       const cash_registers = getState().branches.cash_registers;
-      let cash_register = cash_registers?.find(item => item.is_default && item.branch_id === branch?.branch_id) || null;
+      let cash_register =
+        cash_registers?.find(
+          (item) => item.is_default && item.branch_id === branch?.branch_id,
+        ) || null;
       if (!cash_register) {
         cash_register = cash_registers[0] || null;
       }
       await dispatch(branchesActions.setCurrentCashRegister(cash_register));
     }
   },
-  fetchAppDataOnLogin: () => async (dispatch: AppDispatch, getState: AppState) => {
-    const { profile } = getState().users.user_auth;
+  fetchAppDataOnLogin:
+    () => async (dispatch: AppDispatch, getState: AppState) => {
+      const { profile } = getState().users.user_auth;
 
-    await dispatch(appActions.company.getCompany(profile?.company_id));
-    await dispatch(branchesActions.getBranches());
-    await dispatch(branchesActions.getCashRegistersByCompanyId());
+      await dispatch(appActions.company.getCompany(profile?.company_id));
+      await dispatch(branchesActions.getBranches());
+      await dispatch(branchesActions.getCashRegistersByCompanyId());
 
-    const branches = getState().branches.branches;
-    const branch = branches?.find(item => item.main_branch) || branches[0] || null;
-    await dispatch(branchesActions.setCurrentBranch(branch));
+      const branches = getState().branches.branches;
+      const branch =
+        branches?.find((item) => item.main_branch) || branches[0] || null;
+      await dispatch(branchesActions.setCurrentBranch(branch));
 
-    const cash_registers = getState().branches.cash_registers;
-    let cash_register = cash_registers?.find(item => item.is_default && item.branch_id === branch?.branch_id) || null;
-    if (!cash_register) {
-      cash_register = cash_registers[0] || null;
-    }
-    await dispatch(branchesActions.setCurrentCashRegister(cash_register));
-    await dispatch(userActions.setUserAuth({ authenticated: true }));
-  },
+      const cash_registers = getState().branches.cash_registers;
+      let cash_register =
+        cash_registers?.find(
+          (item) => item.is_default && item.branch_id === branch?.branch_id,
+        ) || null;
+      if (!cash_register) {
+        cash_register = cash_registers[0] || null;
+      }
+      await dispatch(branchesActions.setCurrentCashRegister(cash_register));
+      await dispatch(userActions.setUserAuth({ authenticated: true }));
+    },
   fetchProfile: (profile_id: string) => async (dispatch: AppDispatch) => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('profile_id', profile_id)
+      .single();
     if (error) {
       message.error('No se pudo obtener el perfil');
       dispatch(userActions.signOut());
@@ -69,14 +85,26 @@ const customActions = {
 
     const profileData = {
       ...data,
-      permissions: data?.role === ROLES.ADMIN ? PERMISSIONS : data.permissions || null,
+      permissions:
+        data?.role === ROLES.ADMIN ? PERMISSIONS : data.permissions || null,
     };
 
-    await dispatch(userActions.setUserAuth({ profile: profileData, isAdmin: data.role === ROLES.ADMIN }));
+    await dispatch(
+      userActions.setUserAuth({
+        profile: profileData,
+        isAdmin: data.role === ROLES.ADMIN,
+      }),
+    );
     return data;
   },
   loginSuccess: (profile_id: string) => async (dispatch: AppDispatch) => {
-    let [{ data, error }] = await Promise.all([supabase.from('profiles').select('*').eq('profile_id', profile_id).single()]);
+    let [{ data, error }] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('profile_id', profile_id)
+        .single(),
+    ]);
 
     if (error) {
       message.error(error.message);
@@ -115,7 +143,8 @@ const customActions = {
       userActions.setUserAuth({
         profile: {
           ...data,
-          permissions: data?.role === ROLES.ADMIN ? PERMISSIONS : data.permissions || null,
+          permissions:
+            data?.role === ROLES.ADMIN ? PERMISSIONS : data.permissions || null,
         },
         authenticated: false,
         isAdmin: data.role === ROLES.ADMIN,
@@ -141,24 +170,29 @@ const customActions = {
     dispatch(appActions.resetSlice());
     dispatch(storesActions.resetSlice());
   },
-  toggleFavoriteProduct: (product_id: number) => async (dispatch: AppDispatch, getState: any) => {
-    const { profile } = getState().users.user_auth;
-    let favorite_products = [...(profile?.favorite_products || [])];
+  toggleFavoriteProduct:
+    (product_id: number) => async (dispatch: AppDispatch, getState: any) => {
+      const { profile } = getState().users.user_auth;
+      let favorite_products = [...(profile?.favorite_products || [])];
 
-    if (favorite_products.includes(product_id)) {
-      favorite_products.splice(favorite_products.indexOf(product_id), 1);
-    } else {
-      favorite_products.push(product_id);
-    }
+      if (favorite_products.includes(product_id)) {
+        favorite_products.splice(favorite_products.indexOf(product_id), 1);
+      } else {
+        favorite_products.push(product_id);
+      }
 
-    const { data } = await supabase
-      .from('profiles')
-      .update({ favorite_products })
-      .eq('profile_id', profile.profile_id)
-      .select()
-      .single();
-    await dispatch(userActions.setProfile({ favorite_products: data.favorite_products || [] }));
-  },
+      const { data } = await supabase
+        .from('profiles')
+        .update({ favorite_products })
+        .eq('profile_id', profile.profile_id)
+        .select()
+        .single();
+      await dispatch(
+        userActions.setProfile({
+          favorite_products: data.favorite_products || [],
+        }),
+      );
+    },
   getAllUsers: () => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = getState().app.company?.company_id;
     const { data, error } = await supabase
@@ -174,118 +208,139 @@ const customActions = {
 
     return data;
   },
-  createUser: (profile: Partial<Profile>) => async (dispatch: AppDispatch, getState: AppState) => {
-    const totalUsers = await dispatch(userActions.getAllUsers());
+  createUser:
+    (profile: Partial<Profile>) =>
+    async (dispatch: AppDispatch, getState: AppState) => {
+      const totalUsers = await dispatch(userActions.getAllUsers());
 
-    if ((totalUsers?.length || 0) >= 3) {
-      message.error('No puedes registrar más de 3 usuarios');
-      return null;
-    }
+      if ((totalUsers?.length || 0) >= 3) {
+        message.error('No puedes registrar más de 3 usuarios');
+        return null;
+      }
 
-    const company_id = getState().app.company?.company_id;
-    const metadata = {
-      company_id,
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      phone: profile.phone || '',
-      email: profile.email,
-      password: profile.password,
-      role: profile.role || ROLES.ADMIN,
-      branches: profile.branches,
-      cash_registers: profile.cash_registers,
-      permissions: !!Object.keys(profile.permissions || {})?.length
-        ? profile.permissions
-        : profile?.role === ROLES.ADMIN
-        ? PERMISSIONS
-        : PERMISSIONS_DENIED,
-    } as Profile;
+      const company_id = getState().app.company?.company_id;
+      const metadata = {
+        company_id,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone: profile.phone || '',
+        email: profile.email,
+        password: profile.password,
+        role: profile.role || ROLES.ADMIN,
+        branches: profile.branches,
+        cash_registers: profile.cash_registers,
+        price_list: profile.price_list || [],
+        permissions: !!Object.keys(profile.permissions || {})?.length
+          ? profile.permissions
+          : profile?.role === ROLES.ADMIN
+            ? PERMISSIONS
+            : PERMISSIONS_DENIED,
+      } as Profile;
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email: profile.email!,
-      password: profile.password!,
-      email_confirm: true,
-      phone_confirm: true,
-      user_metadata: metadata,
-    });
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: profile.email!,
+        password: profile.password!,
+        email_confirm: true,
+        phone_confirm: true,
+        user_metadata: metadata,
+      });
 
-    if (error) {
-      message.error(error.message);
-      return null;
-    }
+      if (error) {
+        message.error(error.message);
+        return null;
+      }
 
-    message.success('Usuario creado correctamente');
-    return data;
-  },
+      message.success('Usuario creado correctamente');
+      return data;
+    },
   fetchUser: (profile_id: string) => async (): Promise<Profile | null> => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('profile_id', profile_id).single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('profile_id', profile_id)
+      .single();
     if (error) {
       message.error(error.message);
       return null;
     }
 
     if (data?.branches?.some((b: string) => b?.includes('['))) {
-      data.branches = data?.branches?.map((b: string) => functions.extractUUID(b));
+      data.branches = data?.branches?.map((b: string) =>
+        functions.extractUUID(b),
+      );
     }
 
     if (data?.cash_registers?.some((b: string) => b?.includes('['))) {
-      data.cash_registers = data?.cash_registers?.map((b: string) => functions.extractUUID(b));
+      data.cash_registers = data?.cash_registers?.map((b: string) =>
+        functions.extractUUID(b),
+      );
     }
 
     return { ...data };
   },
-  updateProfile: (profile: Partial<Profile>) => async (dispatch: AppDispatch, getState: AppState) => {
-    const profile_id = getState().users.user_auth.profile?.profile_id;
-    const metadata = {
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      phone: profile.phone || '',
-      email: profile.email,
-      password: profile.password,
-      role: profile.role || ROLES.ADMIN,
-      branches: profile.branches,
-      cash_registers: profile.cash_registers,
-      permissions: !!Object.keys(profile.permissions || {})?.length
-        ? profile.permissions
-        : profile?.role === ROLES.ADMIN
-        ? PERMISSIONS
-        : PERMISSIONS_DENIED,
-    } as Profile;
+  updateProfile:
+    (profile: Partial<Profile>) =>
+    async (dispatch: AppDispatch, getState: AppState) => {
+      const profile_id = getState().users.user_auth.profile?.profile_id;
+      const metadata = {
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone: profile.phone || '',
+        email: profile.email,
+        password: profile.password,
+        role: profile.role || ROLES.ADMIN,
+        branches: profile.branches,
+        cash_registers: profile.cash_registers,
+        price_list: profile.price_list || [],
+        permissions: !!Object.keys(profile.permissions || {})?.length
+          ? profile.permissions
+          : profile?.role === ROLES.ADMIN
+            ? PERMISSIONS
+            : PERMISSIONS_DENIED,
+      } as Profile;
 
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(profile.profile_id!, {
-      email: profile?.email,
-      password: profile.password,
-      email_confirm: true,
-      phone_confirm: true,
-      user_metadata: metadata,
-    });
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(
+        profile.profile_id!,
+        {
+          email: profile?.email,
+          password: profile.password,
+          email_confirm: true,
+          phone_confirm: true,
+          user_metadata: metadata,
+        },
+      );
 
-    if (error) {
-      message.error(error.message);
-      return null;
-    }
+      if (error) {
+        message.error(error.message);
+        return null;
+      }
 
-    const { data, error: profileError } = await supabase
-      .from('profiles')
-      .update(metadata)
-      .eq('profile_id', profile.profile_id)
-      .select()
-      .single();
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .update(metadata)
+        .eq('profile_id', profile.profile_id)
+        .select()
+        .single();
 
-    if (profileError) {
-      message.error(profileError.message);
-      return null;
-    }
+      if (profileError) {
+        message.error(profileError.message);
+        return null;
+      }
 
-    let newProfile = { ...getState()?.users?.user_auth?.profile, ...data };
-    if (profile_id === data?.profile_id) {
-      await dispatch(userActions.setUserAuth({ profile: newProfile, authenticated: true }));
-    }
+      let newProfile = { ...getState()?.users?.user_auth?.profile, ...data };
+      if (profile_id === data?.profile_id) {
+        await dispatch(
+          userActions.setUserAuth({ profile: newProfile, authenticated: true }),
+        );
+      }
 
-    message.success('Perfil actualizado correctamente');
-    return newProfile;
-  },
+      message.success('Perfil actualizado correctamente');
+      return newProfile;
+    },
   deleteUser: (profile_id: string) => async () => {
-    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(profile_id!);
+    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(
+      profile_id!,
+    );
 
     if (error) {
       message.error(error.message);
@@ -311,7 +366,11 @@ const customActions = {
     });
 
     if (error) {
-      if (error.code === 'email_exists') return message.info('El correo ya está registrado, inicia sesión para continuar.', 5);
+      if (error.code === 'email_exists')
+        return message.info(
+          'El correo ya está registrado, inicia sesión para continuar.',
+          5,
+        );
       message.error(error?.message ?? 'No se pudo iniciar sesión.');
       return null;
     }
@@ -330,7 +389,11 @@ const customActions = {
 
     const { data: onboarding } = await supabase
       .from('onboarding')
-      .insert({ company_id: company.company_id, status_id: STATUS_DATA.PENDING.id, step: 1 })
+      .insert({
+        company_id: company.company_id,
+        status_id: STATUS_DATA.PENDING.id,
+        step: 1,
+      })
       .select()
       .single();
 

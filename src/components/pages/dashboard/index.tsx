@@ -68,7 +68,7 @@ const Dashboard = () => {
   return (
     <>
       <div className="p-3">
-        {permissions?.sales?.add_sale?.value ||
+        {permissions?.pos?.add_sale?.value ||
         permissions?.expenses?.add_expense?.value ||
         permissions?.cash_registers?.make_cash_cut?.value ||
         permissions?.cash_registers?.open_cash_cut?.value ? (
@@ -77,7 +77,7 @@ const Dashboard = () => {
           </Typography.Title>
         ) : null}
         <Row gutter={[10, 10]}>
-          {permissions?.sales?.add_sale?.value && (
+          {permissions?.pos?.add_sale?.value && (
             <CardButton
               title="Nueva venta"
               description="Accede al punto de venta"

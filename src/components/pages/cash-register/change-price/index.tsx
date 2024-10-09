@@ -9,7 +9,9 @@ const ChangePrice = () => {
   const dispatch = useAppDispatch();
   const { prices_list } = useAppSelector(({ branches }) => branches);
   const { cash_register } = useAppSelector(({ sales }) => sales);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(
+    ({ users }) => users.user_auth.profile!,
+  );
   const [currentPrice, setCurrentPrice] = useState<Price | null>(null);
   const { price_id } = cash_register;
   const [openForm, setOpenForm] = useState(false);
@@ -17,15 +19,20 @@ const ChangePrice = () => {
 
   useEffect(() => {
     if (!price_id) {
-      let defaultPrice = prices_list.find(item => item.is_default);
-      setCurrentPrice(defaultPrice as Price);
-      dispatch(salesActions.cashRegister.changePrice(defaultPrice?.price_id || null));
+      let defaultPrice =
+        prices_list?.find((item) => item?.is_default) || prices_list?.length
+          ? prices_list[0]
+          : null;
+      setCurrentPrice(defaultPrice);
+      dispatch(
+        salesActions.cashRegister.changePrice(defaultPrice?.price_id || null),
+      );
     }
   }, [price_id, prices_list, dispatch]);
 
   useEffect(() => {
     if (price_id) {
-      let defaultPrice = prices_list.find(item => item.price_id === price_id);
+      let defaultPrice = prices_list.find((item) => item.price_id === price_id);
       setCurrentPrice(defaultPrice as Price);
     }
   }, [price_id]);
@@ -43,7 +50,9 @@ const ChangePrice = () => {
       <div
         onClick={onAddNew}
         className={`flex gap-2 items-center justify-between h-[45px] ${
-          !!permissions?.pos?.switch_prices?.value ? 'cursor-pointer hover:bg-gray-50' : ''
+          !!permissions?.pos?.switch_prices?.value
+            ? 'cursor-pointer hover:bg-gray-50'
+            : ''
         } px-3 rounded-lg bg-white border border-gray-300 w-full`}
       >
         <div className="flex gap-2 md:gap-5 items-center">
@@ -53,7 +62,9 @@ const ChangePrice = () => {
             className={`bg-green-600/10`}
             icon={<DollarOutlined className="text-green-600 !text-lg" />}
           />
-          <p className="leading-4 text-sm font-light m-0 !lowercase">{currentPrice?.name}</p>
+          <p className="leading-4 text-sm font-light m-0 !lowercase">
+            {currentPrice?.name}
+          </p>
         </div>
       </div>
 
@@ -64,7 +75,7 @@ const ChangePrice = () => {
         onCancel={onClose}
         open={openForm}
       >
-        {prices_list.map(item => (
+        {prices_list.map((item) => (
           <div
             key={item.price_id}
             onClick={() => {
@@ -75,7 +86,11 @@ const ChangePrice = () => {
                 type: 'warning',
                 okText: 'Confirmar',
                 onOk: async () => {
-                  dispatch(salesActions.cashRegister.changePrice(item?.price_id || null));
+                  dispatch(
+                    salesActions.cashRegister.changePrice(
+                      item?.price_id || null,
+                    ),
+                  );
                   onClose();
                 },
               });

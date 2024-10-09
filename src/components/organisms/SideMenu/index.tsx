@@ -27,7 +27,11 @@ import { Profile } from '@/redux/reducers/users/types';
 import { createElement } from 'react';
 import { APP_VERSION } from '@/constants/versions';
 import MyMembershipCard from '../membership';
-import { AppModules, useMembershipAccess } from '@/routes/module-access';
+import {
+  AppModules,
+  ModuleAccess,
+  useMembershipAccess,
+} from '@/routes/module-access';
 import { ChevronUp } from 'lucide-react';
 import { appActions } from '@/redux/reducers/app';
 import { LayoutSider } from '../MainLayout/styles';
@@ -36,7 +40,10 @@ type SideMenuProps = {
   onClick?: (args?: any) => void;
 };
 
-export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: AppModules) => boolean) => [
+export const ITEM_LIST = (
+  permissions: Profile['permissions'],
+  hasAccess: (key: AppModules) => boolean,
+) => [
   {
     key: 'dashboard',
     icon: HomeOutlined,
@@ -67,7 +74,8 @@ export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: 
         path: APP_ROUTES.PRIVATE.SALES.path,
       }
     : null,
-  (permissions?.cash_registers?.view_current_cash_cut?.value || permissions?.cash_registers?.view_history_cash_cuts?.value) &&
+  (permissions?.cash_registers?.view_current_cash_cut?.value ||
+    permissions?.cash_registers?.view_history_cash_cuts?.value) &&
   hasAccess('make_cash_cut')
     ? {
         key: 'cashiers',
@@ -101,7 +109,8 @@ export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: 
         path: APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path,
       }
     : null,
-  !!Object.values(permissions?.reports || {}).some(item => item) && hasAccess('reports')
+  !!Object.values(permissions?.reports || {}).some((item) => item?.value) &&
+  hasAccess('reports')
     ? {
         key: 'reports',
         icon: BarChartOutlined,
@@ -109,7 +118,8 @@ export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: 
         path: APP_ROUTES.PRIVATE.REPORTS.path,
       }
     : null,
-  permissions?.online_store?.view_online_store?.value && hasAccess('online_store')
+  permissions?.online_store?.view_online_store?.value &&
+  hasAccess('online_store')
     ? {
         key: 'online_catalog',
         icon: ReadOutlined,
@@ -130,11 +140,15 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
+  const { permissions } = useAppSelector(
+    ({ users }) => users?.user_auth?.profile!,
+  );
   const { hasAccess } = useMembershipAccess();
   const { company, navigation } = useAppSelector(({ app }) => app);
+  const { isAdmin, profile } = useAppSelector(({ users }) => users?.user_auth);
   const [modal, contextHolder] = Modal.useModal();
-  const collapsed = navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
+  const collapsed =
+    navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
 
   const handleLogout = () => {
     modal.confirm({
@@ -155,30 +169,55 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
   };
 
   return (
-    <LayoutSider width={220} collapsed={collapsed} className="!border-r !min-h-[100dvh] !max-h-[100dvh]" theme={'light'}>
-      <Logo collapsed={collapsed} src={company?.logo_url || LogoAppWhite} title="D'eliz" />
+    <LayoutSider
+      width={220}
+      collapsed={collapsed}
+      className="!border-r !min-h-[100dvh] !max-h-[100dvh]"
+      theme={'light'}
+    >
+      <Logo
+        collapsed={collapsed}
+        src={company?.logo_url || LogoAppWhite}
+        title="D'eliz"
+      />
 
-      <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
-        <Tooltip title={collapsed ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
-          <Button
-            className="w-full"
-            icon={<PlusCircleOutlined />}
-            onClick={() => {
-              handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
-            }}
+      {profile?.permissions?.pos?.add_sale?.value || isAdmin ? (
+        <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
+          <Tooltip
+            title={collapsed ? 'Nueva venta' : ''}
+            color="purple-inverse"
+            overlayInnerStyle={{ fontSize: 12 }}
           >
-            {collapsed ? '' : 'Nueva venta'}
-          </Button>
-        </Tooltip>
-      </div>
+            <Button
+              className="w-full"
+              icon={<PlusCircleOutlined />}
+              onClick={() => {
+                handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
+              }}
+            >
+              {collapsed ? '' : 'Nueva venta'}
+            </Button>
+          </Tooltip>
+        </div>
+      ) : (
+        <div className="h-10"></div>
+      )}
 
       {!isPhablet && (
         <Button
           size="small"
           shape="circle"
-          icon={<ChevronUp className={`${collapsed ? 'rotate-90' : '-rotate-90'} w-4 stroke-2`} />}
+          icon={
+            <ChevronUp
+              className={`${collapsed ? 'rotate-90' : '-rotate-90'} w-4 stroke-2`}
+            />
+          }
           className="absolute top-3 -right-3 z-50"
-          onClick={() => dispatch(appActions.setNavigation({ collapsed: !navigation?.collapsed }))}
+          onClick={() =>
+            dispatch(
+              appActions.setNavigation({ collapsed: !navigation?.collapsed }),
+            )
+          }
         />
       )}
       <MenuRoot
@@ -191,7 +230,9 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
             key,
             icon: createElement(item?.icon),
             label: item?.label,
-            className: location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '',
+            className: location.pathname?.includes(item.path)
+              ? 'ant-menu-item-selected'
+              : '',
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
               ? item.children.map((subItem: any) => {
@@ -207,9 +248,11 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
       />
 
       <div className="absolute bottom-0 w-full">
-        <div className="px-5">
-          <MyMembershipCard collapsed={collapsed} />
-        </div>
+        {isAdmin && (
+          <div className="px-5">
+            <MyMembershipCard collapsed={collapsed} />
+          </div>
+        )}
         <MenuRoot
           className=""
           mode="inline"

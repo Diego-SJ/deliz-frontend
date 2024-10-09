@@ -1,10 +1,16 @@
-import { CloseOutlined, SearchOutlined, TeamOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Avatar, Button, Drawer, Select, Modal, Typography } from 'antd';
 import CustomerEditor from '../../customers/editor';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { salesActions } from '@/redux/reducers/sales';
 import functions from '@/utils/functions';
 import useMediaQuery from '@/hooks/useMediaQueries';
@@ -18,8 +24,12 @@ const CashierCustomer = () => {
   const dispatch = useAppDispatch();
   const [customerList, setCustomerList] = useState<Option[]>([]);
   const { customers } = useAppSelector(({ customers }) => customers);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
-  const [currentCustomerId, setCurrentCustomerId] = useState<number | string | null>();
+  const { permissions } = useAppSelector(
+    ({ users }) => users?.user_auth?.profile!,
+  );
+  const [currentCustomerId, setCurrentCustomerId] = useState<
+    number | string | null
+  >();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const { cash_register } = useAppSelector(({ sales }) => sales);
   const [isCreating, setIsCreating] = useState(false);
@@ -35,13 +45,19 @@ const CashierCustomer = () => {
   }, [dispatch, customers, openForm]);
 
   useEffect(() => {
-    let _customers: Option[] = customers.map(item => ({ value: item.customer_id, label: item.name, ...item }));
+    let _customers: Option[] = customers.map((item) => ({
+      value: item.customer_id,
+      label: item.name,
+      ...item,
+    }));
     setCustomerList(_customers);
   }, [customers]);
 
   useEffect(() => {
     setCurrentCustomerId(customer_id);
-    setCustomer(customers.find(item => item.customer_id === customer_id) || null);
+    setCustomer(
+      customers.find((item) => item.customer_id === customer_id) || null,
+    );
   }, [customer_id]);
 
   const onClose = () => {
@@ -55,7 +71,7 @@ const CashierCustomer = () => {
   };
 
   const onAddNew = () => {
-    if (hoverDelete) return;
+    if (hoverDelete || !permissions?.pos?.add_customer_to_sale?.value) return;
     setOpenForm(true);
   };
 
@@ -68,7 +84,9 @@ const CashierCustomer = () => {
     return (
       <>
         {isCreating ? (
-          <CustomerEditor onSuccess={value => onChange(value?.customer_id || null)} />
+          <CustomerEditor
+            onSuccess={(value) => onChange(value?.customer_id || null)}
+          />
         ) : (
           <>
             <Typography.Text type="secondary" className="block mb-4">
@@ -93,14 +111,22 @@ const CashierCustomer = () => {
                   );
                 }}
                 options={customerList}
-                optionRender={option => {
+                optionRender={(option) => {
                   if (option.value === '') return null;
                   return (
                     <div className="flex items-center px-0 py-0 gap-4">
-                      <Avatar shape="square" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
+                      <Avatar
+                        shape="square"
+                        icon={<UserOutlined className="text-primary" />}
+                        className="bg-primary/10"
+                      />
                       <div className="flex flex-col">
-                        <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
-                        <span className="text-slate-400 font-light">{option?.data?.phone || 'Sin número'}</span>{' '}
+                        <span className="font-normal text-base mb-0 lowercase">
+                          {option.label}
+                        </span>{' '}
+                        <span className="text-slate-400 font-light">
+                          {option?.data?.phone || 'Sin número'}
+                        </span>{' '}
                       </div>
                     </div>
                   );
@@ -109,9 +135,14 @@ const CashierCustomer = () => {
             ) : null}
             <div
               onClick={() => onChange(null)}
-              className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg my-2"
+              className={`flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border border-gray-300 rounded-lg my-2`}
             >
-              <Avatar shape="square" size="large" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
+              <Avatar
+                shape="square"
+                size="large"
+                icon={<UserOutlined className="text-primary" />}
+                className="bg-primary/10"
+              />
               <div className="flex flex-col">Público General</div>
             </div>
             {permissions?.customers?.add_customer?.value && (
@@ -138,14 +169,20 @@ const CashierCustomer = () => {
     <>
       <div
         onClick={onAddNew}
-        className="flex gap-2 items-center justify-between h-[45px] cursor-pointer hover:bg-gray-50 px-3 rounded-lg bg-white border border-gray-300 w-full"
+        className={`flex gap-2 items-center justify-between h-[45px] ${!permissions?.pos?.add_customer_to_sale?.value ? '' : 'hover:bg-gray-50 cursor-pointer'}  px-3 rounded-lg bg-white border border-gray-300 w-full`}
       >
         <div className="flex gap-2 md:gap-5 items-center">
           <Avatar
             size="small"
             shape="square"
             className={`bg-primary/10 !text-lg`}
-            icon={!!customer?.customer_id ? <UserOutlined className="text-primary" /> : <TeamOutlined className="text-primary" />}
+            icon={
+              !!customer?.customer_id ? (
+                <UserOutlined className="text-primary" />
+              ) : (
+                <TeamOutlined className="text-primary" />
+              )
+            }
           />
           <p className="leading-4 text-sm font-light m-0 !lowercase">
             {!!customer?.customer_id ? customer?.name : 'Público en general'}

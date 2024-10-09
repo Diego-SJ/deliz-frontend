@@ -107,10 +107,16 @@ type ModuleAccessProps = {
   children: React.ReactNode;
 };
 
-export const ModuleAccess: FC<ModuleAccessProps> = ({ moduleName, children }) => {
+export const ModuleAccess: FC<ModuleAccessProps> = ({
+  moduleName,
+  children,
+}) => {
   const { company } = useAppSelector(({ app }) => app);
 
-  if (company?.membership_id && plans[company.membership_id].includes(moduleName as AppModules)) {
+  if (
+    company?.membership_id &&
+    plans[company.membership_id].includes(moduleName as AppModules)
+  ) {
     return <>{children}</>;
   }
   return null;
@@ -146,11 +152,26 @@ export const useMembershipAccess = () => {
   const maxCashRegisters = MAX_CASH_REGISTERS[company?.membership_id || 1] || 1;
 
   const hasAccess = (moduleName: AppModules): boolean => {
-    return !!company?.membership_id && !!plans[company.membership_id].includes(moduleName);
+    return (
+      !!company?.membership_id &&
+      !!plans[company.membership_id].includes(moduleName)
+    );
+  };
+
+  const hasModuleAccess = (moduleProperties?: {
+    [key: string]: any;
+  }): boolean => {
+    if (!moduleProperties) return false;
+    return Object.values(moduleProperties || { module_name: false })?.some(
+      (prop) => prop?.value,
+    );
   };
 
   const validateAccessFeature = (feature: any, moduleName: AppModules) => {
-    if (company?.membership_id && plans[company.membership_id].includes(moduleName)) {
+    if (
+      company?.membership_id &&
+      plans[company.membership_id].includes(moduleName)
+    ) {
       return feature;
     }
     return undefined;
@@ -158,6 +179,7 @@ export const useMembershipAccess = () => {
 
   return {
     hasAccess,
+    hasModuleAccess,
     validateAccessFeature,
     maxUsers,
     maxBranches,

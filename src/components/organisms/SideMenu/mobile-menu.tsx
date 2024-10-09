@@ -1,4 +1,10 @@
-import { LogoutOutlined, ExclamationCircleOutlined, PlusCircleOutlined, IdcardOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  LogoutOutlined,
+  ExclamationCircleOutlined,
+  PlusCircleOutlined,
+  IdcardOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import LogoAppWhite from '@/assets/logo-color.svg';
@@ -19,7 +25,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { hasAccess } = useMembershipAccess();
-  const { profile } = useAppSelector(({ users }) => users?.user_auth);
+  const { profile, isAdmin } = useAppSelector(({ users }) => users?.user_auth);
   const { company } = useAppSelector(({ app }) => app);
 
   const [modal, contextHolder] = Modal.useModal();
@@ -54,19 +60,35 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
       open={open}
       closeIcon={<></>}
       extra={
-        <Button onClick={closeDrawer} type="text" icon={<CloseOutlined className="text-slate-900 !text-2xl" />} size="large" />
+        <Button
+          onClick={closeDrawer}
+          type="text"
+          icon={<CloseOutlined className="text-slate-900 !text-2xl" />}
+          size="large"
+        />
       }
       onClose={closeDrawer}
-      classNames={{ body: '!bg-neutral-100 !px-5 !pt-0', header: '!bg-neutral-100 !border-b-transparent' }}
+      classNames={{
+        body: '!bg-neutral-100 !px-5 !pt-0',
+        header: '!bg-neutral-100 !border-b-transparent',
+      }}
     >
       <div className="px-0">
         <div className="flex gap-4 pb-8 items-center">
           <div className="bg-white rounded-full w-20 h-20 flex justify-center items-center">
-            <img src={company?.logo_url || LogoAppWhite} alt="posiffy" className="w-14 h-14 object-contain aspect-square" />
+            <img
+              src={company?.logo_url || LogoAppWhite}
+              alt="posiffy"
+              className="w-14 h-14 object-contain aspect-square"
+            />
           </div>
           <div className="flex flex-col">
-            <h5 className="text-xl font-semibold">{company?.name || 'Posiffy'}</h5>
-            <p className="text-base text-slate-400 font-light">{profile?.email || '- - -'}</p>
+            <h5 className="text-xl font-semibold">
+              {company?.name || 'Posiffy'}
+            </h5>
+            <p className="text-base text-slate-400 font-light">
+              {profile?.email || '- - -'}
+            </p>
           </div>
         </div>
 
@@ -81,7 +103,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
         </div>
 
         <div className="flex flex-col bg-white rounded-lg gap-2 py-2 mb-6 shadow-sm">
-          {ITEM_LIST(profile?.permissions! || {}, hasAccess).map(item => {
+          {ITEM_LIST(profile?.permissions! || {}, hasAccess).map((item) => {
             if (!item) return null;
 
             const { key, icon, label, path, children } = item;
@@ -95,7 +117,13 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
                       if (subItem.path) handlePathChange(subItem.path);
                     }}
                     label={subItem.label}
-                    icon={subItem?.icon ? createElement(subItem?.icon as any, { className: 'text-xl text-slate-900' }) : null}
+                    icon={
+                      subItem?.icon
+                        ? createElement(subItem?.icon as any, {
+                            className: 'text-xl text-slate-900',
+                          })
+                        : null
+                    }
                   />
                 );
               });
@@ -108,30 +136,45 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
                   if (path) handlePathChange(path);
                 }}
                 label={label}
-                icon={createElement(icon as any, { className: 'text-xl text-slate-900' })}
+                icon={createElement(icon as any, {
+                  className: 'text-xl text-slate-900',
+                })}
               />
             );
           })}
         </div>
-        <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5">
-          <div className="w-full flex items-center gap-5 px-4 py-3" onClick={goToMembership}>
-            <Avatar
-              size={40}
-              shape="square"
-              className="bg-teal-600/10 text-teal-600 !rounded-xl flex items-center justify-center"
-              icon={createElement(IdcardOutlined, { className: 'text-xl text-teal-600' })}
-            />
-            <p className="text-lg font-medium text-teal-600">Mi Membersía</p>
+
+        {isAdmin && (
+          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5">
+            <div
+              className="w-full flex items-center gap-5 px-4 py-3"
+              onClick={goToMembership}
+            >
+              <Avatar
+                size={40}
+                shape="square"
+                className="bg-teal-600/10 text-teal-600 !rounded-xl flex items-center justify-center"
+                icon={createElement(IdcardOutlined, {
+                  className: 'text-xl text-teal-600',
+                })}
+              />
+              <p className="text-lg font-medium text-teal-600">Mi Membersía</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm">
-          <div className="w-full flex items-center gap-5 px-4 py-3" onClick={handleLogout}>
+          <div
+            className="w-full flex items-center gap-5 px-4 py-3"
+            onClick={handleLogout}
+          >
             <Avatar
               size={40}
               shape="square"
               className="bg-red-600/10 text-red-600 !rounded-xl flex items-center justify-center"
-              icon={createElement(LogoutOutlined, { className: 'text-xl text-red-600' })}
+              icon={createElement(LogoutOutlined, {
+                className: 'text-xl text-red-600',
+              })}
             />
             <p className="text-lg font-medium text-red-600">Cerrar sesión</p>
           </div>
