@@ -63,6 +63,12 @@ const ManageUserProfile = () => {
   const [selectedRole, setSelectedRole] = useState('ADMIN');
   const [permissions, setPermissions] = useState<PermissionsType>({});
 
+  useEffect(() => {
+    if (!prices_list?.length) {
+      dispatch(branchesActions.getPrices());
+    }
+  }, [dispatch]);
+
   const fetchDetails = async () => {
     setLoading(true);
     const data = await dispatch(userActions.fetchUser(profile_id!));

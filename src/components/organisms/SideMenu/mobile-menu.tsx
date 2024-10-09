@@ -92,15 +92,17 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
           </div>
         </div>
 
-        <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-6">
-          <LisItem
-            onClick={() => {
-              handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
-            }}
-            label="Nueva venta"
-            icon={<PlusCircleOutlined className="text-xl text-slate-900" />}
-          />
-        </div>
+        {profile?.permissions?.pos?.add_sale?.value || isAdmin ? (
+          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-6">
+            <LisItem
+              onClick={() => {
+                handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
+              }}
+              label="Nueva venta"
+              icon={<PlusCircleOutlined className="text-xl text-slate-900" />}
+            />
+          </div>
+        ) : null}
 
         <div className="flex flex-col bg-white rounded-lg gap-2 py-2 mb-6 shadow-sm">
           {ITEM_LIST(profile?.permissions! || {}, hasAccess).map((item) => {

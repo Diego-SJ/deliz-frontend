@@ -146,6 +146,7 @@ const SettingsMenu = () => {
           type="primary"
           icon={<LogoutOutlined />}
           block
+          size="large"
           onClick={signOut}
         >
           Cerrar sesión
