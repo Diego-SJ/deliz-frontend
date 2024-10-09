@@ -36,6 +36,7 @@
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.446.0",
     "numeral": "^2.0.6",
     "rc-virtual-list": "^3.14.8",
@@ -58,6 +59,7 @@
     "vaul": "^1.0.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.10",
     "@types/node": "^22.7.3",
     "@types/numeral": "^2.0.5",
     "@types/react": "^18.3.9",

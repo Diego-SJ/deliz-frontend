@@ -330,17 +330,16 @@ const AppRouter = () => {
         {/* SETTINGS ROUTES - END */}
 
         {/* REPORTS ROUTES - START */}
-        {hasModuleAccess(permissions?.reports) ||
-          (isAdmin && (
-            <Route
-              path={APP_ROUTES.PRIVATE.REPORTS.path}
-              element={
-                <ReportsLayout>
-                  <ReportsHomePage />
-                </ReportsLayout>
-              }
-            />
-          ))}
+        {(hasModuleAccess(permissions?.reports) || isAdmin) && (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.path}
+            element={
+              <ReportsLayout>
+                <ReportsHomePage />
+              </ReportsLayout>
+            }
+          />
+        )}
         {permissions?.reports?.view_sales_report?.value &&
         hasAccess('reports') ? (
           <Route

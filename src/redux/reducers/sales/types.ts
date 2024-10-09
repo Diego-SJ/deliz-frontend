@@ -61,6 +61,7 @@ export type Sale = {
   branch_id: string | null;
   company_id: string | null;
   cash_cut_id: string | null;
+  created_by?: string;
 };
 
 export type SaleMetadata = {

@@ -10,12 +10,13 @@ import {
 import { App, Button, Card, Form, Input, Select, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Permissions from './permissions/index';
 import { PERMISSIONS, PermissionsType } from './permissions/data-and-types';
 import { ROLES } from '@/constants/roles';
 import { useMembershipAccess } from '@/routes/module-access';
 import CardRoot from '@/components/atoms/Card';
 import { branchesActions } from '@/redux/reducers/branches';
+import PermissionsGrouped from './permissions/permissions-v2';
+import { finalPermissions } from '@/utils/settings-page';
 
 const getCashRegisters = (
   branches: Branch[],
@@ -76,7 +77,7 @@ const ManageUserProfile = () => {
     form.setFieldsValue({ ...data, role });
     setIsDefaultUserAdmin(!!data?.is_default);
     setSelectedRole(role);
-    setPermissions({ ...PERMISSIONS, ...data?.permissions });
+    setPermissions(finalPermissions(data?.permissions));
     setSelectedBranches(data?.branches || []);
     setSelectedCashRegisters(data?.cash_registers || []);
     setCurrentProfile(data);
@@ -337,7 +338,7 @@ const ManageUserProfile = () => {
                     />
                   </Form.Item>
 
-                  <Permissions
+                  <PermissionsGrouped
                     value={permissions}
                     onPermissionsChange={setPermissions}
                   />

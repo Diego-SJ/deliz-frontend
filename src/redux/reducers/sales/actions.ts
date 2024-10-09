@@ -27,7 +27,7 @@ const customActions = {
     async (dispatch: AppDispatch, getState: AppState) => {
       let salesList: SaleRPC[] = getState().sales.sales || [];
       const company_id = getState().app.company.company_id;
-      const isAdmin = getState().users.user_auth.profile?.role === ROLES.ADMIN;
+      const { isAdmin, profile } = getState()?.users?.user_auth;
       const { currentBranch, currentCashRegister } = getState().branches;
       const {
         orderBy,
@@ -54,6 +54,11 @@ const customActions = {
             ? [currentCashRegister?.cash_register_id]
             : null,
           search_param: filters?.search || null,
+          p_created_by: isAdmin
+            ? null
+            : profile?.permissions?.sales?.view_sales_created
+              ? profile?.profile_id
+              : null,
         });
 
         if (orderBy) {
