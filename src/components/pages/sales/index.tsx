@@ -323,7 +323,7 @@ const Sales = () => {
                 </Dropdown>
               </ModuleAccess>
             </Col>
-            {permissions?.sales?.add_sale?.value && (
+            {permissions?.pos?.add_sale?.value && (
               <Col lg={{ offset: 2, span: 4 }} xs={12}>
                 <Button
                   block
