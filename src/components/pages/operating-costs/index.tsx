@@ -1,8 +1,24 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import functions from '@/utils/functions';
-import { FileTextOutlined, PlusCircleOutlined, SearchOutlined, ShopOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Col, Row, Tag, Table, message, Input, Typography, Dropdown } from 'antd';
+import {
+  FileTextOutlined,
+  PlusCircleOutlined,
+  SearchOutlined,
+  ShopOutlined,
+} from '@ant-design/icons';
+import {
+  Breadcrumb,
+  Button,
+  Col,
+  Row,
+  Tag,
+  Table,
+  message,
+  Input,
+  Typography,
+  Dropdown,
+} from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,6 +29,7 @@ import PaginatedList from '@/components/organisms/PaginatedList';
 import { operatingCostsActions } from '@/redux/reducers/operating-costs';
 import { OperatingCost } from '@/redux/reducers/operating-costs/types';
 import { useDebouncedCallback } from 'use-debounce';
+import BottomMenu from '@/components/organisms/bottom-menu';
 
 const columns: ColumnsType<OperatingCost> = [
   {
@@ -20,7 +37,7 @@ const columns: ColumnsType<OperatingCost> = [
     dataIndex: 'reason',
     align: 'left',
     width: 300,
-    render: value => value || 'Sin motivo',
+    render: (value) => value || 'Sin motivo',
   },
   {
     title: 'Monto',
@@ -38,7 +55,11 @@ const columns: ColumnsType<OperatingCost> = [
     align: 'center',
     render: (status, record) => {
       const _status = STATUS_OBJ[status?.status_id || 1];
-      return <Tag color={_status?.color ?? 'orange'}>{(record as any)?.status?.name}</Tag>;
+      return (
+        <Tag color={_status?.color ?? 'orange'}>
+          {(record as any)?.status?.name}
+        </Tag>
+      );
     },
   },
   {
@@ -68,8 +89,12 @@ const PurchasesExpenses = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { branches } = useAppSelector(({ branches }) => branches);
-  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
-  const { operatingCosts, filters, loading } = useAppSelector(({ operatingCosts }) => operatingCosts);
+  const { permissions } = useAppSelector(
+    ({ users }) => users?.user_auth?.profile!,
+  );
+  const { operatingCosts, filters, loading } = useAppSelector(
+    ({ operatingCosts }) => operatingCosts,
+  );
   const [operations, setOperations] = useState<OperatingCost[]>([]);
   const isFirstRender = useRef(true);
   const { isTablet } = useMediaQuery();
@@ -95,7 +120,10 @@ const PurchasesExpenses = () => {
   }, 650);
 
   const onRowClick = (record: OperatingCost) => {
-    navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT.hash`${record.operation_type?.toLowerCase()}${record.operating_cost_id}`);
+    navigate(
+      APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT
+        .hash`${record.operation_type?.toLowerCase()}${record.operating_cost_id}`,
+    );
   };
 
   return (
@@ -125,7 +153,12 @@ const PurchasesExpenses = () => {
                 prefix={<SearchOutlined />}
                 value={filters?.search_text}
                 onChange={({ target }) => {
-                  dispatch(operatingCostsActions.setFilters({ search_text: target.value, page: 0 }));
+                  dispatch(
+                    operatingCostsActions.setFilters({
+                      search_text: target.value,
+                      page: 0,
+                    }),
+                  );
                   onSearch();
                 }}
               />
@@ -133,7 +166,11 @@ const PurchasesExpenses = () => {
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
-                  defaultSelectedKeys: [filters?.status_id !== 0 ? filters?.status_id?.toString() || '' : '0'],
+                  defaultSelectedKeys: [
+                    filters?.status_id !== 0
+                      ? filters?.status_id?.toString() || ''
+                      : '0',
+                  ],
                   items: [
                     { label: 'Mostrar todos', key: '0' },
                     { label: STATUS_OBJ[4].name, key: '4' },
@@ -141,7 +178,11 @@ const PurchasesExpenses = () => {
                   ],
                   selectable: true,
                   onClick: ({ key }) => {
-                    dispatch(operatingCostsActions.setFilters({ status_id: Number(key) }));
+                    dispatch(
+                      operatingCostsActions.setFilters({
+                        status_id: Number(key),
+                      }),
+                    );
                     applyFilters();
                   },
                 }}
@@ -154,7 +195,9 @@ const PurchasesExpenses = () => {
                   size={isTablet ? 'large' : 'middle'}
                   icon={<FileTextOutlined className="text-base" />}
                 >
-                  {filters?.status_id === 0 ? 'Estado' : STATUS_OBJ[filters?.status_id || 0]?.name}
+                  {filters?.status_id === 0
+                    ? 'Estado'
+                    : STATUS_OBJ[filters?.status_id || 0]?.name}
                 </Button>
               </Dropdown>
             </Col>
@@ -164,17 +207,26 @@ const PurchasesExpenses = () => {
                   defaultSelectedKeys: [filters?.branch_id || 'ALL'],
                   items: [
                     { label: 'Todas las sucursales', key: 'ALL' },
-                    ...(branches?.map(branch => ({ label: branch.name, key: branch.branch_id })) || []),
+                    ...(branches?.map((branch) => ({
+                      label: branch.name,
+                      key: branch.branch_id,
+                    })) || []),
                   ],
                   selectable: true,
                   onClick: ({ key }) => {
-                    dispatch(operatingCostsActions.setFilters({ branch_id: key }));
+                    dispatch(
+                      operatingCostsActions.setFilters({ branch_id: key }),
+                    );
                     applyFilters();
                   },
                 }}
               >
                 <Button
-                  type={!!filters?.branch_id && filters?.branch_id !== 'ALL' ? 'primary' : 'default'}
+                  type={
+                    !!filters?.branch_id && filters?.branch_id !== 'ALL'
+                      ? 'primary'
+                      : 'default'
+                  }
                   block
                   className={`${!!filters?.branch_id && filters?.branch_id !== 'ALL' ? '!bg-white' : ''}`}
                   ghost={!!filters?.branch_id && filters?.branch_id !== 'ALL'}
@@ -183,7 +235,9 @@ const PurchasesExpenses = () => {
                 >
                   {!filters?.branch_id || filters?.branch_id === 'ALL'
                     ? 'Sucursal'
-                    : branches?.find(branch => branch.branch_id === filters?.branch_id)?.name}
+                    : branches?.find(
+                        (branch) => branch.branch_id === filters?.branch_id,
+                      )?.name}
                 </Button>
               </Dropdown>
             </Col>
@@ -194,7 +248,12 @@ const PurchasesExpenses = () => {
                   type="primary"
                   size={isTablet ? 'large' : 'middle'}
                   icon={<PlusCircleOutlined />}
-                  onClick={() => navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`)}
+                  onClick={() =>
+                    navigate(
+                      APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW
+                        .hash`${'expense'}`,
+                    )
+                  }
                 >
                   Agregar
                 </Button>
@@ -203,25 +262,38 @@ const PurchasesExpenses = () => {
           </Row>
 
           {!isTablet ? (
-            <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }} className={`!mt-6`}>
+            <CardRoot
+              styles={{ body: { padding: 0, overflow: 'hidden' } }}
+              className={`!mt-6`}
+            >
               <Table
-                onRow={record => {
+                onRow={(record) => {
                   return {
                     onClick: () => onRowClick(record), // click row
                   };
                 }}
                 loading={loading}
-                rowKey={record => record.operating_cost_id}
+                rowKey={(record) => record.operating_cost_id}
                 columns={columns}
                 dataSource={operations}
-                scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
+                scroll={{
+                  x: 700,
+                  y: 'calc(100dvh - 280px)',
+                  scrollToFirstRowOnChange: true,
+                }}
                 pagination={{
                   defaultCurrent: 0,
-                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showTotal: (total, range) =>
+                    `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
                   showSizeChanger: true,
                   size: 'small',
                   onChange: (page, pageSize) => {
-                    dispatch(operatingCostsActions.setFilters({ page: page - 1, pageSize }));
+                    dispatch(
+                      operatingCostsActions.setFilters({
+                        page: page - 1,
+                        pageSize,
+                      }),
+                    );
                     dispatch(operatingCostsActions.fetchOperations());
                   },
                   pageSize: filters?.pageSize,
@@ -236,16 +308,22 @@ const PurchasesExpenses = () => {
           ) : (
             <PaginatedList
               className="mt-4 !max-h-[calc(100dvh-284px)]"
-              $bodyHeight="calc(100dvh - 340px)"
+              $bodyHeight="calc(100dvh - 415px)"
               dataSource={operations}
               loading={loading}
               pagination={{
                 defaultCurrent: 1,
-                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} de ${total}`,
                 showSizeChanger: true,
                 size: 'small',
                 onChange: (page, pageSize) => {
-                  dispatch(operatingCostsActions.setFilters({ page: page - 1, pageSize }));
+                  dispatch(
+                    operatingCostsActions.setFilters({
+                      page: page - 1,
+                      pageSize,
+                    }),
+                  );
                   dispatch(operatingCostsActions.fetchOperations());
                 },
                 pageSize: filters?.pageSize,
@@ -253,10 +331,10 @@ const PurchasesExpenses = () => {
                 align: 'center',
                 total: filters?.totalRecords,
                 current: (filters?.page || 0) + 1,
-                className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+                className: '!mt-0 border-red-500 pt-0 !mb-1 text-gray-400 pr-4',
                 pageSizeOptions: ['20', '50', '100'],
               }}
-              renderItem={item => {
+              renderItem={(item) => {
                 const _status = STATUS_OBJ[item?.status_id || 1];
                 return (
                   <div
@@ -264,21 +342,33 @@ const PurchasesExpenses = () => {
                     onClick={() => onRowClick(item)}
                     className="flex justify-between py-3 px-4 items-center border-b border-gray-200 cursor-pointer"
                   >
-                    <div className="flex flex-col w-3/5">
-                      <Typography.Text strong className="!mb-1">
+                    <div className="flex flex-col w-3/6">
+                      <span className="m-0 mb-1 font-medium leading-[1.1]">
                         {item?.reason || 'Público general'}
-                      </Typography.Text>
-                      <Typography.Text className="text-gray-400 text-small font-light mb-1">
+                      </span>
+                      <span className="text-xs text-gray-400/70">
                         {functions.tableDate(item.created_at)}
-                      </Typography.Text>
-                      <Tag className="w-fit text-small font-light">Sucursal {item?.branches?.name || 'Desconocida'}</Tag>
+                      </span>
                     </div>
 
-                    <div className="flex flex-col w-2/5 text-end justify-between h-full ">
-                      <Typography.Text className="!mb-4 font-medium">{functions.money(item.amount)}</Typography.Text>
-                      <Tag className="ml-auto w-fit mx-0" color={_status?.color ?? 'orange'}>
-                        {(item as any)?.status?.name}
+                    <div className="flex justify-between items-center pl-0 w-3/6">
+                      <Tag
+                        className="w-fit mx-0"
+                        // color={_status?.color ?? 'orange'}
+                      >
+                        Sucursal {item?.branches?.name || 'Desconocida'}
                       </Tag>
+                      <div className="flex flex-col text-end justify-end">
+                        <span className="text-xs text-gray-500 font-medium mb-1">
+                          {functions.money(item.amount)}
+                        </span>
+                        <Tag
+                          className="ml-auto w-fit mx-0"
+                          color={_status?.color ?? 'orange'}
+                        >
+                          {(item as any)?.status?.name}
+                        </Tag>
+                      </div>
                     </div>
                   </div>
                 );
@@ -287,6 +377,7 @@ const PurchasesExpenses = () => {
           )}
         </Col>
       </Row>
+      {isTablet && <BottomMenu addBottomMargin />}
     </div>
   );
 };

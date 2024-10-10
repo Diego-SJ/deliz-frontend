@@ -1,4 +1,15 @@
-import { Avatar, Button, Col, Input, InputNumber, Modal, Row, Segmented, Select, Typography } from 'antd';
+import {
+  Avatar,
+  Button,
+  Col,
+  Input,
+  InputNumber,
+  Modal,
+  Row,
+  Segmented,
+  Select,
+  Typography,
+} from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Space from '@/components/atoms/Space';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -20,6 +31,7 @@ import {
 import ProductAvatar from '@/components/atoms/ProductAvatar';
 import { productHelpers } from '@/utils/products';
 import { branchesActions } from '@/redux/reducers/branches';
+import { productActions } from '@/redux/reducers/products';
 
 type CashierModalProps = {
   currentProduct?: Product;
@@ -28,15 +40,21 @@ type CashierModalProps = {
   onCancel?: () => void;
 };
 
-const filterOption = (input: string, option?: { label: string; value: string }) =>
-  functions.includes(option?.label, input?.toLowerCase());
+const filterOption = (
+  input: string,
+  option?: { label: string; value: string },
+) => functions.includes(option?.label, input?.toLowerCase());
 
 const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   const dispatch = useAppDispatch();
   const { current_sale } = useAppSelector(({ sales }) => sales);
   const { products } = useAppSelector(({ products }) => products);
-  const { prices_list, currentBranch } = useAppSelector(({ branches }) => branches);
-  const [productQuantity, setPriceQuantity] = useState<number | null>(casherItem?.quantity || null);
+  const { prices_list, currentBranch } = useAppSelector(
+    ({ branches }) => branches,
+  );
+  const [productQuantity, setPriceQuantity] = useState<number | null>(
+    casherItem?.quantity || null,
+  );
   const [productPrice, setProductPrice] = useState(0);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
@@ -44,8 +62,13 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   const [productName, setProductName] = useState('');
   const quantityInput = useRef<HTMLInputElement>(null);
   const { isTablet, isPhablet } = useMediaQuery();
-  const [productType, setProductType] = useState<'CATALOG' | 'CUSTOM'>('CATALOG');
-  const stock = productHelpers.getProductStock(currentProduct, currentBranch?.branch_id || null);
+  const [productType, setProductType] = useState<'CATALOG' | 'CUSTOM'>(
+    'CATALOG',
+  );
+  const stock = productHelpers.getProductStock(
+    currentProduct,
+    currentBranch?.branch_id || null,
+  );
 
   useEffect(() => {
     if (open) {
@@ -105,13 +128,18 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
   };
 
   const onProductChange = (value: string) => {
-    let product = products?.find(p => p.product_id === Number(value));
+    let product = products?.find((p) => p.product_id === Number(value));
     setCurrentProduct(product as Product);
   };
 
   return (
     <>
-      <Button size={isTablet ? 'large' : 'middle'} icon={<PlusCircleOutlined />} block onClick={openModal}>
+      <Button
+        size={isTablet ? 'large' : 'middle'}
+        icon={<PlusCircleOutlined />}
+        block
+        onClick={openModal}
+      >
         {isPhablet ? 'Agregar' : 'Agregar'}
       </Button>
       <Modal
@@ -123,12 +151,25 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
         footer={[
           <Row key="actions" gutter={10}>
             <Col span={12}>
-              <Button size="large" key="back" block onClick={handleOnClose} loading={loading}>
+              <Button
+                size="large"
+                key="back"
+                block
+                onClick={handleOnClose}
+                loading={loading}
+              >
                 Cancelar
               </Button>
             </Col>
             <Col span={12}>
-              <Button block size="large" type="primary" onClick={handleOk} disabled={disableSaveBtn()} loading={loading}>
+              <Button
+                block
+                size="large"
+                type="primary"
+                onClick={handleOk}
+                disabled={disableSaveBtn()}
+                loading={loading}
+              >
                 Guardar
               </Button>
             </Col>
@@ -136,17 +177,27 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
         ]}
       >
         <div>
-          <Typography.Title level={5}>{action === 'EDIT' ? 'Editar' : 'Agregar'} producto</Typography.Title>
+          <Typography.Title level={5}>
+            {action === 'EDIT' ? 'Editar' : 'Agregar'} producto
+          </Typography.Title>
           <Segmented
             className="w-full mb-3"
             size="large"
             value={productType}
             options={[
-              { label: 'Existente', value: 'CATALOG', icon: <ShoppingOutlined /> },
-              { label: 'Personalizado', value: 'CUSTOM', icon: <SignatureOutlined /> },
+              {
+                label: 'Existente',
+                value: 'CATALOG',
+                icon: <ShoppingOutlined />,
+              },
+              {
+                label: 'Personalizado',
+                value: 'CUSTOM',
+                icon: <SignatureOutlined />,
+              },
             ]}
             block
-            onChange={value => {
+            onChange={(value) => {
               setProductType(value as 'CATALOG' | 'CUSTOM');
               if (value === 'CUSTOM') {
                 setCurrentProduct(null);
@@ -167,7 +218,9 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                 />
               ) : (
                 <>
-                  <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">Producto</Typography.Paragraph>
+                  <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">
+                    Producto
+                  </Typography.Paragraph>
                   <Select
                     className="w-full"
                     showSearch
@@ -176,19 +229,36 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                     placeholder="Selecciona un producto"
                     optionFilterProp="children"
                     filterOption={filterOption}
-                    options={products?.map(i => ({ value: `${i?.product_id}`, label: `${i?.name}`, ...i }))}
-                    optionRender={option => {
+                    onFocus={() => {
+                      if (!products?.length)
+                        dispatch(
+                          productActions.fetchProducts({ refetch: true }),
+                        );
+                    }}
+                    options={products?.map((i) => ({
+                      value: `${i?.product_id}`,
+                      label: `${i?.name}`,
+                      ...i,
+                    }))}
+                    optionRender={(option) => {
                       return (
                         <div className="flex items-center px-0 py-0 gap-4">
                           <Avatar
                             shape="square"
                             src={option?.data?.image_url}
-                            icon={<FileImageOutlined className="text-slate-600" />}
+                            icon={
+                              <FileImageOutlined className="text-slate-600" />
+                            }
                             className="bg-slate-600/10 w-10 h-10 min-w-10"
                           />
                           <div className="flex flex-col">
-                            <span className="font-normal text-base mb-0 lowercase">{option?.data?.name}</span>{' '}
-                            <span className="text-slate-400 font-light">{option?.data?.categories?.name || 'Sin categoría'}</span>{' '}
+                            <span className="font-normal text-base mb-0 lowercase">
+                              {option?.data?.name}
+                            </span>{' '}
+                            <span className="text-slate-400 font-light">
+                              {option?.data?.categories?.name ||
+                                'Sin categoría'}
+                            </span>{' '}
                           </div>
                         </div>
                       );
@@ -200,7 +270,9 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             </>
           ) : (
             <>
-              <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">Producto</Typography.Paragraph>
+              <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">
+                Producto
+              </Typography.Paragraph>
               <Input
                 size="large"
                 placeholder="Nombre del artículo"
@@ -208,13 +280,18 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                 onFocus={({ target }) => target.select()}
                 onChange={({ target }) => {
                   setProductName(target.value);
-                  setCurrentProduct({ product_id: null as any, name: target.value } as Product);
+                  setCurrentProduct({
+                    product_id: null as any,
+                    name: target.value,
+                  } as Product);
                 }}
               />
             </>
           )}
 
-          <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">Precio</Typography.Paragraph>
+          <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">
+            Precio
+          </Typography.Paragraph>
           {productType === 'CATALOG' && currentProduct ? (
             <>
               <Select
@@ -225,23 +302,31 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                 placeholder="Selecciona un precio"
                 optionFilterProp="children"
                 filterOption={filterOption}
-                options={prices_list?.map(i => ({
+                options={prices_list?.map((i) => ({
                   value: `${i?.price_id}`,
                   label: `${i?.name} - ${functions.money(productHelpers.getProductPrice(currentProduct, i?.price_id as string))}`,
                   ...i,
                 }))}
                 onClick={() => {
-                  if (!prices_list?.length) dispatch(branchesActions.getPrices());
+                  if (!prices_list?.length)
+                    dispatch(branchesActions.getPrices());
                 }}
-                optionRender={option => {
+                optionRender={(option) => {
                   return (
                     <div className="flex w-full justify-between items-center py-2">
-                      <span className="font-normal text-base mb-0 lowercase ">{option?.label}</span>{' '}
+                      <span className="font-normal text-base mb-0 lowercase ">
+                        {option?.label}
+                      </span>{' '}
                     </div>
                   );
                 }}
-                onChange={value => {
-                  setProductPrice(productHelpers.getProductPrice(currentProduct, value as string));
+                onChange={(value) => {
+                  setProductPrice(
+                    productHelpers.getProductPrice(
+                      currentProduct,
+                      value as string,
+                    ),
+                  );
                   quantityInput.current?.focus();
                 }}
               />
@@ -260,14 +345,16 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
                   target.select();
                 }}
                 addonBefore={<DollarOutlined />}
-                onChange={value => {
+                onChange={(value) => {
                   setProductPrice(value as number);
                 }}
               />
             </div>
           )}
 
-          <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">Cantidad</Typography.Paragraph>
+          <Typography.Paragraph className="!text-sm !font-medium !mb-1 !mt-3">
+            Cantidad
+          </Typography.Paragraph>
           <InputNumber
             size="large"
             ref={quantityInput}
@@ -282,7 +369,7 @@ const CashierModal = ({ action = 'ADD', casherItem }: CashierModalProps) => {
             onFocus={({ target }) => {
               target.select();
             }}
-            onChange={value => setPriceQuantity(value)}
+            onChange={(value) => setPriceQuantity(value)}
           />
           {Number(productQuantity) > stock && (
             <Typography.Paragraph type="warning" className="!mx-0 !mt-2 !mb-0">

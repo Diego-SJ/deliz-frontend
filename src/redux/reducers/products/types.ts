@@ -29,12 +29,9 @@ export type Product = {
   product_id: number;
   name: string;
   description?: string;
-  stock: number;
   created_at?: Date | string;
   status: number;
   category_id: number;
-  retail_price: number;
-  wholesale_price: number;
   image_url?: string | null;
   unit_id?: number;
   size_id?: number;
@@ -50,6 +47,10 @@ export type Product = {
   raw_price?: number;
   inventory?: Inventory;
   price_list?: PriceList;
+
+  // stock: number; deprecated
+  // retail_price: number; deprecated
+  // wholesale_price: number; deprecated
 };
 
 export type Inventory = {

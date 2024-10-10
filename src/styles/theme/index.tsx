@@ -31,7 +31,9 @@ const AppThemeProvider = ({ children }: Props) => {
                 borderRadius: 5,
               },
               Table: {
-                colorText: 'rgba(0, 0, 0, 0.45)',
+                headerBg: '#ffffff',
+                cellPaddingBlock: 10,
+                // colorText: '#4b5563',
               },
             },
           }}

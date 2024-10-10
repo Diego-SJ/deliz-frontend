@@ -11,7 +11,6 @@ import { APP_ROUTES } from '@/routes/routes';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from '@/components/pages/auth/login';
 import Home from '@/components/pages/lading-page';
-import ProductsCatalog from '@/components/pages/products/catalog';
 import TransactionsCashiers from '@/components/pages/cash_cuts';
 import ProductSizes from '@/components/pages/settings/sizes';
 import ProductUnits from '@/components/pages/settings/units';
@@ -69,12 +68,6 @@ const AppRouter = () => {
             <Home />
           )
         }
-      />
-
-      {/* Online store */}
-      <Route
-        path={APP_ROUTES.PUBLIC.PRODUCTS.path}
-        element={<ProductsCatalog />}
       />
 
       {!authenticated && (

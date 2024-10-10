@@ -439,7 +439,6 @@ export const analyticsCustomActions = {
     getExpensesByWeek:
       () => async (dispatch: AppDispatch, getState: AppState) => {
         const company_id = getState().app?.company?.company_id;
-        let [start_date, end_date] = getDateRange('last_7_days');
 
         const { data, error } = await supabase.rpc(
           'get_operating_costs_by_category',
@@ -447,8 +446,8 @@ export const analyticsCustomActions = {
             p_company_id: company_id,
             p_operational_category_ids: null,
             p_branch_ids: null,
-            p_start_date: start_date,
-            p_end_date: end_date,
+            p_start_date: null,
+            p_end_date: null,
           },
         );
 

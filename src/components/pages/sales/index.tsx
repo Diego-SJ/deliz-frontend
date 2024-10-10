@@ -394,7 +394,7 @@ const Sales = () => {
                 align: 'center',
                 total: salesFilters?.sales?.totalRecords,
                 current: (salesFilters?.sales?.page || 0) + 1,
-                className: '!mt-0 border-t pt-2 !mb-1 text-gray-400 pr-4',
+                className: '!mt-0  !mb-1 text-gray-400 pr-4',
                 pageSizeOptions: ['20', '50', '100'],
               }}
               dataSource={auxSales}

@@ -10,8 +10,11 @@ export const productHelpers = {
         ?.toLowerCase() || ''
     );
   },
-  searchProducts: function (searchText: string, products: Product[]): Product[] {
-    return products?.filter(product => {
+  searchProducts: function (
+    searchText: string,
+    products: Product[],
+  ): Product[] {
+    return products?.filter((product) => {
       return (
         functions.includes(product?.name, searchText) ||
         functions.includes(product?.description, searchText) ||
@@ -21,14 +24,27 @@ export const productHelpers = {
       );
     });
   },
-  getProductPrice: (product: Product | null, price_id: string | null): number => {
-    return (product?.price_list || {})[price_id || '']?.unit_price || product?.raw_price || product?.retail_price || 0;
+  getProductPrice: (
+    product: Product | null,
+    price_id: string | null,
+  ): number => {
+    return (
+      (product?.price_list || {})[price_id || '']?.unit_price ||
+      product?.raw_price ||
+      0
+    );
   },
-  getProductStock: (product: Product | null, branch_id: string | null): number => {
+  getProductStock: (
+    product: Product | null,
+    branch_id: string | null,
+  ): number => {
     return (product?.inventory || {})[branch_id || '']?.stock || 0;
   },
-  calculateProductStock: (inventory: Inventory): { stock: number; hasStock: boolean } => {
-    const stock = Object.values(inventory).reduce((acc, item) => acc + item.stock, 0) || 0;
+  calculateProductStock: (
+    inventory: Inventory,
+  ): { stock: number; hasStock: boolean } => {
+    const stock =
+      Object.values(inventory).reduce((acc, item) => acc + item.stock, 0) || 0;
     return { stock, hasStock: stock > 0 };
   },
 };

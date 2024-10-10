@@ -93,7 +93,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
         </div>
 
         {profile?.permissions?.pos?.add_sale?.value || isAdmin ? (
-          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-6">
+          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-6 cursor-pointer">
             <LisItem
               onClick={() => {
                 handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -147,7 +147,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
         </div>
 
         {isAdmin && (
-          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5">
+          <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5 cursor-pointer">
             <div
               className="w-full flex items-center gap-5 px-4 py-3"
               onClick={goToMembership}
@@ -165,7 +165,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
           </div>
         )}
 
-        <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm">
+        <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm cursor-pointer">
           <div
             className="w-full flex items-center gap-5 px-4 py-3"
             onClick={handleLogout}
@@ -205,7 +205,10 @@ type LisItemProps = {
 
 const LisItem = ({ onClick, icon, label }: LisItemProps) => {
   return (
-    <div className="w-full flex items-center gap-5 px-4 py-3" onClick={onClick}>
+    <div
+      className="w-full flex items-center gap-5 px-4 py-3 cursor-pointer"
+      onClick={onClick}
+    >
       <Avatar
         size={35}
         shape="square"

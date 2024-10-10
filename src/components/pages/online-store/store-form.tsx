@@ -1,6 +1,20 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { CopyOutlined, ExportOutlined } from '@ant-design/icons';
-import { App, Badge, Button, Card, Checkbox, Col, Form, GetProp, Input, Row, Switch, TimePicker, Typography } from 'antd';
+import {
+  App,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Form,
+  GetProp,
+  Input,
+  Row,
+  Switch,
+  TimePicker,
+  Typography,
+} from 'antd';
 import LogoManagement from './logo-management';
 import CardRoot from '@/components/atoms/Card';
 import FormItem from 'antd/es/form/FormItem';
@@ -32,16 +46,45 @@ const StoreForm = () => {
   const { schedule, delivery_types } = store || {};
 
   useEffect(() => {
-    setDeliveryOptions(Object.entries(delivery_types || {})?.map(([key, value]) => (value ? key : '')) || []);
-    setScheduleChecks(Object.entries(schedule || {})?.map(([key, value]) => (value?.closed ? `${key}_closed` : '')) || []);
+    setDeliveryOptions(
+      Object.entries(delivery_types || {})?.map(([key, value]) =>
+        value ? key : '',
+      ) || [],
+    );
+    setScheduleChecks(
+      Object.entries(schedule || {})?.map(([key, value]) =>
+        value?.closed ? `${key}_closed` : '',
+      ) || [],
+    );
     form.setFieldsValue({
-      monday_time: [transformTime(schedule?.monday?.from), transformTime(schedule?.monday?.to)],
-      tuesday_time: [transformTime(schedule?.tuesday?.from), transformTime(schedule?.tuesday?.to)],
-      wednesday_time: [transformTime(schedule?.wednesday?.from), transformTime(schedule?.wednesday?.to)],
-      thursday_time: [transformTime(schedule?.thursday?.from), transformTime(schedule?.thursday?.to)],
-      friday_time: [transformTime(schedule?.friday?.from), transformTime(schedule?.friday?.to)],
-      saturday_time: [transformTime(schedule?.saturday?.from), transformTime(schedule?.saturday?.to)],
-      sunday_time: [transformTime(schedule?.sunday?.from), transformTime(schedule?.sunday?.to)],
+      monday_time: [
+        transformTime(schedule?.monday?.from),
+        transformTime(schedule?.monday?.to),
+      ],
+      tuesday_time: [
+        transformTime(schedule?.tuesday?.from),
+        transformTime(schedule?.tuesday?.to),
+      ],
+      wednesday_time: [
+        transformTime(schedule?.wednesday?.from),
+        transformTime(schedule?.wednesday?.to),
+      ],
+      thursday_time: [
+        transformTime(schedule?.thursday?.from),
+        transformTime(schedule?.thursday?.to),
+      ],
+      friday_time: [
+        transformTime(schedule?.friday?.from),
+        transformTime(schedule?.friday?.to),
+      ],
+      saturday_time: [
+        transformTime(schedule?.saturday?.from),
+        transformTime(schedule?.saturday?.to),
+      ],
+      sunday_time: [
+        transformTime(schedule?.sunday?.from),
+        transformTime(schedule?.sunday?.to),
+      ],
     });
   }, [delivery_types, schedule]);
 
@@ -49,14 +92,16 @@ const StoreForm = () => {
     window.open(`${storeUrl}/${store?.slug}`, '_blank');
   };
 
-  const onChangeDeliveryType: GetProp<typeof Checkbox.Group, 'onChange'> = checkedValues => {
+  const onChangeDeliveryType: GetProp<typeof Checkbox.Group, 'onChange'> = (
+    checkedValues,
+  ) => {
     setDeliveryOptions(checkedValues as string[]);
   };
 
   const onDayChange = (day: string) => {
-    setScheduleChecks(prev => {
+    setScheduleChecks((prev) => {
       if (prev.includes(day)) {
-        return prev.filter(item => item !== day);
+        return prev.filter((item) => item !== day);
       }
       return [...prev, day];
     });
@@ -68,7 +113,12 @@ const StoreForm = () => {
       content:
         'Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en línea. Puedes activarla nuevamente en cualquier momento.',
       onOk: () => {
-        dispatch(storesActions.updateStore({ status_id: STATUS_DATA.HIDDEN.id, store_id: store?.store_id }));
+        dispatch(
+          storesActions.updateStore({
+            status_id: STATUS_DATA.HIDDEN.id,
+            store_id: store?.store_id,
+          }),
+        );
       },
       okText: 'Desactivar',
       okType: 'danger',
@@ -81,7 +131,7 @@ const StoreForm = () => {
 
     form
       .validateFields()
-      .then(async values => {
+      .then(async (values) => {
         const dataStore = {
           ...values,
           store_id: store?.store_id,
@@ -93,7 +143,8 @@ const StoreForm = () => {
         await dispatch(storesActions.updateStore(getStoreRecord(dataStore)));
         message.success('Tienda actualizada correctamente');
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
         message.error('Por favor completa los campos requeridos');
       });
   };
@@ -102,7 +153,9 @@ const StoreForm = () => {
     <>
       <section
         className={`p-4 w-full max-w-[700px] mx-auto flex flex-col gap-5 ${
-          profile?.permissions?.online_store?.edit_online_store?.value ? 'min-h-[calc(100dvh-144px)]' : ''
+          profile?.permissions?.online_store?.edit_online_store?.value
+            ? 'min-h-[calc(100dvh-144px)]'
+            : ''
         } ${profile?.permissions?.online_store?.edit_online_store?.value ? 'max-h-[calc(100dvh-144px)]' : ''} overflow-auto`}
       >
         <CardRoot>
@@ -114,7 +167,12 @@ const StoreForm = () => {
               <Badge status="success" text="Activo" />
             </div>
 
-            <Button type="primary" className="" icon={<ExportOutlined />} onClick={openStore}>
+            <Button
+              type="primary"
+              className=""
+              icon={<ExportOutlined />}
+              onClick={openStore}
+            >
               Visitar
             </Button>
           </div>
@@ -130,7 +188,6 @@ const StoreForm = () => {
             instagram: store?.social_media?.instagram,
             whatsapp: store?.social_media?.whatsapp,
           }}
-          requiredMark={false}
           layout="vertical"
           className="w-full"
         >
@@ -140,7 +197,9 @@ const StoreForm = () => {
                 label="Edita la URL de tu negocio"
                 name="slug"
                 className="!w-full"
-                rules={[{ required: true, message: 'Por favor ingresa un nombre' }]}
+                rules={[
+                  { required: true, message: 'Por favor ingresa un nombre' },
+                ]}
               >
                 <Input addonBefore={storeUrl + '/'} className="!w-full" />
               </Form.Item>
@@ -150,7 +209,9 @@ const StoreForm = () => {
               <Button
                 icon={<CopyOutlined />}
                 onClick={() => {
-                  navigator.clipboard.writeText(`${storeUrl}/${store?.slug}/store`);
+                  navigator.clipboard.writeText(
+                    `${storeUrl}/${store?.slug}/store`,
+                  );
                   message.success('Link copiado al portapapeles');
                 }}
               >
@@ -175,32 +236,50 @@ const StoreForm = () => {
             <Form.Item
               label="Título del catálogo"
               name="name"
-              rules={[{ required: true, message: 'Por favor ingresa un nombre' }]}
+              rules={[
+                { required: true, message: 'Por favor ingresa un nombre' },
+              ]}
             >
               <Input placeholder={company.name} />
             </Form.Item>
             <Form.Item
               label="Descripción del catálogo"
               name="description"
-              rules={[{ required: true, message: 'Por favor ingresa un nombre' }]}
+              rules={[
+                { required: true, message: 'Por favor ingresa un nombre' },
+              ]}
             >
-              <Input.TextArea placeholder="¡Cuentanos sobre tu negocio!" maxLength={70} showCount />
+              <Input.TextArea
+                placeholder="¡Cuentanos sobre tu negocio!"
+                maxLength={70}
+                showCount
+              />
             </Form.Item>
           </CardRoot>
 
           <CardRoot title="Contacto" className="mb-5">
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-5 ">
               <Form.Item label="Correo" name="email" className="w-full">
-                <Input type="email" inputMode="email" placeholder="ejemplo@email.com" />
+                <Input
+                  type="email"
+                  inputMode="email"
+                  placeholder="ejemplo@email.com"
+                />
               </Form.Item>
               <Form.Item
                 label="Teléfono"
                 name="phone"
                 className="w-full"
-                rules={[{ pattern: /^[0-9]*$/, message: 'Solo se permiten números' }]}
+                rules={[
+                  { pattern: /^[0-9]*$/, message: 'Solo se permiten números' },
+                ]}
                 tooltip="Teléfono al cual tus clientes podrán realizar llamadas"
               >
-                <Input maxLength={10} inputMode="tel" placeholder="Ingresa tu teléfono" />
+                <Input
+                  maxLength={10}
+                  inputMode="tel"
+                  placeholder="Ingresa tu teléfono"
+                />
               </Form.Item>
             </div>
             <Form.Item
@@ -216,7 +295,11 @@ const StoreForm = () => {
                 },
               ]}
             >
-              <Input type="url" inputMode="url" placeholder="https://maps.app.goo.gl/minegocio" />
+              <Input
+                type="url"
+                inputMode="url"
+                placeholder="https://maps.app.goo.gl/minegocio"
+              />
             </Form.Item>
           </CardRoot>
 
@@ -228,12 +311,17 @@ const StoreForm = () => {
                 className="w-full"
                 rules={[
                   {
-                    pattern: /^(https?:\/\/)?(www\.)?facebook.com\/[a-zA-Z0-9(\.\?)?]/,
+                    pattern:
+                      /^(https?:\/\/)?(www\.)?facebook.com\/[a-zA-Z0-9(\.\?)?]/,
                     message: 'Ingresa un link válido',
                   },
                 ]}
               >
-                <Input type="url" inputMode="url" placeholder="https://www.facebook.com/minegocio" />
+                <Input
+                  type="url"
+                  inputMode="url"
+                  placeholder="https://www.facebook.com/minegocio"
+                />
               </Form.Item>
               <Form.Item
                 label="Link de Instagram"
@@ -241,12 +329,17 @@ const StoreForm = () => {
                 className="w-full"
                 rules={[
                   {
-                    pattern: /^(https?:\/\/)?(www\.)?instagram.com\/[a-zA-Z0-9(\.\?)?]/,
+                    pattern:
+                      /^(https?:\/\/)?(www\.)?instagram.com\/[a-zA-Z0-9(\.\?)?]/,
                     message: 'Ingresa un link válido',
                   },
                 ]}
               >
-                <Input type="url" inputMode="url" placeholder="https://www.instagram.com/minegocio" />
+                <Input
+                  type="url"
+                  inputMode="url"
+                  placeholder="https://www.instagram.com/minegocio"
+                />
               </Form.Item>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-5">
@@ -254,12 +347,21 @@ const StoreForm = () => {
                 label="Número de WhatsApp"
                 name="whatsapp"
                 className="w-full"
-                rules={[{ pattern: /^[0-9]*$/, message: 'Solo se permiten números' }]}
+                rules={[
+                  { pattern: /^[0-9]*$/, message: 'Solo se permiten números' },
+                ]}
               >
-                <Input inputMode="tel" placeholder="Ingresa tu número de WhatsApp" />
+                <Input
+                  inputMode="tel"
+                  placeholder="Ingresa tu número de WhatsApp"
+                />
               </Form.Item>
               <ModuleAccess moduleName="orders_by_whatsapp">
-                <Form.Item label="Permitir pedidos a través de WhatsApp" name="allow_orders_by_whatsapp" className="w-full">
+                <Form.Item
+                  label="Permitir pedidos a través de WhatsApp"
+                  name="allow_orders_by_whatsapp"
+                  className="w-full"
+                >
                   <Switch />
                 </Form.Item>
               </ModuleAccess>
@@ -267,7 +369,11 @@ const StoreForm = () => {
           </CardRoot>
 
           <CardRoot title="Atención Al Cliente" className="mb-5">
-            <Checkbox.Group style={{ width: '100%' }} value={deliveryOptions} onChange={onChangeDeliveryType}>
+            <Checkbox.Group
+              style={{ width: '100%' }}
+              value={deliveryOptions}
+              onChange={onChangeDeliveryType}
+            >
               <Row>
                 <Col span={8}>
                   <Checkbox value="on_site">En sitio</Checkbox>
@@ -285,11 +391,17 @@ const StoreForm = () => {
           <CardRoot title="Horarios De Atención" className="mb-0">
             <div className="grid grid-cols-[1fr_1fr_2fr] border-b py-3 mb-5">
               <Typography.Paragraph className="!m-0">Día</Typography.Paragraph>
-              <Typography.Paragraph className="!m-0">Cerrado</Typography.Paragraph>
-              <Typography.Paragraph className="!m-0">Horario</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0">
+                Cerrado
+              </Typography.Paragraph>
+              <Typography.Paragraph className="!m-0">
+                Horario
+              </Typography.Paragraph>
             </div>
             <div className="grid grid-cols-[1fr_1fr_2fr] place-items-center gap-y-5">
-              <Typography.Paragraph className="!m-0 !w-full text-start">Lunes</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Lunes
+              </Typography.Paragraph>
               <FormItem name="monday_closed" className="!m-0 w-full ">
                 <Switch
                   className="mr-auto"
@@ -308,7 +420,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Martes</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Martes
+              </Typography.Paragraph>
               <FormItem name="tuesday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -327,7 +441,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Miércoles</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Miércoles
+              </Typography.Paragraph>
               <FormItem name="wednesday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -346,7 +462,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Jueves</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Jueves
+              </Typography.Paragraph>
               <FormItem name="thursday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -365,7 +483,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Viernes</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Viernes
+              </Typography.Paragraph>
               <FormItem name="friday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -384,7 +504,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Sábado</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Sábado
+              </Typography.Paragraph>
               <FormItem name="saturday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -403,7 +525,9 @@ const StoreForm = () => {
                 />
               </FormItem>
 
-              <Typography.Paragraph className="!m-0 !w-full text-start">Domingo</Typography.Paragraph>
+              <Typography.Paragraph className="!m-0 !w-full text-start">
+                Domingo
+              </Typography.Paragraph>
               <FormItem name="sunday_closed" className="!m-0 w-full">
                 <Switch
                   className="mr-auto"
@@ -428,8 +552,8 @@ const StoreForm = () => {
         {profile?.permissions?.online_store?.edit_online_store?.value && (
           <CardRoot title="Desactivar Tienda" className="mb-10">
             <Typography.Paragraph>
-              Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en línea. Puedes activarla nuevamente en cualquier
-              momento.
+              Si desactivas tu tienda, tus clientes no podrán ver tu catálogo en
+              línea. Puedes activarla nuevamente en cualquier momento.
             </Typography.Paragraph>
 
             <Button type="primary" danger onClick={inactiveStore}>
@@ -446,10 +570,19 @@ const StoreForm = () => {
           styles={{ body: { padding: '0px', height: '80px' } }}
         >
           <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full  px-4 lg:px-0">
-            <Button className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
+            <Button
+              className="w-full md:w-40"
+              onClick={() => navigate(-1)}
+              loading={loading}
+            >
               Cancelar
             </Button>
-            <Button type="primary" className="w-full md:w-40" onClick={onSubmit} loading={loading}>
+            <Button
+              type="primary"
+              className="w-full md:w-40"
+              onClick={onSubmit}
+              loading={loading}
+            >
               Guardar
             </Button>
           </div>
