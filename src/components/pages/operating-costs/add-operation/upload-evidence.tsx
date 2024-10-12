@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { CloseCircleOutlined, FileImageOutlined } from '@ant-design/icons';
-import { App, GetProp, Image, message, Upload as UploadAnt } from 'antd';
+import { App, Image, Upload as UploadAnt } from 'antd';
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useAppSelector } from '@/hooks/useStore';
 import { getBase64, beforeUpload } from '@/utils/images';
 
 type UploadPropsType = {
@@ -14,10 +14,16 @@ type UploadPropsType = {
   deleteFunction?: (uid: string) => void;
 };
 
-const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, deleteFunction }) => {
+const UploadEvidence: React.FC<UploadPropsType> = ({
+  setFileList,
+  fileList,
+  deleteFunction,
+}) => {
   const { modal } = App.useApp();
   const [previewOpen, setPreviewOpen] = useState(false);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { permissions } = useAppSelector(
+    ({ users }) => users.user_auth.profile!,
+  );
   const [previewImage, setPreviewImage] = useState('');
 
   const handlePreview = async (file: UploadFile) => {
@@ -29,18 +35,27 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
     setPreviewOpen(true);
   };
 
-  const handleChange: UploadProps['onChange'] = ({ fileList: changeFileList, file }) => {
+  const handleChange: UploadProps['onChange'] = ({
+    fileList: changeFileList,
+    file,
+  }) => {
     if (!permissions?.expenses?.upload_evidence?.value) {
       return null;
     }
 
-    if (!!changeFileList[0] && !beforeUpload(changeFileList[0]?.originFileObj as RcFile)) {
+    if (
+      !!changeFileList[0] &&
+      !beforeUpload(changeFileList[0]?.originFileObj as RcFile)
+    ) {
       setFileList([]);
       return null;
     }
 
     if (changeFileList.length) {
-      let newFileList = changeFileList?.map(item => ({ ...item, status: 'done' } as UploadFile)) ?? [];
+      let newFileList =
+        changeFileList?.map(
+          (item) => ({ ...item, status: 'done' }) as UploadFile,
+        ) ?? [];
       setFileList(newFileList);
       return;
     }
@@ -90,8 +105,8 @@ const UploadEvidence: React.FC<UploadPropsType> = ({ setFileList, fileList, dele
             wrapperStyle={{ display: 'none' }}
             preview={{
               visible: previewOpen,
-              onVisibleChange: visible => setPreviewOpen(visible),
-              afterOpenChange: visible => {
+              onVisibleChange: (visible) => setPreviewOpen(visible),
+              afterOpenChange: (visible) => {
                 if (!permissions?.products?.update_image?.value) return;
                 if (!visible) setPreviewImage('');
               },

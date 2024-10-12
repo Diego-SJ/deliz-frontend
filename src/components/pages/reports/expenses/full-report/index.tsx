@@ -42,7 +42,7 @@ const ExpensesFullReport = () => {
   }, [firstRender]);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   const handleStacked = () => {
@@ -76,7 +76,7 @@ const ExpensesFullReport = () => {
               type="primary"
               className="w-fit sm:hidden"
               icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-              onClick={handlePrint}
+              onClick={() => handlePrint()}
             >
               Imprimir
             </Button>
@@ -89,7 +89,7 @@ const ExpensesFullReport = () => {
             type="primary"
             className="w-fit hidden sm:inline-flex"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             Imprimir
           </Button>

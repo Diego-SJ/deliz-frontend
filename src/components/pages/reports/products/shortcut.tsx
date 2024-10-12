@@ -15,7 +15,7 @@ const TopProductsThumbnail = () => {
   const { loading, top_products } = useAppSelector(
     ({ analytics }) => analytics?.products || {},
   );
-  const elementRef = useRef<any>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
   const firstLoad = useRef(false);
   const profile = user_auth?.profile;
 
@@ -37,7 +37,7 @@ const TopProductsThumbnail = () => {
   }, [entry, firstLoad.current, dispatch]);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   return (
@@ -48,7 +48,7 @@ const TopProductsThumbnail = () => {
       }
       extra={
         <Button
-          onClick={handlePrint}
+          onClick={() => handlePrint()}
           icon={<CloudDownload className="w-4 h-4" />}
         />
       }

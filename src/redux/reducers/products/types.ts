@@ -47,10 +47,6 @@ export type Product = {
   raw_price?: number;
   inventory?: Inventory;
   price_list?: PriceList;
-
-  // stock: number; deprecated
-  // retail_price: number; deprecated
-  // wholesale_price: number; deprecated
 };
 
 export type Inventory = {

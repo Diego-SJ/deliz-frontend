@@ -5,10 +5,12 @@ import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import {
   AppstoreOutlined,
+  DownloadOutlined,
   FileImageOutlined,
   FilterOutlined,
   PlusCircleOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import {
   Avatar,
@@ -30,6 +32,8 @@ import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import { productHelpers } from '@/utils/products';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import { Settings2 } from 'lucide-react';
+import CreateProductsByCsv from './upload-csv';
 
 type DataType = Product;
 
@@ -114,6 +118,7 @@ const Products = () => {
   const [options, setOptions] = useState<Product[]>([]);
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -176,6 +181,12 @@ const Products = () => {
   const onOrderChange = async (key: string) => {
     await dispatch(productActions.setProductFilters({ order_by: key }));
     await onRefresh();
+  };
+
+  const handleMoreOptions = async (key: string) => {
+    if (key === 'upload_products') {
+      setOpenModal(true);
+    }
   };
 
   return (
@@ -289,8 +300,31 @@ const Products = () => {
                 </Button>
               </Dropdown>
             </Col>
+            <Col lg={4} xs={12}>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      label: 'Cargar plantilla para crear productos',
+                      key: 'upload_products',
+                      icon: <UploadOutlined />,
+                    },
+                  ],
+                  selectable: true,
+                  onClick: async ({ key }) => handleMoreOptions(key),
+                }}
+              >
+                <Button
+                  block
+                  size={isTablet ? 'large' : 'middle'}
+                  icon={<Settings2 className="text-base w-4" />}
+                >
+                  Más opciones
+                </Button>
+              </Dropdown>
+            </Col>
             {permissions?.products?.add_product?.value && (
-              <Col lg={{ span: 4, offset: 6 }} xs={{ offset: 0, span: 12 }}>
+              <Col lg={{ span: 4, offset: 2 }} xs={{ offset: 0, span: 12 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}
                   block
@@ -399,7 +433,10 @@ const Products = () => {
           )}
         </Col>
       </Row>
-
+      <CreateProductsByCsv
+        visible={openModal}
+        onClose={() => setOpenModal(false)}
+      />
       {isTablet && <BottomMenu addBottomMargin />}
     </div>
   );

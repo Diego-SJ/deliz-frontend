@@ -20,7 +20,7 @@ const ReportSaleThumbnail = () => {
   const elementRef = useRef<any>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   const onActionClick = () => {
@@ -43,7 +43,7 @@ const ReportSaleThumbnail = () => {
             </Tooltip>
           ) : null}
           <Button
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             icon={<CloudDownload className="w-4 h-4" />}
           />
         </div>

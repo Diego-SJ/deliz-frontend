@@ -1,6 +1,13 @@
 import CardRoot from '@/components/atoms/Card';
 import SaleInsight from '@/components/organisms/SaleReports/sale-insight';
-import { ArrowLeft, CircleDollarSign, Printer, ShoppingCart, PiggyBank, Clock9 } from 'lucide-react';
+import {
+  ArrowLeft,
+  CircleDollarSign,
+  Printer,
+  ShoppingCart,
+  PiggyBank,
+  Clock9,
+} from 'lucide-react';
 import { Button, Col, Row, Typography } from 'antd';
 import SalesReportFilters from './filters';
 import { useNavigate } from 'react-router-dom';
@@ -18,8 +25,12 @@ import { analyticsActions } from '@/redux/reducers/analytics';
 const SalesReports = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { total_sales_amount_chart_data, last_sales } = useAppSelector(({ analytics }) => analytics.sales);
-  const { sales_summary, total_sales_chart_data, filters } = useAppSelector(({ analytics }) => analytics.sales);
+  const { total_sales_amount_chart_data, last_sales } = useAppSelector(
+    ({ analytics }) => analytics.sales,
+  );
+  const { sales_summary, total_sales_chart_data, filters } = useAppSelector(
+    ({ analytics }) => analytics.sales,
+  );
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
 
@@ -33,7 +44,7 @@ const SalesReports = () => {
   }, [firstRender]);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   return (
@@ -54,7 +65,7 @@ const SalesReports = () => {
             type="primary"
             className="w-fit sm:hidden"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             Imprimir
           </Button>
@@ -65,7 +76,7 @@ const SalesReports = () => {
             type="primary"
             className="w-fit hidden sm:inline-flex"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             Imprimir
           </Button>
@@ -83,7 +94,9 @@ const SalesReports = () => {
           <SaleInsight
             icon={<CircleDollarSign className="text-indigo-600" />}
             title="$ ventas completadas"
-            value={numeral(sales_summary?.completed_sales_amount).format('$0,0.00')}
+            value={numeral(sales_summary?.completed_sales_amount).format(
+              '$0,0.00',
+            )}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
@@ -97,20 +110,28 @@ const SalesReports = () => {
           <SaleInsight
             icon={<PiggyBank className="text-indigo-600" />}
             title="$ ventas pendientes"
-            value={numeral(sales_summary?.pending_sales_amount).format('$0,0.00')}
+            value={numeral(sales_summary?.pending_sales_amount).format(
+              '$0,0.00',
+            )}
           />
         </Col>
         <Col xs={24} md={12} lg={12}>
           <CardRoot classNames={{ body: '!px-2' }} title="Ventas">
             <div className="h-[390px] w-full">
-              <CompletedSalesChart data={total_sales_chart_data || []} range={filters?.date_range} />
+              <CompletedSalesChart
+                data={total_sales_chart_data || []}
+                range={filters?.date_range}
+              />
             </div>
           </CardRoot>
         </Col>
         <Col xs={24} md={12} lg={12}>
           <CardRoot classNames={{ body: '!px-2' }} title="Monto de las ventas">
             <div className="h-[390px] w-full">
-              <PendingSalesChart range={filters?.date_range} data={total_sales_amount_chart_data || []} />
+              <PendingSalesChart
+                range={filters?.date_range}
+                data={total_sales_amount_chart_data || []}
+              />
             </div>
           </CardRoot>
         </Col>

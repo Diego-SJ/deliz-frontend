@@ -52,8 +52,12 @@ const ProductEditor = () => {
   let { action = 'add', product_id } = useParams<Params>();
   const [loading, setLoading] = useState(false);
   const { hasAccess } = useMembershipAccess();
-  const { current_product, sizes, units, categories } = useAppSelector(({ products }) => products);
-  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { current_product, sizes, units, categories } = useAppSelector(
+    ({ products }) => products,
+  );
+  const { permissions } = useAppSelector(
+    ({ users }) => users.user_auth.profile!,
+  );
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const firstRender = useRef<boolean>(false);
   const [inventory, setInventory] = useState<Inventory>({});
@@ -61,6 +65,20 @@ const ProductEditor = () => {
   const [openBarCode, setOpenBarCode] = useState(false);
   const [barCode, setBarCode] = useState<string | undefined>(undefined);
   const { modal } = App.useApp();
+  const mounted = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+
+      if (!categories?.length)
+        dispatch(productActions.fetchCategories({ refetch: true }));
+      if (!units?.data?.length)
+        dispatch(productActions.units.get({ refetch: true }));
+      if (!sizes?.data?.length)
+        dispatch(productActions.sizes.get({ refetch: true }));
+    }
+  }, [dispatch, categories, units?.data, sizes?.data, mounted]);
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -78,8 +96,14 @@ const ProductEditor = () => {
     if (!!current_product?.image_url) {
       setFileList([
         {
-          uid: current_product.image_url.replace(BUCKETS.PRODUCTS.IMAGES_PATH, ''),
-          name: current_product.image_url.replace(BUCKETS.PRODUCTS.IMAGES_PATH, ''),
+          uid: current_product.image_url.replace(
+            BUCKETS.PRODUCTS.IMAGES_PATH,
+            '',
+          ),
+          name: current_product.image_url.replace(
+            BUCKETS.PRODUCTS.IMAGES_PATH,
+            '',
+          ),
           status: 'done',
           url: current_product.image_url,
         },
@@ -94,7 +118,10 @@ const ProductEditor = () => {
       setInventory(current_product?.inventory ?? {});
       setPriceList(current_product?.price_list ?? {});
       setBarCode(current_product?.code);
-      form.setFieldsValue({ ...current_product, status: current_product?.status ?? 1 });
+      form.setFieldsValue({
+        ...current_product,
+        status: current_product?.status ?? 1,
+      });
     }
   }, [current_product]);
 
@@ -119,7 +146,9 @@ const ProductEditor = () => {
   const saveNewProduct = async (values: Product) => {
     let image_url: string | null = await saveImage();
 
-    const success = await dispatch(productActions.saveProduct({ ...values, image_url }));
+    const success = await dispatch(
+      productActions.saveProduct({ ...values, image_url }),
+    );
     if (success) clearFields();
   };
 
@@ -132,12 +161,22 @@ const ProductEditor = () => {
   const onFinish = async () => {
     form
       .validateFields()
-      .then(async values => {
+      .then(async (values) => {
         setLoading(true);
-        let product = { ...values, inventory, price_list: priceList, code: barCode };
+        let product = {
+          ...values,
+          inventory,
+          price_list: priceList,
+          code: barCode,
+        };
 
-        if (action === 'add' && !!permissions?.products?.add_product?.value) await saveNewProduct(product);
-        else if (action === 'edit' && !!permissions?.products?.edit_product?.value) await saveEditionProduct(product);
+        if (action === 'add' && !!permissions?.products?.add_product?.value)
+          await saveNewProduct(product);
+        else if (
+          action === 'edit' &&
+          !!permissions?.products?.edit_product?.value
+        )
+          await saveEditionProduct(product);
 
         setLoading(false);
       })
@@ -148,7 +187,9 @@ const ProductEditor = () => {
 
   const confirmDelete = async () => {
     setLoading(true);
-    const success = await dispatch(productActions.deleteProduct(current_product));
+    const success = await dispatch(
+      productActions.deleteProduct(current_product),
+    );
     if (success) {
       clearFields();
       navigate(-1);
@@ -165,11 +206,19 @@ const ProductEditor = () => {
               <Breadcrumb
                 items={[
                   {
-                    title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>{APP_ROUTES.PRIVATE.HOME.title}</Link>,
+                    title: (
+                      <Link to={APP_ROUTES.PRIVATE.HOME.path}>
+                        {APP_ROUTES.PRIVATE.HOME.title}
+                      </Link>
+                    ),
                     key: 'dashboard',
                   },
                   {
-                    title: <Link to={APP_ROUTES.PRIVATE.PRODUCTS.path}>{APP_ROUTES.PRIVATE.PRODUCTS.title}</Link>,
+                    title: (
+                      <Link to={APP_ROUTES.PRIVATE.PRODUCTS.path}>
+                        {APP_ROUTES.PRIVATE.PRODUCTS.title}
+                      </Link>
+                    ),
                     key: 'products',
                   },
                   {
@@ -181,9 +230,15 @@ const ProductEditor = () => {
           </Row>
 
           <div className="flex gap-4  w-full mb-4">
-            <Button icon={<ArrowLeftOutlined />} shape="circle" onClick={() => navigate(-1)} />
+            <Button
+              icon={<ArrowLeftOutlined />}
+              shape="circle"
+              onClick={() => navigate(-1)}
+            />
             <Typography.Title level={4} className="m-0">
-              {!!product_id && product_id !== 'new' ? 'Editar producto' : 'Agregar producto'}
+              {!!product_id && product_id !== 'new'
+                ? 'Editar producto'
+                : 'Agregar producto'}
             </Typography.Title>
           </div>
 
@@ -193,7 +248,10 @@ const ProductEditor = () => {
             layout="vertical"
             requiredMark={false}
             onFinish={onFinish}
-            initialValues={{ ...current_product, status: current_product?.status ?? 1 }}
+            initialValues={{
+              ...current_product,
+              status: current_product?.status ?? 1,
+            }}
             validateMessages={{
               required: '${label} es obligatorio.',
               types: {
@@ -210,7 +268,11 @@ const ProductEditor = () => {
                   <Form.Item name="product_id" hidden>
                     <Input size="large" />
                   </Form.Item>
-                  <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
+                  <Form.Item
+                    name="name"
+                    label="Nombre"
+                    rules={[{ required: true }]}
+                  >
                     <Input size="large" placeholder="E.g: Helado de nuez" />
                   </Form.Item>
 
@@ -218,10 +280,10 @@ const ProductEditor = () => {
                     <Select
                       size="large"
                       placeholder="Selecciona o crea una nueva categoría"
-                      dropdownRender={menu => (
+                      dropdownRender={(menu) => (
                         <>
                           <QuickCategoryCreationForm
-                            onSuccess={category_id => {
+                            onSuccess={(category_id) => {
                               form.setFieldsValue({ category_id });
                             }}
                           />
@@ -233,11 +295,15 @@ const ProductEditor = () => {
                       showSearch
                       optionFilterProp="children"
                       virtual={false}
-                      onClick={() => {
-                        if (!categories?.length) dispatch(productActions.fetchCategories({ refetch: true }));
-                      }}
-                      filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                      options={categories?.map(i => ({ value: i.category_id, label: i.name }))}
+                      filterOption={(input, option) =>
+                        (option?.label ?? '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      options={categories?.map((i) => ({
+                        value: i.category_id,
+                        label: i.name,
+                      }))}
                     />
                   </Form.Item>
                   <div className="flex gap-4">
@@ -245,7 +311,7 @@ const ProductEditor = () => {
                       <BarcodeScanner
                         paused={!openBarCode}
                         onCancel={() => setOpenBarCode(false)}
-                        onScan={value => {
+                        onScan={(value) => {
                           form.setFieldsValue({ code: value[0].rawValue });
                           setBarCode(value[0].rawValue);
                           setOpenBarCode(false);
@@ -260,8 +326,16 @@ const ProductEditor = () => {
                         tooltip="Escanea el código de barras del producto"
                       >
                         <Space.Compact style={{ width: '100%' }}>
-                          <Input size="large" placeholder="Opcional" value={barCode as string} />
-                          <Button size="large" icon={<BarcodeOutlined />} onClick={() => setOpenBarCode(true)} />
+                          <Input
+                            size="large"
+                            placeholder="Opcional"
+                            value={barCode as string}
+                          />
+                          <Button
+                            size="large"
+                            icon={<BarcodeOutlined />}
+                            onClick={() => setOpenBarCode(true)}
+                          />
                         </Space.Compact>
                       </Form.Item>
                     </ModuleAccess>
@@ -271,7 +345,11 @@ const ProductEditor = () => {
                   </div>
                   <ModuleAccess moduleName="show_in_catalog">
                     {permissions?.products?.show_in_catalog?.value && (
-                      <Form.Item name="show_in_catalog" label="Mostrar en el catálogo en línea" className="mb-0 w-full">
+                      <Form.Item
+                        name="show_in_catalog"
+                        label="Mostrar en el catálogo en línea"
+                        className="mb-0 w-full"
+                      >
                         <Switch />
                       </Form.Item>
                     )}
@@ -280,7 +358,11 @@ const ProductEditor = () => {
               </Col>
               <ModuleAccess moduleName="update_image">
                 <Col md={12} xs={24}>
-                  <CardRoot title="Imágen" className="h-full" styles={{ body: { height: '100%' } }}>
+                  <CardRoot
+                    title="Imágen"
+                    className="h-full"
+                    styles={{ body: { height: '100%' } }}
+                  >
                     <div className="flex justify-center items-center">
                       <Form.Item name="image_url" className="mb-0">
                         <Upload setFileList={setFileList} fileList={fileList} />
@@ -299,10 +381,10 @@ const ProductEditor = () => {
                         size="large"
                         placeholder="Unidad de venta"
                         virtual={false}
-                        onClick={() => {
-                          if (!units?.data?.length) dispatch(productActions.units.get({ refetch: true }));
-                        }}
-                        options={units?.data?.map(size => ({ value: size.unit_id, label: size?.name }))}
+                        options={units?.data?.map((size) => ({
+                          value: size.unit_id,
+                          label: size?.name,
+                        }))}
                       />
                     </Form.Item>
                     <Form.Item name="size_id" label="Tamaño" className="w-full">
@@ -310,16 +392,24 @@ const ProductEditor = () => {
                         size="large"
                         placeholder="Grande"
                         virtual={false}
-                        onClick={() => {
-                          if (!sizes?.data?.length) dispatch(productActions.sizes.get({ refetch: true }));
-                        }}
-                        options={sizes?.data?.map(size => ({ value: size.size_id, label: size?.short_name }))}
+                        options={sizes?.data?.map((size) => ({
+                          value: size.size_id,
+                          label: size?.short_name,
+                        }))}
                       />
                     </Form.Item>
                   </div>
 
-                  <Form.Item name="description" label="Descripción" className="mb-0">
-                    <TextArea size="large" rows={2} placeholder="E.g: Helado de nuez" />
+                  <Form.Item
+                    name="description"
+                    label="Descripción"
+                    className="mb-0"
+                  >
+                    <TextArea
+                      size="large"
+                      rows={2}
+                      placeholder="E.g: Helado de nuez"
+                    />
                   </Form.Item>
                 </CardRoot>
               </Col>
@@ -327,66 +417,86 @@ const ProductEditor = () => {
 
             <Row gutter={[20, 20]} className="mb-5">
               <Col span={24}>
-                <ExistencesTable setInventory={setInventory} inventory={inventory} />
+                <ExistencesTable
+                  setInventory={setInventory}
+                  inventory={inventory}
+                />
               </Col>
             </Row>
 
             {permissions?.products?.edit_product?.value && (
               <Row gutter={[20, 20]}>
                 <Col span={24}>
-                  <PricesTable setPriceList={setPriceList} priceList={priceList} />
+                  <PricesTable
+                    setPriceList={setPriceList}
+                    priceList={priceList}
+                  />
                 </Col>
               </Row>
             )}
           </Form>
 
-          {action === 'edit' && permissions?.products?.delete_product?.value && (
-            <CardRoot title="Eliminar producto" className="my-5">
-              <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
-                <Typography.Text type="danger">
-                  Una vez eliminado el producto, no se podrá recuperar la información.
-                </Typography.Text>
-                <Button
-                  ghost
-                  danger
-                  size="large"
-                  className="w-full md:max-w-40"
-                  onClick={() => {
-                    modal.confirm({
-                      title: 'Eliminar producto',
-                      type: 'error',
-                      okText: 'Eliminar',
-                      onOk: confirmDelete,
-                      okType: 'danger',
-                      cancelText: 'Cancelar',
-                      content: '¿Confirma que deseas eliminar el producto?',
-                      footer: (_, { OkBtn, CancelBtn }) => (
-                        <>
-                          <CancelBtn />
-                          <OkBtn />
-                        </>
-                      ),
-                    });
-                  }}
-                >
-                  Eliminar
-                </Button>
-              </div>
-            </CardRoot>
-          )}
+          {action === 'edit' &&
+            permissions?.products?.delete_product?.value && (
+              <CardRoot title="Eliminar producto" className="my-5">
+                <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between items-center">
+                  <Typography.Text type="danger">
+                    Una vez eliminado el producto, no se podrá recuperar la
+                    información.
+                  </Typography.Text>
+                  <Button
+                    ghost
+                    danger
+                    size="large"
+                    className="w-full md:max-w-40"
+                    onClick={() => {
+                      modal.confirm({
+                        title: 'Eliminar producto',
+                        type: 'error',
+                        okText: 'Eliminar',
+                        onOk: confirmDelete,
+                        okType: 'danger',
+                        cancelText: 'Cancelar',
+                        content: '¿Confirma que deseas eliminar el producto?',
+                        footer: (_, { OkBtn, CancelBtn }) => (
+                          <>
+                            <CancelBtn />
+                            <OkBtn />
+                          </>
+                        ),
+                      });
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </CardRoot>
+            )}
         </div>
       </div>
-      {(!!permissions?.products?.add_product?.value || !!permissions?.products?.edit_product?.value) && (
+      {(!!permissions?.products?.add_product?.value ||
+        !!permissions?.products?.edit_product?.value) && (
         <Card
           className="rounded-none box-border absolute bottom-0 left-0 w-full"
           classNames={{ body: 'w-full flex items-center' }}
           styles={{ body: { padding: '0px', height: '80px' } }}
         >
           <div className="flex justify-end gap-6 max-w-[700px] mx-auto w-full px-4 lg:px-0">
-            <Button size="large" className="w-full md:w-40" onClick={() => navigate(-1)} loading={loading}>
+            <Button
+              size="large"
+              className="w-full md:w-40"
+              onClick={() => navigate(-1)}
+              loading={loading}
+            >
               Cancelar
             </Button>
-            <Button type="primary" size="large" className="w-full md:w-40" onClick={onFinish} loading={loading}>
+            <Button
+              type="primary"
+              size="large"
+              className="w-full md:w-40"
+              onClick={onFinish}
+              loading={loading}
+            >
               {UI_TEXTS.saveBtn[action]}
             </Button>
           </div>

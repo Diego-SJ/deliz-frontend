@@ -1,4 +1,11 @@
-import { ArrowLeft, Printer, ChartLine, ChartColumnBig, Layers2, Layers } from 'lucide-react';
+import {
+  ArrowLeft,
+  Printer,
+  ChartLine,
+  ChartColumnBig,
+  Layers2,
+  Layers,
+} from 'lucide-react';
 import { Button, Col, Row, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -14,7 +21,9 @@ import ProfitsByRange from './profits-by-range';
 const ProfitReport = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { filters, data } = useAppSelector(({ analytics }) => analytics?.profit);
+  const { filters, data } = useAppSelector(
+    ({ analytics }) => analytics?.profit,
+  );
   const [stacked, setStacked] = useState(false);
   const [chartStyle, setChartStyle] = useState<'linear' | 'step'>('linear');
   const elementRef = useRef<any>(null);
@@ -28,15 +37,15 @@ const ProfitReport = () => {
   }, [firstRender]);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   const handleStacked = () => {
-    setStacked(prev => !prev);
+    setStacked((prev) => !prev);
   };
 
   const handleChartStyle = () => {
-    setChartStyle(prev => (prev === 'linear' ? 'step' : 'linear'));
+    setChartStyle((prev) => (prev === 'linear' ? 'step' : 'linear'));
   };
 
   return (
@@ -57,7 +66,7 @@ const ProfitReport = () => {
             type="primary"
             className="w-fit sm:hidden"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             Imprimir
           </Button>
@@ -67,7 +76,7 @@ const ProfitReport = () => {
             type="primary"
             className="w-fit hidden sm:inline-flex"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             Imprimir
           </Button>
@@ -88,21 +97,38 @@ const ProfitReport = () => {
                 <Tooltip title={'Cambiar estilo de gráfico'}>
                   <Button
                     onClick={handleChartStyle}
-                    icon={chartStyle === 'linear' ? <ChartColumnBig className="w-4 h-4" /> : <ChartLine className="w-4 h-4" />}
+                    icon={
+                      chartStyle === 'linear' ? (
+                        <ChartColumnBig className="w-4 h-4" />
+                      ) : (
+                        <ChartLine className="w-4 h-4" />
+                      )
+                    }
                   />
                 </Tooltip>
 
                 <Tooltip title={stacked ? 'Sin apilar' : 'Apilar'}>
                   <Button
                     onClick={handleStacked}
-                    icon={stacked ? <Layers2 className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+                    icon={
+                      stacked ? (
+                        <Layers2 className="w-4 h-4" />
+                      ) : (
+                        <Layers className="w-4 h-4" />
+                      )
+                    }
                   />
                 </Tooltip>
               </div>
             }
           >
             <div className="h-[390px] w-full">
-              <LineChartProfit data={data || []} range={filters?.date_range} stacked={stacked} chartStyle={chartStyle} />
+              <LineChartProfit
+                data={data || []}
+                range={filters?.date_range}
+                stacked={stacked}
+                chartStyle={chartStyle}
+              />
             </div>
           </CardRoot>
         </Col>

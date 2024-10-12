@@ -13,18 +13,24 @@ import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
 const getTotalAmountSales = (data: LineChartData) =>
-  data.reduce((acc, series) => acc + series.data.reduce((sum, point) => sum + point.total, 0), 0);
+  data.reduce(
+    (acc, series) =>
+      acc + series.data.reduce((sum, point) => sum + point.total, 0),
+    0,
+  );
 
 const ReportMarginShortcut = () => {
   const navigate = useNavigate();
   const { hasAccess } = useMembershipAccess();
   const { user_auth } = useAppSelector(({ users }) => users);
-  const { loading, data } = useAppSelector(({ analytics }) => analytics?.sales || {});
+  const { loading, data } = useAppSelector(
+    ({ analytics }) => analytics?.sales || {},
+  );
   const totalAmountSales = getTotalAmountSales(data) || 0;
   const elementRef = useRef<any>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   const onActionClick = () => {
@@ -34,15 +40,24 @@ const ReportMarginShortcut = () => {
   return (
     <CardRoot
       loading={loading}
-      title={<h5 className="!text-base m-0 font-medium">Monto total de ventas</h5>}
+      title={
+        <h5 className="!text-base m-0 font-medium">Monto total de ventas</h5>
+      }
       extra={
         <div className="flex gap-3">
-          {user_auth?.profile?.permissions?.reports?.view_sales_report?.value && hasAccess('view_sales_report') ? (
+          {user_auth?.profile?.permissions?.reports?.view_sales_report?.value &&
+          hasAccess('view_sales_report') ? (
             <Tooltip title="Ver reporte completo">
-              <Button onClick={onActionClick} icon={<SquareChartGantt className="w-4 h-4" />} />
+              <Button
+                onClick={onActionClick}
+                icon={<SquareChartGantt className="w-4 h-4" />}
+              />
             </Tooltip>
           ) : null}
-          <Button onClick={handlePrint} icon={<CloudDownload className="w-4 h-4" />} />
+          <Button
+            onClick={() => handlePrint()}
+            icon={<CloudDownload className="w-4 h-4" />}
+          />
         </div>
       }
       classNames={{ body: '!px-4 !pt-2' }}
@@ -55,7 +70,9 @@ const ReportMarginShortcut = () => {
                 {functions.money(totalAmountSales)}
               </Typography.Title>
 
-              <Typography.Text className="!text-sm mt-2">{formattedDateRange}</Typography.Text>
+              <Typography.Text className="!text-sm mt-2">
+                {formattedDateRange}
+              </Typography.Text>
             </div>
             <div className="h-64 md:h-80 w-full mt-5">
               <LineChartMargin data={data} />

@@ -47,7 +47,7 @@ const ExpensesShortcutReport = () => {
   }, [entry, firstLoad.current, dispatch]);
 
   const handlePrint = useReactToPrint({
-    content: () => elementRef.current,
+    contentRef: elementRef,
   });
 
   const onActionClick = () => {
@@ -74,7 +74,7 @@ const ExpensesShortcutReport = () => {
             </Tooltip>
           ) : null}
           <Button
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             icon={<CloudDownload className="w-4 h-4" />}
           />
           <Button
