@@ -17,7 +17,7 @@ export const useCheckForUpdates = () => {
     if (error) {
       return;
     }
-    if (data && data.version !== APP_VERSION + 'erf') {
+    if (data && data.version !== APP_VERSION) {
       setSuscriberData(data);
       message.loading(
         '¡Nueva versión disponible! La página se actualizará automáticamente en unos segundos',
