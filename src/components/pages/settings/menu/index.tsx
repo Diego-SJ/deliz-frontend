@@ -1,4 +1,6 @@
 import { ROLES } from '@/constants/roles';
+import { APP_VERSION } from '@/constants/versions';
+import { useCheckForUpdates } from '@/hooks/useCheckForUpdates';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { userActions } from '@/redux/reducers/users';
 import { APP_ROUTES } from '@/routes/routes';
@@ -11,7 +13,7 @@ import {
   LineHeightOutlined,
   LogoutOutlined,
   ProductOutlined,
-  SettingOutlined,
+  ShopOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import { App, Button, Card, Menu } from 'antd';
@@ -26,6 +28,7 @@ const SettingsMenu = () => {
   const { permissions, role } = useAppSelector(
     ({ users }) => users.user_auth.profile!,
   );
+  const { checkForUpdates } = useCheckForUpdates();
   const isAdmin = role === ROLES.ADMIN;
 
   const handleRoute = (path: string) => {
@@ -53,10 +56,10 @@ const SettingsMenu = () => {
         items={[
           {
             key: 1,
-            icon: createElement(SettingOutlined, {
+            icon: createElement(ShopOutlined, {
               className: 'max-md:!text-lg',
             }),
-            label: 'General',
+            label: 'Mi negocio',
             onClick: () =>
               handleRoute(APP_ROUTES.PRIVATE.SETTINGS.path + '/general'),
           },
@@ -140,7 +143,7 @@ const SettingsMenu = () => {
         ].filter(Boolean)}
       />
 
-      <Card className="block md:hidden mt-10">
+      <Card className="block md:hidden mt-5">
         <Button
           danger
           type="primary"
@@ -151,6 +154,19 @@ const SettingsMenu = () => {
         >
           Cerrar sesión
         </Button>
+      </Card>
+
+      <Card className="block md:hidden mt-5">
+        <div className="flex justify-between">
+          <span>Versión {APP_VERSION}</span>
+
+          <button
+            className="m-0 text-primary"
+            onClick={() => checkForUpdates()}
+          >
+            Verificar actualizaciones
+          </button>
+        </div>
       </Card>
     </div>
   );

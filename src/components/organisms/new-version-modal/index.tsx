@@ -5,7 +5,7 @@ import { Button, Modal, Tag } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import UfoWebp from '@/assets/webp/ufo.webp';
 
-type SuscriberData = {
+export type SuscriberData = {
   id: number;
   created_at: string;
   title: string;
@@ -24,7 +24,11 @@ const NewVersionModal = () => {
     if (authenticated && !mounted.current) {
       mounted.current = true;
       (async () => {
-        let { data, error } = await supabase.from('notifications').select('*').eq('active', true).single();
+        let { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('active', true)
+          .single();
         if (error) {
           return;
         }
@@ -36,16 +40,30 @@ const NewVersionModal = () => {
   }, [authenticated, mounted]);
 
   return (
-    <Modal open={!!suscriberData} footer={null} classNames={{ body: '!pb-8' }} closeIcon={null}>
+    <Modal
+      open={!!suscriberData}
+      footer={null}
+      classNames={{ body: '!pb-8' }}
+      closeIcon={null}
+    >
       <div className="flex flex-col items-center">
         <img src={UfoWebp} alt="ufo" className="w-48" />
-        <h2 className="text-2xl font-bold text-center mt-4">¡Nueva versión disponible!</h2>
-        <p className="text-center mt-2">Actualiza la página para disfrutar de las nuevas funcionalidades</p>
+        <h2 className="text-2xl font-bold text-center mt-4">
+          ¡Nueva versión disponible!
+        </h2>
+        <p className="text-center mt-2">
+          Actualiza la página para disfrutar de las nuevas funcionalidades
+        </p>
         <div className="flex flex-col justify-center items-center gap-3 my-5">
           <Tag>Versión actual: {APP_VERSION}</Tag>
           <Tag>Nueva versión: {suscriberData?.version || 'x.x.x-xx'}</Tag>
         </div>
-        <Button type="primary" size="large" onClick={() => window.location.reload()} className="mt-4">
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => window.location.reload()}
+          className="mt-4"
+        >
           ¡Actualizar ahora!
         </Button>
       </div>
