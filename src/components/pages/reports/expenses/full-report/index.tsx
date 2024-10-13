@@ -8,7 +8,7 @@ import {
   Printer,
   Shuffle,
 } from 'lucide-react';
-import { Button, Col, Row, Tooltip, Typography } from 'antd';
+import { Button, Col, Row, Space, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -20,6 +20,7 @@ import { analyticsActions } from '@/redux/reducers/analytics';
 import ProfitsByRange from './profits-by-range';
 import ProfitReportFilters from '@/components/pages/reports/expenses/full-report/filters';
 import ExpensesPieChart from '@/components/pages/reports/expenses/shortcut/chart';
+import EyeButton, { useHideData } from '@/components/atoms/eye-button';
 
 const ExpensesFullReport = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const ExpensesFullReport = () => {
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
   const [sortByValue, setSortByValue] = useState(false);
+  const { handleHideData, hideData } = useHideData();
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -71,34 +73,31 @@ const ExpensesFullReport = () => {
               Reporte de gastos
             </Typography.Title>
           </div>
-          <div className="flex items-center gap-5">
+        </div>
+
+        <div className="flex flex-row sm:items-center gap-3 print:hidden">
+          <ProfitReportFilters />
+          <Space.Compact>
             <Button
               type="primary"
-              className="w-fit sm:hidden"
+              className="w-fit "
               icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
               onClick={() => handlePrint()}
             >
               Imprimir
             </Button>
-          </div>
-        </div>
-
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 print:hidden">
-          <ProfitReportFilters />
-          <Button
-            type="primary"
-            className="w-fit hidden sm:inline-flex"
-            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={() => handlePrint()}
-          >
-            Imprimir
-          </Button>
+            <EyeButton
+              type="primary"
+              onChange={handleHideData}
+              hideData={hideData}
+            />
+          </Space.Compact>
         </div>
       </div>
 
       <Row gutter={[20, 20]}>
         <Col xs={24}>
-          <ProfitsByRange />
+          <ProfitsByRange discrete={hideData} />
         </Col>
         <Col xs={24} md={24} lg={24} xl={12}>
           <CardRoot

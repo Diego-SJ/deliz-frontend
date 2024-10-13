@@ -17,13 +17,16 @@ export const PLANS_PRICES = [
     id: PLANS_IDS.BASIC,
     title: 'Plan Básico',
     price: {
-      monthly: 149,
-      annualy: 119,
+      monthly: 99,
+      annualy: 79,
     },
     items: [
       { label: '1 usuario', tooltip: null },
       { label: '1 sucursal', tooltip: null },
-      { label: '200 productos', tooltip: 'Podrás registrar hasta 200 productos en tu catálogo' },
+      {
+        label: '100 productos',
+        tooltip: 'Podrás registrar hasta 100 productos en tu catálogo',
+      },
       { label: 'Ventas ilimitadas', tooltip: null },
     ],
     planItems: [
@@ -37,8 +40,8 @@ export const PLANS_PRICES = [
     id: PLANS_IDS.ESSENTIAL,
     title: 'Plan Esencial',
     price: {
-      monthly: 299,
-      annualy: 239,
+      monthly: 149,
+      annualy: 119,
     },
     items: [
       { label: '2 usuarios', tooltip: null },
@@ -58,15 +61,16 @@ export const PLANS_PRICES = [
     id: PLANS_IDS.ADVANCED,
     title: 'Plan Avanzado',
     price: {
-      monthly: 499,
-      annualy: 399,
+      monthly: 299,
+      annualy: 239,
     },
     isPopular: true,
     items: [
       { label: '3 usuarios por sucursal', tooltip: null },
       {
         label: '+2 sucursales',
-        tooltip: 'Tendrás 2 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
+        tooltip:
+          'Tendrás 2 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
       },
       { label: 'Productos ilimitados', tooltip: null },
       { label: 'Ventas ilimitadas', tooltip: null },
@@ -84,14 +88,15 @@ export const PLANS_PRICES = [
     id: PLANS_IDS.PRO,
     title: 'Plan Pro',
     price: {
-      monthly: 699,
-      annualy: 559,
+      monthly: 499,
+      annualy: 399,
     },
     items: [
       { label: 'Usuarios ilimitados', tooltip: null },
       {
         label: '+3 sucursales',
-        tooltip: 'Tendrás 3 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
+        tooltip:
+          'Tendrás 3 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
       },
       { label: 'Productos ilimitados', tooltip: null },
       { label: 'Ventas ilimitadas', tooltip: null },
@@ -103,7 +108,8 @@ export const PLANS_PRICES = [
       { label: 'Landing page', tooltip: null },
       {
         label: 'Almacenamiento ilimitado',
-        tooltip: 'Agrega evidencias a tus gastos e imagenes a tus productos de forma ilimitada.',
+        tooltip:
+          'Agrega evidencias a tus gastos e imagenes a tus productos de forma ilimitada.',
       },
     ],
     buttonText: 'Elegir plan',

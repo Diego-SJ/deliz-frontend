@@ -11,8 +11,9 @@ import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import { Reports } from '../types';
 
-const TopCustomersThumbnail = () => {
+const TopCustomersThumbnail = ({ hideData }: Reports) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { hasAccess } = useMembershipAccess();
@@ -112,7 +113,9 @@ const TopCustomersThumbnail = () => {
                         {product.name}
                       </Typography.Text>
                       <Typography.Text className="!text-sm !m-0 !w-fit min-w-40 text-end">
-                        {functions.money(product.total_amount)}
+                        {functions.money(product.total_amount, {
+                          hidden: hideData,
+                        })}
                       </Typography.Text>
                     </div>
                   );

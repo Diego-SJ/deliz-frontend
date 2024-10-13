@@ -8,8 +8,9 @@ import { useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { CloudDownload } from 'lucide-react';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
+import { Reports } from '../types';
 
-const TopProductsThumbnail = () => {
+const TopProductsThumbnail = ({ hideData }: Reports) => {
   const dispatch = useAppDispatch();
   const { user_auth } = useAppSelector(({ users }) => users);
   const { loading, top_products } = useAppSelector(
@@ -80,7 +81,9 @@ const TopProductsThumbnail = () => {
                       {product.name}
                     </Typography.Text>
                     <Typography.Text className="!text-sm !m-0 !w-fit min-w-40 text-end">
-                      {functions.number(product.total_quantity)}{' '}
+                      {functions.number(product.total_quantity, {
+                        hidden: hideData,
+                      })}{' '}
                       <span className="text-neutral-400 text-xs">
                         (unidades)
                       </span>

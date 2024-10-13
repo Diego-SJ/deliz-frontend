@@ -5,7 +5,6 @@ import { Product } from '@/redux/reducers/products/types';
 import functions from '@/utils/functions';
 import {
   AppstoreOutlined,
-  DownloadOutlined,
   FileImageOutlined,
   FilterOutlined,
   PlusCircleOutlined,
@@ -22,11 +21,11 @@ import {
   Row,
   Tag,
   Typography,
+  Table,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Table from '@/components/molecules/Table';
 import CardRoot from '@/components/atoms/Card';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
@@ -34,6 +33,7 @@ import { productHelpers } from '@/utils/products';
 import BottomMenu from '@/components/organisms/bottom-menu';
 import { Settings2 } from 'lucide-react';
 import CreateProductsByCsv from './upload-csv';
+import { useDebouncedCallback } from 'use-debounce';
 
 type DataType = Product;
 
@@ -108,7 +108,7 @@ const categoriesSelected = (categories: number[]) => {
 const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { products, categories, filters } = useAppSelector(
+  const { products, categories, filters, loading } = useAppSelector(
     ({ products }) => products,
   );
   const { currentBranch } = useAppSelector(({ branches }) => branches);
@@ -119,6 +119,7 @@ const Products = () => {
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
   const [openModal, setOpenModal] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -132,6 +133,12 @@ const Products = () => {
     setOptions(products);
   }, [products]);
 
+  useEffect(() => {
+    if (!!filters?.products?.search) {
+      setSearchText(filters?.products?.search);
+    }
+  }, [filters?.products?.search]);
+
   const onAddNew = () => {
     dispatch(productActions.setCurrentProduct({} as Product));
     navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'add'}`);
@@ -144,26 +151,21 @@ const Products = () => {
     );
   };
 
-  const getPanelValue = ({
-    searchText,
-  }: {
-    searchText?: string;
-    categoryId?: number[];
-  }) => {
-    let _options = products?.filter((item) => {
-      return (
-        functions.includes(item?.name, searchText) ||
-        functions.includes(item?.description, searchText)
-      );
-    });
-    setOptions(_options);
-  };
-
   const onRefresh = () => {
     dispatch(productActions.fetchProducts({ refetch: true }));
   };
 
+  const resetPage = async () => {
+    dispatch(productActions.setProductFilters({ page: 0 }));
+    await functions.sleep(50);
+  };
+
+  const fetchProductsByTerm = useDebouncedCallback(() => {
+    onRefresh();
+  }, 650);
+
   const onCategoryChange = async (key: string) => {
+    await resetPage();
     if (key === 'ALL') {
       await dispatch(productActions.setProductFilters({ categories: [] }));
     } else {
@@ -179,6 +181,7 @@ const Products = () => {
   };
 
   const onOrderChange = async (key: string) => {
+    await resetPage();
     await dispatch(productActions.setProductFilters({ order_by: key }));
     await onRefresh();
   };
@@ -207,16 +210,24 @@ const Products = () => {
       <Row>
         <Col span={24}>
           <Row gutter={[10, 10]} className="mt-3 mb-6">
-            <Col lg={6} xs={24}>
+            <Col lg={8} xs={24}>
               <Input
-                placeholder="Buscar producto"
+                placeholder="Buscar por nombre, código, SKU o descripción"
                 style={{ width: '100%' }}
                 allowClear
                 size={isTablet ? 'large' : 'middle'}
                 prefix={<SearchOutlined />}
-                onChange={({ target }) =>
-                  getPanelValue({ searchText: target.value })
-                }
+                value={searchText}
+                onChange={({ target }) => {
+                  setSearchText(target.value);
+                  dispatch(
+                    productActions.setProductFilters({
+                      search: target.value,
+                      page: 0,
+                    }),
+                  );
+                  fetchProductsByTerm();
+                }}
               />
             </Col>
             <Col lg={4} xs={12}>
@@ -305,7 +316,7 @@ const Products = () => {
                 menu={{
                   items: [
                     {
-                      label: 'Cargar plantilla para crear productos',
+                      label: 'Creación masiva de productos',
                       key: 'upload_products',
                       icon: <UploadOutlined />,
                     },
@@ -324,7 +335,7 @@ const Products = () => {
               </Dropdown>
             </Col>
             {permissions?.products?.add_product?.value && (
-              <Col lg={{ span: 4, offset: 2 }} xs={{ offset: 0, span: 12 }}>
+              <Col lg={4} xs={{ offset: 0, span: 12 }}>
                 <Button
                   size={isTablet ? 'large' : 'middle'}
                   block
@@ -340,6 +351,7 @@ const Products = () => {
           {!isTablet ? (
             <CardRoot styles={{ body: { padding: 0, overflow: 'hidden' } }}>
               <Table
+                loading={loading}
                 onRow={(record) => {
                   return {
                     onClick: () => onRowClick(record), // click row
@@ -354,16 +366,25 @@ const Products = () => {
                 }}
                 columns={columns(currentBranch?.branch_id || '')}
                 dataSource={options}
-                onRefresh={onRefresh}
-                hideTotalCount
                 pagination={{
+                  defaultCurrent: 0,
                   showTotal: (total, range) =>
                     `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
                   showSizeChanger: true,
                   size: 'small',
-                  pageSize: 20,
+                  onChange: (page, pageSize) => {
+                    dispatch(
+                      productActions.setProductFilters({
+                        page: page - 1,
+                        pageSize,
+                      }),
+                    );
+                    dispatch(productActions.fetchProducts({ refetch: true }));
+                  },
+                  pageSize: filters?.products?.pageSize,
                   position: ['bottomRight'],
-                  total: products?.length,
+                  total: filters?.products?.totalRecords,
+                  current: (filters?.products?.page || 0) + 1,
                   className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
                   pageSizeOptions: ['20', '50', '100'],
                 }}
@@ -371,19 +392,31 @@ const Products = () => {
             </CardRoot>
           ) : (
             <PaginatedList
+              loading={loading}
               className="mt-4 !max-h-[calc(100dvh-44px)]"
               $bodyHeight="calc(100dvh - 425px)"
               dataSource={options}
               pagination={{
+                defaultCurrent: 1,
                 showTotal: (total, range) =>
                   `${range[0]}-${range[1]} de ${total}`,
                 showSizeChanger: true,
                 size: 'small',
-                pageSize: 20,
+                onChange: (page, pageSize) => {
+                  dispatch(
+                    productActions.setProductFilters({
+                      page: page - 1,
+                      pageSize,
+                    }),
+                  );
+                  dispatch(productActions.fetchProducts({ refetch: true }));
+                },
+                pageSize: filters?.products?.pageSize,
                 position: 'bottom',
                 align: 'center',
-                total: products?.length,
-                className: '!mt-0 !mb-1 text-gray-400 pr-4',
+                total: filters?.products?.totalRecords,
+                current: (filters?.products?.page || 0) + 1,
+                className: '!mt-0  !mb-1 text-gray-400 pr-4',
                 pageSizeOptions: ['20', '50', '100'],
               }}
               renderItem={(item) => {

@@ -8,7 +8,7 @@ import {
   PiggyBank,
   Clock9,
 } from 'lucide-react';
-import { Button, Col, Row, Typography } from 'antd';
+import { Button, Col, Row, Space, Typography } from 'antd';
 import SalesReportFilters from './filters';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -21,6 +21,8 @@ import PendingSalesChart from './pending-sales/chart';
 import { useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import EyeButton, { useHideData } from '@/components/atoms/eye-button';
+import functions from '@/utils/functions';
 
 const SalesReports = () => {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ const SalesReports = () => {
   );
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
+  const { hideData, handleHideData } = useHideData();
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -61,25 +64,24 @@ const SalesReports = () => {
               Reporte de Ventas
             </Typography.Title>
           </div>
-          <Button
-            type="primary"
-            className="w-fit sm:hidden"
-            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={() => handlePrint()}
-          >
-            Imprimir
-          </Button>
         </div>
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 print:hidden">
+        <div className="flex flex-row sm:items-center gap-3 print:hidden">
           <SalesReportFilters />
-          <Button
-            type="primary"
-            className="w-fit hidden sm:inline-flex"
-            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={() => handlePrint()}
-          >
-            Imprimir
-          </Button>
+          <Space.Compact>
+            <Button
+              type="primary"
+              className="w-fit"
+              icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
+              onClick={() => handlePrint()}
+            >
+              Imprimir
+            </Button>
+            <EyeButton
+              type="primary"
+              onChange={handleHideData}
+              hideData={hideData}
+            />
+          </Space.Compact>
         </div>
       </div>
       <Row className="" gutter={[10, 10]}>
@@ -87,32 +89,36 @@ const SalesReports = () => {
           <SaleInsight
             icon={<ShoppingCart className="text-indigo-600" />}
             title="ventas realizadas"
-            value={numeral(sales_summary?.completed_sales).format('0,0')}
+            value={functions.number(sales_summary?.completed_sales, {
+              hidden: hideData,
+            })}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<CircleDollarSign className="text-indigo-600" />}
             title="$ ventas completadas"
-            value={numeral(sales_summary?.completed_sales_amount).format(
-              '$0,0.00',
-            )}
+            value={functions.money(sales_summary?.completed_sales_amount, {
+              hidden: hideData,
+            })}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<Clock9 className="text-indigo-600" />}
             title="ventas pendientes"
-            value={numeral(sales_summary?.pending_sales).format('0,0')}
+            value={functions.number(sales_summary?.pending_sales, {
+              hidden: hideData,
+            })}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<PiggyBank className="text-indigo-600" />}
             title="$ ventas pendientes"
-            value={numeral(sales_summary?.pending_sales_amount).format(
-              '$0,0.00',
-            )}
+            value={functions.money(sales_summary?.pending_sales_amount, {
+              hidden: hideData,
+            })}
           />
         </Col>
         <Col xs={24} md={12} lg={12}>

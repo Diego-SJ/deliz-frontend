@@ -6,7 +6,7 @@ import {
   Layers2,
   Layers,
 } from 'lucide-react';
-import { Button, Col, Row, Tooltip, Typography } from 'antd';
+import { Button, Col, Row, Space, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
@@ -17,6 +17,7 @@ import CardRoot from '@/components/atoms/Card';
 import { analyticsActions } from '@/redux/reducers/analytics';
 import ProfitShorcutReport from './total-profits';
 import ProfitsByRange from './profits-by-range';
+import EyeButton, { useHideData } from '@/components/atoms/eye-button';
 
 const ProfitReport = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const ProfitReport = () => {
   const [chartStyle, setChartStyle] = useState<'linear' | 'step'>('linear');
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
+  const { hideData, handleHideData } = useHideData();
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -50,43 +52,38 @@ const ProfitReport = () => {
 
   return (
     <div ref={elementRef} className="print:bg-white print:p-4">
-      <div className="flex gap-5 flex-col lg:flex-row lg:justify-between lg:items-center mb-5">
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex gap-3 items-center">
-            <Button
-              className="print:hidden"
-              icon={<ArrowLeft strokeWidth={1.5} className="w-4 h-4" />}
-              onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
-            />
-            <Typography.Title level={4} className="!m-0">
-              Reporte de ganancias
-            </Typography.Title>
-          </div>
+      <div className="flex items-center gap-2 justify-between mb-5">
+        <div className="flex gap-3 items-center">
+          <Button
+            className="print:hidden"
+            icon={<ArrowLeft strokeWidth={1.5} className="w-4 h-4" />}
+            onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
+          />
+          <Typography.Title level={4} className="!m-0">
+            Reporte de ganancias
+          </Typography.Title>
+        </div>
+        <Space.Compact>
           <Button
             type="primary"
-            className="w-fit sm:hidden"
+            className="w-fit"
             icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
             onClick={() => handlePrint()}
           >
             Imprimir
           </Button>
-        </div>
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 print:hidden">
-          <Button
+          <EyeButton
             type="primary"
-            className="w-fit hidden sm:inline-flex"
-            icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
-            onClick={() => handlePrint()}
-          >
-            Imprimir
-          </Button>
-        </div>
+            onChange={handleHideData}
+            hideData={hideData}
+          />
+        </Space.Compact>
       </div>
-      <ProfitShorcutReport />
+      <ProfitShorcutReport hideData={hideData} />
 
       <Row gutter={[10, 10]}>
         <Col xs={24}>
-          <ProfitsByRange />
+          <ProfitsByRange hideData={hideData} />
         </Col>
         <Col xs={24}>
           <CardRoot

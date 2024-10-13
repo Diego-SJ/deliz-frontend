@@ -281,7 +281,7 @@ const CloseSales = () => {
                 columns={columns}
                 dataSource={cash_cuts?.data}
                 rowKey={(item) => `${item.cash_cut_id}`}
-                scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
+                scroll={{ x: 700, y: 'calc(100dvh)' }}
                 pagination={{
                   defaultCurrent: 0,
                   showTotal: (total, range) =>

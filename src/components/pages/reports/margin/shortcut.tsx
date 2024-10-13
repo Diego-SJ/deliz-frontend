@@ -11,6 +11,7 @@ import { APP_ROUTES } from '@/routes/routes';
 import { CloudDownload, SquareChartGantt } from 'lucide-react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { Reports } from '../types';
 
 const getTotalAmountSales = (data: LineChartData) =>
   data.reduce(
@@ -19,7 +20,7 @@ const getTotalAmountSales = (data: LineChartData) =>
     0,
   );
 
-const ReportMarginShortcut = () => {
+const ReportMarginShortcut = ({ hideData }: Reports) => {
   const navigate = useNavigate();
   const { hasAccess } = useMembershipAccess();
   const { user_auth } = useAppSelector(({ users }) => users);
@@ -67,7 +68,7 @@ const ReportMarginShortcut = () => {
           <div className="flex flex-col w-full">
             <div className="flex justify-between items-center mb-2 pl-1 pr-2">
               <Typography.Title level={2} className="!text-3xl !m-0">
-                {functions.money(totalAmountSales)}
+                {functions.money(totalAmountSales, { hidden: hideData })}
               </Typography.Title>
 
               <Typography.Text className="!text-sm mt-2">

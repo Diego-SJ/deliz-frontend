@@ -5,23 +5,35 @@ import { ArrowDownToDotIcon, ArrowUpFromDotIcon, Wallet } from 'lucide-react';
 import { getTotalAmounts } from './total-profits';
 import { useAppSelector } from '@/hooks/useStore';
 import ProfitReportFilters from './filters';
+import { Reports } from '../../types';
 
-const StatisticBody = ({ completed, pending }: { completed?: number; pending?: number }) => {
+const StatisticBody = ({
+  completed,
+  pending,
+  discrete = false,
+}: {
+  completed?: number;
+  pending?: number;
+  discrete?: boolean;
+}) => {
   return (
     <div className="flex justify-between mt-2 border-t pt-3">
       <p className="text-sm text-gray-600">
-        <Badge status="success" /> Completado: {functions.money(completed || 0)}
+        <Badge status="success" /> Completado:{' '}
+        {functions.money(completed || 0, { hidden: discrete })}
       </p>
       <p className="text-sm text-gray-600">
-        <Badge status="warning" /> Pendiente: {functions.money(pending || 0)}
+        <Badge status="warning" /> Pendiente:{' '}
+        {functions.money(pending || 0, { hidden: discrete })}
       </p>
     </div>
   );
 };
 
-const ProfitsByRange = () => {
+const ProfitsByRange = ({ hideData }: Reports) => {
   const { profit } = useAppSelector(({ analytics }) => analytics);
-  const [expensesTotalByRange, incomesTotalByRange, profitTotalByRange] = getTotalAmounts(profit?.summary_by_range);
+  const [expensesTotalByRange, incomesTotalByRange, profitTotalByRange] =
+    getTotalAmounts(profit?.summary_by_range);
 
   return (
     <>
@@ -39,10 +51,12 @@ const ProfitsByRange = () => {
             size="small"
             value={incomesTotalByRange}
             showArrow
+            discrete={hideData}
           >
             <StatisticBody
               completed={profit?.summary_by_range?.completed_sales}
               pending={profit?.summary_by_range?.pending_sales}
+              discrete={hideData}
             />
           </ProfitInsight>
         </Col>
@@ -53,10 +67,12 @@ const ProfitsByRange = () => {
             size="small"
             value={expensesTotalByRange}
             showArrow
+            discrete={hideData}
           >
             <StatisticBody
               completed={profit?.summary_by_range?.completed_expenses}
               pending={profit?.summary_by_range?.pending_expenses}
+              discrete={hideData}
             />
           </ProfitInsight>
         </Col>
@@ -67,18 +83,23 @@ const ProfitsByRange = () => {
             size="small"
             value={profitTotalByRange}
             showArrow
+            discrete={hideData}
           >
             <div className="flex justify-between mt-2 border-t pt-3">
               <p className="text-sm text-gray-600">
                 <Badge status="success" /> Completado:{' '}
                 {functions.money(
-                  (profit?.summary_by_range?.completed_sales || 0) - (profit?.summary_by_range?.completed_expenses || 0),
+                  (profit?.summary_by_range?.completed_sales || 0) -
+                    (profit?.summary_by_range?.completed_expenses || 0),
+                  { hidden: hideData },
                 )}
               </p>
               <p className="text-sm text-gray-600">
                 <Badge status="warning" /> Pendiente:{' '}
                 {functions.money(
-                  (profit?.summary_by_range?.pending_sales || 0) - (profit?.summary_by_range?.pending_expenses || 0),
+                  (profit?.summary_by_range?.pending_sales || 0) -
+                    (profit?.summary_by_range?.pending_expenses || 0),
+                  { hidden: hideData },
                 )}
               </p>
             </div>

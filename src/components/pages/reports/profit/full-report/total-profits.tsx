@@ -3,6 +3,7 @@ import { Col, Row, Typography } from 'antd';
 import { ArrowDownToDotIcon, ArrowUpFromDotIcon, Wallet } from 'lucide-react';
 import { ProfitSummary } from '@/redux/reducers/analytics/types';
 import ProfitInsight from '@/components/organisms/SaleReports/profit-insight';
+import { Reports } from '../../types';
 
 export const getTotalAmounts = (summary: ProfitSummary) => {
   let expensesTotal =
@@ -14,7 +15,7 @@ export const getTotalAmounts = (summary: ProfitSummary) => {
   return [expensesTotal, incomesTotal, profitTotal];
 };
 
-const ProfitShorcutReport = () => {
+const ProfitShorcutReport = ({ hideData }: Reports) => {
   const { profit } = useAppSelector(({ analytics }) => analytics);
   const [expensesTotal, incomesTotal, profitTotal] = getTotalAmounts(
     profit?.summary,
@@ -32,6 +33,7 @@ const ProfitShorcutReport = () => {
             title="Entradas"
             size="small"
             value={incomesTotal}
+            discrete={hideData}
           />
         </Col>
         <Col xs={24} md={12} lg={8}>
@@ -40,6 +42,7 @@ const ProfitShorcutReport = () => {
             title="Salidas"
             size="small"
             value={expensesTotal}
+            discrete={hideData}
           />
         </Col>
         <Col xs={24} md={12} lg={8}>
@@ -48,6 +51,7 @@ const ProfitShorcutReport = () => {
             title="Ganancias"
             value={profitTotal}
             size="small"
+            discrete={hideData}
           />
         </Col>
       </Row>

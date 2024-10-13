@@ -20,8 +20,8 @@ export const TABLE_HEADER = [
     title: 'Básico',
     code: 'basic',
     price: {
-      monthly: 149,
-      annual: 119,
+      monthly: 99,
+      annual: 79,
     },
   },
   {
@@ -29,8 +29,8 @@ export const TABLE_HEADER = [
     title: 'Esencial',
     code: 'essential',
     price: {
-      monthly: 299,
-      annual: 239,
+      monthly: 149,
+      annual: 119,
     },
   },
   {
@@ -38,8 +38,8 @@ export const TABLE_HEADER = [
     title: 'Avanzado',
     code: 'advanced',
     price: {
-      monthly: 499,
-      annual: 399,
+      monthly: 299,
+      annual: 239,
     },
   },
   {
@@ -47,8 +47,8 @@ export const TABLE_HEADER = [
     title: 'Premium',
     code: 'premium',
     price: {
-      monthly: 699,
-      annual: 559,
+      monthly: 499,
+      annual: 399,
     },
   },
 ];
@@ -97,11 +97,13 @@ export const TABLE_BODY = [
       { title: '1 sucursal' },
       {
         title: '2 sucursales',
-        tooltip: 'Tendrás 2 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
+        tooltip:
+          'Tendrás 2 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
       },
       {
         title: '3 sucursales',
-        tooltip: 'Tendrás 3 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
+        tooltip:
+          'Tendrás 3 sucursales incluidas. Agrega nuevas sucursales por $100 MXN al mes por cada una.',
       },
     ],
   },
@@ -110,7 +112,10 @@ export const TABLE_BODY = [
     id: uuidv4(),
     cols: [
       { title: 'Productos' },
-      { title: '100 productos', tooltip: 'Podrás registrar hasta 200 productos en tu catálogo.' },
+      {
+        title: '100 productos',
+        tooltip: 'Podrás registrar hasta 100 productos en tu catálogo.',
+      },
       { title: 'Productos ilimitados' },
       { title: 'Productos ilimitados' },
       { title: 'Productos ilimitados' },
@@ -278,7 +283,10 @@ export const TABLE_BODY = [
     rowType: 'body',
     id: uuidv4(),
     cols: [
-      { title: 'Editar venta', tooltip: 'Agrega, edita o elimina productos de una venta completada.' },
+      {
+        title: 'Editar venta',
+        tooltip: 'Agrega, edita o elimina productos de una venta completada.',
+      },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
       { title: <CheckIcon /> },
@@ -322,7 +330,11 @@ export const TABLE_BODY = [
     rowType: 'body',
     id: uuidv4(),
     cols: [
-      { title: 'Catálogo en linea', tooltip: 'Comparte con tus clientes tu catálogo de productos a través de un enlace.' },
+      {
+        title: 'Catálogo en linea',
+        tooltip:
+          'Comparte con tus clientes tu catálogo de productos a través de un enlace.',
+      },
       { title: <NoneIcon /> },
       { title: <CheckIcon /> },
       { title: <CheckIcon /> },
@@ -344,7 +356,11 @@ export const TABLE_BODY = [
     rowType: 'body',
     id: uuidv4(),
     cols: [
-      { title: 'Landing page', tooltip: 'Comparte con tus clientes una pagina con la información de tu negocio.' },
+      {
+        title: 'Landing page',
+        tooltip:
+          'Comparte con tus clientes una pagina con la información de tu negocio.',
+      },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
@@ -388,7 +404,10 @@ export const TABLE_BODY = [
     rowType: 'body',
     id: uuidv4(),
     cols: [
-      { title: 'Agregar evidencia a gastos', tooltip: 'Agrega una foto a tus gastos para tener un mejor control.' },
+      {
+        title: 'Agregar evidencia a gastos',
+        tooltip: 'Agrega una foto a tus gastos para tener un mejor control.',
+      },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
@@ -443,7 +462,11 @@ export const TABLE_BODY = [
     rowType: 'body',
     id: uuidv4(),
     cols: [
-      { title: 'Reportes avanzados', tooltip: 'Reportes  de utilidades, ventas por producto, ventas por cliente, etc.' },
+      {
+        title: 'Reportes avanzados',
+        tooltip:
+          'Reportes  de utilidades, ventas por producto, ventas por cliente, etc.',
+      },
       { title: <NoneIcon /> },
       { title: <NoneIcon /> },
       { title: <CheckIcon /> },

@@ -222,8 +222,9 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
       closable={false}
       onOk={processFile}
       okText={loading ? 'Procesando...' : 'Procesar'}
-      okButtonProps={{ loading }}
+      okButtonProps={{ loading, disabled: !uploadedFile }}
       cancelButtonProps={{ disabled: loading }}
+      forceRender
     >
       <Typography.Title level={4}>Subir archivo</Typography.Title>
       <p className="mb-2">

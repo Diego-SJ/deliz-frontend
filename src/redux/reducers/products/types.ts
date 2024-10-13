@@ -16,13 +16,14 @@ export type ProductsSlice = {
 export type ProductFilters = {
   categories: number[];
   search: string;
-  size_id: number;
-  unit_id: number;
-  status: number;
-  page: number;
-  per_page: number;
+  // size_id: number;
+  // unit_id: number;
+  // status: number | null;
+  page?: number;
+  pageSize?: number;
+  totalRecords?: number;
   order_by: string;
-  order_type: string;
+  // order_type: string;
 };
 
 export type Product = {

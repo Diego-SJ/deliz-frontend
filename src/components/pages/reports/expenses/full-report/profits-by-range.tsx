@@ -3,7 +3,11 @@ import { Col, Row } from 'antd';
 import { ArrowDownToDotIcon } from 'lucide-react';
 import { useAppSelector } from '@/hooks/useStore';
 
-const ProfitsByRange = () => {
+type Props = {
+  discrete?: boolean;
+};
+
+const ProfitsByRange = ({ discrete }: Props) => {
   const { expenses } = useAppSelector(({ analytics }) => analytics);
 
   return (
@@ -15,6 +19,7 @@ const ProfitsByRange = () => {
             title="Gastos"
             size="small"
             value={expenses?.charts?.totalAmount || 0}
+            discrete={discrete}
           />
         </Col>
       </Row>

@@ -3,17 +3,26 @@ import numeral from 'numeral';
 
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { repeat } from 'lodash';
 
 dayjs.extend(utc);
 
 const functions = {
-  money: (number?: string | number) => {
+  money: (
+    number: string | number | undefined,
+    options?: { hidden?: boolean; digits?: number },
+  ) => {
+    if (options?.hidden) return `$${repeat('*', options?.digits || 5)}`;
     return numeral(number).format('$0,0.00');
   },
   moneySimple: (number: string | number) => {
     return numeral(number).format('$0.0');
   },
-  number: (number?: string | number) => {
+  number: (
+    number: string | number | undefined,
+    options?: { hidden?: boolean; digits?: number },
+  ) => {
+    if (options?.hidden) return `${repeat('*', options?.digits || 5)}`;
     return numeral(number).format('0,0');
   },
   formatToLocal: (dateStr: string | Dayjs): Dayjs => {
@@ -34,10 +43,7 @@ const functions = {
   },
   date: (dateStr: Date | string) => {
     if (!dateStr) return '- - -';
-    const date = dayjs.utc(dateStr?.toString());
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const localDate = date.tz(timeZone);
-    return localDate.format('D MMMM, YYYY');
+    return dayjs(dateStr).format('D MMMM, YYYY');
   },
   tableDate: (dateStr: Date | string | null) => {
     if (!dateStr) return '- - -';
@@ -61,14 +67,27 @@ const functions = {
   },
   getTagColor: (frase: string) => {
     if (frase === 'empty') return 'default';
-    const hash = frase.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colores = ['green', 'volcano', 'gold', 'magenta', 'red', 'orange', 'cyan', 'blue', 'geekblue', 'purple'];
+    const hash = frase
+      .split('')
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colores = [
+      'green',
+      'volcano',
+      'gold',
+      'magenta',
+      'red',
+      'orange',
+      'cyan',
+      'blue',
+      'geekblue',
+      'purple',
+    ];
     return colores[hash % colores.length];
   },
   getCode: (product: Product) => {
     let words = product?.description?.split(' ');
     let code = '';
-    code = words?.map(word => word[0])?.join('') || '';
+    code = words?.map((word) => word[0])?.join('') || '';
     code += product?.size_id;
     code += product?.category_id;
     return code?.toUpperCase();
@@ -85,13 +104,14 @@ const functions = {
     return [x, roundedToBase50, roundedToBase100];
   },
   sleep: async (ms: number) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   },
   extractUUID(input: string): string | null {
     const inputString = String(input);
 
     // Expresión regular para extraer solo el UUID
-    const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+    const uuidRegex =
+      /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
     // Extraer el UUID del string
     const match = inputString.match(uuidRegex);

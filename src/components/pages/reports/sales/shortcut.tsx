@@ -9,8 +9,9 @@ import { useMembershipAccess } from '@/routes/module-access';
 import { CloudDownload, SquareChartGantt } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import { useRef } from 'react';
+import { Reports } from '../types';
 
-const ReportSaleThumbnail = () => {
+const ReportSaleThumbnail = ({ hideData }: Reports) => {
   const navigate = useNavigate();
   const { hasAccess } = useMembershipAccess();
   const { total, loading, data } = useAppSelector(
@@ -55,7 +56,7 @@ const ReportSaleThumbnail = () => {
           <div className="flex flex-col w-full">
             <div className="flex justify-between items-center mb-2 pl-1 pr-2">
               <Typography.Title level={2} className="!text-3xl !m-0">
-                {total || 0}
+                {hideData ? '*****' : total || 0}
               </Typography.Title>
 
               <Typography.Text className="!text-sm mt-2">

@@ -11,6 +11,7 @@ type Props = {
   size?: 'small' | 'default';
   children?: React.ReactNode;
   showArrow?: boolean;
+  discrete?: boolean;
 };
 
 const ProfitInsight = ({
@@ -22,9 +23,12 @@ const ProfitInsight = ({
   size = 'default',
   children,
   showArrow = false,
+  discrete = false,
 }: Props) => {
   return (
-    <div className={`w-full flex flex-col bg-white rounded-xl border px-4 py-4 ${className}`}>
+    <div
+      className={`w-full flex flex-col bg-white rounded-xl border px-4 py-4 ${className}`}
+    >
       <div className="flex items-center gap-5">
         <Avatar
           shape="square"
@@ -35,7 +39,11 @@ const ProfitInsight = ({
         />
         <div>
           <div className="flex gap-2 items-center">
-            <h5 className={`m-0 ${size === 'default' ? 'text-2xl' : 'text-lg'} font-semibold`}>{functions.money(value)}</h5>
+            <h5
+              className={`m-0 ${size === 'default' ? 'text-2xl' : 'text-lg'} font-semibold`}
+            >
+              {functions.money(value, { hidden: discrete })}
+            </h5>
             {showArrow ? (
               value < 0 ? (
                 <ArrowDown className="text-red-500 w-4" />

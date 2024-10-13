@@ -14,8 +14,9 @@ import { useNavigate } from 'react-router-dom';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
 import { useEffect, useRef } from 'react';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import { Reports } from '../types';
 
-const ProfitShorcutReport = () => {
+const ProfitShorcutReport = ({ hideData }: Reports) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { profit } = useAppSelector(({ analytics }) => analytics);
@@ -69,7 +70,9 @@ const ProfitShorcutReport = () => {
           />
           <div className="">
             <p className="text-sm text-gray-500 mb-1">Entradas</p>
-            <p className="text-2xl font-bold mb-1">{functions.money(sales)}</p>
+            <p className="text-2xl font-bold mb-1">
+              {functions.money(sales, { hidden: hideData })}
+            </p>
             <p className="text-xs font-light text-gray-400">Ventas</p>
           </div>
         </div>
@@ -83,7 +86,7 @@ const ProfitShorcutReport = () => {
           <div className="">
             <p className="text-sm text-gray-500 mb-1">Salidas</p>
             <p className="text-2xl font-bold mb-1">
-              {functions.money(expenses)}
+              {functions.money(expenses, { hidden: hideData })}
             </p>
             <p className="text-xs font-light text-gray-400">Compras y gastos</p>
           </div>
@@ -97,7 +100,7 @@ const ProfitShorcutReport = () => {
           <div className="">
             <p className="text-sm text-gray-500 mb-1">Ganancia</p>
             <p className="text-2xl font-bold mb-1">
-              {functions.money(profitTotal)}
+              {functions.money(profitTotal, { hidden: hideData })}
             </p>
             <p className="text-xs font-light text-gray-400">
               Entradas - Gastos

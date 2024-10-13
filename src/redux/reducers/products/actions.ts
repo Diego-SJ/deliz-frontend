@@ -16,41 +16,59 @@ export interface FetchFunction {
 
 const customActions = {
   fetchProducts:
-    (args?: FetchFunction) =>
+    (_?: FetchFunction) =>
     async (dispatch: AppDispatch, getState: AppState) => {
       let products = getState()?.products?.products || [];
       const company_id = getState().app?.company?.company_id;
-      const { categories, order_by } =
+      const { categories, order_by, ...filters } =
         getState()?.products?.filters?.products || {};
 
-      if (!products.length || args?.refetch) {
-        dispatch(productActions.setLoading(true));
-        const supabaseQuery = supabase
-          .from('products')
-          .select(`*, categories(category_id,name), units(*), sizes(*)`)
-          .eq('company_id', company_id);
+      dispatch(productActions.setLoading(true));
+      const supabaseQuery = supabase
+        .from('products')
+        .select(`*, categories(category_id,name), units(*), sizes(*)`, {
+          count: 'exact',
+        })
+        .eq('company_id', company_id);
 
-        if (categories?.length) {
-          supabaseQuery.in('category_id', categories);
-        }
-
-        if (order_by) {
-          const [field, order] = order_by.split(',');
-          supabaseQuery.order(field, { ascending: order === 'asc' });
-        }
-
-        const { data, error } = await supabaseQuery;
-        dispatch(productActions.setLoading(false));
-
-        if (error) {
-          message.error('No se pudo obtener la información de los productos');
-          return;
-        }
-
-        products = data || [];
-
-        dispatch(productActions.setProducts(products));
+      if (categories?.length) {
+        supabaseQuery.in('category_id', categories);
       }
+
+      if (order_by) {
+        const [field, order] = order_by.split(',');
+        supabaseQuery.order(field, { ascending: order === 'asc' });
+      }
+
+      if (filters?.search) {
+        supabaseQuery.or(
+          `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,code.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`,
+        );
+      }
+
+      const page = filters?.page || 0;
+      const pageSize = filters?.pageSize || 20;
+      let offset = page * pageSize;
+      let limit = (page + 1) * pageSize - 1;
+
+      const { data, error, count } = await supabaseQuery.range(offset, limit);
+      dispatch(productActions.setLoading(false));
+
+      if (error) {
+        message.error('No se pudo obtener la información de los productos');
+        return;
+      }
+
+      products = data || [];
+
+      dispatch(
+        productActions.setProductFilters({
+          page: page,
+          pageSize: pageSize,
+          totalRecords: count || 0,
+        }),
+      );
+      dispatch(productActions.setProducts(products));
     },
   getProductById:
     (product_id: number) => async (dispatch: AppDispatch, _: AppState) => {
