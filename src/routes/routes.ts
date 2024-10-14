@@ -1,6 +1,8 @@
 export const APP_ROUTES = {
   PUBLIC: {
     PRODUCTS: { path: '/products' },
+    TERMS_AND_CONDITIONS: { path: '/terms-and-conditions' },
+    PRIVACY_POLICY: { path: '/privacy-policy' },
   },
   AUTH: {
     MAIN: {

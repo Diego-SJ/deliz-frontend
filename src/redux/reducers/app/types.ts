@@ -1,3 +1,5 @@
+import { Step } from 'react-joyride';
+
 export type AppSlice = {
   company: Company;
   navigation: {
@@ -6,9 +8,18 @@ export type AppSlice = {
       activeItem: string;
       activeTitle: string;
     };
+    mobile: { collapsed: boolean };
   };
   onboarding: Onboarding;
+  tour?: Tour;
   loading: boolean;
+};
+
+export type Tour = {
+  run?: boolean;
+  stepIndex?: number;
+  steps?: Step[];
+  tourActive?: boolean;
 };
 
 export type Company = {

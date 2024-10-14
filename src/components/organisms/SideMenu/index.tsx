@@ -189,7 +189,7 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
             overlayInnerStyle={{ fontSize: 12 }}
           >
             <Button
-              className="w-full"
+              className="w-full step-new_sale_btn"
               icon={<PlusCircleOutlined />}
               onClick={() => {
                 handlePathChange(APP_ROUTES.PRIVATE.CASH_REGISTER.MAIN.path);
@@ -230,9 +230,10 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
             key,
             icon: createElement(item?.icon),
             label: item?.label,
-            className: location.pathname?.includes(item.path)
-              ? 'ant-menu-item-selected'
-              : '',
+            className:
+              (location.pathname?.includes(item.path)
+                ? 'ant-menu-item-selected'
+                : '') + `step-${item.key}`,
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
               ? item.children.map((subItem: any) => {

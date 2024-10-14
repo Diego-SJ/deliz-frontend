@@ -28,4 +28,7 @@ export type Profile = {
   is_inactive: boolean;
   permissions: typeof PERMISSIONS | null;
   price_list?: string[];
+  tours?: {
+    dashboard: boolean;
+  };
 };

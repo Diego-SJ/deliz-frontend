@@ -14,7 +14,9 @@ function App() {
   const dispatch = useAppDispatch();
   const network = useNetworkState();
   const { onboarding } = useAppSelector(({ app }) => app);
-  const { authenticated, profile } = useAppSelector(({ users }) => users?.user_auth);
+  const { authenticated, profile } = useAppSelector(
+    ({ users }) => users?.user_auth,
+  );
   const firstRender = useRef(false);
 
   useEffect(() => {
@@ -23,11 +25,17 @@ function App() {
       (async () => {
         await dispatch(userActions.fetchProfile(profile?.profile_id!));
 
-        if (!!profile?.role && onboarding?.status_id === STATUS_DATA.COMPLETED.id) {
+        if (
+          !!profile?.role &&
+          onboarding?.status_id === STATUS_DATA.COMPLETED.id
+        ) {
           dispatch(userActions.fetchAppData());
         }
 
-        if (profile?.role === ROLES.ONBOARDING_PENDING && onboarding.step <= ONBOARDING_STEPS.FOUR) {
+        if (
+          profile?.role === ROLES.ONBOARDING_PENDING &&
+          onboarding.step <= ONBOARDING_STEPS.FOUR
+        ) {
           dispatch(appActions.fetchOnboarding());
           dispatch(appActions.company.getCompany());
         }

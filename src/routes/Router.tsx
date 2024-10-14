@@ -43,6 +43,8 @@ import { useMembershipAccess } from './module-access';
 import ProfitReport from '@/components/pages/reports/profit/full-report';
 import ExpensesFullReport from '@/components/pages/reports/expenses/full-report';
 import CustomersFullReport from '@/components/pages/reports/customers/full-report';
+import TermnsAndConditions from '@/components/pages/lading-page/terms-and-conditions';
+import PrivacyPolicy from '@/components/pages/lading-page/privacy-policy';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -59,7 +61,7 @@ const AppRouter = () => {
 
   return (
     <Routes>
-      {/* landing page */}
+      {/* Start - landing page */}
       <Route
         path={APP_ROUTES.AUTH.MAIN.path}
         element={
@@ -70,6 +72,17 @@ const AppRouter = () => {
           )
         }
       />
+
+      <Route
+        path={APP_ROUTES.PUBLIC.TERMS_AND_CONDITIONS.path}
+        element={<TermnsAndConditions />}
+      />
+
+      <Route
+        path={APP_ROUTES.PUBLIC.PRIVACY_POLICY.path}
+        element={<PrivacyPolicy />}
+      />
+      {/* End - landing page */}
 
       {!authenticated && (
         <>

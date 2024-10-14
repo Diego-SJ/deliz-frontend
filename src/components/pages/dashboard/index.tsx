@@ -4,7 +4,7 @@ import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
-import { Avatar, Col, Drawer, Row, Typography } from 'antd';
+import { Avatar, Button, Col, Drawer, Row, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CustomerEditor from '../customers/editor';
 import {
@@ -21,6 +21,8 @@ import { useState } from 'react';
 import OpenCashierModal from '../cash_cuts/current-cash-cut/open-cashier-modal/modal';
 import { ModuleAccess } from '@/routes/module-access';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import { appActions } from '@/redux/reducers/app';
+import OnboardingTour from '@/components/organisms/onboarding-tour';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -67,7 +69,8 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="p-3">
+      <OnboardingTour />
+      <div className="p-3 step-1">
         {permissions?.pos?.add_sale?.value ||
         permissions?.expenses?.add_expense?.value ||
         permissions?.cash_registers?.make_cash_cut?.value ||
@@ -219,23 +222,28 @@ const Dashboard = () => {
 };
 
 type CardButtonProps = {
+  id?: string;
   icon?: JSX.Element;
   title?: string;
   description?: string;
   className?: string;
+  rootClassName?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 };
 
 export const CardButton = ({
+  id,
   description,
   icon,
   title,
   onClick,
   className,
+  rootClassName = '',
 }: CardButtonProps) => {
   return (
-    <Col lg={8} sm={12} xs={12} xxl={6}>
+    <Col lg={8} sm={12} xs={12} xxl={6} className={rootClassName}>
       <div
+        id={id}
         className="flex flex-col border sm:flex-row gap-2 sm:gap-4 items-center w-full rounded-lg px-4 h-auto py-3 sm:py-1 sm:h-20 bg-white cursor-pointer hover:shadow-md"
         onClick={onClick}
       >
