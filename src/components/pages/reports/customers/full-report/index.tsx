@@ -1,7 +1,7 @@
 import EyeButton, { useHideData } from '@/components/atoms/eye-button';
 import { APP_ROUTES } from '@/routes/routes';
-import { Button, Col, Dropdown, Row, Select, Space, Typography } from 'antd';
-import { ArrowLeft, Printer, UserCheck, Users } from 'lucide-react';
+import { Button, Col, Dropdown, Row, Space, Typography } from 'antd';
+import { ArrowLeft, LandPlot, Printer, UserCheck, Users } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
@@ -14,6 +14,7 @@ import functions from '@/utils/functions';
 import CustomersFilters from './filters';
 import LastCustomers from './last-customers';
 import { SortAscendingOutlined } from '@ant-design/icons';
+import { DATE_REANGE_NAMES } from '@/constants/catalogs';
 
 const CustomersFullReport = () => {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ const CustomersFullReport = () => {
       </div>
 
       <Row gutter={[10, 10]} className="!mb-5">
-        <Col xs={24} md={12}>
+        <Col xs={24} md={8}>
           <SaleInsight
             icon={<Users className="text-indigo-600" />}
             title="Total de clientes"
@@ -98,13 +99,27 @@ const CustomersFullReport = () => {
             })}
           />
         </Col>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={8}>
           <SaleInsight
             icon={<UserCheck className="text-indigo-600" />}
             title="Clientes activos"
             value={functions.number(last_customer_sales?.data?.length, {
               hidden: hideData,
             })}
+          />
+        </Col>
+        <Col xs={24} md={8}>
+          <SaleInsight
+            icon={<LandPlot className="text-indigo-600" />}
+            title="% de clientes activos"
+            value={
+              functions.number(
+                (last_customer_sales?.data?.length / total_customers) * 100,
+                {
+                  hidden: hideData,
+                },
+              ) + '%'
+            }
           />
         </Col>
       </Row>
@@ -129,38 +144,48 @@ const CustomersFullReport = () => {
               </h5>
             }
             extra={
-              <Dropdown
-                menu={{
-                  selectedKeys: [
-                    last_customer_sales?.filters?.order_by ||
-                      'total_amount,desc',
-                  ],
-                  selectable: true,
-                  items: [
-                    {
-                      label: 'Monto total (mayor a menor)',
-                      key: 'total_amount,desc',
-                    },
-                    {
-                      label: 'Monto total (menor a mayor)',
-                      key: 'total_amount,asc',
-                    },
-                    {
-                      label: 'Número de compras (mayor a menor)',
-                      key: 'total_sales,desc',
-                    },
-                    {
-                      label: 'Número de compras (menor a mayor)',
-                      key: 'total_sales,asc',
-                    },
-                  ],
-                  onClick: ({ key }) => handleSort(key),
-                }}
-              >
-                <Button icon={<SortAscendingOutlined />} loading={loading}>
-                  Ordenar
-                </Button>
-              </Dropdown>
+              <>
+                <Dropdown
+                  className="print:hidden"
+                  menu={{
+                    selectedKeys: [
+                      last_customer_sales?.filters?.order_by ||
+                        'total_amount,desc',
+                    ],
+                    selectable: true,
+                    items: [
+                      {
+                        label: 'Monto total (mayor a menor)',
+                        key: 'total_amount,desc',
+                      },
+                      {
+                        label: 'Monto total (menor a mayor)',
+                        key: 'total_amount,asc',
+                      },
+                      {
+                        label: 'Número de compras (mayor a menor)',
+                        key: 'total_sales,desc',
+                      },
+                      {
+                        label: 'Número de compras (menor a mayor)',
+                        key: 'total_sales,asc',
+                      },
+                    ],
+                    onClick: ({ key }) => handleSort(key),
+                  }}
+                >
+                  <Button icon={<SortAscendingOutlined />} loading={loading}>
+                    Ordenar
+                  </Button>
+                </Dropdown>
+                <span className="hidden print:!inline-flex text-slate-700">
+                  {
+                    DATE_REANGE_NAMES[
+                      last_customer_sales?.filters?.date_range || 'last_7_days'
+                    ]
+                  }
+                </span>
+              </>
             }
           >
             <LastCustomers

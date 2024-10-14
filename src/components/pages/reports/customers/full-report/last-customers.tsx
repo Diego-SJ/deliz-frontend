@@ -14,7 +14,7 @@ const LastCustomers = ({ data, hideData }: LastCustomersProps) => {
   return (
     <>
       {data?.length ? (
-        <div className="flex flex-col h-64 md:h-96 overflow-y-scroll">
+        <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
           {data?.map((customer, index) => {
             return (
               <div
@@ -39,7 +39,8 @@ const LastCustomers = ({ data, hideData }: LastCustomersProps) => {
                 <Tag className="">
                   {functions.number(customer.total_sales, {
                     hidden: hideData,
-                  })}
+                  })}{' '}
+                  {customer.total_sales === 1 ? 'venta' : 'ventas'}
                 </Tag>
                 <Typography.Text className="!text-sm !m-0 !w-fit min-w-20 text-end">
                   {functions.money(customer.total_amount, {

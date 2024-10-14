@@ -24,7 +24,7 @@ const CustomerList = ({ data, hideData }: Props) => {
   return (
     <div>
       {data?.length ? (
-        <div className="flex flex-col h-64 md:h-96 overflow-y-scroll">
+        <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
           {data?.map((product, index) => {
             return (
               <div

@@ -611,7 +611,9 @@ export const analyticsCustomActions = {
         });
 
         if (filters?.order_by) {
-          const [field, order] = filters.order_by.split(',');
+          const [field, order] = (
+            filters?.order_by || 'total_amount,desc'
+          )?.split(',');
           supabaseQuery.order(field, { ascending: order === 'asc' });
         }
 
