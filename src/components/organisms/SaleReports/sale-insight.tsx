@@ -8,9 +8,17 @@ type Props = {
   className?: string;
 };
 
-const saleInsight = ({ icon, iconClassName, title, value, className }: Props) => {
+const SaleInsight = ({
+  icon,
+  iconClassName,
+  title,
+  value,
+  className,
+}: Props) => {
   return (
-    <div className={`w-full flex items-center gap-4 bg-white rounded-xl border px-4 py-4 ${className}`}>
+    <div
+      className={`w-full flex items-center gap-4 bg-white rounded-xl border px-4 py-4 ${className}`}
+    >
       <Avatar
         shape="square"
         icon={icon}
@@ -24,4 +32,4 @@ const saleInsight = ({ icon, iconClassName, title, value, className }: Props) =>
   );
 };
 
-export default saleInsight;
+export default SaleInsight;

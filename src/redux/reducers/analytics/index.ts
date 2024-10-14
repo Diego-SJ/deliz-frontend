@@ -4,6 +4,7 @@ import {
   CustomerAnalytics,
   ExpensesAnalytics,
   ExpensesFilters,
+  LastCustomerSale,
   LineChartData,
   ProductAnalytics,
   ProfitAnalytics,
@@ -93,6 +94,15 @@ const initialState: AnalyticsSlice = {
   },
   customers: {
     top_customers: [],
+    total_customers: 0,
+    last_customer_sales: {
+      data: [],
+      filters: {
+        custom_dates: [null, null],
+        date_range: 'last_7_days',
+        order_by: 'total_amount,desc',
+      },
+    },
     loading: false,
   },
 };
@@ -102,6 +112,41 @@ const analytics = createSlice({
   initialState,
   reducers: {
     resetSlice: () => initialState,
+    setLastCustomerSales: (
+      state,
+      action: PayloadAction<LastCustomerSale[]>,
+    ) => {
+      if (!state?.customers?.last_customer_sales) {
+        state.customers = {
+          ...state.customers,
+          last_customer_sales: initialState.customers.last_customer_sales,
+        };
+      }
+      state.customers.last_customer_sales = {
+        ...state.customers.last_customer_sales,
+        data: action.payload,
+      };
+    },
+    setCustomerSalesFilters: (
+      state,
+      action: PayloadAction<
+        Partial<CustomerAnalytics['last_customer_sales']['filters']>
+      >,
+    ) => {
+      if (!state?.customers?.last_customer_sales) {
+        state.customers = {
+          ...state.customers,
+          last_customer_sales: initialState.customers.last_customer_sales,
+        };
+      }
+      state.customers.last_customer_sales = {
+        ...state.customers.last_customer_sales,
+        filters: {
+          ...state.customers.last_customer_sales.filters,
+          ...action.payload,
+        },
+      };
+    },
     setSales: (state, action: PayloadAction<Partial<SalesAnalytics>>) => {
       state.sales = { ...state.sales, ...action.payload };
     },

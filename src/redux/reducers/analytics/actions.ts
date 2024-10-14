@@ -591,4 +591,57 @@ export const analyticsCustomActions = {
         );
       },
   },
+  customers: {
+    getLastCustomerSales:
+      () => async (dispatch: AppDispatch, getState: AppState) => {
+        const company_id = getState().app.company.company_id;
+        const filters =
+          getState().analytics?.customers?.last_customer_sales?.filters;
+        const [start_date, end_date] = getDateRange(
+          filters?.date_range,
+          filters?.custom_dates,
+        );
+
+        dispatch(analyticsActions.setCustomers({ loading: true }));
+
+        const supabaseQuery = supabase.rpc('get_last_customer_sales', {
+          p_company_id: company_id,
+          p_start_date: start_date,
+          p_end_date: end_date,
+        });
+
+        if (filters?.order_by) {
+          const [field, order] = filters.order_by.split(',');
+          supabaseQuery.order(field, { ascending: order === 'asc' });
+        }
+
+        const { data, error } = await supabaseQuery;
+
+        dispatch(analyticsActions.setCustomers({ loading: false }));
+
+        if (error) {
+          message.error(error.message);
+        }
+
+        dispatch(
+          analyticsActions.setLastCustomerSales(data?.length ? data : []),
+        );
+      },
+    getTotalCustomers:
+      () => async (dispatch: AppDispatch, getState: AppState) => {
+        const company_id = getState().app.company.company_id;
+        const { data, error } = await supabase
+          .from('customers')
+          .select('customer_id')
+          .eq('company_id', company_id);
+
+        if (error) {
+          message.error(error.message);
+        }
+
+        dispatch(
+          analyticsActions.setCustomers({ total_customers: data?.length || 0 }),
+        );
+      },
+  },
 };

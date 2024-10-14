@@ -42,6 +42,7 @@ import SalesReports from '@/components/pages/reports/sales/full-report';
 import { useMembershipAccess } from './module-access';
 import ProfitReport from '@/components/pages/reports/profit/full-report';
 import ExpensesFullReport from '@/components/pages/reports/expenses/full-report';
+import CustomersFullReport from '@/components/pages/reports/customers/full-report';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -362,6 +363,18 @@ const AppRouter = () => {
             element={
               <ReportsLayout>
                 <ExpensesFullReport />
+              </ReportsLayout>
+            }
+          />
+        ) : null}
+
+        {permissions?.reports?.view_customers_report?.value &&
+        hasAccess('reports') ? (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.CUSTOMERS.path}
+            element={
+              <ReportsLayout>
+                <CustomersFullReport />
               </ReportsLayout>
             }
           />

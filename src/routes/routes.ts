@@ -15,7 +15,8 @@ export const APP_ROUTES = {
 
       ONBOARDING: {
         path: '/sign-up/onboarding',
-        hash: (_: TemplateStringsArray, step: number) => `/sign-up/step/${step}`,
+        hash: (_: TemplateStringsArray, step: number) =>
+          `/sign-up/step/${step}`,
         title: 'Registro',
       },
     },
@@ -39,11 +40,17 @@ export const APP_ROUTES = {
     },
     PRODUCT_EDITOR: {
       path: '/app/products/:action/:product_id',
-      hash: (_: TemplateStringsArray, action: 'edit' | 'add', product_id?: number) =>
-        `/app/products/${action}/${product_id || 'new'}`,
+      hash: (
+        _: TemplateStringsArray,
+        action: 'edit' | 'add',
+        product_id?: number,
+      ) => `/app/products/${action}/${product_id || 'new'}`,
       title: 'Editar producto',
     },
-    PRODUCTS_ID: { path: (_: TemplateStringsArray, id: number) => `/app/products/${id}`, title: 'Productos' },
+    PRODUCTS_ID: {
+      path: (_: TemplateStringsArray, id: number) => `/app/products/${id}`,
+      title: 'Productos',
+    },
     CUSTOMERS: { path: '/app/customers', title: 'Clientes' },
     SALES: { path: '/app/sales', title: 'Ventas' },
     SALE_DETAIL: {
@@ -58,9 +65,13 @@ export const APP_ROUTES = {
       CASHIERS: { path: '/app/transactions/cashiers', title: 'Cortes de caja' },
       CASHIER_DETAIL: {
         path: '/app/transactions/cashiers/:cash_cut_id',
-        hash: (_: TemplateStringsArray, cash_cut_id: string) => `/app/transactions/cashiers/${cash_cut_id}`,
+        hash: (_: TemplateStringsArray, cash_cut_id: string) =>
+          `/app/transactions/cashiers/${cash_cut_id}`,
       },
-      CURRENT_CASHIER: { path: '/app/transactions/current-cashier', title: 'Caja registradora' },
+      CURRENT_CASHIER: {
+        path: '/app/transactions/current-cashier',
+        title: 'Caja registradora',
+      },
     },
     ORDERS: {
       path: '/app/orders',
@@ -74,8 +85,10 @@ export const APP_ROUTES = {
       ADD_NEW: {
         path: '/app/purchases-expenses/:action/:operation_type',
         title: 'Agregar operación',
-        hash: (_: TemplateStringsArray, operation_type: 'expense' | 'purchase') =>
-          `/app/purchases-expenses/add/${operation_type}`,
+        hash: (
+          _: TemplateStringsArray,
+          operation_type: 'expense' | 'purchase',
+        ) => `/app/purchases-expenses/add/${operation_type}`,
       },
       EDIT: {
         path: '/app/purchases-expenses/:action/:operation_type/:operating_cost_id',
@@ -103,7 +116,11 @@ export const APP_ROUTES = {
       EXPENSES: {
         path: '/app/reports/expenses',
         title: 'Reporte de gastos',
-      }
+      },
+      CUSTOMERS: {
+        path: '/app/reports/customers',
+        title: 'Reporte de clientes',
+      },
     },
     ONLINE_STORE: { path: '/app/online-store', title: 'Catálogo en linea' },
     SETTINGS: {
@@ -114,7 +131,8 @@ export const APP_ROUTES = {
         ADD: { path: '/app/settings/users/add' },
         EDIT: {
           path: '/app/settings/users/edit/:profile_id',
-          hash: (_: TemplateStringsArray, user_id: string) => `/app/settings/users/edit/${user_id}`,
+          hash: (_: TemplateStringsArray, user_id: string) =>
+            `/app/settings/users/edit/${user_id}`,
         },
       },
       GENERAL: { path: '/app/settings' },
@@ -125,7 +143,8 @@ export const APP_ROUTES = {
         },
         EDIT: {
           path: '/app/settings/branches/edit/:branch_id',
-          hash: (_: TemplateStringsArray, branch_id: string) => `/app/settings/branches/edit/${branch_id}`,
+          hash: (_: TemplateStringsArray, branch_id: string) =>
+            `/app/settings/branches/edit/${branch_id}`,
         },
       },
       CASH_REGISTERS: {

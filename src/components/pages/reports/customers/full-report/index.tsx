@@ -1,0 +1,177 @@
+import EyeButton, { useHideData } from '@/components/atoms/eye-button';
+import { APP_ROUTES } from '@/routes/routes';
+import { Button, Col, Dropdown, Row, Select, Space, Typography } from 'antd';
+import { ArrowLeft, Printer, UserCheck, Users } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
+import CustomerList from './customer-list';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import CardRoot from '@/components/atoms/Card';
+import { analyticsActions } from '@/redux/reducers/analytics';
+import SaleInsight from '@/components/organisms/SaleReports/sale-insight';
+import functions from '@/utils/functions';
+import CustomersFilters from './filters';
+import LastCustomers from './last-customers';
+import { SortAscendingOutlined } from '@ant-design/icons';
+
+const CustomersFullReport = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const elementRef = useRef<HTMLDivElement>(null);
+  const { handleHideData, hideData } = useHideData();
+  const { top_customers, last_customer_sales, total_customers, loading } =
+    useAppSelector(({ analytics }) => analytics?.customers || {});
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (!top_customers?.length) {
+      dispatch(analyticsActions.getTopCustomers());
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      dispatch(analyticsActions.customers.getLastCustomerSales());
+      dispatch(analyticsActions.customers.getTotalCustomers());
+    }
+  }, [dispatch, mounted]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: elementRef,
+  });
+
+  const handleSort = async (value: string) => {
+    dispatch(
+      analyticsActions.setCustomerSalesFilters({
+        order_by: value,
+      }),
+    );
+    await functions.sleep(100);
+    dispatch(analyticsActions.customers.getLastCustomerSales());
+  };
+
+  return (
+    <div ref={elementRef} className="print:bg-white print:p-4">
+      <div className="flex gap-5 flex-col lg:flex-row lg:justify-between lg:items-center mb-5">
+        <div className="flex items-center gap-2 justify-between">
+          <div className="flex gap-3 items-center">
+            <Button
+              className="print:hidden"
+              icon={<ArrowLeft strokeWidth={1.5} className="w-4 h-4" />}
+              onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
+            />
+            <Typography.Title level={4} className="!m-0">
+              Reporte de clientes
+            </Typography.Title>
+          </div>
+        </div>
+
+        <div className="flex flex-row sm:items-center gap-3 print:hidden">
+          <CustomersFilters />
+          <Space.Compact>
+            <Button
+              type="primary"
+              className="w-fit "
+              icon={<Printer strokeWidth={1.5} className="w-4 h-4" />}
+              onClick={() => handlePrint()}
+            >
+              Imprimir
+            </Button>
+            <EyeButton
+              type="primary"
+              onChange={handleHideData}
+              hideData={hideData}
+            />
+          </Space.Compact>
+        </div>
+      </div>
+
+      <Row gutter={[10, 10]} className="!mb-5">
+        <Col xs={24} md={12}>
+          <SaleInsight
+            icon={<Users className="text-indigo-600" />}
+            title="Total de clientes"
+            value={functions.number(total_customers, {
+              hidden: hideData,
+            })}
+          />
+        </Col>
+        <Col xs={24} md={12}>
+          <SaleInsight
+            icon={<UserCheck className="text-indigo-600" />}
+            title="Clientes activos"
+            value={functions.number(last_customer_sales?.data?.length, {
+              hidden: hideData,
+            })}
+          />
+        </Col>
+      </Row>
+
+      <Row gutter={[20, 20]}>
+        <Col xs={24} lg={12}>
+          <CardRoot
+            title={
+              <h5 className="!text-base m-0 font-medium">
+                Los 10 mejores clientes
+              </h5>
+            }
+          >
+            <CustomerList data={top_customers} hideData={hideData} />
+          </CardRoot>
+        </Col>
+        <Col xs={24} lg={12}>
+          <CardRoot
+            title={
+              <h5 className="!text-base m-0 font-medium">
+                Últimas ventas de clientes
+              </h5>
+            }
+            extra={
+              <Dropdown
+                menu={{
+                  selectedKeys: [
+                    last_customer_sales?.filters?.order_by ||
+                      'total_amount,desc',
+                  ],
+                  selectable: true,
+                  items: [
+                    {
+                      label: 'Monto total (mayor a menor)',
+                      key: 'total_amount,desc',
+                    },
+                    {
+                      label: 'Monto total (menor a mayor)',
+                      key: 'total_amount,asc',
+                    },
+                    {
+                      label: 'Número de compras (mayor a menor)',
+                      key: 'total_sales,desc',
+                    },
+                    {
+                      label: 'Número de compras (menor a mayor)',
+                      key: 'total_sales,asc',
+                    },
+                  ],
+                  onClick: ({ key }) => handleSort(key),
+                }}
+              >
+                <Button icon={<SortAscendingOutlined />} loading={loading}>
+                  Ordenar
+                </Button>
+              </Dropdown>
+            }
+          >
+            <LastCustomers
+              data={last_customer_sales?.data || []}
+              hideData={hideData}
+            />
+          </CardRoot>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default CustomersFullReport;

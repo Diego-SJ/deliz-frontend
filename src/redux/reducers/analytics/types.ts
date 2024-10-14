@@ -119,7 +119,23 @@ export type ProductTop = {
 
 export type CustomerAnalytics = {
   top_customers: CustomerTop[];
+  total_customers: number;
+  last_customer_sales: {
+    data: LastCustomerSale[];
+    filters: {
+      date_range: DateRangeKey;
+      custom_dates: (string | null)[];
+      order_by: string;
+    };
+  };
   loading: boolean;
+};
+
+export type LastCustomerSale = {
+  customer_id: number;
+  customer_name: string;
+  total_sales: number;
+  total_amount: number;
 };
 
 export type CustomerTop = {
