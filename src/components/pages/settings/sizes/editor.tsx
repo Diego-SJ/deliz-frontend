@@ -33,16 +33,16 @@ const CategoryEditor: React.FC<CustomerEditorProps> = ({ onSuccess }) => {
       validateMessages={{ required: '${label} es obligatorio.', types: { email: 'Formato del correo inválido' } }}
     >
       <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
-        <Input placeholder="Nombre" />
+        <Input size="large" placeholder="Nombre" />
       </Form.Item>
       <Form.Item name="short_name" label="Abreviación" rules={[{ required: true }]}>
-        <Input placeholder="Abreviación" />
+        <Input size="large" placeholder="Abreviación" />
       </Form.Item>
       <Form.Item name="description" label="Descripción">
-        <TextArea rows={2} placeholder="Descripción" />
+        <TextArea size="large" rows={2} placeholder="Descripción" />
       </Form.Item>
       <Form.Item>
-        <Button block type="primary" htmlType="submit" loading={loading}>
+        <Button block size="large" type="primary" htmlType="submit" loading={loading}>
           {sizes?.drawer === 'new' ? 'Guardar' : 'Guardar cambios'}
         </Button>
       </Form.Item>

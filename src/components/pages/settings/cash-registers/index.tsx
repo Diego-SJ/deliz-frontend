@@ -19,6 +19,7 @@ const CashRegistersPage = () => {
   const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const [options, setOptions] = useState<CashRegister[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [loading, setLoading] = useState(false);
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
 
@@ -26,13 +27,13 @@ const CashRegistersPage = () => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       dispatch(branchesActions.getCashRegistersByCompanyId());
-      setSelectedBranch(branches?.find(item => item.main_branch) || null);
+      setSelectedBranch(branches?.find((item) => item.main_branch) || null);
       return;
     }
   }, [dispatch, branches]);
 
   useEffect(() => {
-    setOptions(cash_registers?.filter(i => i?.branch_id === selectedBranch?.branch_id) || []);
+    setOptions(cash_registers?.filter((i) => i?.branch_id === selectedBranch?.branch_id) || []);
   }, [cash_registers, selectedBranch]);
 
   const openModal = () => {
@@ -81,9 +82,9 @@ const CashRegistersPage = () => {
         <div className="flex gap-4 mb-6">
           <Select
             value={selectedBranch?.branch_id}
-            options={branches.map(item => ({ label: `Sucursal ${item.name}`, value: item.branch_id }))}
-            onChange={branch_id => {
-              const branch = branches.find(item => item.branch_id === branch_id);
+            options={branches.map((item) => ({ label: `Sucursal ${item.name}`, value: item.branch_id }))}
+            onChange={(branch_id) => {
+              const branch = branches.find((item) => item.branch_id === branch_id);
               setSelectedBranch(branch || null);
             }}
             size={isTablet ? 'large' : 'middle'}
@@ -116,7 +117,7 @@ const CashRegistersPage = () => {
           }
           className="px-0"
           dataSource={options}
-          renderItem={item => (
+          renderItem={(item) => (
             <List.Item
               styles={{ actions: { paddingRight: 15, margin: 0 } }}
               classNames={{ actions: 'flex' }}
@@ -155,7 +156,8 @@ const CashRegistersPage = () => {
         onOk={async () => {
           await form
             .validateFields()
-            .then(async values => {
+            .then(async (values) => {
+              setLoading(true);
               await dispatch(branchesActions.upsertCashRegister({ ...values, branch_id: selectedBranch?.branch_id }));
 
               form.resetFields();
@@ -164,8 +166,11 @@ const CashRegistersPage = () => {
             })
             .catch(() => {
               message.error('Por favor, completa los campos requeridos');
-            });
+            })
+            .finally(() => setLoading(false));
         }}
+        okButtonProps={{ loading }}
+        cancelButtonProps={{ disabled: loading }}
         width={340}
         okText="Guardar"
         cancelText="Cancelar"
@@ -177,16 +182,16 @@ const CashRegistersPage = () => {
         </Typography.Text>
         <Form form={form} layout="vertical" className="mt-4">
           <Form.Item name="cash_register_id" hidden>
-            <Input />
+            <Input size="large" />
           </Form.Item>
           <Form.Item name="is_default" hidden>
-            <Input />
+            <Input size="large" />
           </Form.Item>
           <Form.Item name="branch_id" hidden>
-            <Input />
+            <Input size="large" />
           </Form.Item>
           <Form.Item label="Nombre" name="name" rules={[{ required: true, message: 'Este campo es requerido' }]}>
-            <Input prefix="Caja" placeholder="Mostrador 1" />
+            <Input size="large" prefix="Caja" placeholder="Mostrador 1" />
           </Form.Item>
         </Form>
       </Modal>

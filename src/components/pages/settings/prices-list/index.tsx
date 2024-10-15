@@ -1,22 +1,22 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { App, Button, Form, Input, List, Modal, Tag, Typography } from 'antd';
-
+import { App, Button, List, Tag, Typography } from 'antd';
 import BreadcrumbSettings from '../menu/breadcrumb';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { branchesActions } from '@/redux/reducers/branches';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import CardRoot from '@/components/atoms/Card';
+import AddNewPriceModal from './add-new-modal';
+import { Price } from '@/redux/reducers/branches/type';
 
 const PricesListPage = () => {
   const mounted = useRef(false);
   const dispatch = useAppDispatch();
-  const { prices_list } = useAppSelector(state => state.branches);
-  const { company_id } = useAppSelector(state => state.app.company);
+  const { prices_list } = useAppSelector((state) => state.branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
-  const [form] = Form.useForm();
-  const { message, modal } = App.useApp();
+  const { modal } = App.useApp();
   const [open, setOpen] = useState(false);
+  const [priceToEdit, setPriceToEdit] = useState<Price | null>(null);
   const { isTablet } = useMediaQuery();
 
   useEffect(() => {
@@ -28,17 +28,15 @@ const PricesListPage = () => {
 
   const openModal = () => {
     setOpen(true);
-    form.setFieldsValue({ company_id });
   };
 
   const closeModal = () => {
-    form.resetFields();
     setOpen(false);
+    setPriceToEdit(null);
   };
 
   const onEdit = (data: { price_id: string; name: string }) => {
-    form.setFieldValue('name', data.name);
-    form.setFieldValue('price_id', data.price_id);
+    setPriceToEdit(data as Price);
     openModal();
   };
 
@@ -51,24 +49,8 @@ const PricesListPage = () => {
       okType: 'danger',
       onOk: async () => {
         await dispatch(branchesActions.deletePrice(price_id));
-        message.success('Precio eliminado correctamente');
       },
     });
-  };
-
-  const onSave = async () => {
-    await form
-      .validateFields()
-      .then(async values => {
-        await dispatch(branchesActions.upsertPrice(values));
-
-        form.resetFields();
-        closeModal();
-        message.success('Precio guardado correctamente');
-      })
-      .catch(() => {
-        message.error('Por favor, completa los campos requeridos');
-      });
   };
 
   return (
@@ -105,7 +87,7 @@ const PricesListPage = () => {
           }
           className="px-0"
           dataSource={prices_list}
-          renderItem={item => (
+          renderItem={(item) => (
             <List.Item
               styles={{ actions: { paddingRight: 15, margin: 0 } }}
               classNames={{ actions: 'flex' }}
@@ -136,35 +118,7 @@ const PricesListPage = () => {
         />
       </CardRoot>
 
-      <Modal
-        open={open}
-        onClose={closeModal}
-        title={form.getFieldValue('price_id') ? 'Editar precio' : 'Nuevo precio'}
-        onCancel={closeModal}
-        onOk={async () => {
-          await onSave();
-        }}
-        width={340}
-        okText="Guardar"
-        cancelText="Cancelar"
-      >
-        <Typography.Text type="secondary">
-          {form.getFieldValue('price_id')
-            ? 'Al editar el tipo de precio, se actualizará en todos los productos que lo tengan asignado'
-            : 'Una vez creado el tipo de precio, podrás asignarlo a tus productos'}
-        </Typography.Text>
-        <Form form={form} layout="vertical" className="mt-4">
-          <Form.Item name="company_id" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item name="price_id" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Nombre" name="name" rules={[{ required: true, message: 'Este campo es requerido' }]}>
-            <Input placeholder="Nombre del precio" onPressEnter={onSave} />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <AddNewPriceModal value={priceToEdit} open={open} onClose={closeModal} />
     </div>
   );
 };

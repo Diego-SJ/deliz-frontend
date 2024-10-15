@@ -27,6 +27,7 @@ export type Price = {
   name: string;
   created_at: string;
   is_default: boolean;
+  company_id?: string;
 };
 
 export type CashRegister = {
