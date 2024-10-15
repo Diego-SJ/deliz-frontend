@@ -1,7 +1,8 @@
+import ReportEmpty from '@/components/atoms/report-empty';
 import { CustomerTop } from '@/redux/reducers/analytics/types';
 import functions from '@/utils/functions';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Empty, Typography } from 'antd';
+import { Avatar, Typography } from 'antd';
 import { Trophy } from 'lucide-react';
 
 export const TEX_COLOR: { [key: number]: string } = {
@@ -56,9 +57,7 @@ const CustomerList = ({ data, hideData }: Props) => {
           })}
         </div>
       ) : (
-        <>
-          <Empty description="Registra tus primeras ventas para visualizar información" />
-        </>
+        <ReportEmpty />
       )}
     </div>
   );

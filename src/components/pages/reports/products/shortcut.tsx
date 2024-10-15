@@ -1,4 +1,4 @@
-import { Avatar, Button, Empty, Typography } from 'antd';
+import { Avatar, Button, Typography } from 'antd';
 import CardRoot from '@/components/atoms/Card';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { analyticsActions } from '@/redux/reducers/analytics';
@@ -9,6 +9,7 @@ import { useReactToPrint } from 'react-to-print';
 import { CloudDownload } from 'lucide-react';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
 import { Reports } from '../types';
+import ReportEmpty from '@/components/atoms/report-empty';
 
 const TopProductsThumbnail = ({ hideData }: Reports) => {
   const dispatch = useAppDispatch();
@@ -94,9 +95,7 @@ const TopProductsThumbnail = ({ hideData }: Reports) => {
             </div>
           </div>
         ) : (
-          <>
-            <Empty description="Registra tus primeras ventas para visualizar información" />
-          </>
+          <ReportEmpty />
         )}
       </div>
     </CardRoot>

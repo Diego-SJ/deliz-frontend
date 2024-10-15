@@ -1,9 +1,10 @@
 import { LastCustomerSale } from '@/redux/reducers/analytics/types';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Empty, Tag, Typography } from 'antd';
+import { Avatar, Tag, Typography } from 'antd';
 import { Trophy } from 'lucide-react';
 import { BG_COLOR, TEX_COLOR } from './customer-list';
 import functions from '@/utils/functions';
+import ReportEmpty from '@/components/atoms/report-empty';
 
 type LastCustomersProps = {
   data?: LastCustomerSale[];
@@ -52,7 +53,7 @@ const LastCustomers = ({ data, hideData }: LastCustomersProps) => {
           })}
         </div>
       ) : (
-        <Empty description="No hay datos disponibles" />
+        <ReportEmpty />
       )}
     </>
   );

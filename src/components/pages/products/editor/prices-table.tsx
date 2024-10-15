@@ -1,4 +1,5 @@
 import CardRoot from '@/components/atoms/Card';
+import useMediaQuery from '@/hooks/useMediaQueries';
 import { useAppSelector } from '@/hooks/useStore';
 import { Price } from '@/redux/reducers/branches/type';
 import { PriceList } from '@/redux/reducers/products/types';
@@ -17,11 +18,13 @@ type Props = {
 
 const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
   const navigate = useNavigate();
-  const { prices_list } = useAppSelector(state => state.branches);
+  const { prices_list } = useAppSelector((state) => state.branches);
+  const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const [unitPrice, setUnitPrice] = useState(0);
+  const { isTablet } = useMediaQuery();
 
   const handleChange = (value: number, price: Price) => {
-    setPriceList(prev => {
+    setPriceList((prev) => {
       let newData = {
         ...prev,
         [price.price_id]: { price_id: price.price_id, is_default: !!price.is_default, unit_price: value },
@@ -32,7 +35,14 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
   };
 
   return (
-    <CardRoot title="Precios">
+    <CardRoot
+      title="Precios"
+      extra={
+        profile?.permissions?.price_list?.add_price?.value && (
+          <Button icon={<PlusCircleOutlined />}>Agregar nuevo precio</Button>
+        )
+      }
+    >
       <div className="w-full">
         <div className="w-full md:max-w-[300px] mb-10 flex gap-2 items-start flex-col justify-center">
           <Form.Item
@@ -52,19 +62,28 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
               type="number"
               inputMode="decimal"
               onFocus={({ target }) => (target as HTMLInputElement).select()}
-              onChange={value => setUnitPrice(value as number)}
+              onChange={(value) => setUnitPrice(value as number)}
             />
           </Form.Item>
         </div>
 
         <div className="flex w-full items-center border-b border-slate-200 my-3 pb-2">
           <Typography.Title level={5} className="w-full md:w-[50%] py-1" style={{ margin: 0, fontSize: 14 }}>
-            Precio(s) de venta <br /> <span className="text-xs text-neutral-400 font-extralight">(Impuestos incluidos)</span>
+            Precio(s) de venta <br />{' '}
+            <span className="text-xs text-neutral-400 font-extralight">(Impuestos incluidos)</span>
           </Typography.Title>
-          <Typography.Title level={5} className="hidden md:block w-[25%] py-1 text-center " style={{ margin: 0, fontSize: 14 }}>
+          <Typography.Title
+            level={5}
+            className="hidden md:block w-[25%] py-1 text-center "
+            style={{ margin: 0, fontSize: 14 }}
+          >
             Márgen
           </Typography.Title>
-          <Typography.Title level={5} className="hidden md:block w-[25%] py-1 text-center " style={{ margin: 0, fontSize: 14 }}>
+          <Typography.Title
+            level={5}
+            className="hidden md:block w-[25%] py-1 text-center "
+            style={{ margin: 0, fontSize: 14 }}
+          >
             Ganancia
           </Typography.Title>
         </div>
@@ -75,7 +94,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
                 <Typography.Text className="!m-0 !text-sm">{price?.name || ''}</Typography.Text>
                 <InputNumber
                   value={priceList[price?.price_id || '']?.unit_price || 0}
-                  onChange={value => handleChange(value as number, price)}
+                  onChange={(value) => handleChange(value as number, price)}
                   onFocus={({ target }) => (target as HTMLInputElement).select()}
                   prefix="$"
                   size="large"
@@ -90,11 +109,16 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
               <div className="w-full flex pt-1 md:pt-6">
                 <Typography.Text className="text-neutral-500 w-full text-start md:text-center">
                   <span className="mr-4 inline-flex md:hidden">Márgen</span>{' '}
-                  {unitPrice ? ((((priceList[price.price_id]?.unit_price || 0) - unitPrice) / unitPrice) * 100).toFixed(2) : 0}%
+                  {unitPrice
+                    ? ((((priceList[price.price_id]?.unit_price || 0) - unitPrice) / unitPrice) * 100).toFixed(2)
+                    : 0}
+                  %
                 </Typography.Text>
                 <Typography.Text className="text-neutral-500 w-full text-start md:text-center">
                   <span className="mr-4 inline-flex md:hidden">Ganancia</span>
-                  {functions.money(unitPrice ? ((priceList[price.price_id]?.unit_price || 0) - unitPrice).toFixed(2) : 0)}
+                  {functions.money(
+                    unitPrice ? ((priceList[price.price_id]?.unit_price || 0) - unitPrice).toFixed(2) : 0,
+                  )}
                 </Typography.Text>
               </div>
             </div>

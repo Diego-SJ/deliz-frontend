@@ -30,6 +30,7 @@ import PaginatedList from '@/components/organisms/PaginatedList';
 import { useDebouncedCallback } from 'use-debounce';
 import { ModuleAccess } from '@/routes/module-access';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import TableEmpty from '@/components/atoms/table-empty';
 
 export const PAYMENT_METHOD: { [key: string]: string } = {
   CASH: 'Efectivo',
@@ -370,6 +371,9 @@ const Sales = () => {
                   pageSizeOptions: ['20', '50', '100'],
                 }}
                 scroll={{ x: 700, y: 'calc(100dvh - 300px)' }}
+                locale={{
+                  emptyText: <TableEmpty onAddNew={onAddNew} />,
+                }}
               />
             </CardRoot>
           ) : (
@@ -398,7 +402,9 @@ const Sales = () => {
                 pageSizeOptions: ['20', '50', '100'],
               }}
               dataSource={auxSales}
-              rootClassName="sadasd"
+              locale={{
+                emptyText: <TableEmpty onAddNew={onAddNew} margin="small" />,
+              }}
               renderItem={(item) => {
                 const _status = STATUS_OBJ[item?.status_id || 1];
                 return (

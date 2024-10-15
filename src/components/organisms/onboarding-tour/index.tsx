@@ -30,14 +30,14 @@ const allySteps = ({ title, content, target, ...props }: Step) => {
 const OnboardingTour = () => {
   const dispatch = useAppDispatch();
   const { tour } = useAppSelector(({ app }) => app);
-  const { isPhablet } = useMediaQuery();
+  const { isTablet } = useMediaQuery();
   const { profile, isAdmin } = useAppSelector(({ users }) => users?.user_auth);
 
   useEffect(() => {
-    if (isAdmin && !isPhablet) {
+    if (isAdmin && !isTablet) {
       dispatch(appActions.setTourState({ run: !profile?.tours?.dashboard }));
     }
-  }, [profile?.tours?.dashboard, isPhablet]);
+  }, [profile?.tours?.dashboard, isTablet]);
 
   const handleCallback = (data: CallBackProps) => {
     const { status, step } = data;
@@ -53,7 +53,7 @@ const OnboardingTour = () => {
       <Joyride
         callback={handleCallback}
         continuous
-        run={!!tour?.run && !isPhablet}
+        run={!!tour?.run && !isTablet}
         scrollToFirstStep
         showProgress
         disableCloseOnEsc

@@ -21,6 +21,7 @@ import { operatingCostsActions } from '../operating-costs';
 import { analyticsActions } from '../analytics';
 import { storesActions } from '../stores';
 import functions from '@/utils/functions';
+import { PLANS_IDS } from '@/constants/membership-plans';
 
 const customActions = {
   fetchAppData: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -382,7 +383,11 @@ const customActions = {
 
     const { data: company } = await supabase
       .from('companies')
-      .insert({ email: profile.email, phone: profile.phone } as Company)
+      .insert({
+        email: profile.email,
+        phone: profile.phone,
+        membership_id: PLANS_IDS.PRO,
+      } as Company)
       .select()
       .single();
     await dispatch(appActions.setCompany(company));

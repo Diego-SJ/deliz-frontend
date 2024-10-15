@@ -24,6 +24,7 @@ import { Building, LockKeyhole, LockKeyholeOpen } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { groupCashRegisters } from '@/utils/cash-cuts';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import TableEmpty from '@/components/atoms/table-empty';
 
 export const getStatus = (total = 0, received = 0) => {
   if (total === received)
@@ -306,6 +307,9 @@ const CloseSales = () => {
                   className: '!mt-0 border-t pt-2 !mb-2 text-gray-400 pr-4',
                   pageSizeOptions: ['10', '20', '50', '100'],
                 }}
+                locale={{
+                  emptyText: <TableEmpty />,
+                }}
               />
             </CardRoot>
           ) : (
@@ -336,6 +340,9 @@ const CloseSales = () => {
                 current: (cash_cuts?.filters?.page || 0) + 1,
                 className: '!mt-0 !mb-1 text-gray-400 pr-4',
                 pageSizeOptions: ['10', '20', '50', '100'],
+              }}
+              locale={{
+                emptyText: <TableEmpty margin="small" />,
               }}
               renderItem={(item) => {
                 let { color, text } = getStatus(

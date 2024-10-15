@@ -48,6 +48,7 @@ export type Product = {
   raw_price?: number;
   inventory?: Inventory;
   price_list?: PriceList;
+  show_in_catalog?: boolean;
 };
 
 export type Inventory = {

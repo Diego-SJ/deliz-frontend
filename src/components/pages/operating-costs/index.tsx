@@ -30,6 +30,7 @@ import { operatingCostsActions } from '@/redux/reducers/operating-costs';
 import { OperatingCost } from '@/redux/reducers/operating-costs/types';
 import { useDebouncedCallback } from 'use-debounce';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import TableEmpty from '@/components/atoms/table-empty';
 
 const columns: ColumnsType<OperatingCost> = [
   {
@@ -124,6 +125,10 @@ const PurchasesExpenses = () => {
       APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.EDIT
         .hash`${record.operation_type?.toLowerCase()}${record.operating_cost_id}`,
     );
+  };
+
+  const onAddNew = () => {
+    navigate(APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW.hash`${'expense'}`);
   };
 
   return (
@@ -248,12 +253,7 @@ const PurchasesExpenses = () => {
                   type="primary"
                   size={isTablet ? 'large' : 'middle'}
                   icon={<PlusCircleOutlined />}
-                  onClick={() =>
-                    navigate(
-                      APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.ADD_NEW
-                        .hash`${'expense'}`,
-                    )
-                  }
+                  onClick={onAddNew}
                 >
                   Agregar
                 </Button>
@@ -280,6 +280,9 @@ const PurchasesExpenses = () => {
                   x: 700,
                   y: 'calc(100dvh - 280px)',
                   scrollToFirstRowOnChange: true,
+                }}
+                locale={{
+                  emptyText: <TableEmpty onAddNew={onAddNew} />,
                 }}
                 pagination={{
                   defaultCurrent: 0,
@@ -333,6 +336,9 @@ const PurchasesExpenses = () => {
                 current: (filters?.page || 0) + 1,
                 className: '!mt-0 border-red-500 pt-0 !mb-1 text-gray-400 pr-4',
                 pageSizeOptions: ['20', '50', '100'],
+              }}
+              locale={{
+                emptyText: <TableEmpty margin="small" onAddNew={onAddNew} />,
               }}
               renderItem={(item) => {
                 const _status = STATUS_OBJ[item?.status_id || 1];

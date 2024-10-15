@@ -31,6 +31,7 @@ const plans: { [planId: number]: AppModules[] } = {
     'customers',
     'company',
     'cash_registers',
+    'show_in_catalog',
   ],
   // advanced
   [PLANS_IDS.ADVANCED]: [
@@ -63,6 +64,7 @@ const plans: { [planId: number]: AppModules[] } = {
     'categories',
     'sizes',
     'units',
+    'show_in_catalog',
   ],
   // pro
   [PLANS_IDS.PRO]: [
@@ -99,6 +101,7 @@ const plans: { [planId: number]: AppModules[] } = {
     'sizes',
     'units',
     'upload_evidence',
+    'show_in_catalog',
   ],
 };
 
@@ -107,16 +110,10 @@ type ModuleAccessProps = {
   children: React.ReactNode;
 };
 
-export const ModuleAccess: FC<ModuleAccessProps> = ({
-  moduleName,
-  children,
-}) => {
+export const ModuleAccess: FC<ModuleAccessProps> = ({ moduleName, children }) => {
   const { company } = useAppSelector(({ app }) => app);
 
-  if (
-    company?.membership_id &&
-    plans[company.membership_id].includes(moduleName as AppModules)
-  ) {
+  if (company?.membership_id && plans[company.membership_id].includes(moduleName as AppModules)) {
     return <>{children}</>;
   }
   return null;
@@ -152,26 +149,16 @@ export const useMembershipAccess = () => {
   const maxCashRegisters = MAX_CASH_REGISTERS[company?.membership_id || 1] || 1;
 
   const hasAccess = (moduleName: AppModules): boolean => {
-    return (
-      !!company?.membership_id &&
-      !!plans[company.membership_id].includes(moduleName)
-    );
+    return !!company?.membership_id && !!plans[company.membership_id].includes(moduleName);
   };
 
-  const hasModuleAccess = (moduleProperties?: {
-    [key: string]: any;
-  }): boolean => {
+  const hasModuleAccess = (moduleProperties?: { [key: string]: any }): boolean => {
     if (!moduleProperties) return false;
-    return Object.values(moduleProperties || { module_name: false })?.some(
-      (prop) => prop?.value,
-    );
+    return Object.values(moduleProperties || { module_name: false })?.some((prop) => prop?.value);
   };
 
   const validateAccessFeature = (feature: any, moduleName: AppModules) => {
-    if (
-      company?.membership_id &&
-      plans[company.membership_id].includes(moduleName)
-    ) {
+    if (company?.membership_id && plans[company.membership_id].includes(moduleName)) {
       return feature;
     }
     return undefined;

@@ -15,83 +15,77 @@ export interface FetchFunction {
 }
 
 const customActions = {
-  fetchProducts:
-    (_?: FetchFunction) =>
-    async (dispatch: AppDispatch, getState: AppState) => {
-      let products = getState()?.products?.products || [];
-      const company_id = getState().app?.company?.company_id;
-      const { categories, order_by, ...filters } =
-        getState()?.products?.filters?.products || {};
+  fetchProducts: (_?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    let products = getState()?.products?.products || [];
+    const company_id = getState().app?.company?.company_id;
+    const { categories, order_by, ...filters } = getState()?.products?.filters?.products || {};
 
-      dispatch(productActions.setLoading(true));
-      const supabaseQuery = supabase
-        .from('products')
-        .select(`*, categories(category_id,name), units(*), sizes(*)`, {
-          count: 'exact',
-        })
-        .eq('company_id', company_id);
+    dispatch(productActions.setLoading(true));
+    const supabaseQuery = supabase
+      .from('products')
+      .select(`*, categories(category_id,name), units(*), sizes(*)`, {
+        count: 'exact',
+      })
+      .eq('company_id', company_id);
 
-      if (categories?.length) {
-        supabaseQuery.in('category_id', categories);
-      }
+    if (categories?.length) {
+      supabaseQuery.in('category_id', categories);
+    }
 
-      if (order_by) {
-        const [field, order] = order_by.split(',');
-        supabaseQuery.order(field, { ascending: order === 'asc' });
-      }
+    if (order_by) {
+      const [field, order] = order_by.split(',');
+      supabaseQuery.order(field, { ascending: order === 'asc' });
+    }
 
-      if (filters?.search) {
-        supabaseQuery.or(
-          `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,code.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`,
-        );
-      }
-
-      const page = filters?.page || 0;
-      const pageSize = filters?.pageSize || 20;
-      let offset = page * pageSize;
-      let limit = (page + 1) * pageSize - 1;
-
-      const { data, error, count } = await supabaseQuery.range(offset, limit);
-      dispatch(productActions.setLoading(false));
-
-      if (error) {
-        message.error('No se pudo obtener la información de los productos');
-        return;
-      }
-
-      products = data || [];
-
-      dispatch(
-        productActions.setProductFilters({
-          page: page,
-          pageSize: pageSize,
-          totalRecords: count || 0,
-        }),
+    if (filters?.search) {
+      supabaseQuery.or(
+        `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,code.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`,
       );
-      dispatch(productActions.setProducts(products));
-    },
-  getProductById:
-    (product_id: number) => async (dispatch: AppDispatch, _: AppState) => {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`*, categories(category_id,name), units(*), sizes(*)`)
-        .eq('product_id', product_id)
-        .single();
+    }
 
-      if (error) {
-        message.error('No se pudo obtener la información del producto');
-        return;
-      }
+    const page = filters?.page || 0;
+    const pageSize = filters?.pageSize || 20;
+    let offset = page * pageSize;
+    let limit = (page + 1) * pageSize - 1;
 
-      dispatch(productActions.setCurrentProduct(data));
-    },
+    const { data, error, count } = await supabaseQuery.range(offset, limit);
+    dispatch(productActions.setLoading(false));
+
+    if (error) {
+      message.error('No se pudo obtener la información de los productos');
+      return;
+    }
+
+    products = data || [];
+
+    dispatch(
+      productActions.setProductFilters({
+        page: page,
+        pageSize: pageSize,
+        totalRecords: count || 0,
+      }),
+    );
+    dispatch(productActions.setProducts(products));
+  },
+  getProductById: (product_id: number) => async (dispatch: AppDispatch, _: AppState) => {
+    const { data, error } = await supabase
+      .from('products')
+      .select(`*, categories(category_id,name), units(*), sizes(*)`)
+      .eq('product_id', product_id)
+      .single();
+
+    if (error) {
+      message.error('No se pudo obtener la información del producto');
+      return;
+    }
+
+    dispatch(productActions.setCurrentProduct(data));
+  },
   saveImage: async (image: RcFile): Promise<string | null> => {
     const filename = image.uid;
-    const { data, error } = await supabase.storage
-      .from('deliz')
-      .upload(`products/images/${filename}`, image, {
-        upsert: true,
-      });
+    const { data, error } = await supabase.storage.from('deliz').upload(`products/images/${filename}`, image, {
+      upsert: true,
+    });
 
     if (data?.fullPath && !error) {
       message.success('¡Imagen guardada!', 4);
@@ -101,97 +95,83 @@ const customActions = {
     message.error('No se pudo guardar la imagen.', 4);
     return null;
   },
-  deleteImage:
-    (uid: string) => async (dispatch: AppDispatch, getState: AppState) => {
-      const product = getState().products.current_product;
-      const { error } = await supabase.storage
-        .from('deliz')
-        .remove([`products/images/${uid}`]);
-      if (error) {
-        message.error('Error al eliminar la imagen');
-        return;
-      }
+  deleteImage: (uid: string) => async (dispatch: AppDispatch, getState: AppState) => {
+    const product = getState().products.current_product;
+    const { error } = await supabase.storage.from('deliz').remove([`products/images/${uid}`]);
+    if (error) {
+      message.error('Error al eliminar la imagen');
+      return;
+    }
 
-      const result = await supabase
-        .from('products')
-        .update({ image_url: null })
-        .eq('product_id', product.product_id)
-        .select()
-        .single();
-
-      dispatch(
-        productActions.setCurrentProduct({ ...product, ...result.data }),
-      );
-      message.info('Imagen eliminada');
-    },
-  saveProduct:
-    (product: Partial<Product>) =>
-    async (dispatch: AppDispatch, getState: AppState) => {
-      dispatch(productActions.setLoading(true));
-      const { company_id, membership_id } = getState().app?.company;
-
-      const has100Products =
-        getState()?.products?.products?.length >= MAX_USERS[PLANS_IDS.BASIC];
-
-      if (has100Products && membership_id === PLANS_IDS.BASIC) {
-        message.error('Tu membresía no te permite tener más de 100 productos');
-        dispatch(productActions.setLoading(false));
-        return false;
-      }
-
-      const result = await supabase
-        .from('products')
-        .insert({ ...product, company_id });
-
-      dispatch(productActions.setLoading(false));
-
-      if (result.error) {
-        let errorMessage = 'No se pudo guardar el producto';
-        if (result.error.details.includes('Key (code)=')) {
-          errorMessage = 'El código de barras ya existe';
-        }
-        if (result.error.details.includes('Key (sku)=')) {
-          errorMessage = 'El SKU ya existe';
-        }
-        message.error(errorMessage, 4);
-        return false;
-      }
-
-      message.success('¡Producto agregado con éxito!', 4);
-      return true;
-    },
-  updateProduct:
-    (product: Partial<Product>) => async (dispatch: AppDispatch) => {
-      dispatch(productActions.setLoading(true));
-      const result = await supabase
-        .from('products')
-        .update(product)
-        .eq('product_id', product.product_id)
-        .select()
-        .single();
-      dispatch(productActions.setLoading(false));
-
-      if (result.error) {
-        let errorMessage = 'No se pudo actualizar el producto';
-        if (result.error.details.includes('Key (code)=')) {
-          errorMessage = 'El código de barras ya existe';
-        }
-        if (result.error.details.includes('Key (sku)=')) {
-          errorMessage = 'El SKU ya existe';
-        }
-        message.error(errorMessage, 4);
-        return false;
-      }
-
-      dispatch(productActions.setCurrentProduct(result.data));
-      message.success('¡Producto actualizado con éxito!', 4);
-      return true;
-    },
-  deleteProduct: (product: Product) => async (dispatch: AppDispatch) => {
-    const { error } = await supabase
+    const result = await supabase
       .from('products')
-      .delete()
-      .eq('product_id', product.product_id);
+      .update({ image_url: null })
+      .eq('product_id', product.product_id)
+      .select()
+      .single();
+
+    dispatch(productActions.setCurrentProduct({ ...product, ...result.data }));
+    message.info('Imagen eliminada');
+  },
+  saveProduct: (product: Partial<Product>) => async (dispatch: AppDispatch, getState: AppState) => {
+    dispatch(productActions.setLoading(true));
+    const { company_id, membership_id } = getState().app?.company;
+
+    const has100Products = getState()?.products?.products?.length >= MAX_USERS[PLANS_IDS.BASIC];
+
+    if (has100Products && membership_id === PLANS_IDS.BASIC) {
+      message.error('Tu membresía no te permite tener más de 100 productos');
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+
+    const result = await supabase.from('products').insert({ ...product, company_id });
+
+    dispatch(productActions.setLoading(false));
+
+    if (result.error) {
+      let errorMessage = 'No se pudo guardar el producto';
+      if (result.error.details.includes('Key (code)=')) {
+        errorMessage = 'El código de barras ya existe';
+      }
+      if (result.error.details.includes('Key (sku)=')) {
+        errorMessage = 'El SKU ya existe';
+      }
+      message.error(errorMessage, 4);
+      return false;
+    }
+
+    message.success('¡Producto agregado con éxito!', 4);
+    return true;
+  },
+  updateProduct: (product: Partial<Product>) => async (dispatch: AppDispatch) => {
+    dispatch(productActions.setLoading(true));
+    const result = await supabase
+      .from('products')
+      .update(product)
+      .eq('product_id', product.product_id)
+      .select()
+      .single();
+    dispatch(productActions.setLoading(false));
+
+    if (result.error) {
+      let errorMessage = 'No se pudo actualizar el producto';
+      if (result.error.details.includes('Key (code)=')) {
+        errorMessage = 'El código de barras ya existe';
+      }
+      if (result.error.details.includes('Key (sku)=')) {
+        errorMessage = 'El SKU ya existe';
+      }
+      message.error(errorMessage, 4);
+      return false;
+    }
+
+    dispatch(productActions.setCurrentProduct(result.data));
+    message.success('¡Producto actualizado con éxito!', 4);
+    return true;
+  },
+  deleteProduct: (product: Product) => async (dispatch: AppDispatch) => {
+    const { error } = await supabase.from('products').delete().eq('product_id', product.product_id);
 
     if (error) {
       message.error('No se pudo eliminar el registro');
@@ -202,44 +182,39 @@ const customActions = {
     message.success('Registro eliminado');
     return true;
   },
-  fetchCategories:
-    (args?: FetchFunction) =>
-    async (dispatch: AppDispatch, getState: AppState) => {
-      try {
-        let categories = getState().products.categories || [];
-        let company_id = getState().app.company.company_id;
+  fetchCategories: (args?: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
+    try {
+      let categories = getState().products.categories || [];
+      let company_id = getState().app.company.company_id;
 
-        if (!categories.length || args?.refetch) {
-          dispatch(productActions.setLoading(true));
-          const result = await supabase
-            .from('categories')
-            .select('*')
-            .eq('company_id', company_id)
-            .order('name', { ascending: true });
-          categories =
-            result?.data?.map((item) => {
-              return {
-                ...item,
-                key: item.category_id as number,
-              } as Category;
-            }) ?? [];
-          dispatch(productActions.setCategories(categories));
-        }
-        dispatch(productActions.setLoading(false));
-      } catch (error) {
-        message.error('No se pudo obtener la lista de categorias');
-        dispatch(productActions.setLoading(false));
-        return false;
+      if (!categories.length || args?.refetch) {
+        dispatch(productActions.setLoading(true));
+        const result = await supabase
+          .from('categories')
+          .select('*')
+          .eq('company_id', company_id)
+          .order('name', { ascending: true });
+        categories =
+          result?.data?.map((item) => {
+            return {
+              ...item,
+              key: item.category_id as number,
+            } as Category;
+          }) ?? [];
+        dispatch(productActions.setCategories(categories));
       }
-    },
+      dispatch(productActions.setLoading(false));
+    } catch (error) {
+      message.error('No se pudo obtener la lista de categorias');
+      dispatch(productActions.setLoading(false));
+      return false;
+    }
+  },
   categories: {
     delete: (category_id: number) => async (dispatch: AppDispatch) => {
       try {
         dispatch(productActions.setLoading(true));
-        const { error } = await supabase
-          .from('categories')
-          .delete()
-          .eq('category_id', category_id);
+        const { error } = await supabase.from('categories').delete().eq('category_id', category_id);
 
         dispatch(productActions.setLoading(false));
         if (error) {
@@ -255,33 +230,31 @@ const customActions = {
         return false;
       }
     },
-    add:
-      (category: Category) =>
-      async (dispatch: AppDispatch, getState: AppState) => {
-        try {
-          dispatch(productActions.setLoading(true));
-          let company_id = getState().app.company.company_id;
+    add: (category: Category) => async (dispatch: AppDispatch, getState: AppState) => {
+      try {
+        dispatch(productActions.setLoading(true));
+        let company_id = getState().app.company.company_id;
 
-          const { error, data } = await supabase
-            .from('categories')
-            .insert({ ...category, company_id })
-            .select()
-            .single();
+        const { error, data } = await supabase
+          .from('categories')
+          .insert({ ...category, company_id })
+          .select()
+          .single();
 
-          dispatch(productActions.setLoading(false));
+        dispatch(productActions.setLoading(false));
 
-          if (error) {
-            message.error('No se pudo guardar la categoría.', 4);
-            return false;
-          }
-          await dispatch(productActions.fetchCategories({ refetch: true }));
-          message.success('Categoría agregada', 4);
-          return data.category_id;
-        } catch (error) {
-          dispatch(productActions.setLoading(false));
+        if (error) {
+          message.error('No se pudo guardar la categoría.', 4);
           return false;
         }
-      },
+        await dispatch(productActions.fetchCategories({ refetch: true }));
+        message.success('Categoría agregada', 4);
+        return data.category_id;
+      } catch (error) {
+        dispatch(productActions.setLoading(false));
+        return false;
+      }
+    },
     update: (category: Category) => async (dispatch: AppDispatch) => {
       try {
         dispatch(productActions.setLoading(true));
@@ -312,77 +285,65 @@ const customActions = {
     },
   },
   sizes: {
-    get:
-      (args: FetchFunction) =>
-      async (dispatch: AppDispatch, getState: AppState) => {
-        try {
-          let sizes = getState()?.products?.sizes;
-
-          if (!!sizes?.data?.length && !args?.refetch) return true;
-
-          dispatch(productActions.setLoading(true));
-          const company_id = getState()?.app?.company?.company_id;
-          let { data: result, error } = await supabase
-            .from('sizes')
-            .select('*')
-            .eq('company_id', company_id)
-            .order('created_at', { ascending: false });
-          dispatch(productActions.setLoading(false));
-
-          if (error) {
-            message.error('No se pudo cargar esta información', 4);
-            return false;
-          }
-
-          let data =
-            result?.map(
-              (item) => ({ ...item, key: item.size_id as number }) as Size,
-            ) ?? [];
-
-          dispatch(productActions.setSize({ data }));
-          return true;
-        } catch (error) {
-          dispatch(productActions.setLoading(false));
-          return false;
-        }
-      },
-    add: (size: Size) => async (dispatch: AppDispatch, getState: AppState) => {
+    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
+        let sizes = getState()?.products?.sizes;
+
+        if (!!sizes?.data?.length && !args?.refetch) return true;
+
         dispatch(productActions.setLoading(true));
         const company_id = getState()?.app?.company?.company_id;
-        const { error } = await supabase
+        let { data: result, error } = await supabase
           .from('sizes')
-          .insert([
-            {
-              name: size.name,
-              description: size.description,
-              short_name: size.short_name,
-              company_id,
-            },
-          ])
-          .select();
+          .select('*')
+          .eq('company_id', company_id)
+          .order('created_at', { ascending: false });
         dispatch(productActions.setLoading(false));
 
         if (error) {
-          message.error('No se pudo guardar el registro.', 4);
+          message.error('No se pudo cargar esta información', 4);
           return false;
         }
 
-        await dispatch(productActions.sizes.get({ refetch: true }));
-        message.success('Registro agregado', 4);
+        let data = result?.map((item) => ({ ...item, key: item.size_id as number }) as Size) ?? [];
+
+        dispatch(productActions.setSize({ data }));
         return true;
       } catch (error) {
         dispatch(productActions.setLoading(false));
         return false;
       }
     },
+    add: (size: Partial<Size>) => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState()?.app?.company?.company_id;
+      dispatch(productActions.setLoading(true));
+      const { data, error } = await supabase
+        .from('sizes')
+        .insert([
+          {
+            name: size.name,
+            description: size?.description || size?.name,
+            short_name: size?.short_name || size?.name,
+            company_id,
+          },
+        ])
+        .select()
+        .single();
+      dispatch(productActions.setLoading(false));
+
+      if (error) {
+        message.error('No se pudo guardar el registro.', 4);
+        return false;
+      }
+
+      await dispatch(productActions.sizes.get({ refetch: true }));
+      message.success('Tamaño agregado', 4);
+      return data;
+    },
     delete: (size_id: number) => async (dispatch: AppDispatch) => {
       try {
         dispatch(productActions.setLoading(true));
-        const { error } = await supabase
-          .from('sizes')
-          .delete()
-          .eq('size_id', size_id);
+        const { error } = await supabase.from('sizes').delete().eq('size_id', size_id);
         dispatch(productActions.setLoading(false));
 
         if (error) {
@@ -431,77 +392,66 @@ const customActions = {
     },
   },
   units: {
-    get:
-      (args: FetchFunction) =>
-      async (dispatch: AppDispatch, getState: AppState) => {
-        try {
-          let units = getState()?.products?.units;
-
-          if (!!units?.data?.length && !args?.refetch) return true;
-
-          dispatch(productActions.setLoading(true));
-          const company_id = getState()?.app?.company?.company_id;
-          let { data: result, error } = await supabase
-            .from('units')
-            .select('*')
-            .eq('company_id', company_id)
-            .order('created_at', { ascending: false });
-          dispatch(productActions.setLoading(false));
-
-          if (error) {
-            message.error('No se pudo cargar esta información', 4);
-            return false;
-          }
-
-          let data =
-            result?.map(
-              (item) => ({ ...item, key: item.unit_id as number }) as Unit,
-            ) ?? [];
-
-          dispatch(productActions.setUnit({ data }));
-          return true;
-        } catch (error) {
-          dispatch(productActions.setLoading(false));
-          return false;
-        }
-      },
-    add: (unit: Unit) => async (dispatch: AppDispatch, getState: AppState) => {
+    get: (args: FetchFunction) => async (dispatch: AppDispatch, getState: AppState) => {
       try {
+        let units = getState()?.products?.units;
+
+        if (!!units?.data?.length && !args?.refetch) return true;
+
         dispatch(productActions.setLoading(true));
         const company_id = getState()?.app?.company?.company_id;
-        const { error } = await supabase
+        let { data: result, error } = await supabase
           .from('units')
-          .insert([
-            {
-              name: unit.name,
-              description: unit.description,
-              short_name: unit.short_name,
-              company_id,
-            },
-          ])
-          .select();
+          .select('*')
+          .eq('company_id', company_id)
+          .order('created_at', { ascending: false });
         dispatch(productActions.setLoading(false));
 
         if (error) {
-          message.error('No se pudo guardar el registro.', 4);
+          message.error('No se pudo cargar esta información', 4);
           return false;
         }
 
-        await dispatch(productActions.units.get({ refetch: true }));
-        message.success('Registro agregado', 4);
+        let data = result?.map((item) => ({ ...item, key: item.unit_id as number }) as Unit) ?? [];
+
+        dispatch(productActions.setUnit({ data }));
         return true;
       } catch (error) {
         dispatch(productActions.setLoading(false));
         return false;
       }
     },
+    add: (unit: Partial<Unit>) => async (dispatch: AppDispatch, getState: AppState) => {
+      dispatch(productActions.setLoading(true));
+      const company_id = getState()?.app?.company?.company_id;
+      const { data, error } = await supabase
+        .from('units')
+        .insert([
+          {
+            name: unit?.name,
+            description: unit?.description || unit?.name,
+            short_name: unit?.short_name || unit?.name,
+            company_id,
+          },
+        ])
+        .select()
+        .single();
+
+      dispatch(productActions.setLoading(false));
+
+      if (error) {
+        message.error('No se pudo guardar el registro.', 4);
+        return null;
+      }
+
+      await dispatch(productActions.units.get({ refetch: true }));
+      message.success('Registro agregado', 4);
+      return data;
+    },
     delete: (unit_id: number) => async (dispatch: AppDispatch) => {
       try {
         dispatch(productActions.setLoading(true));
-        const { error } = await supabase
-          .from('units')
-          .delete()
-          .eq('unit_id', unit_id);
+        const { error } = await supabase.from('units').delete().eq('unit_id', unit_id);
         dispatch(productActions.setLoading(false));
 
         if (error) {
@@ -555,30 +505,13 @@ const customActions = {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Productos');
       const columnStyle = { font: { bold: true } };
-      const [priceList, categories, sizes, units, branches] = await Promise.all(
-        [
-          supabase
-            .from('prices_list')
-            .select('price_id, name')
-            .eq('company_id', companyId),
-          supabase
-            .from('categories')
-            .select('category_id, name')
-            .eq('company_id', companyId),
-          supabase
-            .from('sizes')
-            .select('size_id, name')
-            .eq('company_id', companyId),
-          supabase
-            .from('units')
-            .select('unit_id, name')
-            .eq('company_id', companyId),
-          supabase
-            .from('branches')
-            .select('branch_id, name')
-            .eq('company_id', companyId),
-        ],
-      );
+      const [priceList, categories, sizes, units, branches] = await Promise.all([
+        supabase.from('prices_list').select('price_id, name').eq('company_id', companyId),
+        supabase.from('categories').select('category_id, name').eq('company_id', companyId),
+        supabase.from('sizes').select('size_id, name').eq('company_id', companyId),
+        supabase.from('units').select('unit_id, name').eq('company_id', companyId),
+        supabase.from('branches').select('branch_id, name').eq('company_id', companyId),
+      ]);
 
       let columns: Partial<ExcelJS.Column>[] = [
         {
@@ -672,9 +605,7 @@ const customActions = {
         'Indique el tamaño del producto',
         'Unidad de medida del producto',
         'Precio bruto sin impuestos',
-        ...(priceList?.data || [])?.map(
-          () => 'Precio final para venta al público',
-        ),
+        ...(priceList?.data || [])?.map(() => 'Precio final para venta al público'),
         ...(branches?.data || [])?.map(() => 'Stock disponible en la sucursal'),
         'Código SKU del producto',
         'Código interno del producto',

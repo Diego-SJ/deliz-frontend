@@ -15,6 +15,7 @@ import { createElement } from 'react';
 import { ITEM_LIST } from '.';
 import { APP_VERSION } from '@/constants/versions';
 import { useMembershipAccess } from '@/routes/module-access';
+import { membershipFlags } from '@/feature-flags/membership';
 
 type SideMobileMenuProps = {
   closeDrawer?: () => void;
@@ -146,7 +147,7 @@ const SideMobileMenu = ({ closeDrawer, open }: SideMobileMenuProps) => {
           })}
         </div>
 
-        {isAdmin && (
+        {isAdmin && membershipFlags.show_membership_btn && (
           <div className="flex flex-col bg-white rounded-lg py-1 shadow-sm mb-5 cursor-pointer">
             <div
               className="w-full flex items-center gap-5 px-4 py-3"

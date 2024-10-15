@@ -4,7 +4,7 @@ import { customerActions } from '@/redux/reducers/customers';
 import { Customer } from '@/redux/reducers/customers/types';
 import { productActions } from '@/redux/reducers/products';
 import { Product } from '@/redux/reducers/products/types';
-import { Avatar, Button, Col, Drawer, Row, Typography } from 'antd';
+import { Avatar, Col, Drawer, Row, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import CustomerEditor from '../customers/editor';
 import {
@@ -21,7 +21,6 @@ import { useState } from 'react';
 import OpenCashierModal from '../cash_cuts/current-cash-cut/open-cashier-modal/modal';
 import { ModuleAccess } from '@/routes/module-access';
 import BottomMenu from '@/components/organisms/bottom-menu';
-import { appActions } from '@/redux/reducers/app';
 import OnboardingTour from '@/components/organisms/onboarding-tour';
 
 const Dashboard = () => {

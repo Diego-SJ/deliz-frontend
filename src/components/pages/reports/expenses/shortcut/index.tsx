@@ -1,4 +1,4 @@
-import { Button, Empty, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
 import CardRoot from '@/components/atoms/Card';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import ExpensesPieChart from '@/components/pages/reports/expenses/shortcut/chart';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import ReportEmpty from '@/components/atoms/report-empty';
 
 const ExpensesShortcutReport = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const ExpensesShortcutReport = () => {
               </div>
             </>
           ) : (
-            <Empty description="Registra tus primeras ventas para visualizar información" />
+            <ReportEmpty />
           )}
         </div>
       </div>

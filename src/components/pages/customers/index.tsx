@@ -24,6 +24,7 @@ import CardRoot from '@/components/atoms/Card';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import DeleteCustomer from './delete-customer';
 import BottomMenu from '@/components/organisms/bottom-menu';
+import TableEmpty from '@/components/atoms/table-empty';
 
 type DataType = Customer;
 
@@ -189,6 +190,9 @@ const Customers = () => {
                 columns={columns}
                 dataSource={options}
                 onRefresh={onRefresh}
+                locale={{
+                  emptyText: <TableEmpty onAddNew={onAddNew} />,
+                }}
               />
             </CardRoot>
           ) : (
@@ -197,7 +201,9 @@ const Customers = () => {
               $bodyHeight="calc(100dvh - 380px)"
               pagination={{ position: 'bottom', align: 'center' }}
               dataSource={options}
-              rootClassName="sadasd"
+              locale={{
+                emptyText: <TableEmpty onAddNew={onAddNew} margin="small" />,
+              }}
               renderItem={(item) => {
                 return (
                   <div

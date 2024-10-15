@@ -6,6 +6,15 @@ const initialState: StoresSlice = {
   store: {
     is_active: false,
     status_id: null,
+    schedule: {
+      friday: { closed: true, from: '', to: '' },
+      monday: { closed: true, from: '', to: '' },
+      sunday: { closed: true, from: '', to: '' },
+      thursday: { closed: true, from: '', to: '' },
+      tuesday: { closed: true, from: '', to: '' },
+      saturday: { closed: true, from: '', to: '' },
+      wednesday: { closed: true, from: '', to: '' },
+    },
   },
   loading: false,
 };

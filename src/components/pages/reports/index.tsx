@@ -14,7 +14,7 @@ const ReportsHomePage = () => {
   const { profile } = useAppSelector(({ users }) => users.user_auth);
   const firstLoad = useRef(false);
   const elementRef = useRef<any>(null);
-  const [hideData, setHideData] = useState(true);
+  const [hideData, setHideData] = useState(false);
 
   useEffect(() => {
     if (

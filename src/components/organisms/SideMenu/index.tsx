@@ -35,6 +35,7 @@ import {
 import { ChevronUp } from 'lucide-react';
 import { appActions } from '@/redux/reducers/app';
 import { LayoutSider } from '../MainLayout/styles';
+import { membershipFlags } from '@/feature-flags/membership';
 
 type SideMenuProps = {
   onClick?: (args?: any) => void;
@@ -249,7 +250,7 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
       />
 
       <div className="absolute bottom-0 w-full">
-        {isAdmin && (
+        {isAdmin && membershipFlags.show_membership_btn && (
           <div className="px-5">
             <MyMembershipCard collapsed={collapsed} />
           </div>

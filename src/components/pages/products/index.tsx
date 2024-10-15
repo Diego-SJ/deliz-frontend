@@ -34,6 +34,7 @@ import BottomMenu from '@/components/organisms/bottom-menu';
 import { Settings2 } from 'lucide-react';
 import CreateProductsByCsv from './upload-csv';
 import { useDebouncedCallback } from 'use-debounce';
+import TableEmpty from '@/components/atoms/table-empty';
 
 type DataType = Product;
 
@@ -364,6 +365,14 @@ const Products = () => {
                   x: 700,
                   scrollToFirstRowOnChange: true,
                 }}
+                locale={{
+                  emptyText: (
+                    <TableEmpty
+                      title="No hay productos para mostrar"
+                      onAddNew={onAddNew}
+                    />
+                  ),
+                }}
                 columns={columns(currentBranch?.branch_id || '')}
                 dataSource={options}
                 pagination={{
@@ -396,6 +405,15 @@ const Products = () => {
               className="mt-4 !max-h-[calc(100dvh-44px)]"
               $bodyHeight="calc(100dvh - 425px)"
               dataSource={options}
+              locale={{
+                emptyText: (
+                  <TableEmpty
+                    title="No hay productos para mostrar"
+                    onAddNew={onAddNew}
+                    margin="small"
+                  />
+                ),
+              }}
               pagination={{
                 defaultCurrent: 1,
                 showTotal: (total, range) =>
