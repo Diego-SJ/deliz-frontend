@@ -15,6 +15,7 @@ import { Branch, CashRegister } from '@/redux/reducers/branches/type';
 import { Download } from 'lucide-react';
 import ReceiptPrinterEncoder from '@point-of-sale/receipt-printer-encoder';
 import { connectPrinter, disconnectPrinter, printData } from '@/redux/reducers/printer';
+import useDeviceInfo from '@/feature-flags/useDeviceInfo';
 
 type PrintInvoiceButtonProps = {
   amounts: {
@@ -77,6 +78,7 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
   const elementRef = useRef<any>(null);
   const [totalItems, setTotalItems] = useState(0);
   const { isTablet } = useMediaQuery();
+  const { isDesktop, browserName } = useDeviceInfo();
   const saleBranch = (current_sale?.metadata as any)?.branches as Branch;
   const saleCashRegister = (current_sale?.metadata as any)?.cash_registers as CashRegister;
 
@@ -289,10 +291,11 @@ const PrintInvoiceButton = ({ amounts }: PrintInvoiceButtonProps) => {
             <Button block onClick={downloadInvoice} icon={<Download className="w-4" />}>
               Descargar
             </Button>
-            <Button onClick={handlePrint} icon={<PrinterOutlined />} loading={messageLoading}>
-              Imprimir
-            </Button>
-
+            {isDesktop && browserName === 'Chrome' && (
+              <Button onClick={handlePrint} icon={<PrinterOutlined />} loading={messageLoading}>
+                Imprimir
+              </Button>
+            )}
             <Button hidden onClick={sendNoteByWhatsapp} icon={<WhatsAppOutlined />} loading={messageLoading}>
               Enviar via Whatsapp
             </Button>

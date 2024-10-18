@@ -17,6 +17,7 @@ import { analyticsCustomActions } from './actions';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import { Sale } from '../sales/types';
 
 dayjs.extend(advancedFormat);
 dayjs.extend(isoWeek);
@@ -112,10 +113,7 @@ const analytics = createSlice({
   initialState,
   reducers: {
     resetSlice: () => initialState,
-    setLastCustomerSales: (
-      state,
-      action: PayloadAction<LastCustomerSale[]>,
-    ) => {
+    setLastCustomerSales: (state, action: PayloadAction<LastCustomerSale[]>) => {
       if (!state?.customers?.last_customer_sales) {
         state.customers = {
           ...state.customers,
@@ -129,9 +127,7 @@ const analytics = createSlice({
     },
     setCustomerSalesFilters: (
       state,
-      action: PayloadAction<
-        Partial<CustomerAnalytics['last_customer_sales']['filters']>
-      >,
+      action: PayloadAction<Partial<CustomerAnalytics['last_customer_sales']['filters']>>,
     ) => {
       if (!state?.customers?.last_customer_sales) {
         state.customers = {
@@ -150,19 +146,19 @@ const analytics = createSlice({
     setSales: (state, action: PayloadAction<Partial<SalesAnalytics>>) => {
       state.sales = { ...state.sales, ...action.payload };
     },
+    setLastCompletedSales: (state, action: PayloadAction<Partial<Sale>[]>) => {
+      state.sales.last_sales.completed = action.payload;
+    },
+    setLastPendingSales: (state, action: PayloadAction<Partial<Sale>[]>) => {
+      state.sales.last_sales.pending = action.payload;
+    },
     setProducts: (state, action: PayloadAction<Partial<ProductAnalytics>>) => {
       state.products = { ...state.products, ...action.payload };
     },
-    setCustomers: (
-      state,
-      action: PayloadAction<Partial<CustomerAnalytics>>,
-    ) => {
+    setCustomers: (state, action: PayloadAction<Partial<CustomerAnalytics>>) => {
       state.customers = { ...state.customers, ...action.payload };
     },
-    setSalesFilters: (
-      state,
-      action: PayloadAction<Partial<SalesAnalytics['filters']>>,
-    ) => {
+    setSalesFilters: (state, action: PayloadAction<Partial<SalesAnalytics['filters']>>) => {
       state.sales.filters = { ...state.sales.filters, ...action.payload };
     },
     setSalesSummary: (state, action: PayloadAction<Partial<SalesSummary>>) => {
@@ -171,28 +167,19 @@ const analytics = createSlice({
         ...action.payload,
       };
     },
-    setProfitAnalytics: (
-      state,
-      action: PayloadAction<Partial<ProfitAnalytics>>,
-    ) => {
+    setProfitAnalytics: (state, action: PayloadAction<Partial<ProfitAnalytics>>) => {
       if (!state.profit) {
         state = { ...state, profit: { ...initialState.profit } };
       }
       state.profit = { ...state.profit, ...action.payload };
     },
-    setProfitFilters: (
-      state,
-      action: PayloadAction<Partial<ProfitFilters>>,
-    ) => {
+    setProfitFilters: (state, action: PayloadAction<Partial<ProfitFilters>>) => {
       if (!state.profit) {
         state = { ...state, profit: { ...initialState.profit } };
       }
       state.profit.filters = { ...state.profit.filters, ...action.payload };
     },
-    setProfitSummary: (
-      state,
-      action: PayloadAction<Partial<ProfitSummary>>,
-    ) => {
+    setProfitSummary: (state, action: PayloadAction<Partial<ProfitSummary>>) => {
       if (!state?.profit || !state?.profit?.summary) {
         state.profit = {
           ...state.profit,
@@ -202,25 +189,16 @@ const analytics = createSlice({
         state.profit.summary = { ...state.profit.summary, ...action.payload };
       }
     },
-    setExpensesFilters: (
-      state,
-      action: PayloadAction<Partial<ExpensesFilters>>,
-    ) => {
+    setExpensesFilters: (state, action: PayloadAction<Partial<ExpensesFilters>>) => {
       state.expenses = {
         ...state.expenses,
         filters: { ...state?.expenses?.filters, ...action.payload },
       };
     },
-    setExpensesData: (
-      state,
-      action: PayloadAction<Partial<ExpensesAnalytics>>,
-    ) => {
+    setExpensesData: (state, action: PayloadAction<Partial<ExpensesAnalytics>>) => {
       state.expenses = { ...state.expenses, ...action.payload };
     },
-    setExpensesCharts: (
-      state,
-      action: PayloadAction<Partial<ExpensesAnalytics['charts']>>,
-    ) => {
+    setExpensesCharts: (state, action: PayloadAction<Partial<ExpensesAnalytics['charts']>>) => {
       state.expenses.charts = { ...state?.expenses?.charts, ...action.payload };
     },
   },

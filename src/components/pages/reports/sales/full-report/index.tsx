@@ -1,20 +1,12 @@
 import CardRoot from '@/components/atoms/Card';
 import SaleInsight from '@/components/organisms/SaleReports/sale-insight';
-import {
-  ArrowLeft,
-  CircleDollarSign,
-  Printer,
-  ShoppingCart,
-  PiggyBank,
-  Clock9,
-} from 'lucide-react';
+import { ArrowLeft, CircleDollarSign, Printer, ShoppingCart, PiggyBank, Clock9 } from 'lucide-react';
 import { Button, Col, Row, Space, Typography } from 'antd';
 import SalesReportFilters from './filters';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import LastCompletedSales from './last-completed-sales';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import numeral from 'numeral';
 import Pendingsales from './pending-sales';
 import CompletedSalesChart from './last-completed-sales/chart';
 import PendingSalesChart from './pending-sales/chart';
@@ -27,12 +19,8 @@ import functions from '@/utils/functions';
 const SalesReports = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { total_sales_amount_chart_data, last_sales } = useAppSelector(
-    ({ analytics }) => analytics.sales,
-  );
-  const { sales_summary, total_sales_chart_data, filters } = useAppSelector(
-    ({ analytics }) => analytics.sales,
-  );
+  const { total_sales_amount_chart_data, last_sales } = useAppSelector(({ analytics }) => analytics.sales);
+  const { sales_summary, total_sales_chart_data, filters } = useAppSelector(({ analytics }) => analytics.sales);
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
   const { hideData, handleHideData } = useHideData();
@@ -76,11 +64,7 @@ const SalesReports = () => {
             >
               Imprimir
             </Button>
-            <EyeButton
-              type="primary"
-              onChange={handleHideData}
-              hideData={hideData}
-            />
+            <EyeButton type="primary" onChange={handleHideData} hideData={hideData} />
           </Space.Compact>
         </div>
       </div>
@@ -124,20 +108,14 @@ const SalesReports = () => {
         <Col xs={24} md={12} lg={12}>
           <CardRoot classNames={{ body: '!px-2' }} title="Ventas">
             <div className="h-[390px] w-full">
-              <CompletedSalesChart
-                data={total_sales_chart_data || []}
-                range={filters?.date_range}
-              />
+              <CompletedSalesChart data={total_sales_chart_data || []} range={filters?.date_range} />
             </div>
           </CardRoot>
         </Col>
         <Col xs={24} md={12} lg={12}>
           <CardRoot classNames={{ body: '!px-2' }} title="Monto de las ventas">
             <div className="h-[390px] w-full">
-              <PendingSalesChart
-                range={filters?.date_range}
-                data={total_sales_amount_chart_data || []}
-              />
+              <PendingSalesChart range={filters?.date_range} data={total_sales_amount_chart_data || []} />
             </div>
           </CardRoot>
         </Col>

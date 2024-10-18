@@ -1,13 +1,4 @@
-import {
-  ArrowDown01,
-  ArrowLeft,
-  ChartColumnBig,
-  ChartLine,
-  Layers,
-  Layers2,
-  Printer,
-  Shuffle,
-} from 'lucide-react';
+import { ArrowDown01, ArrowLeft, ChartColumnBig, ChartLine, Layers, Layers2, Printer, Shuffle } from 'lucide-react';
 import { Button, Col, Row, Space, Tooltip, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -25,9 +16,7 @@ import EyeButton, { useHideData } from '@/components/atoms/eye-button';
 const ExpensesFullReport = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { filters, charts } = useAppSelector(
-    ({ analytics }) => analytics?.expenses,
-  );
+  const { filters, charts } = useAppSelector(({ analytics }) => analytics?.expenses);
   const [stacked, setStacked] = useState(false);
   const [chartStyle, setChartStyle] = useState<'linear' | 'step'>('linear');
   const elementRef = useRef<any>(null);
@@ -86,11 +75,7 @@ const ExpensesFullReport = () => {
             >
               Imprimir
             </Button>
-            <EyeButton
-              type="primary"
-              onChange={handleHideData}
-              hideData={hideData}
-            />
+            <EyeButton type="primary" onChange={handleHideData} hideData={hideData} />
           </Space.Compact>
         </div>
       </div>
@@ -102,7 +87,7 @@ const ExpensesFullReport = () => {
         <Col xs={24} md={24} lg={24} xl={12}>
           <CardRoot
             classNames={{ body: '!px-2' }}
-            title="Entradas y gastos"
+            title="Gastos realizados"
             extra={
               <div className="flex gap-4 print:hidden">
                 <Tooltip title={'Cambiar estilo de gráfico'}>
@@ -121,13 +106,7 @@ const ExpensesFullReport = () => {
                 <Tooltip title={stacked ? 'Sin apilar' : 'Apilar'}>
                   <Button
                     onClick={handleStacked}
-                    icon={
-                      stacked ? (
-                        <Layers2 className="w-4 h-4" />
-                      ) : (
-                        <Layers className="w-4 h-4" />
-                      )
-                    }
+                    icon={stacked ? <Layers2 className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
                   />
                 </Tooltip>
               </div>
@@ -150,21 +129,12 @@ const ExpensesFullReport = () => {
             extra={
               <Button
                 onClick={handleSort}
-                icon={
-                  sortByValue ? (
-                    <Shuffle className="w-4 h-4" />
-                  ) : (
-                    <ArrowDown01 className="w-4 h-4" />
-                  )
-                }
+                icon={sortByValue ? <Shuffle className="w-4 h-4" /> : <ArrowDown01 className="w-4 h-4" />}
               />
             }
           >
             <div className="h-[390px] w-full">
-              <ExpensesPieChart
-                data={charts?.pieCustom || []}
-                sortByValue={sortByValue}
-              />
+              <ExpensesPieChart data={charts?.pieCustom || []} sortByValue={sortByValue} />
             </div>
           </CardRoot>
         </Col>

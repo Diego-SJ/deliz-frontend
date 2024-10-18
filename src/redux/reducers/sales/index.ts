@@ -7,7 +7,6 @@ import {
   CurrentSale,
   OperatingExpense,
   OperatingExpenses,
-  SaleDetails,
   SaleFilters,
   SaleRPC,
   SalesSlice,

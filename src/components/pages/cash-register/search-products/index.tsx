@@ -28,9 +28,7 @@ const SearchProducts = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
   const [inputIsFocused, setInputIsFocused] = useState(false);
-  const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const { isPhablet, isTablet } = useMediaQuery();
+  const { isTablet } = useMediaQuery();
   const [openBarCode, setOpenBarCode] = useState(false);
   const { message } = App.useApp();
   const listReft = useRef<HTMLDivElement | null>(null);
@@ -38,70 +36,12 @@ const SearchProducts = () => {
 
   const handleInputTextChange = useDebouncedCallback(() => {
     let _products = productHelpers.searchProducts(searchText, products);
-    setCurrentProducts(_products?.slice(0, 30) || []);
+    setCurrentProducts(_products);
   }, 250);
 
   useEffect(() => {
     handleInputTextChange();
   }, [products, searchText]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (currentProducts.length) {
-        let addPosition = !isPhablet ? 2 : 1;
-        let inputIsFocused = document.activeElement === searchInputRef.current?.input;
-
-        if (event.key === 'ArrowDown') {
-          if (selectedCardIndex === -1) {
-            setSelectedCardIndex(0);
-            cardRefs.current[0]?.focus();
-          } else if (selectedCardIndex < currentProducts.length - 1) {
-            if (!isPhablet && selectedCardIndex + 2 >= currentProducts.length - 1) {
-              setSelectedCardIndex(currentProducts.length - 1);
-            } else {
-              setSelectedCardIndex(prevIndex => prevIndex + addPosition);
-            }
-            cardRefs.current[selectedCardIndex + addPosition]?.focus();
-          } else {
-            setSelectedCardIndex(-1);
-            searchInputRef.current?.focus();
-          }
-        } else if (event.key === 'ArrowUp' && selectedCardIndex > 0 && !inputIsFocused) {
-          setSelectedCardIndex(prevIndex => prevIndex - addPosition);
-          cardRefs.current[selectedCardIndex - addPosition]?.focus();
-        } else if (event.key === 'ArrowUp' && selectedCardIndex === 0) {
-          setSelectedCardIndex(-1);
-          searchInputRef.current?.focus();
-        } else if (event.key === 'ArrowLeft' && !inputIsFocused) {
-          setSelectedCardIndex(prevIndex => prevIndex - 1);
-          cardRefs.current[selectedCardIndex - 1]?.focus();
-        } else if (event.key === 'ArrowRight' && !inputIsFocused) {
-          setSelectedCardIndex(prevIndex => prevIndex + 1);
-          cardRefs.current[selectedCardIndex + 1]?.focus();
-        } else if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
-          event.preventDefault();
-          searchInputRef.current?.focus();
-        }
-      }
-    };
-
-    if (!currentProducts.length) {
-      cardRefs.current = [];
-    }
-
-    const handleClick = () => {
-      setSelectedCardIndex(-1);
-      cardRefs.current = [];
-    };
-
-    window.addEventListener('keydown', handleKeyDown as unknown as EventListener);
-    window.addEventListener('click', handleClick);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown as unknown as EventListener);
-      window.removeEventListener('click', handleClick);
-    };
-  }, [selectedCardIndex, currentProducts, isPhablet]);
 
   const handleItemInteract = (item: Product) => {
     dispatch(salesActions.cashRegister.add({ product: item }));
@@ -120,7 +60,7 @@ const SearchProducts = () => {
   };
 
   const onSuccessScan = (barcode: string) => {
-    let productFound = products?.find(product => product.code === barcode);
+    let productFound = products?.find((product) => product.code === barcode);
 
     if (!productFound?.product_id) {
       message.error('Producto no encontrado', 5);
@@ -142,7 +82,7 @@ const SearchProducts = () => {
           <BarcodeScanner
             paused={!openBarCode}
             onCancel={() => setOpenBarCode(false)}
-            onScan={value => {
+            onScan={(value) => {
               onSuccessScan(value[0].rawValue);
             }}
           />
@@ -158,7 +98,7 @@ const SearchProducts = () => {
               value={searchText}
               onFocus={() => {
                 setInputIsFocused(!isTablet);
-                setCurrentProducts(products?.slice(0, 16) || []);
+                setCurrentProducts(products);
                 searchInputRef.current?.select();
               }}
               onBlur={() => {
@@ -192,41 +132,22 @@ const SearchProducts = () => {
       <div className="min-h-[calc(100dvh-169px)] max-h-[calc(100dvh-169px)] overflow-x-auto pt-0 pb-0 md:pt-4 md:pb-4">
         {!!searchText || inputIsFocused ? (
           <div className="px-3 pt-2 md:pt-0">
-            {currentProducts.length > 0 ? (
+            {currentProducts?.length ? (
               <Row ref={listReft} gutter={[20, 20]}>
-                {currentProducts.map((product, index) => {
+                {currentProducts.map((product) => {
                   const price = productHelpers.getProductPrice(product, price_id || null);
                   return (
                     <Col key={product.product_id} lg={12} md={24} xs={24}>
-                      <div
-                        ref={el => (cardRefs.current[index] = el)}
-                        tabIndex={0}
-                        className={`outline outline-2 rounded-lg box-border overflow-hidden ${
-                          selectedCardIndex === index ? 'outline-primary' : 'outline-transparent'
-                        }`}
-                        onFocus={() => setSelectedCardIndex(index)}
-                        onKeyDown={event => {
-                          if (event.key === 'Enter') {
-                            setInputIsFocused(false);
-                            handleItemInteract(product);
-                          }
-                        }}
-                      >
-                        <ItemProduct
-                          key={product.product_id}
-                          imageSrc={product.image_url}
-                          title={product.name}
-                          price={price}
-                          category={(product as any)?.categories?.name}
-                          size={(product as any)?.sizes?.name}
-                          onClick={() => {
-                            handleItemInteract(product);
-                            setInputIsFocused(false);
-                          }}
-                          isFavorite={profile?.favorite_products?.includes(product.product_id)}
-                          onFavorite={() => handleFavorite(product.product_id)}
-                        />
-                      </div>
+                      <ItemProduct
+                        imageSrc={product.image_url}
+                        title={product.name}
+                        price={price}
+                        category={(product as any)?.categories?.name}
+                        size={(product as any)?.sizes?.name}
+                        onClick={() => handleItemInteract(product)}
+                        isFavorite={profile?.favorite_products?.includes(product.product_id)}
+                        onFavorite={() => handleFavorite(product.product_id)}
+                      />
                     </Col>
                   );
                 })}

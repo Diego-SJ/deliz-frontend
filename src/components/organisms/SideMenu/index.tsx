@@ -1,5 +1,4 @@
 import {
-  HomeOutlined,
   LogoutOutlined,
   DollarOutlined,
   ShoppingOutlined,
@@ -12,6 +11,7 @@ import {
   ClockCircleOutlined,
   BarChartOutlined,
   ReadOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
@@ -27,11 +27,7 @@ import { Profile } from '@/redux/reducers/users/types';
 import { createElement } from 'react';
 import { APP_VERSION } from '@/constants/versions';
 import MyMembershipCard from '../membership';
-import {
-  AppModules,
-  ModuleAccess,
-  useMembershipAccess,
-} from '@/routes/module-access';
+import { AppModules, ModuleAccess, useMembershipAccess } from '@/routes/module-access';
 import { ChevronUp } from 'lucide-react';
 import { appActions } from '@/redux/reducers/app';
 import { LayoutSider } from '../MainLayout/styles';
@@ -41,13 +37,10 @@ type SideMenuProps = {
   onClick?: (args?: any) => void;
 };
 
-export const ITEM_LIST = (
-  permissions: Profile['permissions'],
-  hasAccess: (key: AppModules) => boolean,
-) => [
+export const ITEM_LIST = (permissions: Profile['permissions'], hasAccess: (key: AppModules) => boolean) => [
   {
     key: 'dashboard',
-    icon: HomeOutlined,
+    icon: AppstoreOutlined,
     label: 'Inicio',
     path: APP_ROUTES.PRIVATE.HOME.path,
   },
@@ -110,8 +103,7 @@ export const ITEM_LIST = (
         path: APP_ROUTES.PRIVATE.PURCHASES_EXPENSES.path,
       }
     : null,
-  !!Object.values(permissions?.reports || {}).some((item) => item?.value) &&
-  hasAccess('reports')
+  !!Object.values(permissions?.reports || {}).some((item) => item?.value) && hasAccess('reports')
     ? {
         key: 'reports',
         icon: BarChartOutlined,
@@ -119,8 +111,7 @@ export const ITEM_LIST = (
         path: APP_ROUTES.PRIVATE.REPORTS.path,
       }
     : null,
-  permissions?.online_store?.view_online_store?.value &&
-  hasAccess('online_store')
+  permissions?.online_store?.view_online_store?.value && hasAccess('online_store')
     ? {
         key: 'online_catalog',
         icon: ReadOutlined,
@@ -141,15 +132,12 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { permissions } = useAppSelector(
-    ({ users }) => users?.user_auth?.profile!,
-  );
+  const { permissions } = useAppSelector(({ users }) => users?.user_auth?.profile!);
   const { hasAccess } = useMembershipAccess();
   const { company, navigation } = useAppSelector(({ app }) => app);
   const { isAdmin, profile } = useAppSelector(({ users }) => users?.user_auth);
   const [modal, contextHolder] = Modal.useModal();
-  const collapsed =
-    navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
+  const collapsed = navigation.collapsed && !isPhablet ? true : isPhablet && !isTablet;
 
   const handleLogout = () => {
     modal.confirm({
@@ -176,19 +164,11 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
       className="!border-r !min-h-[100dvh] !max-h-[100dvh]"
       theme={'light'}
     >
-      <Logo
-        collapsed={collapsed}
-        src={company?.logo_url || LogoAppWhite}
-        title="D'eliz"
-      />
+      <Logo collapsed={collapsed} src={company?.logo_url || LogoAppWhite} title="D'eliz" />
 
       {profile?.permissions?.pos?.add_sale?.value || isAdmin ? (
         <div className="flex md:px-4 mb-2 mt-5 w-full justify-center">
-          <Tooltip
-            title={collapsed ? 'Nueva venta' : ''}
-            color="purple-inverse"
-            overlayInnerStyle={{ fontSize: 12 }}
-          >
+          <Tooltip title={collapsed ? 'Nueva venta' : ''} color="purple-inverse" overlayInnerStyle={{ fontSize: 12 }}>
             <Button
               className="w-full step-new_sale_btn"
               icon={<PlusCircleOutlined />}
@@ -208,17 +188,9 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
         <Button
           size="small"
           shape="circle"
-          icon={
-            <ChevronUp
-              className={`${collapsed ? 'rotate-90' : '-rotate-90'} w-4 stroke-2`}
-            />
-          }
+          icon={<ChevronUp className={`${collapsed ? 'rotate-90' : '-rotate-90'} w-4 stroke-2`} />}
           className="absolute top-3 -right-3 z-50"
-          onClick={() =>
-            dispatch(
-              appActions.setNavigation({ collapsed: !navigation?.collapsed }),
-            )
-          }
+          onClick={() => dispatch(appActions.setNavigation({ collapsed: !navigation?.collapsed }))}
         />
       )}
       <MenuRoot
@@ -231,10 +203,7 @@ const SideMenu = ({ onClick }: SideMenuProps) => {
             key,
             icon: createElement(item?.icon),
             label: item?.label,
-            className:
-              (location.pathname?.includes(item.path)
-                ? 'ant-menu-item-selected'
-                : '') + `step-${item.key}`,
+            className: (location.pathname?.includes(item.path) ? 'ant-menu-item-selected' : '') + `step-${item.key}`,
             onClick: () => handlePathChange(item?.path),
             children: item?.children?.length
               ? item.children.map((subItem: any) => {
