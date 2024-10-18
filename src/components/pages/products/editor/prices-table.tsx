@@ -16,7 +16,7 @@ type Props = {
 
 const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
   const { prices_list } = useAppSelector((state) => state.branches);
-  const { profile } = useAppSelector(({ users }) => users?.user_auth);
+  const { profile, isAdmin } = useAppSelector(({ users }) => users?.user_auth);
   const [unitPrice, setUnitPrice] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -40,7 +40,7 @@ const PricesTable = ({ onChange, priceList, setPriceList }: Props) => {
       <CardRoot
         title="Precios"
         extra={
-          profile?.permissions?.price_list?.add_price?.value && (
+          (profile?.permissions?.price_list?.add_price?.value || isAdmin) && (
             <Button icon={<PlusCircleOutlined />} onClick={() => handleModal()}>
               Agregar nuevo precio
             </Button>

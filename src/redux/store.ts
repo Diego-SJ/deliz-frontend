@@ -13,6 +13,7 @@ import ordersReducer from './reducers/orders';
 import operatingCostsReducer from './reducers/operating-costs';
 import analyticsReducer from './reducers/analytics';
 import storesReducer from './reducers/stores';
+import printerReducer from './reducers/printer';
 
 const rootReducer = combineReducers({
   app: appReducer,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   branches: branchesReducer,
   analytics: analyticsReducer,
   stores: storesReducer,
+  printer: printerReducer,
 });
 
 const persistConfig = { key: 'deliz.app', version: 1, storage };
@@ -34,7 +36,7 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),

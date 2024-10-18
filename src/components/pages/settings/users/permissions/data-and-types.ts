@@ -120,8 +120,8 @@ export const PERMISSIONS_DENIED = {
     edit_product: { value: false },
     delete_product: { value: false },
     show_in_catalog: { value: false },
-    update_stock: { value: false },
-    update_price: { value: false },
+    // update_stock: { value: false },
+    // update_price: { value: false },
     update_image: { value: false },
   },
   online_store: {
@@ -135,7 +135,7 @@ export const PERMISSIONS_DENIED = {
     delete_customer: { value: false },
   },
   company: {
-    view_company: { value: false },
+    // view_company: { value: false },
     edit_company: { value: false },
   },
   branches: {

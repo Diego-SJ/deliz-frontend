@@ -26,19 +26,13 @@ const ChangeCustomerModal = () => {
   const { isTablet } = useMediaQuery();
 
   useEffect(() => {
-    let _customers: Option[] = customers.map(item => ({ value: item.customer_id, label: item.name, ...item }));
+    let _customers: Option[] = customers.map((item) => ({ value: item.customer_id, label: item.name, ...item }));
     setCustomerList(_customers);
   }, [customers]);
 
   useEffect(() => {
     setCurrentCustomerId(current_sale?.metadata?.customer_id || null);
   }, [current_sale]);
-
-  const checkCustomerList = () => {
-    if (!customerList.length) {
-      dispatch(customerActions.fetchCustomers());
-    }
-  };
 
   const onClose = () => {
     setIsCreating(false);
@@ -58,6 +52,9 @@ const ChangeCustomerModal = () => {
   };
 
   const onAddNew = () => {
+    if (!customers?.length) {
+      dispatch(customerActions.fetchCustomers({ refetch: true }));
+    }
     setOpenForm(true);
   };
 
@@ -70,44 +67,50 @@ const ChangeCustomerModal = () => {
     return (
       <>
         {isCreating ? (
-          <CustomerEditor onSuccess={value => onChange(value?.customer_id || null)} />
+          <CustomerEditor onSuccess={(value) => onChange(value?.customer_id || null)} />
         ) : (
           <>
             <Typography.Text type="secondary" className="block mb-4">
               Selecciona un cliente
             </Typography.Text>
-            <Select
-              showSearch
-              style={{ width: '100%', height: 58 }}
-              size="large"
-              value={currentCustomerId as number}
-              placeholder="Buscar cliente"
-              virtual={false}
-              suffixIcon={loading ? <LoadingOutlined /> : <SearchOutlined />}
-              optionFilterProp="children"
-              className="xl-select"
-              onChange={onChange}
-              disabled={loading}
-              onClick={checkCustomerList}
-              filterOption={(input, option) => {
-                return (
-                  functions.includes(option?.label, input.toLowerCase()) || functions.includes(option?.phone, input.toLowerCase())
-                );
-              }}
-              options={customerList}
-              optionRender={option => {
-                if (option.value === '') return null;
-                return (
-                  <div className="flex items-center px-0 py-0 gap-4">
-                    <Avatar shape="square" icon={<UserOutlined className="text-primary" />} className="bg-primary/10" />
-                    <div className="flex flex-col">
-                      <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
-                      <span className="text-slate-400 font-light">{option?.data?.phone || 'Sin número'}</span>{' '}
+            {customers?.length ? (
+              <Select
+                showSearch
+                style={{ width: '100%', height: 58 }}
+                size="large"
+                value={currentCustomerId as number}
+                placeholder="Buscar cliente"
+                virtual={false}
+                suffixIcon={loading ? <LoadingOutlined /> : <SearchOutlined />}
+                optionFilterProp="children"
+                className="xl-select"
+                onChange={onChange}
+                disabled={loading}
+                filterOption={(input, option) => {
+                  return (
+                    functions.includes(option?.label, input.toLowerCase()) ||
+                    functions.includes(option?.phone, input.toLowerCase())
+                  );
+                }}
+                options={customerList}
+                optionRender={(option) => {
+                  if (option.value === '') return null;
+                  return (
+                    <div className="flex items-center px-0 py-0 gap-4">
+                      <Avatar
+                        shape="square"
+                        icon={<UserOutlined className="text-primary" />}
+                        className="bg-primary/10"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-normal text-base mb-0 lowercase">{option.label}</span>{' '}
+                        <span className="text-slate-400 font-light">{option?.data?.phone || 'Sin número'}</span>{' '}
+                      </div>
                     </div>
-                  </div>
-                );
-              }}
-            />
+                  );
+                }}
+              />
+            ) : null}
             <div
               onClick={() => onChange(null)}
               className="flex items-center px-2 py-2 gap-3 hover:bg-gray-50 cursor-pointer border rounded-lg my-2"
@@ -140,7 +143,15 @@ const ChangeCustomerModal = () => {
 
   return (
     <>
-      <Button shape="circle" size="large" className="!w-fit -mt-5" type="text" icon={<EditOutlined />} block onClick={onAddNew} />
+      <Button
+        shape="circle"
+        size="large"
+        className="!w-fit -mt-5"
+        type="text"
+        icon={<EditOutlined />}
+        block
+        onClick={onAddNew}
+      />
       {!isTablet ? (
         <Modal
           title={<Typography.Title level={4}>Actualizar cliente</Typography.Title>}

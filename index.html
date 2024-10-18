@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,5 +15,49 @@
   <body class="overscroll-none">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@point-of-sale/webbluetooth-receipt-printer/dist/webbluetooth-receipt-printer.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/NielsLeenheer/ReceiptPrinterEncoder@main/dist/receipt-printer-encoder.umd.js"></script>
+
+    <button hidden id="connect-to-printer-btn" class="bg-red-500 hidden" onclick="handleConnectButtonClick()">
+      Connect to printer
+    </button>
+    <button hidden id="print-receipt-btn" class="bg-red-500 hidden" onclick="printReceipt()">printReceipt</button>
+    <script>
+      const receiptPrinter = new WebBluetoothReceiptPrinter();
+
+      function handleConnectButtonClick() {
+        receiptPrinter.connect();
+      }
+
+      let printerLanguage = '';
+      let printerCodepageMapping = '';
+      let lastUsedDevice = null;
+
+      receiptPrinter.addEventListener('connected', (device) => {
+        console.info('Device connected', device);
+
+        printerLanguage = device.language;
+        printerCodepageMapping = device.codepageMapping;
+        lastUsedDevice = device;
+      });
+
+      async function printReceipt() {
+        try {
+          console.log('printerLanguage', printerLanguage || 'undefined');
+          console.log('printerCodepageMapping', printerCodepageMapping || 'undefined');
+          let encoder = await new ReceiptPrinterEncoder({
+            language: printerLanguage || 'esc-pos',
+            // codepageMapping: printerCodepageMapping || 'default',
+          });
+
+          console.log({ encoder });
+
+          let data = encoder.initialize().codepage('auto').line('hola mi amor te amo <3').newline().encode();
+          receiptPrinter.print(data);
+        } catch (error) {
+          console.info('Error while printing', error);
+        }
+      }
+    </script> -->
   </body>
 </html>

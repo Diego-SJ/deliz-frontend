@@ -1,4 +1,4 @@
-import { PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
+import { PAYMENT_METHOD_SHORT_NAME, PAYMENT_METHODS_KEYS } from '@/constants/payment_methods';
 import { STATUS_DATA } from '@/constants/status';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { salesActions } from '@/redux/reducers/sales';
@@ -14,12 +14,17 @@ import {
   LoadingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Collapse, DatePicker, InputNumber, Tag, Typography } from 'antd';
+import { App, Avatar, Button, Collapse, DatePicker, InputNumber, Tag, Typography } from 'antd';
 import { Dispatch, memo, SetStateAction, useRef, useState } from 'react';
 import { FinishSaleData } from '.';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
+import { connectPrinter, disconnectPrinter, printData } from '@/redux/reducers/printer';
+import ReceiptPrinterEncoder from '@point-of-sale/receipt-printer-encoder';
+import { cashierHelpers } from '@/utils/cashiers';
+import { Branch } from '@/redux/reducers/branches/type';
+import useDeviceInfo from '@/feature-flags/useDeviceInfo';
 
 type Props = {
   total: number;
@@ -28,20 +33,28 @@ type Props = {
   onChange?: Dispatch<SetStateAction<FinishSaleData>>;
 };
 
-const disabledDate: RangePickerProps['disabledDate'] = current => {
+const disabledDate: RangePickerProps['disabledDate'] = (current) => {
   // Can not select days before today and today
   return current && current < dayjs().endOf('day');
 };
 
 const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, value }: Props) => {
+  const { message } = App.useApp();
+  const { isTablet } = useMediaQuery();
   const dispatch = useAppDispatch();
+  const { mode, items, customer_id } = useAppSelector(({ sales }) => sales.cash_register);
+  const { isConnected, device, error } = useAppSelector(({ printer }) => printer);
+  const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
+  const { customers } = useAppSelector(({ customers }) => customers);
+  const { company } = useAppSelector(({ app }) => app);
+  const { isDesktop, browserName } = useDeviceInfo();
+
+  const [orderDueDate, setOrderDueDate] = useState('');
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
   const [_, suggestion1, suggestion2] = functions.getRoundedValues(total);
   const { receivedMoney, paymentMethod, saleCreated } = value;
-  const [orderDueDate, setOrderDueDate] = useState('');
-  const { isTablet } = useMediaQuery();
-  const { mode } = useAppSelector(({ sales }) => sales.cash_register);
   const isOrder = mode === 'order';
 
   const saveSale = async (statusId: number) => {
@@ -51,7 +64,8 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
       payment_method: paymentMethod as string,
       status_id: statusId,
       amount_paid: statusId === STATUS_DATA.PAID.id ? receivedMoney || 0 : 0,
-      cashback: statusId === STATUS_DATA.PAID.id ? (total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney)) : 0,
+      cashback:
+        statusId === STATUS_DATA.PAID.id ? (total - receivedMoney >= 0 ? 0 : Math.abs(total - receivedMoney)) : 0,
       total: total,
     };
 
@@ -62,14 +76,166 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
     if (!!sale?.sale_id) {
       let success = await dispatch(salesActions.saveSaleItems(sale as Sale));
       if (success) {
-        onChange(prev => ({ ...prev, saleCreated: sale as Sale }));
+        onChange((prev) => ({ ...prev, saleCreated: sale as Sale }));
+        handlePrint(sale);
       }
     }
     setLoading(false);
   };
 
+  const reconnectPrinter = () => {
+    message.loading('La impresora no está conectada, conecta la impresora e intenta de nuevo.');
+    dispatch(disconnectPrinter());
+    dispatch(connectPrinter());
+  };
+
+  const handlePrint = async (sale: Sale) => {
+    if (!isConnected || !device || error || (!isDesktop && browserName !== 'Chrome')) {
+      return;
+    }
+
+    const customer = customers.find((item) => item?.customer_id === customer_id);
+    let subtotal = 0;
+    const tableRows = (items || [])?.map((item) => {
+      subtotal += (item.quantity || 0) * (item.price || 0);
+      return [
+        item?.product?.name || '- - -',
+        (item.quantity || 0).toString(),
+        functions.money(item.price || 0),
+        functions.money((item.quantity || 0) * (item.price || 0)),
+      ];
+    });
+
+    try {
+      let encoder = new ReceiptPrinterEncoder({ language: device?.language, width: 32 });
+      encoder
+        .initialize()
+        .codepage('auto')
+        .newline()
+        .align('center')
+        .text('Recibo de venta')
+        .newline()
+        .align('left')
+        .size(2, 2)
+        .text(company?.name || 'Possify')
+        .newline()
+        .newline()
+        .size(1, 1)
+        .align('left')
+        .text('Fecha de venta:')
+        .newline()
+        .align('left')
+        .text(functions.formatToLocalTimezone(sale?.created_at?.toString() || ''))
+        .newline()
+        .newline()
+        .align('left')
+        .line('Cliente:')
+        .line(`Nombre: ${customer?.name || 'Público General'}`)
+        .line(`Teléfono: ${customer?.phone || 'N/A'}`)
+        .line(`Dirección: ${customer?.address || 'N/A'}`)
+        .newline()
+        .font('B')
+        .table(
+          [
+            { width: 12, align: 'left' },
+            { width: 10, align: 'center' },
+            { width: 10, align: 'center' },
+            { width: 10, align: 'right' },
+          ],
+          [
+            [
+              (encoder) => encoder.bold(true).text('Nombre').bold(false),
+              (encoder) => encoder.bold(true).text('Cant.').bold(false),
+              (encoder) => encoder.bold(true).text('Precio').bold(false),
+              (encoder) => encoder.bold(true).text('Total').bold(false),
+            ],
+            [
+              (encoder) => encoder.rule(),
+              (encoder) => encoder.rule(),
+              (encoder) => encoder.rule(),
+              (encoder) => encoder.rule(),
+            ],
+            ...tableRows,
+          ],
+        )
+        .font('A')
+        .newline()
+        .align('left')
+        .text(`Artículos: ${items?.reduce((acc, item) => acc + (item?.quantity || 0), 0)}`)
+        .newline()
+        .newline()
+        .align('right')
+        .text(`Subtotal: ${functions.money(subtotal || 0)}`);
+
+      if (!!sale?.shipping) {
+        encoder
+          .newline()
+          .align('right')
+          .text(`Envio: ${functions.money(sale?.shipping || 0)}`);
+      }
+      if (!!sale?.discount) {
+        encoder
+          .newline()
+          .align('right')
+          .text(
+            `Descuento: ${sale?.discount_type === 'AMOUNT' ? '$' : ''}${sale?.discount}${
+              sale?.discount_type === 'PERCENTAGE' ? '%' : ''
+            }`,
+          );
+      }
+
+      encoder
+        .newline()
+        .align('right')
+        .text(`TOTAL: ${functions.money(sale?.total || 0)}`)
+        .newline()
+        .newline()
+
+        .newline()
+        .align('center')
+        .text(`Recibido: ${functions.money(receivedMoney || 0)}`)
+        .newline()
+        .align('center')
+        .text(`Cambio: ${functions.money(sale?.cashback || 0)}`)
+        .newline()
+        .align('center')
+        .text(`Forma de pago: ${PAYMENT_METHOD_SHORT_NAME[sale?.payment_method || ''] || '- - -'}`)
+        .newline()
+        .align('center')
+        .text(`Estatus de la venta: ${sale?.status_id === STATUS_DATA.PENDING.id ? 'Pendiente' : 'Pagado'}`)
+        .newline()
+        .align('center')
+        .text(`${company?.name || '- - -'}`)
+        .newline()
+        .align('center')
+        .text(`Sucursal ${currentBranch?.name || '- - -'}`)
+        .newline()
+        .align('center')
+        .text(`Caja ${currentCashRegister?.name || '- - -'}`)
+        .newline()
+        .align('center')
+        .text(cashierHelpers.getAddress(currentBranch as Branch))
+        .newline()
+        .align('center')
+        .text(`Contacto: ${currentBranch?.phone || company?.phone || 'Tel.: N/A'}`)
+        .newline()
+        .newline()
+        .align('center')
+        .text('¡GRACIAS POR SU COMPRA!')
+        .cut()
+        .newline()
+        .newline()
+        .newline();
+
+      dispatch(printData(encoder.encode()));
+    } catch (error) {
+      reconnectPrinter();
+    }
+  };
+
   return (
     <div>
+      {browserName}
       {!saleCreated?.sale_id && !isTablet && (
         <Typography.Title level={5} className="mb-3">
           Finalizar {isOrder ? 'pedido' : 'venta'}
@@ -109,11 +275,11 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
               defaultActiveKey={[PAYMENT_METHODS_KEYS.CASH]}
               accordion
               destroyInactivePanel={false}
-              onChange={value => {
+              onChange={(value) => {
                 if (value[0] !== PAYMENT_METHODS_KEYS.CASH) {
-                  onChange(prev => ({ ...prev, receivedMoney: total }));
+                  onChange((prev) => ({ ...prev, receivedMoney: total }));
                 }
-                onChange(prev => ({ ...prev, paymentMethod: value[0] }));
+                onChange((prev) => ({ ...prev, paymentMethod: value[0] }));
               }}
               items={[
                 {
@@ -135,13 +301,13 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                         addonBefore="$"
                         value={receivedMoney}
                         style={{ width: '100%', marginBottom: 10 }}
-                        onFocus={target => {
+                        onFocus={(target) => {
                           target.currentTarget.select();
                         }}
                         type="number"
                         inputMode="decimal"
-                        onChange={value => {
-                          onChange(prev => ({ ...prev, receivedMoney: value || 0 }));
+                        onChange={(value) => {
+                          onChange((prev) => ({ ...prev, receivedMoney: value || 0 }));
                         }}
                       />
                       <div className="flex justify-between gap-4">
@@ -156,7 +322,9 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                               saveSale(STATUS_DATA.PAID.id);
                             }}
                           >
-                            {receivedMoney < total ? 'Monto menor al total' : `Recibir ${functions.money(receivedMoney)}`}
+                            {receivedMoney < total
+                              ? 'Monto menor al total'
+                              : `Recibir ${functions.money(receivedMoney)}`}
                           </Button>
                         ) : (
                           <>
@@ -164,7 +332,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                               className="w-full"
                               type="primary"
                               size="large"
-                              onClick={() => onChange(prev => ({ ...prev, receivedMoney: total }))}
+                              onClick={() => onChange((prev) => ({ ...prev, receivedMoney: total }))}
                             >
                               {functions.money(total)}
                             </Button>
@@ -172,7 +340,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                               className="w-full"
                               type="primary"
                               size="large"
-                              onClick={() => onChange(prev => ({ ...prev, receivedMoney: suggestion1 }))}
+                              onClick={() => onChange((prev) => ({ ...prev, receivedMoney: suggestion1 }))}
                             >
                               {functions.money(suggestion1)}
                             </Button>
@@ -180,7 +348,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                               className="w-full"
                               type="primary"
                               size="large"
-                              onClick={() => onChange(prev => ({ ...prev, receivedMoney: suggestion2 }))}
+                              onClick={() => onChange((prev) => ({ ...prev, receivedMoney: suggestion2 }))}
                             >
                               {functions.money(suggestion2)}
                             </Button>
@@ -286,7 +454,7 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                 className="w-full"
                 disabledDate={disabledDate}
                 format={'D [de] MMMM, YYYY'}
-                onChange={date => {
+                onChange={(date) => {
                   setOrderDueDate(!!date ? dayjs(date).format('YYYY-MM-DD') : '');
                 }}
               />
@@ -323,8 +491,8 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
                 {isOrder
                   ? 'Pedido registrado'
                   : saleCreated?.status_id === STATUS_DATA.PENDING.id
-                  ? 'Venta guardada'
-                  : '¡Venta completada!'}
+                    ? 'Venta guardada'
+                    : '¡Venta completada!'}
               </Typography.Title>
             </div>
 
@@ -349,7 +517,11 @@ const PaymentMethods = ({ total, onSuccess = () => null, onChange = () => null, 
               >
                 Cerrar
               </Button>
-              <a className="w-full" href={APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(saleCreated?.sale_id)}`} target="_blank">
+              <a
+                className="w-full"
+                href={APP_ROUTES.PRIVATE.SALE_DETAIL.hash`${Number(saleCreated?.sale_id)}`}
+                target="_blank"
+              >
                 <Button
                   className="w-full"
                   size="large"

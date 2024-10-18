@@ -11,18 +11,7 @@ import {
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import {
-  Avatar,
-  Breadcrumb,
-  Button,
-  Col,
-  Dropdown,
-  Input,
-  Row,
-  Tag,
-  Typography,
-  Table,
-} from 'antd';
+import { Avatar, Breadcrumb, Button, Col, Dropdown, Input, Row, Tag, Typography, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -50,9 +39,7 @@ const columns = (branch_id: string) =>
             {...(!!record?.image_url
               ? { src: record.image_url }
               : {
-                  icon: (
-                    <FileImageOutlined className="text-slate-600 text-base" />
-                  ),
+                  icon: <FileImageOutlined className="text-slate-600 text-base" />,
                 })}
             className={`bg-slate-600/10 p-1 w-8 min-w-8 h-8`}
             size="large"
@@ -68,22 +55,15 @@ const columns = (branch_id: string) =>
       align: 'center',
       render: (_: number, record) => {
         const stock = productHelpers.getProductStock(record || null, branch_id);
-        return (
-          <Tag color={stock >= 0 ? '' : 'volcano'}>
-            {`${stock} unidades` || 'Sin stock'}
-          </Tag>
-        );
+        return <Tag color={stock >= 0 ? '' : 'volcano'}>{`${stock} unidades` || 'Sin stock'}</Tag>;
       },
     },
 
     {
       title: 'Precio',
       dataIndex: 'retail_price',
-      render: (value: number, record) => {
-        let price =
-          Object.values(record.price_list || {})?.find(
-            (item) => !!item?.is_default,
-          )?.unit_price || value;
+      render: (_: number, record) => {
+        let price = productHelpers.getDefaultPrice(record.price_list || {}, record?.raw_price);
         return <span>{functions.money(price)}</span>;
       },
       width: 70,
@@ -109,13 +89,9 @@ const categoriesSelected = (categories: number[]) => {
 const Products = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { products, categories, filters, loading } = useAppSelector(
-    ({ products }) => products,
-  );
+  const { products, categories, filters, loading } = useAppSelector(({ products }) => products);
   const { currentBranch } = useAppSelector(({ branches }) => branches);
-  const { permissions } = useAppSelector(
-    ({ users }) => users.user_auth.profile!,
-  );
+  const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
   const [options, setOptions] = useState<Product[]>([]);
   const { isTablet } = useMediaQuery();
   const isFirstRender = useRef(true);
@@ -147,9 +123,7 @@ const Products = () => {
 
   const onRowClick = (record: DataType) => {
     dispatch(productActions.setCurrentProduct(record));
-    navigate(
-      APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'edit'}${record.product_id}`,
-    );
+    navigate(APP_ROUTES.PRIVATE.PRODUCT_EDITOR.hash`${'edit'}${record.product_id}`);
   };
 
   const onRefresh = () => {
@@ -234,9 +208,7 @@ const Products = () => {
             <Col lg={4} xs={12}>
               <Dropdown
                 menu={{
-                  selectedKeys: categoriesSelected(
-                    filters?.products?.categories || [],
-                  ),
+                  selectedKeys: categoriesSelected(filters?.products?.categories || []),
                   items: [
                     { label: 'Todas las categorías', key: 'ALL' },
                     ...(categories?.map((cat) => ({
@@ -250,11 +222,7 @@ const Products = () => {
                 }}
               >
                 <Button
-                  type={
-                    !filters?.products?.categories?.length
-                      ? 'default'
-                      : 'primary'
-                  }
+                  type={!filters?.products?.categories?.length ? 'default' : 'primary'}
                   block
                   className={`${!!filters?.products?.categories?.length ? '!bg-white' : ''}`}
                   ghost={!!filters?.products?.categories?.length}
@@ -262,9 +230,7 @@ const Products = () => {
                   icon={<AppstoreOutlined className="text-base" />}
                   onMouseEnter={() => {
                     if (!categories?.length) {
-                      dispatch(
-                        productActions.fetchCategories({ refetch: true }),
-                      );
+                      dispatch(productActions.fetchCategories({ refetch: true }));
                     }
                   }}
                 >
@@ -294,17 +260,11 @@ const Products = () => {
               >
                 <Button
                   type={
-                    !filters?.products?.order_by ||
-                    filters?.products?.order_by === 'name,asc'
-                      ? 'default'
-                      : 'primary'
+                    !filters?.products?.order_by || filters?.products?.order_by === 'name,asc' ? 'default' : 'primary'
                   }
                   block
                   className={`${!!filters?.products?.order_by && filters?.products?.order_by !== 'name,asc' ? '!bg-white' : ''}`}
-                  ghost={
-                    !!filters?.products?.order_by &&
-                    filters?.products?.order_by !== 'name,asc'
-                  }
+                  ghost={!!filters?.products?.order_by && filters?.products?.order_by !== 'name,asc'}
                   size={isTablet ? 'large' : 'middle'}
                   icon={<FilterOutlined className="text-base" />}
                 >
@@ -326,11 +286,7 @@ const Products = () => {
                   onClick: async ({ key }) => handleMoreOptions(key),
                 }}
               >
-                <Button
-                  block
-                  size={isTablet ? 'large' : 'middle'}
-                  icon={<Settings2 className="text-base w-4" />}
-                >
+                <Button block size={isTablet ? 'large' : 'middle'} icon={<Settings2 className="text-base w-4" />}>
                   Más opciones
                 </Button>
               </Dropdown>
@@ -366,19 +322,13 @@ const Products = () => {
                   scrollToFirstRowOnChange: true,
                 }}
                 locale={{
-                  emptyText: (
-                    <TableEmpty
-                      title="No hay productos para mostrar"
-                      onAddNew={onAddNew}
-                    />
-                  ),
+                  emptyText: <TableEmpty title="No hay productos para mostrar" onAddNew={onAddNew} />,
                 }}
                 columns={columns(currentBranch?.branch_id || '')}
                 dataSource={options}
                 pagination={{
                   defaultCurrent: 0,
-                  showTotal: (total, range) =>
-                    `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
+                  showTotal: (total, range) => `mostrando del ${range[0]} al ${range[1]} de ${total} elementos`,
                   showSizeChanger: true,
                   size: 'small',
                   onChange: (page, pageSize) => {
@@ -406,18 +356,11 @@ const Products = () => {
               $bodyHeight="calc(100dvh - 425px)"
               dataSource={options}
               locale={{
-                emptyText: (
-                  <TableEmpty
-                    title="No hay productos para mostrar"
-                    onAddNew={onAddNew}
-                    margin="small"
-                  />
-                ),
+                emptyText: <TableEmpty title="No hay productos para mostrar" onAddNew={onAddNew} margin="small" />,
               }}
               pagination={{
                 defaultCurrent: 1,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} de ${total}`,
+                showTotal: (total, range) => `${range[0]}-${range[1]} de ${total}`,
                 showSizeChanger: true,
                 size: 'small',
                 onChange: (page, pageSize) => {
@@ -438,8 +381,8 @@ const Products = () => {
                 pageSizeOptions: ['20', '50', '100'],
               }}
               renderItem={(item) => {
-                const { stock, hasStock } =
-                  productHelpers.calculateProductStock(item.inventory || {});
+                const { stock, hasStock } = productHelpers.calculateProductStock(item.inventory || {});
+                let price = productHelpers.getDefaultPrice(item.price_list || {}, item?.raw_price);
                 return (
                   <div
                     key={item.product_id}
@@ -448,20 +391,14 @@ const Products = () => {
                   >
                     <Avatar
                       src={item.image_url}
-                      icon={
-                        <FileImageOutlined className="text-slate-400 text-xl" />
-                      }
+                      icon={<FileImageOutlined className="text-slate-400 text-xl" />}
                       className={`bg-slate-600/10 p-1 w-11 min-w-11 h-11 min-h-11`}
                       size="large"
                       shape="square"
                     />
                     <div className="flex items-start flex-col gap-1 pl-4">
-                      <Typography.Paragraph className="!mb-0">
-                        {item.name}
-                      </Typography.Paragraph>
-                      <Typography.Text type="secondary">
-                        {functions.money(item.raw_price)}
-                      </Typography.Text>
+                      <Typography.Paragraph className="!mb-0">{item.name}</Typography.Paragraph>
+                      <Typography.Text type="secondary">{functions.money(price)}</Typography.Text>
                     </div>
 
                     <div className="flex flex-col text-end justify-center h-full items-end self-end ml-auto ">
@@ -470,9 +407,7 @@ const Products = () => {
                       </Typography.Text>
                       <Tag
                         className="ml-auto w-fit mx-0"
-                        color={functions.getTagColor(
-                          item?.categories?.name || 'empty',
-                        )}
+                        color={functions.getTagColor(item?.categories?.name || 'empty')}
                       >
                         {item?.categories?.name || 'Sin categoría'}
                       </Tag>
@@ -484,10 +419,7 @@ const Products = () => {
           )}
         </Col>
       </Row>
-      <CreateProductsByCsv
-        visible={openModal}
-        onClose={() => setOpenModal(false)}
-      />
+      <CreateProductsByCsv visible={openModal} onClose={() => setOpenModal(false)} />
       {isTablet && <BottomMenu addBottomMargin />}
     </div>
   );

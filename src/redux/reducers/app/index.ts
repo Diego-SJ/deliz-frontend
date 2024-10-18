@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppSlice, Company, Tour } from './types';
-import { Step } from 'react-joyride';
 import customActions from './actions';
 import { ONBOARDING_STEPS } from '@/constants/onboarding';
 
@@ -52,10 +51,7 @@ const app = createSlice({
     setCompany: (state, action: PayloadAction<Partial<Company>>) => {
       state.company = { ...state.company, ...action.payload };
     },
-    setNavigation: (
-      state,
-      action: PayloadAction<Partial<AppSlice['navigation']>>,
-    ) => {
+    setNavigation: (state, action: PayloadAction<Partial<AppSlice['navigation']>>) => {
       state.navigation = { ...state.navigation, ...action.payload };
     },
     setMobileCollapsed: (state, action: PayloadAction<boolean>) => {
@@ -67,10 +63,7 @@ const app = createSlice({
       }
       state.navigation.mobile.collapsed = action.payload;
     },
-    setOnboarding: (
-      state,
-      action: PayloadAction<Partial<AppSlice['onboarding']>>,
-    ) => {
+    setOnboarding: (state, action: PayloadAction<Partial<AppSlice['onboarding']>>) => {
       state.onboarding = { ...state.onboarding, ...action.payload };
     },
     setLoading: (state, action: PayloadAction<boolean>) => {

@@ -78,7 +78,7 @@ export const customActions = {
     message.info('Sucursal eliminada');
   },
   upsertPrice: (price: Partial<Price>) => async (dispatch: AppDispatch, getState: AppState) => {
-    const company_id = price?.company_id || getState()?.app?.company?.company_id;
+    const company_id = getState()?.app?.company?.company_id;
     const { error } = await supabase
       .from('prices_list')
       .upsert({ ...price, company_id })
@@ -94,7 +94,7 @@ export const customActions = {
   },
   getPrices: () => async (dispatch: AppDispatch, getState: AppState) => {
     const company_id = getState()?.app?.company?.company_id;
-    const user = getState().users?.user_auth;
+    const { isAdmin, profile } = getState().users?.user_auth;
 
     let supabaseQuery = supabase
       .from('prices_list')
@@ -102,8 +102,8 @@ export const customActions = {
       .order('created_at', { ascending: true })
       .eq('company_id', company_id);
 
-    if (!user?.isAdmin) {
-      supabaseQuery.in('price_id', user?.profile?.price_list || []);
+    if (!isAdmin) {
+      supabaseQuery.in('price_id', profile?.price_list || []);
     }
 
     const { data, error } = await supabaseQuery;

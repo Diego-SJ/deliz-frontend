@@ -6,7 +6,6 @@ import {
   InboxOutlined,
   MenuOutlined,
   SettingOutlined,
-  ShopOutlined,
   ShoppingOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
@@ -16,6 +15,9 @@ import { useState } from 'react';
 import { useAppSelector } from '@/hooks/useStore';
 import ChangeBranchModal from './change-branch-modal';
 import { useMembershipAccess } from '@/routes/module-access';
+import PrinterButton from '@/components/atoms/printer-btn';
+import { Store } from 'lucide-react';
+import useDeviceInfo from '@/feature-flags/useDeviceInfo';
 
 const CashierHeader = () => {
   const navigate = useNavigate();
@@ -23,18 +25,19 @@ const CashierHeader = () => {
   const [open, setOpen] = useState(false);
   const { currentBranch, currentCashRegister } = useAppSelector(({ branches }) => branches);
   const { permissions } = useAppSelector(({ users }) => users.user_auth.profile!);
+  const { isDesktop, browserName } = useDeviceInfo();
 
   const onNavigate = (path: string) => {
     navigate(path);
   };
 
   const handleOpen = () => {
-    setOpen(prev => !prev);
+    setOpen((prev) => !prev);
   };
 
   return (
     <HeaderRoot className="border-b border-gray-300 px-3">
-      <div className="flex items-center">
+      <div className="flex items-center gap-5">
         <Dropdown
           menu={{
             items: [
@@ -114,29 +117,27 @@ const CashierHeader = () => {
             <Button icon={<MenuOutlined className="text-2xl font-light" />} size="large" />
           </div>
         </Dropdown>
+        {isDesktop && browserName === 'Chrome' && <PrinterButton />}
       </div>
-
-      <HeaderActions>
-        <div
-          onClick={handleOpen}
-          className="flex gap-4 min-w-44 items-center hover:bg-slate-50 py-1 pl-3 pr-4 rounded-lg border border-transparent cursor-pointer hover:border-primary/30 "
-        >
-          <Avatar
-            shape="square"
-            size={40}
-            className={'bg-primary/10'}
-            icon={<ShopOutlined className="text-primary text-2xl font-light" />}
-          />
-          <div className="flex flex-col">
-            <Typography.Title className="avatar-title m-0 !text-sm leading-tight !font-medium capitalize" level={5}>
-              Sucursal {currentBranch?.name || 'Principal'}
-            </Typography.Title>
-            <Typography.Text className="leading-tight capitalize font-light" type="secondary">
-              Caja {currentCashRegister?.name}
-            </Typography.Text>
-          </div>
+      <div
+        onClick={handleOpen}
+        className="flex gap-4 min-w-fit items-center hover:bg-slate-50 py-1 pl-1 pr-2 rounded-lg border border-transparent cursor-pointer hover:border-primary/30 "
+      >
+        <Avatar
+          shape="square"
+          size={40}
+          className={'bg-primary/10 min-w-10'}
+          icon={<Store className="text-primary text-2xl font-light" />}
+        />
+        <div className="flex flex-col min-w-fit">
+          <Typography.Title className="avatar-title !m-0 !text-sm leading-tight !font-medium capitalize" level={5}>
+            Sucursal {currentBranch?.name || 'Principal'}
+          </Typography.Title>
+          <Typography.Text className="leading-tight capitalize font-light" type="secondary">
+            Caja {currentCashRegister?.name}
+          </Typography.Text>
         </div>
-      </HeaderActions>
+      </div>
       <ChangeBranchModal onCancel={handleOpen} open={open} />
     </HeaderRoot>
   );

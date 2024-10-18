@@ -8,8 +8,8 @@ export const cashierHelpers = {
     return regex.test(phoneClean);
   },
   getAddress: (branch: Branch) => {
-    return `${branch?.street || 'Domicilio Conocido'} ${branch?.ext_number || 'S/N'}, ${branch?.city || 'México'}, ${
-      branch?.zip_code || '000000'
+    return `${branch?.street || 'Domicilio Conocido'} ${branch?.ext_number || 'S/N'}, ${branch?.city || 'México'}${
+      branch?.zip_code ? `, C.P. ${branch?.zip_code}` : ''
     }`;
   },
 };
