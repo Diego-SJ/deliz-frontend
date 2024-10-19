@@ -46,6 +46,7 @@ import CustomersFullReport from '@/components/pages/reports/customers/full-repor
 import TermnsAndConditions from '@/components/pages/lading-page/terms-and-conditions';
 import PrivacyPolicy from '@/components/pages/lading-page/privacy-policy';
 import PrinterPage from '@/components/pages/settings/printer';
+import ProductsFullReport from '@/components/pages/reports/products/full-report';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -268,6 +269,17 @@ const AppRouter = () => {
             element={
               <ReportsLayout>
                 <SalesReports />
+              </ReportsLayout>
+            }
+          />
+        ) : null}
+
+        {permissions?.reports?.view_products_report?.value && hasAccess('reports') ? (
+          <Route
+            path={APP_ROUTES.PRIVATE.REPORTS.PRODUCTS.path}
+            element={
+              <ReportsLayout>
+                <ProductsFullReport />
               </ReportsLayout>
             }
           />

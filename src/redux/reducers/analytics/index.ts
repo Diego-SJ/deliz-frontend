@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AnalyticsSlice,
   CustomerAnalytics,
+  DebtorCustomers,
   ExpensesAnalytics,
   ExpensesFilters,
   LastCustomerSale,
@@ -91,11 +92,13 @@ const initialState: AnalyticsSlice = {
   },
   products: {
     top_products: [],
+    filters: { date_range: 'last_7_days', custom_dates: [null, null], limit: 10, order: 'desc' },
     loading: false,
   },
   customers: {
     top_customers: [],
     total_customers: 0,
+    debtor_customers: { data: [], total: 0 },
     last_customer_sales: {
       data: [],
       filters: {
@@ -113,6 +116,9 @@ const analytics = createSlice({
   initialState,
   reducers: {
     resetSlice: () => initialState,
+    setDebtorCustomers: (state, action: PayloadAction<DebtorCustomers>) => {
+      state.customers.debtor_customers = action.payload;
+    },
     setLastCustomerSales: (state, action: PayloadAction<LastCustomerSale[]>) => {
       if (!state?.customers?.last_customer_sales) {
         state.customers = {
@@ -154,6 +160,9 @@ const analytics = createSlice({
     },
     setProducts: (state, action: PayloadAction<Partial<ProductAnalytics>>) => {
       state.products = { ...state.products, ...action.payload };
+    },
+    setProductsFilters: (state, action: PayloadAction<Partial<ProductAnalytics['filters']>>) => {
+      state.products.filters = { ...state.products.filters, ...action.payload };
     },
     setCustomers: (state, action: PayloadAction<Partial<CustomerAnalytics>>) => {
       state.customers = { ...state.customers, ...action.payload };

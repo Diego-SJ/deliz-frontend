@@ -17,10 +17,7 @@ const ReportsHomePage = () => {
   const [hideData, setHideData] = useState(false);
 
   useEffect(() => {
-    if (
-      !firstLoad.current &&
-      profile?.permissions?.reports?.view_sales_report?.value
-    ) {
+    if (!firstLoad.current && profile?.permissions?.reports?.view_sales_report?.value) {
       firstLoad.current = true;
       dispatch(analyticsActions.sales.getWeekReport());
     }
@@ -33,24 +30,20 @@ const ReportsHomePage = () => {
   return (
     <div className="flex flex-col" ref={elementRef}>
       <div className="flex justify-between items-center  mb-5">
-        <p className="text-sm text-gray-500">
-          Aquí tienes un resumen de los reportes más importantes
-        </p>
+        <p className="text-sm text-gray-500">Aquí tienes un resumen de los reportes más importantes</p>
         <EyeButton onChange={handleHideData} hideData={hideData} />
       </div>
       <div className="grid grid-cols-1 gap-5 w-full mb-5">
         <ProfitShorcutReport hideData={hideData} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full mb-5">
-        {profile?.permissions?.reports?.view_sales_report?.value ? (
-          <ReportMarginShortcut hideData={hideData} />
-        ) : null}
+        {profile?.permissions?.reports?.view_sales_report?.value ? <ReportMarginShortcut hideData={hideData} /> : null}
         <ExpensesShortcutReport />
       </div>
       <div className="grid grid-cols-1  lg:grid-cols-2 gap-5">
-        {profile?.permissions?.reports?.view_sales_report?.value ? (
+        {/* {profile?.permissions?.reports?.view_sales_report?.value ? (
           <ReportSaleThumbnail hideData={hideData} />
-        ) : null}
+        ) : null} */}
         {profile?.permissions?.reports?.view_customers_report?.value ? (
           <TopCustomersThumbnail hideData={hideData} />
         ) : null}

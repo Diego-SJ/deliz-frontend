@@ -1,37 +1,55 @@
 import { DATE_REANGE_NAMES } from '@/constants/catalogs';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { analyticsActions } from '@/redux/reducers/analytics';
+import { branchesActions } from '@/redux/reducers/branches';
 import { DateRangeKey } from '@/utils/sales-report';
 import { Button, DatePicker, Dropdown, Space } from 'antd';
 import dayjs from 'dayjs';
-import { CalendarDays, FilterX, SearchIcon } from 'lucide-react';
+import { Building, CalendarDays, FilterX, SearchIcon } from 'lucide-react';
 import functions from '@/utils/functions';
 
-const CustomersFilters = () => {
+const ProductsReportFilters = () => {
   const dispatch = useAppDispatch();
-  const { loading, last_customer_sales } = useAppSelector(({ analytics }) => analytics?.customers);
-  const filters = last_customer_sales?.filters;
+  // const { branches } = useAppSelector(({ branches }) => branches);
+  const { filters } = useAppSelector(({ analytics }) => analytics?.products);
   const filtersApplied = filters?.date_range !== 'last_7_days';
 
   const fetchReportData = () => {
-    dispatch(analyticsActions.customers.getLastCustomerSales());
-    dispatch(analyticsActions.customers.getDebtorCustomers());
+    dispatch(analyticsActions.products.getTopProducts());
   };
 
   const onDateRangeChange = async (date_range: DateRangeKey) => {
-    dispatch(analyticsActions.setCustomerSalesFilters({ date_range }));
+    dispatch(analyticsActions.setProductsFilters({ date_range }));
     await functions.sleep(100);
     if (date_range !== 'custom') {
-      dispatch(
-        analyticsActions.setCustomerSalesFilters({
-          custom_dates: [null, null],
-        }),
-      );
+      dispatch(analyticsActions.setExpensesFilters({ custom_dates: [null, null] }));
       fetchReportData();
     }
   };
 
+  // const onBranchChange = async (value: string) => {
+  //   let branchesSelected: string[] = [...(filters?.branches || [])];
+  //   if (value === 'ALL') {
+  //     branchesSelected = [];
+  //   } else if (filters?.branches?.includes(value)) {
+  //     branchesSelected = filters?.branches?.filter((b) => b !== value) || [];
+  //   } else {
+  //     branchesSelected.push(value);
+  //   }
+  //   dispatch(analyticsActions.setExpensesFilters({ branches: branchesSelected }));
+  //   await functions.sleep(100);
+  //   fetchReportData();
+  // };
+
   const removeFilters = async () => {
+    dispatch(
+      analyticsActions.setProductsFilters({
+        date_range: 'last_7_days',
+        limit: 10,
+        order: 'desc',
+        custom_dates: [null, null],
+      }),
+    );
     await onDateRangeChange('last_7_days');
   };
 
@@ -39,10 +57,30 @@ const CustomersFilters = () => {
     <>
       <div className="flex flex-col sm:flex-row gap-3 md:items-center">
         <Space.Compact>
+          {/* <Dropdown
+            menu={{
+              selectedKeys: filters?.branches?.length ? filters?.branches : ['ALL'],
+              items: [{ key: 'ALL', label: 'Todas' }].concat(
+                branches?.map((branch) => ({
+                  label: branch?.name,
+                  key: branch?.branch_id,
+                })),
+              ),
+
+              selectable: true,
+              onClick: async ({ key }) => onBranchChange(key),
+            }}
+            onOpenChange={(open) => {
+              if (!branches?.length && open) dispatch(branchesActions.getBranches());
+            }}
+          >
+            <Button icon={<Building className="text-base w-4 h-4" />}>Sucursales</Button>
+          </Dropdown> */}
           <Dropdown
             menu={{
               selectedKeys: [filters?.date_range || 'last_7_days'],
               items: [
+                { key: 'historical', label: 'Histórico' },
                 { key: 'today', label: 'Hoy' },
                 { key: 'last_7_days', label: 'Últimos 7 días' },
                 { key: 'this_month', label: 'Este mes' },
@@ -53,7 +91,7 @@ const CustomersFilters = () => {
               onClick: async ({ key }) => onDateRangeChange(key as DateRangeKey),
             }}
           >
-            <Button icon={<CalendarDays className="text-base w-4 h-4" />} loading={loading}>
+            <Button icon={<CalendarDays className="text-base w-4 h-4" />}>
               {DATE_REANGE_NAMES[filters?.date_range || 'last_7_days']}
             </Button>
           </Dropdown>
@@ -81,7 +119,7 @@ const CustomersFilters = () => {
                 const custom_dates = dates
                   ? [dates[0]?.toISOString() || null, dates[1]?.toISOString() || null]
                   : [null, null];
-                dispatch(analyticsActions.setCustomerSalesFilters({ custom_dates }));
+                dispatch(analyticsActions.setProductsFilters({ custom_dates }));
               }}
             />
             <Button onClick={fetchReportData} icon={<SearchIcon className="w-4 h-4" />} />
@@ -92,4 +130,4 @@ const CustomersFilters = () => {
   );
 };
 
-export default CustomersFilters;
+export default ProductsReportFilters;

@@ -4,7 +4,7 @@ import { supabase } from '@/config/supabase';
 import dayjs from 'dayjs';
 import { STATUS_DATA } from '@/constants/status';
 import { message } from 'antd';
-import { BarChartDataItem, LineChartData, LineChartDataItem } from './types';
+import { BarChartDataItem, DebtorCustomer, LineChartData, LineChartDataItem } from './types';
 import functions from '@/utils/functions';
 import { getDateRange } from '@/utils/sales-report';
 import { PieChartItem } from '@/types/charts';
@@ -90,6 +90,31 @@ export const analyticsCustomActions = {
     }
 
     dispatch(analyticsActions.setCustomers({ top_customers: data, loading: false }));
+  },
+  products: {
+    getTopProducts: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const filters = getState().analytics?.products?.filters;
+      let [start_date, end_date] = getDateRange(filters?.date_range, filters?.custom_dates);
+
+      dispatch(analyticsActions.setProducts({ loading: true }));
+
+      const { data, error } = await supabase.rpc('get_top_selling_products', {
+        company_uuid: company_id,
+        limit_num: filters?.limit || 10,
+        order_direction: filters?.order || 'desc',
+        end_date: filters?.date_range === 'historical' ? null : end_date,
+        start_date: filters?.date_range === 'historical' ? null : start_date,
+      });
+
+      dispatch(analyticsActions.setProducts({ loading: false }));
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      dispatch(analyticsActions.setProducts({ top_products: data || [] }));
+    },
   },
   sales: {
     getWeekReport: () => async (dispatch: AppDispatch, getState: AppState) => {
@@ -551,6 +576,37 @@ export const analyticsCustomActions = {
       }
 
       dispatch(analyticsActions.setCustomers({ total_customers: data?.length || 0 }));
+    },
+    getDebtorCustomers: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+
+      const { data, error } = await supabase
+        .from('sales')
+        .select('sale_id, total, customer_id, customers (name), created_at')
+        .eq('company_id', company_id)
+        .eq('status_id', STATUS_DATA.PENDING.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      let customers: DebtorCustomer[] = [];
+      let debtors: { [key: string]: boolean } = {};
+
+      data?.forEach((sale: any) => {
+        if (!debtors[sale.customer_id]) {
+          debtors[sale.customer_id] = true;
+          let customer = {
+            customer_id: sale.customer_id,
+            customer_name: sale?.customers?.name,
+            sales: data.filter((s) => s.customer_id === sale.customer_id),
+          };
+          customers.push(customer);
+        }
+      });
+
+      dispatch(analyticsActions.setDebtorCustomers({ data: customers, total: customers.length }));
     },
   },
 };

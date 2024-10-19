@@ -15,7 +15,7 @@ const LastCustomers = ({ data, hideData }: LastCustomersProps) => {
   return (
     <>
       {data?.length ? (
-        <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
+        <div className="flex flex-col h-72 print:!h-auto overflow-y-scroll">
           {data?.map((customer, index) => {
             return (
               <div
@@ -34,9 +34,7 @@ const LastCustomers = ({ data, hideData }: LastCustomersProps) => {
                   }
                   className={`!w-10 !min-w-10 !h-10 p-1 rounded-xl ${BG_COLOR[index] || 'bg-slate-400/10'}`}
                 />
-                <Typography.Text className="!text-sm !m-0 text-start w-60">
-                  {customer.customer_name}
-                </Typography.Text>
+                <Typography.Text className="!text-sm !m-0 text-start w-60">{customer.customer_name}</Typography.Text>
                 <Tag className="">
                   {functions.number(customer.total_sales, {
                     hidden: hideData,

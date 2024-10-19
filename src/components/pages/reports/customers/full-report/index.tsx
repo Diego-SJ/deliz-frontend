@@ -1,7 +1,7 @@
 import EyeButton, { useHideData } from '@/components/atoms/eye-button';
 import { APP_ROUTES } from '@/routes/routes';
 import { Button, Col, Dropdown, Row, Space, Typography } from 'antd';
-import { ArrowLeft, LandPlot, Printer, UserCheck, Users } from 'lucide-react';
+import { ArrowLeft, LandPlot, Printer, RefreshCw, UserCheck, Users, UserX } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
@@ -15,14 +15,16 @@ import CustomersFilters from './filters';
 import LastCustomers from './last-customers';
 import { SortAscendingOutlined } from '@ant-design/icons';
 import { DATE_REANGE_NAMES } from '@/constants/catalogs';
+import PendingCustomerList from './pending-customer-list';
 
 const CustomersFullReport = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const elementRef = useRef<HTMLDivElement>(null);
   const { handleHideData, hideData } = useHideData();
-  const { top_customers, last_customer_sales, total_customers, loading } =
-    useAppSelector(({ analytics }) => analytics?.customers || {});
+  const { top_customers, last_customer_sales, total_customers, loading, debtor_customers } = useAppSelector(
+    ({ analytics }) => analytics?.customers || {},
+  );
   const mounted = useRef(false);
 
   useEffect(() => {
@@ -36,6 +38,7 @@ const CustomersFullReport = () => {
       mounted.current = true;
       dispatch(analyticsActions.customers.getLastCustomerSales());
       dispatch(analyticsActions.customers.getTotalCustomers());
+      dispatch(analyticsActions.customers.getDebtorCustomers());
     }
   }, [dispatch, mounted]);
 
@@ -80,17 +83,13 @@ const CustomersFullReport = () => {
             >
               Imprimir
             </Button>
-            <EyeButton
-              type="primary"
-              onChange={handleHideData}
-              hideData={hideData}
-            />
+            <EyeButton type="primary" onChange={handleHideData} hideData={hideData} />
           </Space.Compact>
         </div>
       </div>
 
-      <Row gutter={[10, 10]} className="!mb-5">
-        <Col xs={24} md={8}>
+      <Row gutter={[10, 10]} className="!mb-3">
+        <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<Users className="text-indigo-600" />}
             title="Total de clientes"
@@ -99,7 +98,7 @@ const CustomersFullReport = () => {
             })}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<UserCheck className="text-indigo-600" />}
             title="Clientes activos"
@@ -108,50 +107,59 @@ const CustomersFullReport = () => {
             })}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={12} lg={6}>
           <SaleInsight
             icon={<LandPlot className="text-indigo-600" />}
             title="% de clientes activos"
             value={
-              functions.number(
-                (last_customer_sales?.data?.length / total_customers) * 100,
-                {
-                  hidden: hideData,
-                },
-              ) + '%'
+              functions.number((last_customer_sales?.data?.length / total_customers) * 100, {
+                hidden: hideData,
+              }) + '%'
             }
+          />
+        </Col>
+        <Col xs={24} md={12} lg={6}>
+          <SaleInsight
+            icon={<UserX className="text-indigo-600" />}
+            title="Clientes con pagos pendientes"
+            value={functions.number(debtor_customers?.total, { hidden: hideData })}
           />
         </Col>
       </Row>
 
-      <Row gutter={[20, 20]}>
+      <Row gutter={[10, 10]}>
         <Col xs={24} lg={12}>
           <CardRoot
-            title={
-              <h5 className="!text-base m-0 font-medium">
-                Los 10 mejores clientes
-              </h5>
-            }
+            classNames={{ body: '!py-2 !px-5' }}
+            title={<h5 className="!text-base m-0 font-medium">Los 10 mejores clientes</h5>}
           >
             <CustomerList data={top_customers} hideData={hideData} />
           </CardRoot>
         </Col>
         <Col xs={24} lg={12}>
           <CardRoot
-            title={
-              <h5 className="!text-base m-0 font-medium">
-                Últimas ventas de clientes
-              </h5>
+            classNames={{ body: '!py-2 !px-5' }}
+            title={<h5 className="!text-base m-0 font-medium">Clientes con pagos pendientes</h5>}
+            extra={
+              <Button
+                icon={<RefreshCw className="w-4" />}
+                onClick={() => dispatch(analyticsActions.customers.getDebtorCustomers())}
+              />
             }
+          >
+            <PendingCustomerList data={debtor_customers?.data} hideData={hideData} />
+          </CardRoot>
+        </Col>
+        <Col xs={24} lg={12}>
+          <CardRoot
+            classNames={{ body: '!py-2 !px-5' }}
+            title={<h5 className="!text-base m-0 font-medium">Resumen de clientes</h5>}
             extra={
               <>
                 <Dropdown
                   className="print:hidden"
                   menu={{
-                    selectedKeys: [
-                      last_customer_sales?.filters?.order_by ||
-                        'total_amount,desc',
-                    ],
+                    selectedKeys: [last_customer_sales?.filters?.order_by || 'total_amount,desc'],
                     selectable: true,
                     items: [
                       {
@@ -179,19 +187,12 @@ const CustomersFullReport = () => {
                   </Button>
                 </Dropdown>
                 <span className="hidden print:!inline-flex text-slate-700">
-                  {
-                    DATE_REANGE_NAMES[
-                      last_customer_sales?.filters?.date_range || 'last_7_days'
-                    ]
-                  }
+                  {DATE_REANGE_NAMES[last_customer_sales?.filters?.date_range || 'last_7_days']}
                 </span>
               </>
             }
           >
-            <LastCustomers
-              data={last_customer_sales?.data || []}
-              hideData={hideData}
-            />
+            <LastCustomers data={last_customer_sales?.data || []} hideData={hideData} />
           </CardRoot>
         </Col>
       </Row>

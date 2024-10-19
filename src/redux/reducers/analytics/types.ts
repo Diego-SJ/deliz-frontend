@@ -106,6 +106,12 @@ export type LineChartDataItem = {
 
 export type ProductAnalytics = {
   top_products: ProductTop[];
+  filters: {
+    limit: number;
+    date_range: DateRangeKey;
+    custom_dates: (string | null)[];
+    order: 'asc' | 'desc';
+  };
   loading: boolean;
 };
 
@@ -120,6 +126,7 @@ export type ProductTop = {
 export type CustomerAnalytics = {
   top_customers: CustomerTop[];
   total_customers: number;
+  debtor_customers: DebtorCustomers;
   last_customer_sales: {
     data: LastCustomerSale[];
     filters: {
@@ -142,4 +149,15 @@ export type CustomerTop = {
   name: string;
   total_amount: number;
   customer_id: number;
+};
+
+export type DebtorCustomers = {
+  data: DebtorCustomer[];
+  total: number;
+};
+
+export type DebtorCustomer = {
+  customer_id: number;
+  customer_name: string;
+  sales: Partial<Sale>[];
 };

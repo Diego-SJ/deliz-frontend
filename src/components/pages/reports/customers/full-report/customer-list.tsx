@@ -25,7 +25,7 @@ const CustomerList = ({ data, hideData }: Props) => {
   return (
     <div>
       {data?.length ? (
-        <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
+        <div className="flex flex-col h-72 print:!h-auto overflow-y-scroll">
           {data?.map((product, index) => {
             return (
               <div
@@ -44,9 +44,7 @@ const CustomerList = ({ data, hideData }: Props) => {
                   }
                   className={`!w-10 !min-w-10 !h-10 p-1 rounded-xl ${BG_COLOR[index] || 'bg-slate-400/10'}`}
                 />
-                <Typography.Text className="!text-sm !m-0 text-start w-full">
-                  {product.name}
-                </Typography.Text>
+                <Typography.Text className="!text-sm !m-0 text-start w-full">{product.name}</Typography.Text>
                 <Typography.Text className="!text-sm !m-0 !w-fit min-w-40 text-end">
                   {functions.money(product.total_amount, {
                     hidden: hideData,

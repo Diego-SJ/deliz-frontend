@@ -8,13 +8,11 @@ type Props = {
 };
 
 export const LineChartMargin = ({ data }: Props) => {
-  const dynamicBaselineValue = Math.min(
-    ...data?.flatMap((series) => series?.data?.map((point) => point.y)),
-  );
+  const dynamicBaselineValue = Math.min(...data?.flatMap((series) => series?.data?.map((point) => point.y)));
 
-  // Suponiendo que la serie de totales ya está incluida en "data"
-  // Si no, puedes agregarla manualmente como en este ejemplo:
-  const totalSalesData = {
+  console.log({ data });
+
+  const totalSalesAmountData = {
     id: 'Total Sales',
     color: 'hsl(220, 70%, 50%)', // Puedes cambiar el color según lo necesites
     data: data[0]?.data.map((point) => ({
@@ -24,7 +22,7 @@ export const LineChartMargin = ({ data }: Props) => {
   };
 
   // Añade la nueva serie de datos al array `data`
-  const updatedData = [...data, totalSalesData];
+  const updatedData = [totalSalesAmountData];
 
   return (
     <ResponsiveLine
@@ -76,9 +74,7 @@ export const LineChartMargin = ({ data }: Props) => {
       tooltip={function (e) {
         return (
           <div className="bg-white py-2 px-3 shadow-lg rounded-md text-center">
-            <p className="font-medium text-xl">
-              {functions.money(e.point.data.y.toString())}
-            </p>
+            <p className="font-medium text-xl">{functions.money(e.point.data.y.toString())}</p>
             <p className="font-base font-light text-gray-400">En ventas</p>
           </div>
         );
@@ -94,7 +90,7 @@ export const LineChartMargin = ({ data }: Props) => {
       areaBlendMode="normal" // Asegura que el área se dibuje debajo de las líneas
       useMesh
       enableGridX={false}
-      enableGridY={false}
+      // enableGridY={false}
     />
   );
 };
