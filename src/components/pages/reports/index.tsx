@@ -8,6 +8,7 @@ import TopCustomersThumbnail from './customers/shortcut';
 import ProfitShorcutReport from './profit/shorcut';
 import ExpensesShortcutReport from '@/components/pages/reports/expenses/shortcut';
 import EyeButton from '@/components/atoms/eye-button';
+import StockProductsShortcut from './stock/shortcut';
 
 const ReportsHomePage = () => {
   const dispatch = useAppDispatch();
@@ -49,6 +50,9 @@ const ReportsHomePage = () => {
         ) : null}
         {profile?.permissions?.reports?.view_products_report?.value ? (
           <TopProductsThumbnail hideData={hideData} />
+        ) : null}
+        {profile?.permissions?.reports?.view_products_report?.value ? (
+          <StockProductsShortcut hideData={hideData} />
         ) : null}
       </div>
     </div>

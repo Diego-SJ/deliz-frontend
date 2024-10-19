@@ -1,6 +1,7 @@
 import { DateRangeKey } from '@/utils/sales-report';
 import { Sale } from '../sales/types';
 import { PieChartItem } from '@/types/charts';
+import { Inventory } from '../products/types';
 
 export type AnalyticsSlice = {
   sales: SalesAnalytics;
@@ -106,6 +107,7 @@ export type LineChartDataItem = {
 
 export type ProductAnalytics = {
   top_products: ProductTop[];
+  products_to_replenish: ProductToReplenish[];
   filters: {
     limit: number;
     date_range: DateRangeKey;
@@ -113,6 +115,15 @@ export type ProductAnalytics = {
     order: 'asc' | 'desc';
   };
   loading: boolean;
+};
+
+export type ProductToReplenish = {
+  product_id: number;
+  name: string;
+  min_stock: number;
+  total_stock: number;
+  inventory: Inventory;
+  image_url: string;
 };
 
 export type ProductTop = {

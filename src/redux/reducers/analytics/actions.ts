@@ -115,6 +115,20 @@ export const analyticsCustomActions = {
 
       dispatch(analyticsActions.setProducts({ top_products: data || [] }));
     },
+    getProductsToReplenish: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const { data, error } = await supabase.rpc('get_products_below_min_stock', {
+        p_company_id: company_id,
+      });
+
+      dispatch(analyticsActions.setProducts({ loading: false }));
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      dispatch(analyticsActions.setProducts({ products_to_replenish: data || [] }));
+    },
   },
   sales: {
     getWeekReport: () => async (dispatch: AppDispatch, getState: AppState) => {

@@ -92,6 +92,7 @@ const initialState: AnalyticsSlice = {
   },
   products: {
     top_products: [],
+    products_to_replenish: [],
     filters: { date_range: 'last_7_days', custom_dates: [null, null], limit: 10, order: 'desc' },
     loading: false,
   },

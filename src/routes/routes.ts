@@ -100,6 +100,10 @@ export const APP_ROUTES = {
         path: '/app/reports/products',
         title: 'Reporte de productos',
       },
+      STOCK: {
+        path: '/app/reports/stock',
+        title: 'Reporte de stock',
+      },
       SALES: {
         path: '/app/reports/sales',
         title: 'Reporte de ventas',
