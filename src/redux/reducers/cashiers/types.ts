@@ -80,6 +80,8 @@ export type CashCut = {
   expenses_amount: number;
 
   operations: CashOperation[];
+  opened_by?: string | null;
+  closed_by?: string | null;
 };
 
 export type FetchCashCutArgs = {
