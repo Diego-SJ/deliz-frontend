@@ -11,6 +11,7 @@ import {
   GetProp,
   Input,
   Row,
+  Select,
   Switch,
   TimePicker,
   Typography,
@@ -39,9 +40,11 @@ const StoreForm = () => {
   const navigate = useNavigate();
   const { message, modal } = App.useApp();
   const { store, loading } = useAppSelector(({ stores }) => stores);
+  const { prices_list } = useAppSelector(({ branches }) => branches);
   const { company } = useAppSelector(({ app }) => app);
   const { profile } = useAppSelector(({ users }) => users?.user_auth);
   const [deliveryOptions, setDeliveryOptions] = useState<string[]>([]);
+  const [showPricesInCatalog, setSetshowPricesInCatalog] = useState(true);
   const [scheduleChecks, setScheduleChecks] = useState<string[]>([
     'monday_closed',
     'tuesday_closed',
@@ -120,6 +123,7 @@ const StoreForm = () => {
           deliveryOptions,
           scheduleChecks,
           logo_url: store?.logo_url,
+          default_price: showPricesInCatalog ? values.default_price : null,
         };
         await dispatch(storesActions.updateStore(getStoreRecord(dataStore)));
         message.success('Tienda actualizada correctamente');
@@ -289,6 +293,28 @@ const StoreForm = () => {
               >
                 <Input inputMode="tel" placeholder="Ingresa tu número de WhatsApp" />
               </Form.Item>
+            </div>
+          </CardRoot>
+
+          <CardRoot title="Productos" className="mb-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-5">
+              <div className="flex flex-col">
+                <Form.Item label="Mostrar precios en el catálogo" className="w-full">
+                  <Switch onChange={setSetshowPricesInCatalog} checked={showPricesInCatalog} />
+                </Form.Item>
+                {showPricesInCatalog && (
+                  <Form.Item
+                    label="Selecciona el precio que se mostrará en tu catálogo"
+                    name="default_price"
+                    className="w-full"
+                  >
+                    <Select
+                      placeholder="Selecciona un precio"
+                      options={prices_list?.map((price) => ({ value: price.price_id, label: price.name }))}
+                    />
+                  </Form.Item>
+                )}
+              </div>
               <ModuleAccess moduleName="orders_by_whatsapp">
                 <Form.Item
                   label="Permitir pedidos a través de WhatsApp"

@@ -2,12 +2,19 @@ import { useCallback, useRef, useState } from 'react';
 import { Avatar, Button, InputNumber, Tag, Typography } from 'antd';
 import { CashRegisterItem } from '@/redux/reducers/sales/types';
 import functions from '@/utils/functions';
-import { CloseOutlined, DollarCircleOutlined, FileImageOutlined, SignatureOutlined, WarningOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  DollarCircleOutlined,
+  FileImageOutlined,
+  SignatureOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import CashierModal from '../cashier-modal';
 import { salesActions } from '@/redux/reducers/sales';
 import { AvatarProps } from '@/components/molecules/Avatar/types';
 import useMediaQuery from '@/hooks/useMediaQueries';
+import { AlertOctagon, MessageSquareWarning } from 'lucide-react';
 
 const CashRegisterItemsList = () => {
   const dispatch = useAppDispatch();
@@ -44,7 +51,7 @@ const CashRegisterItemsList = () => {
     <div className="cashier-items min-h-[calc(100dvh-400px)] max-h-[calc(100dvh-400px)] md:min-h-[calc(100dvh-290px)] md:max-h-[calc(100dvh-290px)] overflow-y-scroll">
       <input type="number" inputMode="numeric" ref={inputGhostRef} className="!h-0 !w-0 !m-0 bg-transparent absolute" />
       <ul className="px-3 py-2 md:px-0 md:py-0 flex flex-col">
-        {(cash_register?.items || []).map(record => {
+        {(cash_register?.items || []).map((record) => {
           const stock = (record?.product?.inventory || {})[currentBranch?.branch_id || '']?.stock || 0;
 
           const avatarProps = {
@@ -100,7 +107,9 @@ const CashRegisterItemsList = () => {
                           value={record.quantity}
                           className="w-24 md:w-20 lg:w-24  h-min"
                           onFocus={({ target }) => target.select()}
-                          onChange={value => dispatch(salesActions.cashRegister.update({ ...record, quantity: Number(value) }))}
+                          onChange={(value) =>
+                            dispatch(salesActions.cashRegister.update({ ...record, quantity: Number(value) }))
+                          }
                         />
                       </div>
                     </div>
@@ -124,8 +133,13 @@ const CashRegisterItemsList = () => {
                 </div>
               </div>
               {Number(record.quantity) > stock && !!record?.product?.product_id && (
-                <Typography.Paragraph type="warning" className="!mx-0 !mt-0 !mb-0 bg-yellow-50 pl-3">
-                  <WarningOutlined /> La cantidad ingresada supera el stock
+                <Typography.Paragraph className="!text-xs !mx-0 !mt-0 !mb-0 bg-red-50 !text-red-600 pl-3 flex items-center gap-1">
+                  <AlertOctagon className="w-4" /> La cantidad ingresada supera el stock
+                </Typography.Paragraph>
+              )}
+              {!!record?.product?.min_stock && stock <= record?.product?.min_stock && (
+                <Typography.Paragraph className="!text-xs !mx-0 !mt-0 !mb-0 bg-yellow-600/10 !text-yellow-600 pl-3 flex items-center gap-1">
+                  <MessageSquareWarning className="w-4" /> Quedan menos de {record?.product?.min_stock} unidades
                 </Typography.Paragraph>
               )}
             </li>

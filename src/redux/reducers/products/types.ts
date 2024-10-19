@@ -38,6 +38,7 @@ export type Product = {
   size_id?: number;
   code?: string;
   sku?: string;
+  min_stock?: number;
 
   // relations
   categories?: Category;

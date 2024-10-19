@@ -553,6 +553,13 @@ const customActions = {
         });
       }
 
+      columns.push({
+        header: 'Alerta de Stock',
+        key: 'min_stock',
+        width: 20,
+        style: columnStyle,
+      });
+
       if (branches.data) {
         branches.data.forEach((item: any) => {
           columns.push({
@@ -606,6 +613,7 @@ const customActions = {
         'Unidad de medida del producto',
         'Precio bruto sin impuestos',
         ...(priceList?.data || [])?.map(() => 'Precio final para venta al público'),
+        'Se mostrará una alerta si el stock es menor a este valor',
         ...(branches?.data || [])?.map(() => 'Stock disponible en la sucursal'),
         'Código SKU del producto',
         'Código interno del producto',

@@ -22,9 +22,7 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
   const { branches, prices_list } = useAppSelector(({ branches }) => branches);
   const { company } = useAppSelector(({ app }) => app);
   const [loading, setLoading] = useState(false);
-  const { categories, units, sizes } = useAppSelector(
-    ({ products }) => products,
-  );
+  const { categories, units, sizes } = useAppSelector(({ products }) => products);
   const handleClose = () => {
     if (loading) return;
     setUploadedFile(null);
@@ -90,6 +88,7 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
         SKU: 'sku',
         Código: 'code',
         'Mostrar en Catálogo': 'show_in_catalog',
+        'Alerta de Stock': 'min_stock',
       };
 
       // **Mapear nombres de listas de precios a IDs**
@@ -105,29 +104,27 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
       });
 
       // **Crear el array de columnKeys**
-      const columnKeys: (string | null | undefined)[] = headers.map(
-        (header) => {
-          // Manejar columnas dinámicas
-          if (header.startsWith('Precio ') && header !== 'Precio Bruto') {
-            // Extraer el nombre de la lista de precios
-            const priceListName = header.substring('Precio '.length);
-            const priceListId = priceListNameToId[priceListName];
-            if (priceListId) {
-              return `price_list.${priceListId}`;
-            }
-          } else if (header.startsWith('Stock ')) {
-            const branchName = header.substring('Stock '.length);
-            const branchId = branchNameToId[branchName];
-            if (branchId) {
-              return `branch.${branchId}`;
-            }
-          } else if (headerKeyMap[header]) {
-            return headerKeyMap[header];
-          } else {
-            return null; // Si no coincide, retornamos null
+      const columnKeys: (string | null | undefined)[] = headers.map((header) => {
+        // Manejar columnas dinámicas
+        if (header.startsWith('Precio ') && header !== 'Precio Bruto') {
+          // Extraer el nombre de la lista de precios
+          const priceListName = header.substring('Precio '.length);
+          const priceListId = priceListNameToId[priceListName];
+          if (priceListId) {
+            return `price_list.${priceListId}`;
           }
-        },
-      );
+        } else if (header.startsWith('Stock ')) {
+          const branchName = header.substring('Stock '.length);
+          const branchId = branchNameToId[branchName];
+          if (branchId) {
+            return `branch.${branchId}`;
+          }
+        } else if (headerKeyMap[header]) {
+          return headerKeyMap[header];
+        } else {
+          return null; // Si no coincide, retornamos null
+        }
+      });
 
       // **Procesar las filas de datos (a partir de la fila 4)**
       const dataStartRow = 4;
@@ -140,9 +137,7 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
         const rowData: { [key: string]: any } = {};
 
         // Verificar si la fila está vacía
-        const isEmpty = (row?.values as any).every((value: any) =>
-          _.isEmpty(value),
-        );
+        const isEmpty = (row?.values as any).every((value: any) => _.isEmpty(value));
         if (isEmpty) {
           continue; // Saltar filas vacías
         }
@@ -169,34 +164,25 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
             };
           } else if (columnKey === 'category_id') {
             // Encontrar la categoría por nombre
-            const category = categories.find(
-              (category) => category.name === cell.value,
-            );
+            const category = categories.find((category) => category.name === cell.value);
             if (category) {
               rowData[columnKey] = category.category_id;
             }
           } else if (columnKey === 'size_id') {
             // Encontrar el tamaño por nombre
-            const size = (sizes?.data || [])?.find(
-              (size) => size.name === cell.value,
-            );
+            const size = (sizes?.data || [])?.find((size) => size.name === cell.value);
             if (size) {
               rowData[columnKey] = size.size_id;
             }
           } else if (columnKey === 'unit_id') {
             // Encontrar la unidad por nombre
-            const unit = (units?.data || []).find(
-              (unit) => unit.name === cell.value,
-            );
+            const unit = (units?.data || []).find((unit) => unit.name === cell.value);
             if (unit) {
               rowData[columnKey] = unit.unit_id;
             }
           } else if (columnKey === 'show_in_catalog') {
             rowData[columnKey] = cell.value === 'SI';
-          } else if (
-            columnKey &&
-            ['code', 'sku'].includes(columnKey?.toString() || '')
-          ) {
+          } else if (columnKey && ['code', 'sku'].includes(columnKey?.toString() || '')) {
             rowData[columnKey] = cell.value?.toString()?.trim()?.toUpperCase();
           } else if (columnKey) {
             rowData[columnKey] = cell.value?.toString()?.trim();
@@ -208,9 +194,7 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
 
       saveProducts(data);
     } catch (error) {
-      message.error(
-        'Ocurrió un error al procesar el archivo, por favor verifica que el archivo sea correcto.',
-      );
+      message.error('Ocurrió un error al procesar el archivo, por favor verifica que el archivo sea correcto.');
     }
   };
 
@@ -229,10 +213,7 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
       <Typography.Title level={4}>Subir archivo</Typography.Title>
       <p className="mb-2">
         Si no tienes un archivo, puedes descargar la plantilla{' '}
-        <span
-          className="text-primary cursor-pointer underline"
-          onClick={downloadTemplate}
-        >
+        <span className="text-primary cursor-pointer underline" onClick={downloadTemplate}>
           aquí
         </span>
         .
@@ -249,12 +230,8 @@ const CreateProductsByCsv = ({ visible = false, onClose }: Props) => {
         <p className="flex justify-center py-2 ">
           <Upload className="text-primary" />
         </p>
-        <p className="ant-upload-text">
-          Da click o arrastra un archivo para subirlo
-        </p>
-        <p className="ant-upload-hint">
-          Asegurate de subir el archivo proporcionado por el sistema
-        </p>
+        <p className="ant-upload-text">Da click o arrastra un archivo para subirlo</p>
+        <p className="ant-upload-hint">Asegurate de subir el archivo proporcionado por el sistema</p>
       </Dragger>
     </Modal>
   );

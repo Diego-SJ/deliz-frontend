@@ -12,6 +12,7 @@ export const getStoreRecord = (values: any): Partial<CompanyStore> => {
     slug: values?.slug || null,
     logo_url: values?.logo_url || null,
     allow_orders_by_whatsapp: values?.allow_orders_by_whatsapp || false,
+    default_price: values?.default_price || null,
     delivery_types: {
       on_site: !!values?.deliveryOptions?.includes('on_site'),
       take_away: !!values?.deliveryOptions?.includes('take_away'),

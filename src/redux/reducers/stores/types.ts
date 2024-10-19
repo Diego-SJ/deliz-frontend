@@ -22,6 +22,7 @@ export type CompanyStore = {
   company_id: string;
   status_id: number | null;
   allow_orders_by_whatsapp: boolean;
+  default_price?: string;
 };
 
 export type WifiCredentials = {

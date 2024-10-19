@@ -9,11 +9,9 @@ import {
   Button,
   Card,
   Col,
-  Divider,
   Form,
   Input,
   Row,
-  Select,
   Space,
   Switch,
   Typography,
@@ -26,9 +24,7 @@ import { ArrowLeftOutlined, BarcodeOutlined } from '@ant-design/icons';
 import CardRoot from '@/components/atoms/Card';
 import ExistencesTable from './existences-table';
 import PricesTable from './prices-table';
-
 import { BUCKETS } from '@/constants/buckets';
-import { QuickCategoryCreationForm } from '../../settings/categories/editor';
 import BarcodeScanner from '@/components/organisms/bar-code-reader';
 import { branchesActions } from '@/redux/reducers/branches';
 import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
@@ -58,6 +54,7 @@ const ProductEditor = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const firstRender = useRef<boolean>(false);
   const [inventory, setInventory] = useState<Inventory>({});
+  const [alertStock, setAlertStock] = useState<number>(0);
   const [priceList, setPriceList] = useState<PriceList>({});
   const [openBarCode, setOpenBarCode] = useState(false);
   const [barCode, setBarCode] = useState<string | undefined>(undefined);
@@ -105,6 +102,7 @@ const ProductEditor = () => {
     if (!!current_product?.product_id) {
       setInventory(current_product?.inventory ?? {});
       setPriceList(current_product?.price_list ?? {});
+      setAlertStock(current_product?.min_stock || 0);
       setBarCode(current_product?.code);
       form.setFieldsValue({
         ...current_product,
@@ -152,6 +150,7 @@ const ProductEditor = () => {
         let product = {
           ...values,
           inventory,
+          min_stock: alertStock,
           price_list: priceList,
           code: barCode,
         };
@@ -346,7 +345,12 @@ const ProductEditor = () => {
 
             <Row gutter={[20, 20]} className="mb-5">
               <Col span={24}>
-                <ExistencesTable setInventory={setInventory} inventory={inventory} />
+                <ExistencesTable
+                  setInventory={setInventory}
+                  inventory={inventory}
+                  setAlertStock={setAlertStock}
+                  alertStock={alertStock}
+                />
               </Col>
             </Row>
 
