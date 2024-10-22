@@ -13,6 +13,7 @@ import {
   ProfitSummary,
   SalesAnalytics,
   SalesSummary,
+  UserAnalytics,
 } from './types';
 import { analyticsCustomActions } from './actions';
 import dayjs from 'dayjs';
@@ -110,6 +111,11 @@ const initialState: AnalyticsSlice = {
     },
     loading: false,
   },
+  users: {
+    loading: false,
+    filters: { date_range: 'historical', custom_dates: [null, null] },
+    charts: { total_amount: [], total_sales: [] },
+  },
 };
 
 const analytics = createSlice({
@@ -117,6 +123,12 @@ const analytics = createSlice({
   initialState,
   reducers: {
     resetSlice: () => initialState,
+    setUsers: (state, action: PayloadAction<Partial<UserAnalytics>>) => {
+      if (!state.users) {
+        state.users = initialState.users;
+      }
+      state.users = { ...state.users, ...action.payload };
+    },
     setDebtorCustomers: (state, action: PayloadAction<DebtorCustomers>) => {
       state.customers.debtor_customers = action.payload;
     },

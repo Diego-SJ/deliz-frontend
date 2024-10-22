@@ -10,6 +10,7 @@ type Props = {
   range?: DateRangeKey;
   stacked?: boolean;
   chartStyle?: 'linear' | 'step';
+  hideData?: boolean;
 };
 
 const countAllitems = (data: LineChartData) => {
@@ -17,7 +18,7 @@ const countAllitems = (data: LineChartData) => {
   return data[0].data.length;
 };
 
-export const LineChartProfit = ({ data, range, stacked = false, chartStyle = 'linear' }: Props) => {
+export const LineChartProfit = ({ data, range, stacked = false, chartStyle = 'linear', hideData }: Props) => {
   // const minYValue = Math.min(...data?.flatMap(series => series?.data?.map(point => point.y)));
   // const dynamicBaselineValue = minYValue;
 
@@ -43,7 +44,7 @@ export const LineChartProfit = ({ data, range, stacked = false, chartStyle = 'li
         legendOffset: 36,
         legendPosition: 'middle',
         legend: formatAxisBottomLabel(range || 'last_7_days'),
-        format: e => formatAxisBottom(e, countAllitems(data)),
+        format: (e) => formatAxisBottom(e, countAllitems(data)),
         truncateTickAt: 0,
       }}
       axisLeft={{
@@ -54,7 +55,7 @@ export const LineChartProfit = ({ data, range, stacked = false, chartStyle = 'li
         legendOffset: -40,
         legendPosition: 'middle',
         truncateTickAt: 0,
-        format: e => numeral(e).format('0 a'),
+        format: (e) => (hideData ? '* K' : numeral(e).format('0 a')),
       }}
       legends={[
         {

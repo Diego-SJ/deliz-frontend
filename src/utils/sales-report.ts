@@ -7,13 +7,19 @@ dayjs.extend(timezone);
 
 export type DateRangeKey = 'historical' | 'today' | 'last_7_days' | 'this_month' | 'last_month' | 'custom';
 
-export function getDateRange(key: DateRangeKey, customRange?: (string | null)[]): [string, string, string[]] {
+export function getDateRange(
+  key: DateRangeKey,
+  customRange?: (string | null)[],
+): [string | null, string | null, string[]] {
   let startDate: dayjs.Dayjs;
   let endDate: dayjs.Dayjs;
 
   const now = dayjs().tz('America/Mexico_City'); // Usa la zona horaria deseada
 
   switch (key) {
+    case 'historical':
+      return [null, null, []];
+      break;
     case 'today':
       startDate = now.startOf('day').utc();
       endDate = now.endOf('day').subtract(1, 'day').utc();

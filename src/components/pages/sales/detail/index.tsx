@@ -1,7 +1,7 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, FileImageOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Col, Typography, Row, Alert, Table, AlertProps, Divider, Button, App, Dropdown } from 'antd';
+import { Avatar, Breadcrumb, Col, Typography, Row, Alert, Table, AlertProps, Button, App, Dropdown } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
 import { useEffect, useRef, useState } from 'react';
@@ -14,12 +14,11 @@ import AddNewItem from './detail-item-actions/add-new-item';
 import DeleteSaleButton from './delete-sale-btn';
 import CardRoot from '@/components/atoms/Card';
 import EditSaleItemModal from './detail-item-actions/edit-item';
-import ChangeCustomerModal from './change-customer';
-import { PAYMENT_METHOD_SHORT_NAME } from '@/constants/payment_methods';
 import useMediaQuery from '@/hooks/useMediaQueries';
 import PaginatedList from '@/components/organisms/PaginatedList';
 import ChangeBranchDrawer from './change-branch';
 import { ModuleAccess, useMembershipAccess } from '@/routes/module-access';
+import SaleDetails from './sale-details';
 
 export type Amounts = {
   total: number;
@@ -57,7 +56,7 @@ const SaleDetail = () => {
 
   useEffect(() => {
     let subtotal = items?.reduce((acum, item) => acum + (item?.price || 0) * (item?.quantity || 0), 0);
-    let color = STATUS.find(item => item.id === metadata?.status_id)?.color ?? 'info';
+    let color = STATUS.find((item) => item.id === metadata?.status_id)?.color ?? 'info';
     let total = subtotal + (metadata?.shipping || 0);
     // get discount function
     if (metadata?.discount_type === 'AMOUNT') {
@@ -88,7 +87,7 @@ const SaleDetail = () => {
   };
 
   const handleBranchDrawer = () => {
-    setOpenBranchDrawer(prev => !prev);
+    setOpenBranchDrawer((prev) => !prev);
   };
 
   return (
@@ -192,77 +191,12 @@ const SaleDetail = () => {
 
           {/* CUSTOMER CARD DETAILS */}
           {!isTablet && (
-            <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Cliente
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {current_sale?.metadata?.customers?.name || 'Público general'}
-                  </Typography.Paragraph>
-
-                  {permissions?.sales?.edit_sale?.value && <ChangeCustomerModal />}
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Fecha
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Método de pago
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Caja
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    Caja {(metadata as any)?.cash_registers?.name || '- - -'}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Sucursal
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    Sucursal {(metadata as any)?.branches?.name || '- - -'}
-                  </Typography.Paragraph>
-
-                  <ModuleAccess moduleName="transfer_sale">
-                    <Button
-                      shape="circle"
-                      size="large"
-                      className="!w-fit -mt-5"
-                      type="text"
-                      icon={<EditOutlined />}
-                      block
-                      onClick={handleBranchDrawer}
-                    />
-                  </ModuleAccess>
-                </div>
-              </div>
-            </CardRoot>
+            <SaleDetails
+              loading={isLoading}
+              current_sale={current_sale}
+              onBranchClick={handleBranchDrawer}
+              user_permissions={permissions}
+            />
           )}
         </Col>
         <Col xl={{ span: 16 }} xs={24} md={24} lg={14}>
@@ -293,7 +227,7 @@ const SaleDetail = () => {
             <CardRoot styles={{ body: { padding: '0 0 2px 0', overflow: 'hidden' } }}>
               <Table
                 loading={isLoading}
-                rowKey={record => record?.sale_detail_id?.toString() || ''}
+                rowKey={(record) => record?.sale_detail_id?.toString() || ''}
                 columns={
                   [
                     {
@@ -336,7 +270,8 @@ const SaleDetail = () => {
                       dataIndex: 'retail_price',
                       width: 100,
                       align: 'center',
-                      render: (_: number, record: SaleItem) => functions.money((record.quantity || 0) * (record.price || 0)),
+                      render: (_: number, record: SaleItem) =>
+                        functions.money((record.quantity || 0) * (record.price || 0)),
                     },
                     hasAccess('edit_sale')
                       ? {
@@ -384,7 +319,7 @@ const SaleDetail = () => {
                           },
                         }
                       : {},
-                  ].filter(i => i?.dataIndex) as any
+                  ].filter((i) => i?.dataIndex) as any
                 }
                 dataSource={items}
                 size="small"
@@ -398,9 +333,12 @@ const SaleDetail = () => {
               $bodyHeight={items?.length > 6 ? '80dvh' : 'auto'}
               pagination={false}
               dataSource={items}
-              renderItem={item => {
+              renderItem={(item) => {
                 return (
-                  <div key={item.product_id} className="flex py-3 pl-4 pr-4 border-b border-gray-200 cursor-pointer items-center">
+                  <div
+                    key={item.product_id}
+                    className="flex py-3 pl-4 pr-4 border-b border-gray-200 cursor-pointer items-center"
+                  >
                     <Avatar
                       src={item.products?.image_url}
                       icon={<FileImageOutlined className="text-slate-600 text-2xl" />}
@@ -412,7 +350,9 @@ const SaleDetail = () => {
                       <Typography.Paragraph className="!mb-0 text-base">
                         {item.products?.name || item?.metadata?.product_name}
                       </Typography.Paragraph>
-                      <Typography.Text type="secondary">{item?.products?.categories?.name || 'Sin categoría'}</Typography.Text>
+                      <Typography.Text type="secondary">
+                        {item?.products?.categories?.name || 'Sin categoría'}
+                      </Typography.Text>
                       <Typography.Text className="!mb-2" type="secondary">
                         {item.quantity} x {functions.money(item.price)}
                       </Typography.Text>
@@ -455,7 +395,9 @@ const SaleDetail = () => {
                         >
                           <Button shape="circle" type="text" size="large" icon={<EllipsisOutlined />} />
                         </Dropdown>
-                        <span className="font-medium mt-2">{functions.money(Number(item.quantity) * Number(item.price))}</span>
+                        <span className="font-medium mt-2">
+                          {functions.money(Number(item.quantity) * Number(item.price))}
+                        </span>
                       </div>
                     </ModuleAccess>
                   </div>
@@ -466,76 +408,12 @@ const SaleDetail = () => {
 
           {/* CUSTOMER CARD DETAILS */}
           {isTablet && (
-            <CardRoot loading={isLoading} style={{ marginTop: 20 }}>
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Cliente
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {current_sale?.metadata?.customers?.name || 'Público general'}
-                  </Typography.Paragraph>
-
-                  {permissions?.sales?.edit_sale?.value && <ChangeCustomerModal />}
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Fecha
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {functions.formatToLocalTimezone(metadata?.created_at?.toString() || '')}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Método de pago
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    {PAYMENT_METHOD_SHORT_NAME[metadata?.payment_method || ''] || '- - -'}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Caja
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    Caja {(metadata as any)?.cash_registers?.name || '- - -'}
-                  </Typography.Paragraph>
-                </div>
-              </div>
-              <Divider className="!my-3" />
-
-              <div className="w-full ">
-                <Typography.Title level={5} className="!font-medium !text-sm !mb-0">
-                  Sucursal
-                </Typography.Title>
-                <div className="flex items-center justify-between">
-                  <Typography.Paragraph className="w-full !m-0" type="secondary">
-                    Sucursal {(metadata as any)?.branches?.name || '- - -'}
-                  </Typography.Paragraph>
-                  <ModuleAccess moduleName="transfer_sale">
-                    <Button
-                      shape="circle"
-                      size="large"
-                      className="!w-fit -mt-5"
-                      type="text"
-                      icon={<EditOutlined />}
-                      block
-                      onClick={handleBranchDrawer}
-                    />
-                  </ModuleAccess>
-                </div>
-              </div>
-            </CardRoot>
+            <SaleDetails
+              loading={isLoading}
+              current_sale={current_sale}
+              onBranchClick={handleBranchDrawer}
+              user_permissions={permissions}
+            />
           )}
         </Col>
       </Row>

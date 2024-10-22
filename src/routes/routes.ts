@@ -107,6 +107,10 @@ export const APP_ROUTES = {
       SALES: {
         path: '/app/reports/sales',
         title: 'Reporte de ventas',
+        SALES_BY_USER: {
+          path: '/app/reports/sales-by-user',
+          title: 'Ventas por usuario',
+        },
       },
       PROFIT: {
         path: '/app/reports/profit',

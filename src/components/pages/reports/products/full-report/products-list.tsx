@@ -62,7 +62,7 @@ const ProductsList = ({ hideData = false }: Reports) => {
       <CardRoot loading={loading} title="Productos" classNames={{ body: '!px-4 !pt-2' }}>
         {top_products?.length ? (
           <div>
-            <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
+            <div className="flex flex-col h-[80dvh] sm:h-96 print:!h-auto overflow-y-scroll">
               {top_products?.map((product, index) => {
                 return (
                   <div

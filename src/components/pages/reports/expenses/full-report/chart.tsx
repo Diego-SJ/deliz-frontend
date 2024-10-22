@@ -1,10 +1,6 @@
 import { LineChartData } from '@/redux/reducers/analytics/types';
 import functions from '@/utils/functions';
-import {
-  DateRangeKey,
-  formatAxisBottom,
-  formatAxisBottomLabel,
-} from '@/utils/sales-report';
+import { DateRangeKey, formatAxisBottom, formatAxisBottomLabel } from '@/utils/sales-report';
 import { ResponsiveLine } from '@nivo/line';
 import { Badge } from 'antd';
 import numeral from 'numeral';
@@ -14,6 +10,7 @@ type Props = {
   range?: DateRangeKey;
   stacked?: boolean;
   chartStyle?: 'linear' | 'step';
+  hideData?: boolean;
 };
 
 const countAllitems = (data: LineChartData) => {
@@ -21,12 +18,7 @@ const countAllitems = (data: LineChartData) => {
   return data[0].data.length;
 };
 
-export const LineChartProfit = ({
-  data,
-  range,
-  stacked = false,
-  chartStyle = 'linear',
-}: Props) => {
+export const LineChartProfit = ({ data, range, stacked = false, chartStyle = 'linear', hideData = false }: Props) => {
   // const minYValue = Math.min(...data?.flatMap(series => series?.data?.map(point => point.y)));
   // const dynamicBaselineValue = minYValue;
 
@@ -63,7 +55,7 @@ export const LineChartProfit = ({
         legendOffset: -40,
         legendPosition: 'middle',
         truncateTickAt: 0,
-        format: (e) => numeral(e).format('0 a'),
+        format: (e) => (hideData ? '* K' : numeral(e).format('0 a')),
       }}
       legends={[
         {
@@ -96,16 +88,12 @@ export const LineChartProfit = ({
         return (
           <div className="bg-white py-2 px-3 shadow-lg rounded-md border">
             <p className="font-base text-xs text-gray-400">{point?.serieId}</p>
-            <p className="font-medium text-xl">
-              {functions.money(Number(point?.data?.y))}
+            <p className="font-medium text-xl">{functions.money(Number(point?.data?.y))}</p>
+            <p className="text-sm text-gray-600">
+              <Badge status="success" /> Completado: {functions.money((point?.data as any)?.completed)}
             </p>
             <p className="text-sm text-gray-600">
-              <Badge status="success" /> Completado:{' '}
-              {functions.money((point?.data as any)?.completed)}
-            </p>
-            <p className="text-sm text-gray-600">
-              <Badge status="warning" /> Pendiente:{' '}
-              {functions.money((point?.data as any)?.pending)}
+              <Badge status="warning" /> Pendiente: {functions.money((point?.data as any)?.pending)}
             </p>
           </div>
         );

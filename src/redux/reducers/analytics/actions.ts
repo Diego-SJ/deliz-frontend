@@ -623,4 +623,49 @@ export const analyticsCustomActions = {
       dispatch(analyticsActions.setDebtorCustomers({ data: customers, total: customers.length }));
     },
   },
+  users: {
+    getSalesByUser: () => async (dispatch: AppDispatch, getState: AppState) => {
+      const company_id = getState().app.company.company_id;
+      const filters = getState().analytics?.users?.filters;
+      const [start_date, end_date] = getDateRange(filters?.date_range, filters?.custom_dates);
+
+      dispatch(analyticsActions.setUsers({ loading: true }));
+
+      const { data, error } = await supabase.rpc('get_sales_by_creator', {
+        p_company_id: company_id,
+        p_start_date: start_date,
+        p_end_date: end_date,
+      });
+
+      dispatch(analyticsActions.setUsers({ loading: false }));
+
+      if (error) {
+        message.error(error.message);
+      }
+
+      let totalSalesByUser: PieChartItem[] = [];
+      let totalAmountByUser: PieChartItem[] = [];
+
+      if (data?.length) {
+        data.forEach((user: any) => {
+          let label = `${user.first_name} ${user?.last_name || ''}`;
+
+          totalSalesByUser.push({
+            id: user.profile_id,
+            label,
+            value: user.total_sales,
+          });
+          totalAmountByUser.push({
+            id: user.profile_id,
+            label,
+            value: user.total_amount,
+          });
+        });
+      }
+
+      dispatch(
+        analyticsActions.setUsers({ charts: { total_sales: totalSalesByUser, total_amount: totalAmountByUser } }),
+      );
+    },
+  },
 };

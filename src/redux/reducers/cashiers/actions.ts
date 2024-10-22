@@ -229,7 +229,7 @@ const customActions = {
 
         const { data, error } = await supabase
           .from('cash_cuts')
-          .select('*')
+          .select('*, profiles!cash_cuts_opened_by_fkey (first_name, last_name)')
           .eq('cash_register_id', cash_register_id)
           .eq('is_open', true)
           .single();
@@ -421,7 +421,13 @@ const customActions = {
 
         const { data, error: cashCutError } = await supabase
           .from('cash_cuts')
-          .select('*, branches (name), cash_registers (name)')
+          .select(
+            `*,
+            branches (name),
+            cash_registers (name),
+            opened_by:profiles!cash_cuts_opened_by_fkey (first_name, last_name),
+            closed_by:profiles!cash_cuts_closed_by_fkey (first_name, last_name)`,
+          )
           .eq('cash_cut_id', cash_cut_id)
           .single();
 

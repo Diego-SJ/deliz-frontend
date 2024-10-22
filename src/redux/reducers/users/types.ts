@@ -12,6 +12,8 @@ export type UserAuth = {
   isAdmin: boolean;
 };
 
+export type UserPermissions = typeof PERMISSIONS | null;
+
 export type Profile = {
   profile_id: string;
   password: string;
@@ -26,7 +28,7 @@ export type Profile = {
   favorite_products: number[];
   is_default: boolean;
   is_inactive: boolean;
-  permissions: typeof PERMISSIONS | null;
+  permissions: UserPermissions | null;
   price_list?: string[];
   tours?: {
     dashboard: boolean;

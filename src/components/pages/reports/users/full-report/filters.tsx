@@ -1,22 +1,19 @@
 import { DATE_REANGE_NAMES } from '@/constants/catalogs';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { analyticsActions } from '@/redux/reducers/analytics';
-import { branchesActions } from '@/redux/reducers/branches';
 import { DateRangeKey } from '@/utils/sales-report';
 import { Button, DatePicker, Dropdown, Space } from 'antd';
-import dayjs from 'dayjs';
-import { Building, CalendarDays, FilterX, SearchIcon } from 'lucide-react';
+import { CalendarDays, FilterX, SearchIcon } from 'lucide-react';
 import functions from '@/utils/functions';
+import dayjs from 'dayjs';
 
 const ProfitReportFilters = () => {
   const dispatch = useAppDispatch();
-  const { branches } = useAppSelector(({ branches }) => branches);
-  const { filters } = useAppSelector(({ analytics }) => analytics?.expenses);
-  const filtersApplied = !!filters?.branches?.length || filters?.date_range !== 'last_7_days';
+  const { filters } = useAppSelector(({ analytics }) => analytics?.users);
+  const filtersApplied = filters?.date_range !== 'historical';
 
   const fetchReportData = () => {
-    dispatch(analyticsActions.expenses.getExpensesByDate());
-    dispatch(analyticsActions.expenses.getExpensesByCategory());
+    dispatch(analyticsActions.users.getSalesByUser());
   };
 
   const onDateRangeChange = async (date_range: DateRangeKey) => {
@@ -28,23 +25,8 @@ const ProfitReportFilters = () => {
     }
   };
 
-  const onBranchChange = async (value: string) => {
-    let branchesSelected: string[] = [...(filters?.branches || [])];
-    if (value === 'ALL') {
-      branchesSelected = [];
-    } else if (filters?.branches?.includes(value)) {
-      branchesSelected = filters?.branches?.filter((b) => b !== value) || [];
-    } else {
-      branchesSelected.push(value);
-    }
-    dispatch(analyticsActions.setExpensesFilters({ branches: branchesSelected }));
-    await functions.sleep(100);
-    fetchReportData();
-  };
-
   const removeFilters = async () => {
-    dispatch(analyticsActions.setExpensesFilters({ branches: [] }));
-    await onDateRangeChange('last_7_days');
+    await onDateRangeChange('historical');
   };
 
   return (
@@ -53,27 +35,9 @@ const ProfitReportFilters = () => {
         <Space.Compact>
           <Dropdown
             menu={{
-              selectedKeys: filters?.branches?.length ? filters?.branches : ['ALL'],
-              items: [{ key: 'ALL', label: 'Todas' }].concat(
-                branches?.map((branch) => ({
-                  label: branch?.name,
-                  key: branch?.branch_id,
-                })),
-              ),
-
-              selectable: true,
-              onClick: async ({ key }) => onBranchChange(key),
-            }}
-            onOpenChange={(open) => {
-              if (!branches?.length && open) dispatch(branchesActions.getBranches());
-            }}
-          >
-            <Button icon={<Building className="text-base w-4 h-4" />}>Sucursales</Button>
-          </Dropdown>
-          <Dropdown
-            menu={{
-              selectedKeys: [filters?.date_range || 'last_7_days'],
+              selectedKeys: [filters?.date_range || 'historical'],
               items: [
+                { key: 'historical', label: 'Histórico' },
                 { key: 'today', label: 'Hoy' },
                 { key: 'last_7_days', label: 'Últimos 7 días' },
                 { key: 'this_month', label: 'Este mes' },

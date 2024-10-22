@@ -47,6 +47,7 @@ import TermnsAndConditions from '@/components/pages/lading-page/terms-and-condit
 import PrivacyPolicy from '@/components/pages/lading-page/privacy-policy';
 import PrinterPage from '@/components/pages/settings/printer';
 import ProductsFullReport from '@/components/pages/reports/products/full-report';
+import SalesByUserFullReport from '@/components/pages/reports/users/full-report';
 
 const AppRouter = () => {
   const { isTablet } = useMediaQuery();
@@ -264,14 +265,24 @@ const AppRouter = () => {
           />
         )}
         {permissions?.reports?.view_sales_report?.value && hasAccess('reports') ? (
-          <Route
-            path={APP_ROUTES.PRIVATE.REPORTS.SALES.path}
-            element={
-              <ReportsLayout>
-                <SalesReports />
-              </ReportsLayout>
-            }
-          />
+          <>
+            <Route
+              path={APP_ROUTES.PRIVATE.REPORTS.SALES.path}
+              element={
+                <ReportsLayout>
+                  <SalesReports />
+                </ReportsLayout>
+              }
+            />
+            <Route
+              path={APP_ROUTES.PRIVATE.REPORTS.SALES.SALES_BY_USER.path}
+              element={
+                <ReportsLayout>
+                  <SalesByUserFullReport />
+                </ReportsLayout>
+              }
+            />
+          </>
         ) : null}
 
         {permissions?.reports?.view_products_report?.value && hasAccess('reports') ? (

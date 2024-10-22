@@ -1,34 +1,30 @@
-import { ArrowDown01, ArrowLeft, ChartColumnBig, ChartLine, Layers, Layers2, Printer, Shuffle } from 'lucide-react';
-import { Button, Col, Row, Space, Tooltip, Typography } from 'antd';
+import { ArrowDown01, ArrowLeft, Printer, Shuffle } from 'lucide-react';
+import { Button, Col, Row, Space, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useEffect, useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
-import { LineChartProfit } from './chart';
 import CardRoot from '@/components/atoms/Card';
 import { analyticsActions } from '@/redux/reducers/analytics';
-import ProfitsByRange from './profits-by-range';
-import ProfitReportFilters from '@/components/pages/reports/expenses/full-report/filters';
-import ExpensesPieChart from '@/components/pages/reports/expenses/shortcut/chart';
+import ProfitReportFilters from './filters';
+import ExpensesPieChart from '@/components/pages/reports/users/shortcut/chart';
 import EyeButton, { useHideData } from '@/components/atoms/eye-button';
+import functions from '@/utils/functions';
 
-const ExpensesFullReport = () => {
+const SalesByUserFullReport = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { filters, charts } = useAppSelector(({ analytics }) => analytics?.expenses);
-  const [stacked, setStacked] = useState(false);
-  const [chartStyle, setChartStyle] = useState<'linear' | 'step'>('linear');
+  const { charts } = useAppSelector(({ analytics }) => analytics?.users);
   const elementRef = useRef<any>(null);
   const firstRender = useRef(false);
-  const [sortByValue, setSortByValue] = useState(false);
+  const [sortByValue, setSortByValue] = useState({ char1: false, char2: false });
   const { handleHideData, hideData } = useHideData();
 
   useEffect(() => {
     if (!firstRender.current) {
       firstRender.current = true;
-      dispatch(analyticsActions.expenses.getExpensesByCategory());
-      dispatch(analyticsActions.expenses.getExpensesByDate());
+      dispatch(analyticsActions.users.getSalesByUser());
     }
   }, [firstRender]);
 
@@ -36,16 +32,10 @@ const ExpensesFullReport = () => {
     contentRef: elementRef,
   });
 
-  const handleStacked = () => {
-    setStacked((prev) => !prev);
-  };
-
-  const handleChartStyle = () => {
-    setChartStyle((prev) => (prev === 'linear' ? 'step' : 'linear'));
-  };
-
-  const handleSort = () => {
-    setSortByValue((prev) => !prev);
+  const handleChartSort = (char: string) => {
+    setSortByValue((prev) => {
+      return { ...prev, [char]: !prev[char as keyof typeof prev] };
+    });
   };
 
   return (
@@ -59,7 +49,7 @@ const ExpensesFullReport = () => {
               onClick={() => navigate(APP_ROUTES.PRIVATE.REPORTS.path)}
             />
             <Typography.Title level={4} className="!m-0">
-              Reporte de gastos
+              Reporte de ventas por usuario
             </Typography.Title>
           </div>
         </div>
@@ -81,44 +71,23 @@ const ExpensesFullReport = () => {
       </div>
 
       <Row gutter={[20, 20]}>
-        <Col xs={24}>
-          <ProfitsByRange discrete={hideData} />
-        </Col>
         <Col xs={24} md={24} lg={24} xl={12}>
           <CardRoot
             classNames={{ body: '!px-2' }}
-            title="Gastos realizados"
+            title="Monto de ventas por usuario"
             extra={
-              <div className="flex gap-4 print:hidden">
-                <Tooltip title={'Cambiar estilo de gráfico'}>
-                  <Button
-                    onClick={handleChartStyle}
-                    icon={
-                      chartStyle === 'linear' ? (
-                        <ChartColumnBig className="w-4 h-4" />
-                      ) : (
-                        <ChartLine className="w-4 h-4" />
-                      )
-                    }
-                  />
-                </Tooltip>
-
-                <Tooltip title={stacked ? 'Sin apilar' : 'Apilar'}>
-                  <Button
-                    onClick={handleStacked}
-                    icon={stacked ? <Layers2 className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
-                  />
-                </Tooltip>
-              </div>
+              <Button
+                onClick={() => handleChartSort('char1')}
+                icon={sortByValue.char1 ? <Shuffle className="w-4 h-4" /> : <ArrowDown01 className="w-4 h-4" />}
+              />
             }
           >
             <div className="h-[390px] w-full">
-              <LineChartProfit
-                data={charts?.line || []}
-                range={filters?.date_range}
-                stacked={stacked}
-                chartStyle={chartStyle}
+              <ExpensesPieChart
+                data={charts?.total_amount || []}
+                sortByValue={sortByValue.char1}
                 hideData={hideData}
+                valueFormatter={(value) => functions.money(value, { hidden: hideData })}
               />
             </div>
           </CardRoot>
@@ -126,16 +95,16 @@ const ExpensesFullReport = () => {
         <Col xs={24} md={24} lg={24} xl={12}>
           <CardRoot
             classNames={{ body: '!px-2' }}
-            title="Gastos por categoría"
+            title="Ventas por usuario"
             extra={
               <Button
-                onClick={handleSort}
-                icon={sortByValue ? <Shuffle className="w-4 h-4" /> : <ArrowDown01 className="w-4 h-4" />}
+                onClick={() => handleChartSort('char2')}
+                icon={sortByValue.char2 ? <Shuffle className="w-4 h-4" /> : <ArrowDown01 className="w-4 h-4" />}
               />
             }
           >
             <div className="h-[390px] w-full">
-              <ExpensesPieChart data={charts?.pieCustom || []} sortByValue={sortByValue} />
+              <ExpensesPieChart data={charts?.total_sales || []} sortByValue={sortByValue.char2} hideData={hideData} />
             </div>
           </CardRoot>
         </Col>
@@ -144,4 +113,4 @@ const ExpensesFullReport = () => {
   );
 };
 
-export default ExpensesFullReport;
+export default SalesByUserFullReport;

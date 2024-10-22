@@ -13,23 +13,14 @@ const CurrentCashier = () => {
   const dispatch = useAppDispatch();
   const { isTablet } = useMediaQuery();
   const { active_cash_cut } = useAppSelector(({ cashiers }) => cashiers);
-  const [actualCashCut, setActualCashCut] = useState<Partial<CashCut> | null>(
-    active_cash_cut || null,
-  );
+  const [actualCashCut, setActualCashCut] = useState<Partial<CashCut> | null>(active_cash_cut || null);
   const firstRender = useRef(true);
   const firstCashCutFetch = useRef(false);
 
   useEffect(() => {
-    console.log(
-      active_cash_cut?.cash_cut_id,
-      '---',
-      actualCashCut?.cash_cut_id,
-    );
+    console.log(active_cash_cut?.cash_cut_id, '---', actualCashCut?.cash_cut_id);
     // If the active cash cut is different from the actual cash cut, then it is not the first render
-    if (
-      !!active_cash_cut?.cash_cut_id &&
-      active_cash_cut?.cash_cut_id !== actualCashCut?.cash_cut_id
-    ) {
+    if (!!active_cash_cut?.cash_cut_id && active_cash_cut?.cash_cut_id !== actualCashCut?.cash_cut_id) {
       firstRender.current = false;
     }
   }, [active_cash_cut, firstRender, actualCashCut]);
@@ -63,7 +54,7 @@ const CurrentCashier = () => {
           <Breadcrumb
             items={[
               {
-                title: <Link to={APP_ROUTES.PRIVATE.HOME.path}>Cajas</Link>,
+                title: <Link to={APP_ROUTES.PRIVATE.TRANSACTIONS.CASHIERS.path}>Cajas</Link>,
                 key: 'transactions',
               },
               { title: 'Caja actual' },

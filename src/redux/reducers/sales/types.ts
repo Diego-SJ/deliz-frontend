@@ -115,6 +115,7 @@ export type SaleDetails = {
   customers: Customer;
   status: { status_id: number; name: string };
   cash_cut: Partial<CashCut>;
+  profiles: { first_name: string; last_name: string };
 } & Sale;
 
 // redux cash register

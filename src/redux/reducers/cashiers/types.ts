@@ -1,4 +1,5 @@
 import { Cashier, SaleDetails } from '../sales/types';
+import { Profile } from '../users/types';
 
 export type CashiersSlice = {
   active_cash_cut: CashCut | null;
@@ -82,6 +83,8 @@ export type CashCut = {
   operations: CashOperation[];
   opened_by?: string | null;
   closed_by?: string | null;
+
+  profiles?: Partial<Profile>;
 };
 
 export type FetchCashCutArgs = {

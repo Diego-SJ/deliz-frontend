@@ -9,6 +9,19 @@ export type AnalyticsSlice = {
   products: ProductAnalytics;
   customers: CustomerAnalytics;
   expenses: ExpensesAnalytics;
+  users: UserAnalytics;
+};
+
+export type UserAnalytics = {
+  loading: boolean;
+  filters: {
+    date_range: DateRangeKey;
+    custom_dates: (string | null)[];
+  };
+  charts: {
+    total_sales: PieChartItem[];
+    total_amount: PieChartItem[];
+  };
 };
 
 export type ExpensesAnalytics = {

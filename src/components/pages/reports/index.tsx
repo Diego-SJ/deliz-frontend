@@ -9,6 +9,7 @@ import ProfitShorcutReport from './profit/shorcut';
 import ExpensesShortcutReport from '@/components/pages/reports/expenses/shortcut';
 import EyeButton from '@/components/atoms/eye-button';
 import StockProductsShortcut from './stock/shortcut';
+import SalesByUserShortcutReport from './users/shortcut';
 
 const ReportsHomePage = () => {
   const dispatch = useAppDispatch();
@@ -53,6 +54,9 @@ const ReportsHomePage = () => {
         ) : null}
         {profile?.permissions?.reports?.view_products_report?.value ? (
           <StockProductsShortcut hideData={hideData} />
+        ) : null}
+        {profile?.permissions?.reports?.view_sales_report?.value ? (
+          <SalesByUserShortcutReport hideData={hideData} />
         ) : null}
       </div>
     </div>

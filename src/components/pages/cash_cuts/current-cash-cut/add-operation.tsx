@@ -19,7 +19,7 @@ const AddOperationDrawer = () => {
   };
 
   const addOperation = async () => {
-    addOperationForm.validateFields().then(async values => {
+    addOperationForm.validateFields().then(async (values) => {
       const { amount, name, payment_method } = values;
       setLoading(true);
       let success = await dispatch(
@@ -41,27 +41,19 @@ const AddOperationDrawer = () => {
     <>
       <div className="flex">
         <div
-          className="p-4 w-1/2 flex flex-col justify-center items-center hover:shadow-md cursor-pointer hover:bg-gray-50 group"
+          className="px-4 py-1 w-1/2 flex flex-col justify-center items-center cursor-pointer hover:bg-gray-50 group"
           onClick={() => setOperationType('INCOME')}
         >
-          <Avatar
-            size={80}
-            className="mb-2 p-2"
-            src={<DownloadOutlined className="text-4xl text-neutral-400 group-hover:text-primary" />}
-          />
-          <Typography.Text className="text-base text-center leading-5">Ingresar dinero</Typography.Text>
+          <DownloadOutlined className="text-4xl text-neutral-400 group-hover:text-primary mb-2" />
+          <Typography.Text className="!text-sm text-center leading-5">Ingresar dinero</Typography.Text>
         </div>
         <span className="w-[1px] bg-slate-200 h-[7rem] mt-auto mb-auto"></span>
         <div
-          className="p-4 w-1/2 flex flex-col justify-center items-center hover:shadow-md cursor-pointer hover:bg-gray-50 group"
+          className="px-4 py-1 w-1/2 flex flex-col justify-center items-center cursor-pointer hover:bg-gray-50 group"
           onClick={() => setOperationType('EXPENSE')}
         >
-          <Avatar
-            size={80}
-            className="mb-2 p-2"
-            src={<UploadOutlined className="text-4xl text-neutral-400 group-hover:text-primary" />}
-          />
-          <Typography.Text className="text-base text-center leading-5">Retirar dinero</Typography.Text>
+          <UploadOutlined className="text-4xl text-neutral-400 group-hover:text-primary mb-2" />
+          <Typography.Text className="!text-sm text-center leading-5">Retirar dinero</Typography.Text>
         </div>
       </div>
       {/* Add income and outcome */}

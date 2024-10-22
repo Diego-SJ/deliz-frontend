@@ -25,13 +25,13 @@ const CustomerList = ({ data, hideData }: Props) => {
   return (
     <div>
       {data?.length ? (
-        <div className="flex flex-col h-72 print:!h-auto overflow-y-scroll">
+        <div className="flex flex-col h-64 md:h-96 print:!h-auto overflow-y-scroll">
           {data?.map((product, index) => {
             return (
               <div
                 key={index}
                 className={`flex justify-between items-center py-2 pl-1 pr-2 gap-4 border-t ${
-                  index !== 0 ? 'border--100' : 'border-transparent'
+                  index !== 0 ? 'border-slate-100' : 'border-transparent'
                 }`}
               >
                 <Avatar

@@ -102,7 +102,8 @@ const customActions = {
               status (status_id, name),
               branches (branch_id, name),
               cash_registers (cash_register_id, name),
-              cash_cuts ( opening_date, closing_date )
+              cash_cuts ( opening_date, closing_date ),
+              profiles (first_name, last_name)
             `,
             )
             .eq('sale_id', args?.sale_id),

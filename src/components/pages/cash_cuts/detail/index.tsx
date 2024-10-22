@@ -1,6 +1,6 @@
 import { APP_ROUTES } from '@/routes/routes';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { Avatar, Breadcrumb, Card, Col, Divider, Input, List, Row, Typography } from 'antd';
+import { Avatar, Breadcrumb, Col, Divider, Input, List, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import functions from '@/utils/functions';
@@ -9,6 +9,7 @@ import CardRoot from '@/components/atoms/Card';
 import CashRegisterSvg from '@/assets/img/jsx/cash-register';
 import { CashCut } from '@/redux/reducers/cashiers/types';
 import OperationItem from './operation-item';
+import { Calendar, User } from 'lucide-react';
 
 const CashierDetail = () => {
   const dispatch = useAppDispatch();
@@ -21,7 +22,7 @@ const CashierDetail = () => {
     if (firstRender.current && cash_cut_id) {
       firstRender.current = false;
 
-      dispatch(cashiersActions.cash_cuts.fetchCashCutDataById(cash_cut_id)).then(data => {
+      dispatch(cashiersActions.cash_cuts.fetchCashCutDataById(cash_cut_id)).then((data) => {
         setCurrentCashCut(data);
       });
     }
@@ -44,103 +45,117 @@ const CashierDetail = () => {
         ]}
       />
       <div className="max-w-[900px] mx-auto">
-        <Row style={{ marginTop: 20 }} gutter={[20, 20]}>
+        <Row style={{ marginTop: 20 }} gutter={[10, 10]}>
           <Col xs={24} md={24} lg={10}>
-            <CardRoot className="mb-5" loading={!currentCashCut?.cash_cut_id}>
-              <div className="flex flex-col gap-4 w-full items-center">
-                <Card.Meta
-                  className="w-full"
-                  avatar={
-                    <Avatar src={<CashRegisterSvg className="fill-slate-600" />} className="bg-slate-600/5 p-3" size={60} />
-                  }
-                  title={
+            <CardRoot
+              className="!p-5"
+              classNames={{ body: '!p-0' }}
+              style={{ marginBottom: 10 }}
+              loading={!currentCashCut?.cash_cut_id}
+            >
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex items-center gap-4 w-full">
+                  <Avatar
+                    src={<CashRegisterSvg className="fill-green-600" />}
+                    className="bg-green-400/10 !p-3"
+                    size={50}
+                  />
+                  <div className="flex flex-col  justify-between h-full">
                     <Typography.Title level={5} style={{ margin: 0 }}>
                       Caja {currentCashCut?.cash_registers?.name}
                     </Typography.Title>
-                  }
-                  description={
-                    <Typography.Text className="text-neutral-400">Sucursal {currentCashCut?.branches?.name}</Typography.Text>
-                  }
-                />
-                <div className="flex flex-col text-start w-full">
-                  <Typography.Text className="!mb-2 text-gray-400 !font-light">
-                    Fecha y hora de apertura:
-                    <span className="block text-gray-600 font-medium">
-                      {functions.tableDate(currentCashCut?.opening_date || '')}
-                    </span>
-                  </Typography.Text>
-                  <Typography.Text className="mb-2 text-gray-400 !font-light">
-                    Fecha y hora de cierre:
-                    <span className="block text-gray-600 font-medium">
-                      {functions.tableDate(currentCashCut?.closing_date || '')}
-                    </span>
-                  </Typography.Text>
-
-                  {/* <span className="mb-2 text-gray-400 !font-light">Estado: </span>
-                  <Tag color={color} className="w-fit">
-                    {text}
-                  </Tag> */}
+                    <div className="flex flex-col">
+                      <span className="text-gray-500">Sucursal {currentCashCut?.branches?.name}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </CardRoot>
 
-            <CardRoot
-              className="!p-0"
-              styles={{ body: { padding: !!currentCashCut?.cash_cut_id ? 0 : 20 } }}
-              loading={!currentCashCut?.cash_cut_id}
-            >
-              <Typography.Title level={5} className="m-0 py-3 px-6" style={{ marginBottom: 0 }}>
-                Administración del dinero
-              </Typography.Title>
-              <Divider className="m-0" />
-              <div className="p-2">
-                <div className="flex flex-col px-4">
+                <div className="flex flex-col">
                   <div className="flex justify-between py-1 ">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Monto inicial</Typography.Text>
-                    <Typography.Text className="m-0 text-neutral-600">
+                    <Typography.Text className="m-0 text-gray-400 !font-light">Monto inicial</Typography.Text>
+                    <Typography.Text className="m-0 text-gray-600">
                       {functions.money(currentCashCut?.initial_amount)}
                     </Typography.Text>
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Ventas realizadas</Typography.Text>
-                    <Typography.Text className="m-0 text-neutral-600">
+                    <Typography.Text className="m-0 text-gray-400 !font-light">Ventas realizadas</Typography.Text>
+                    <Typography.Text className="m-0 text-gray-600">
                       {functions.money(currentCashCut?.sales_amount || 0)}
                     </Typography.Text>
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Ingresos</Typography.Text>
-                    <Typography.Text className="m-0 text-neutral-600">
+                    <Typography.Text className="m-0 text-gray-400 !font-light">Ingresos</Typography.Text>
+                    <Typography.Text className="m-0 text-gray-600">
                       {functions.money(currentCashCut?.incomes_amount || 0)}
                     </Typography.Text>
                   </div>
 
                   <div className="flex justify-between py-1">
-                    <Typography.Text className="m-0 text-neutral-400 !font-light">Gastos y egresos</Typography.Text>
-                    <Typography.Text className="m-0 text-neutral-600">
+                    <Typography.Text className="m-0 text-gray-400 !font-light">Gastos y egresos</Typography.Text>
+                    <Typography.Text className="m-0 text-gray-600">
                       - {functions.money(currentCashCut?.expenses_amount)}
                     </Typography.Text>
                   </div>
                 </div>
                 <Divider className="my-2" />
-                <div className="flex justify-between py-0 mb-1 px-4">
+                <div className="flex justify-between">
                   <Typography.Text className="m-0 text-sm font-base">Monto esperado</Typography.Text>
                   <Typography.Text className="m-0 text-base font-medium">
                     {functions.money(currentCashCut?.final_amount)}
                   </Typography.Text>
                 </div>
-                <div className="flex justify-between py-0 mb-1 px-4">
+                <div className="flex justify-between">
                   <Typography.Text className="m-0 text-sm font-base">Monto recibido</Typography.Text>
                   <Typography.Text className="m-0 text-base font-medium">
                     {functions.money(currentCashCut?.received_amount)}
                   </Typography.Text>
                 </div>
-                <div className="flex justify-between py-0 mb-1 px-4">
+                <div className="flex justify-between">
                   <Typography.Text className="m-0 text-base font-medium">Diferencia</Typography.Text>
                   <Typography.Text className="mb-2 text-base font-medium">
                     {functions.money((currentCashCut?.received_amount || 0) - (currentCashCut?.final_amount || 0))}
                   </Typography.Text>
+                </div>
+              </div>
+            </CardRoot>
+
+            <CardRoot className="!p-5" classNames={{ body: '!p-0' }} loading={!currentCashCut?.cash_cut_id}>
+              <div className="flex flex-col gap-3 text-start w-full">
+                <div className="flex flex-col text-gray-400">
+                  <span className="text-gray-800 flex items-center gap-2">
+                    <Calendar className="w-3" /> Fecha y hora de apertura
+                  </span>{' '}
+                  <span className="font-light">
+                    {functions.formatToLocalTimezone(currentCashCut?.opening_date || '')}
+                  </span>
+                </div>
+                <div className="flex flex-col text-gray-400">
+                  <span className="text-gray-800 flex items-center gap-2">
+                    <Calendar className="w-3" /> Fecha y hora de cierre
+                  </span>{' '}
+                  <span className="font-light">
+                    {functions.formatToLocalTimezone(currentCashCut?.closing_date || '')}
+                  </span>
+                </div>
+
+                <div className="flex flex-col text-gray-400">
+                  <span className="text-gray-800 flex items-center gap-2">
+                    <User className="w-3" /> Abierta por:
+                  </span>{' '}
+                  <span className="font-light">
+                    {`${(currentCashCut?.opened_by as any)?.first_name || '- - -'} ${(currentCashCut?.opened_by as any)?.last_name || ''}`}
+                  </span>
+                </div>
+
+                <div className="flex flex-col text-gray-400">
+                  <span className="text-gray-800 flex items-center gap-2">
+                    <User className="w-3" /> Cerrada por:
+                  </span>{' '}
+                  <span className="font-light">
+                    {`${(currentCashCut?.closed_by as any)?.first_name || '- - -'} ${(currentCashCut?.closed_by as any)?.last_name || ''}`}
+                  </span>
                 </div>
               </div>
             </CardRoot>
